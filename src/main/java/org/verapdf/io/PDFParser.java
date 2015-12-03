@@ -3,5 +3,5 @@ package org.verapdf.io;
 /**
  * @author Timur Kamalov
  */
-public class PDFParser {
+public class PDFParser extends Parser {
 }

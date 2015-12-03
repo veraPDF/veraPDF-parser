@@ -2,19 +2,20 @@ package org.verapdf.as;
 
 
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 
 /**
  * @author Timur Kamalov
  */
 public class ASFileInStream implements ASInputStream {
 
-	private InputStream stream;
+	private RandomAccessFile stream;
 	private int offset;
 	private int size;
 	private int curPos;
 
 	public ASFileInStream(InputStream stream, final int offset, final int size) {
-		this.stream = stream;
+		this.stream = new RandomAccessFile();
 		this.offset = offset;
 		this.size = size;
 		this.curPos = 0;

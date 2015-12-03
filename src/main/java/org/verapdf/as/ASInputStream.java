@@ -1,5 +1,7 @@
 package org.verapdf.as;
 
+import java.io.IOException;
+
 /**
  * @author Timur Kamalov
  */
@@ -7,13 +9,13 @@ public interface ASInputStream {
 
 	int nPos = -1;
 
-	int read(byte[] buffer, int size);
+	int read(byte[] buffer, int size) throws IOException;
 
-	int skip(int size);
+	int skip(int size) throws IOException;
 
-	void close();
+	void close() throws IOException;
 
-	void reset();
+	void reset() throws IOException;
 
 	boolean isCloneable();
 
