@@ -1,5 +1,8 @@
 package org.verapdf.io;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Timur Kamalov
  */
@@ -46,6 +49,35 @@ public class Token {
 		KW_XREF,
 		KW_STARTXREF,
 		KW_TRAILER
+	}
+
+	private static final Map<Keyword, String> keywords = new HashMap<Keyword, String>();
+
+	static {
+		keywords.put(Keyword.KW_NULL, "null");
+		keywords.put(Keyword.KW_TRUE, "true");
+		keywords.put(Keyword.KW_FALSE, "false");
+		keywords.put(Keyword.KW_STREAM, "stream");
+		keywords.put(Keyword.KW_ENDSTREAM, "endstream");
+		keywords.put(Keyword.KW_OBJ, "obj");
+		keywords.put(Keyword.KW_ENDOBJ, "endobj");
+		keywords.put(Keyword.KW_R, "R");
+		keywords.put(Keyword.KW_N, "n");
+		keywords.put(Keyword.KW_F, "f");
+		keywords.put(Keyword.KW_XREF, "xref");
+		keywords.put(Keyword.KW_STARTXREF, "startxref");
+		keywords.put(Keyword.KW_TRAILER, "trailer");
+		keywords.put(Keyword.KW_NONE, null);
+	}
+
+	public static Keyword getKeyword(final String keyword) {
+		for (Map.Entry<Keyword, String> entry : keywords.entrySet()) {
+			if (entry.getValue().equals(keyword)) {
+				return entry.getKey();
+			}
+		}
+		//TODO : not sure it's correct
+		return Keyword.KW_NONE;
 	}
 
 }

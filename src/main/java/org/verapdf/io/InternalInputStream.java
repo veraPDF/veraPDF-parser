@@ -39,4 +39,23 @@ public class InternalInputStream implements ASInputStream {
 		return false;
 	}
 
+	public int tellg() throws IOException {
+		return (int) this.source.getFilePointer();
+	}
+
+	public InternalInputStream seekg(int pos) throws IOException {
+		this.source.seek(pos);
+		return this;
+	}
+
+	public InternalInputStream get(char ch) throws IOException {
+		ch = this.source.readChar();
+		return this;
+	}
+
+	public InternalInputStream unread() throws IOException{
+		this.source.seek(this.source.getFilePointer() - 1);
+		return this;
+	}
+
 }
