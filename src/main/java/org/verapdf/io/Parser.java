@@ -25,6 +25,112 @@ public class Parser {
 		this.stream.seekg(offset);
 	}
 
+
+	// PROTECTED METHODS
+
+	protected Token getToken() {
+		return this.token;
+	}
+
+	protected String getLine(final int offset) throws IOException {
+		this.token.token = "";
+		char ch = 0;
+		while (stream.get(ch) != null) {
+			if (ch == CharTable.ASCII_LF || ch == CharTable.ASCII_CR) {
+				break;
+			}
+			this.token.token.concat(Character.toString(ch));
+		}
+		return this.token.token;
+	}
+
+	protected boolean findKeyword(final Token.Keyword keyword) throws IOException {
+		nextToken();
+		while (this.token.type != Token.Type.TT_EOF && (this.token.type != Token.Type.TT_KEYWORD || this.token.keyword != keyword)) {
+			nextToken();
+		}
+		return this.token.type == Token.Type.TT_KEYWORD && this.token.keyword == keyword;
+	}
+
+	protected void nextToken() throws IOException {
+		skipSpaces();
+		if (this.stream != null) {
+			this.token.type = Token.Type.TT_EOF;
+			return;
+		}
+
+		this.token.type = Token.Type.TT_NONE;
+
+		char ch = 0;
+		this.stream.get(ch);
+
+		switch (ch) {
+			case '(':
+				this.token.type = Token.Type.TT_LITSTRING;
+				readLitString();
+				break;
+			case ')':
+				//error
+				break;
+			case '<':
+				stream.get(ch);
+				if (ch == '<') {
+					this.token.type = Token.Type.TT_OPENDICT;
+				} else {
+					this.stream.unread();
+					this.token.type = Token.Type.TT_CLOSEDICT;
+					readHexString();
+				}
+				break;
+			case '>':
+				this.stream.get(ch);
+				if (ch == '>') {
+					this.token.type = Token.Type.TT_CLOSEDICT;
+				} else {
+					// error
+				}
+			case '[':
+				this.token.type = Token.Type.TT_OPENARRAY;
+				break;
+			case ']':
+				this.token.type = Token.Type.TT_CLOSEARRAY;
+				break;
+			case '{': // as delimiter in PostScript calculator functions 181
+				break;
+			case '}':
+				break;
+			case '/':
+				this.token.type = Token.Type.TT_NAME;
+				readName();
+				break;
+			case '0':case '1':case '2':case '3':case '4':
+			case '5':case '6':case '7':case '8':case'9':
+			case '.':
+				this.stream.unread();
+				readNumber();
+				break;
+			case '-':
+				readNumber();
+				this.token.integer = -this.token.integer;
+				this.token.real = -this.token.real;
+				break;
+			default:
+				this.stream.unread();
+				readToken();
+				this.token.toKeyword();
+				if (this.token.keyword == Token.Keyword.KW_NONE) {
+					this.token.type = Token.Type.TT_NONE;
+				}
+				break;
+		}
+	}
+
+
+
+
+
+	// PRIVATE METHODS
+
 	private void skipSpaces() throws IOException {
 		char ch = 0;
 		while (this.stream.get(ch) != null) {
@@ -114,17 +220,17 @@ public class Parser {
 				case '6':
 				case '7': {
 					// look for 1, 2, or 3 octal characters
-					int ch1 = ch - '0';
+					char ch1 = (char) (ch - '0');
 					for (int i = 1; i < 3; i++) {
 						this.stream.get(ch);
 						if (ch < '0' || ch > '7') {
 							this.stream.unread();
 							break;
 						} else {
-							ch1 = (ch1 << 3) + (ch - '0');
+							ch1 = (char) ((ch1 << 3) + (ch - '0'));
 						}
 					}
-					//TODO : pushback
+					this.token.token.concat(Character.toString(ch1));
 					break;
 				}
 				case CharTable.ASCII_LF:
@@ -184,12 +290,62 @@ public class Parser {
 		}
 
 		if (ch == '#') {
-			char ch1, ch2, dc = 0;
-			if (stream.get(ch1) != null)
-
+			char ch1 = 0, ch2 = 0, dc = 0;
+			if (stream.get(ch1) != null) { //TODO : && COSFilterASCIIHexDecode::DecodeLoHex(ch1) != COSFilterASCIIHexDecode::er
+				dc = ch1; //TODO : COSFilterASCIIHexDecode::DecodeLoHex(ch1);
+				if (this.stream.get(ch1) != null) { //TODO : && COSFilterASCIIHexDecode::DecodeLoHex(ch1) != COSFilterASCIIHexDecode::er)
+					dc = ch1; //TODO : COSFilterASCIIHexDecode::DecodeLoHex(ch1);
+					if (this.stream.get(ch2) != null) { //TODO : && COSFilterASCIIHexDecode::DecodeLoHex(ch2) != COSFilterASCIIHexDecode::er
+						dc = (char) ((dc << 4) + ch2); //TODO : COSFilterASCIIHexDecode::DecodeLoHex(ch2);
+						this.token.token.concat(Character.toString(dc));
+					} else {
+						this.token.token.concat(Character.toString(ch));
+						this.token.token.concat(Character.toString(ch1));
+						this.stream.unread();
+					}
+				}
+			} else {
+				this.token.token.concat(Character.toString(ch));
+				this.stream.unread();
+			}
+		} else {
+			this.token.token.concat(Character.toString(ch));
 		}
 	}
 
+	private void readToken() throws IOException {
+		this.token.token = "";
+		char ch = 0;
+		while (this.stream.get(ch) != null) {
+			if (CharTable.isTokenDelimiter(ch)) {
+				this.stream.unread();
+				break;
+			}
 
+			this.token.token.concat(Character.toString(ch));
+		}
+	}
+
+	private void readNumber() throws IOException {
+		this.token.token = "";
+		this.token.type = Token.Type.TT_INTEGER;
+		char ch = 0;
+		while (this.stream.get(ch) != null) {
+			if (CharTable.isTokenDelimiter(ch)) {
+				this.stream.unread();
+				break;
+			}
+			if (ch >= '0' && ch <= '9') {
+				this.token.token.concat(Character.toString(ch));
+			} else if (ch == '.') {
+				this.token.type = Token.Type.TT_REAL;
+			} else {
+				this.stream.unread();
+				break;
+			}
+		}
+		this.token.integer = Integer.valueOf(this.token.token);
+		this.token.real = Float.parseFloat(this.token.token);
+	}
 
 }
