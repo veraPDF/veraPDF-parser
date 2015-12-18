@@ -7,8 +7,24 @@ public class COSObject {
 
 	private COSBase base;
 
-	public COSObject(COSBase base) {
+	public COSObject() {
+	}
+
+	public COSObject(final COSBase base) {
 		this.base = base;
+	}
+
+	public COSObject(final COSObject object) {
+		set(object.base);
+	}
+
+	public COSKey getKey() {
+		final COSKey key = new COSKey();
+		return this.base != null ? this.base.getKey() : key;
+	}
+
+	public COSObject getDirect() {
+		return this.base != null ? this.base.getObject() : new COSObject();
 	}
 
 	public void set(COSBase base) {
@@ -22,6 +38,10 @@ public class COSObject {
 		this.base = base;
 	}
 
+	public COSObjType getType() {
+		return this.base != null ? this.base.getType() : COSObjType.COSUndefinedT;
+	}
+
 	public boolean empty() {
 		return this.base == null;
 	}
@@ -29,8 +49,5 @@ public class COSObject {
 	public void clear() {
 		this.set(null);
 	}
-
-
-
 
 }

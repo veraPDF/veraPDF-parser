@@ -14,11 +14,11 @@ public class COSHeader {
 		this.header = header;
 	}
 
-	public String getHeader() {
+	public String get() {
 		return header;
 	}
 
-	public void setHeader(String header) {
+	public void set(String header) {
 		this.header = header;
 	}
 

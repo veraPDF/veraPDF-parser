@@ -1,15 +1,17 @@
 package org.verapdf.cos;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Timur Kamalov
  */
 public class COSBody {
 
-	private HashMap<COSKey, COSObject> table;
+	private Map<COSKey, COSObject> table;
 
 	public COSBody() {
+		this.table = new HashMap<COSKey, COSObject>();
 	}
 
 	public COSObject get(final COSKey key) {
@@ -19,6 +21,5 @@ public class COSBody {
 	public void set(final COSKey key, final COSObject object) {
 		table.put(key, object);
 	}
-
 
 }

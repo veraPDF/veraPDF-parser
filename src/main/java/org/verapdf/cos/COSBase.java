@@ -11,6 +11,11 @@ public abstract class COSBase {
 		this.count = 0;
 	}
 
+	public abstract COSObjType getType();
+
+	public abstract COSKey getKey();
+
+	public abstract COSObject getObject();
 
 	//TODO : seems this code is related to memory management. Not required in java
 	public void acquire() {
