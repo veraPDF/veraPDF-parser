@@ -1,5 +1,7 @@
 package org.verapdf.cos;
 
+import org.verapdf.as.ASAtom;
+
 /**
  * @author Timur Kamalov
  */
@@ -36,6 +38,20 @@ public class COSObject {
 		if (base != null) base.acquire();
 		if (this.base != null) this.base.release();
 		this.base = base;
+	}
+
+	//DICTIONARIES
+	public void setKey(final ASAtom key, final COSObject value) {
+		if (this.base == null || !this.base.setKey(key, value)) {
+			// TODO : impossible assign value to this in java.
+		}
+	}
+
+	// ARRAYS
+	public void add(final COSObject value) {
+		if (this.base == null || !this.base.add(value)) {
+			// TODO : impossible assign value to this in java.
+		}
 	}
 
 	public COSObjType getType() {

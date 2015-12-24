@@ -136,4 +136,86 @@ public class PDFParser extends Parser {
         return new COSObject();
     }
 
+    private COSObject getArray() throws IOException {
+        if (this.flag) {
+            nextToken();
+        }
+        this.flag = true;
+
+        final Token token = getToken();
+        if (token.type != Token.Type.TT_OPENARRAY) {
+            return new COSObject();
+        }
+
+        COSObject arr = COSArray.construct();
+
+        COSObject obj = nextObject();
+        while(!obj.empty()) {
+            arr.add(obj);
+            obj = nextObject();
+        }
+
+        if (token.type != Token.Type.TT_CLOSEARRAY) {
+            closeInputStream();
+            // TODO : replace with ASException
+            throw new IOException("PDFParser::GetArray()" + INVALID_PDF_ARRAY);
+        }
+
+        return arr;
+    }
+
+    private COSObject getName() throws IOException {
+        if (this.flag) {
+            nextToken();
+        }
+        this.flag = true;
+
+        final Token token = getToken();
+        if (token.type != Token.Type.TT_NAME) {
+            return new COSObject();
+        }
+        return COSName.construct(token.token);
+    }
+
+    private COSObject getDictionary() throws IOException {
+        if (this.flag) {
+            nextToken();
+        }
+        this.flag = true;
+        final Token token = getToken();
+
+        if (token.type != Token.Type.TT_OPENDICT) {
+            return new COSObject();
+        }
+
+        COSObject dict = COSDictionary.construct();
+
+        COSObject key = getName();
+        while(!key.empty()) {
+            COSObject obj = nextObject();
+            dict.setKey(key.getName(), obj);
+            key = getName();
+        }
+
+        if (token.type != Token.Type.TT_CLOSEDICT) {
+            closeInputStream();
+            // TODO : replace with ASException
+            throw new IOException("PDFParser::GetDictionary()", INVALID_PDF_DICTONARY);
+        }
+
+        if (this.flag) {
+            nextToken();
+        }
+        this.flag = false;
+
+        if (token.type == Token.Type.TT_KEYWORD &&
+                token.keyword == Token.Keyword.KW_STREAM) {
+            return getStream(dict);
+        }
+
+        return dict;
+    }
+
+
+
 }
