@@ -1,6 +1,7 @@
 package org.verapdf.as;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
@@ -21,7 +22,7 @@ public class ASFileInStream implements ASInputStream {
 		this.curPos = 0;
 	}
 
-	public int read(byte[] buffer, int size) {
+	public int read(byte[] buffer, int size) throws IOException {
 		if (size == 0 || this.size != nPos && this.size <= this.curPos) {
 			return 0;
 		}

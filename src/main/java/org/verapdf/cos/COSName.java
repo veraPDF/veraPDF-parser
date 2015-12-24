@@ -14,12 +14,8 @@ public class COSName extends COSDirect {
         this.value = value;
     }
 
-    protected COSName(String value) {
+    protected COSName(final String value) {
         this(new ASAtom(value));
-    }
-
-    public COSObjType getType() {
-        return COSObjType.COSNameT;
     }
 
     public static COSObject construct(final ASAtom value) {
@@ -28,6 +24,14 @@ public class COSName extends COSDirect {
 
     public static COSObject construct(final String value) {
         return new COSObject(new COSName(value));
+    }
+
+    public COSObjType getType() {
+        return COSObjType.COSNameT;
+    }
+
+    public ASAtom getName() {
+        return this.value;
     }
 
 }

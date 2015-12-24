@@ -11,13 +11,21 @@ public class COSInteger extends COSNumber {
         this.value = value;
     }
 
+    public static COSObject construct(final long initValue) {
+        return new COSObject(new COSInteger(initValue));
+
+    }
+
     public COSObjType getType() {
         return COSObjType.COSIntegerT;
     }
 
-    public static COSObject construct(final long initValue) {
-        return new COSObject(new COSInteger(initValue));
+    public long getInteger() {
+        return get();
+    }
 
+    public long get() {
+        return this.value;
     }
 
 }

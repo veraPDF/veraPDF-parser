@@ -28,6 +28,10 @@ public class COSString extends COSDirect {
         return new COSObject(new COSString(initValue, isHex));
     }
 
+    public long getInteger() {
+        return this.value.length();
+    }
+
     public COSObjType getType() {
         return COSObjType.COSStringT;
     }

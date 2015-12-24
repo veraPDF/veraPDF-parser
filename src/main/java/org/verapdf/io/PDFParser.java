@@ -1,5 +1,6 @@
 package org.verapdf.io;
 
+import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 
 import java.io.FileNotFoundException;
@@ -136,6 +137,54 @@ public class PDFParser extends Parser {
         return new COSObject();
     }
 
+	public COSObject getObject(final int offset) throws IOException {
+		clear();
+
+		seek(offset);
+
+		final Token token = getToken();
+
+		nextToken();
+		if (token.type != Token.Type.TT_INTEGER) {
+			return new COSObject();
+		}
+		long number = token.integer;
+
+		nextToken();
+		if (token.type != Token.Type.TT_INTEGER) {
+			return new COSObject();
+		}
+		long generation = token.integer;
+
+		nextToken();
+		if (token.type != Token.Type.TT_KEYWORD &&
+				token.keyword != Token.Keyword.KW_OBJ) {
+			return new COSObject();
+		}
+
+		COSObject obj = nextObject();
+
+		if (this.flag) {
+			nextToken();
+		}
+		this.flag = true;
+
+		if (token.type != Token.Type.TT_KEYWORD &&
+				token.keyword != Token.Keyword.KW_ENDOBJ) {
+			closeInputStream();
+			// TODO : replace with ASException
+			throw new IOException("PDFParser::GetObject(...)" + INVALID_PDF_OBJECT);
+		}
+
+		return obj;
+	}
+
+	private void clear() {
+		this.objects.clear();
+		this.integers.clear();
+		this.flag = true;
+	}
+
     private COSObject getArray() throws IOException {
         if (this.flag) {
             nextToken();
@@ -216,6 +265,37 @@ public class PDFParser extends Parser {
         return dict;
     }
 
+	private COSObject getStream(COSObject dict) throws IOException {
+		if (this.flag) {
+			nextToken();
+		}
+		this.flag = true;
 
+		final Token token = getToken();
+
+		if (token.type != Token.Type.TT_KEYWORD ||
+				token.keyword != Token.Keyword.KW_STREAM) {
+			this.flag = false;
+			return dict;
+		}
+
+		int offset = getOffset();
+		long size = dict.getKey(ASAtom.LENGTH).getInteger();
+		seek(offset);
+
+		ASSharedInStream stm = super.getStream(size);
+		dict.setData(stm);
+
+		nextToken();
+
+		if (token.type != Token.Type.TT_KEYWORD ||
+				token.keyword != Token.Keyword.KW_ENDSTREAM) {
+			closeInputStream();
+			// TODO : replace with ASException
+			throw new IOException("PDFParser::GetStream(...)" + INVALID_PDF_STREAM);
+		}
+
+		return dict;
+	}
 
 }

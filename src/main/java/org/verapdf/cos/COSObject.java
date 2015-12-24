@@ -40,7 +40,28 @@ public class COSObject {
 		this.base = base;
 	}
 
-	//DICTIONARIES
+	// OBJECT TYPE
+	public COSObjType getType() {
+		return this.base != null ? this.base.getType() : COSObjType.COSUndefinedT;
+	}
+
+	// INTEGER NUMBERS
+	public long getInteger() {
+		return this.base != null ? this.base.getInteger() : 0;
+	}
+
+	// NAMES
+	public ASAtom getName() {
+		final ASAtom empty = new ASAtom();
+		return this.base != null ? this.base.getName() : empty;
+
+	}
+
+	// DICTIONARIES
+	public COSObject getKey(final ASAtom key) {
+		return this.base != null ? this.base.getKey(key) : new COSObject();
+	}
+
 	public void setKey(final ASAtom key, final COSObject value) {
 		if (this.base == null || !this.base.setKey(key, value)) {
 			// TODO : impossible assign value to this in java.
@@ -52,10 +73,6 @@ public class COSObject {
 		if (this.base == null || !this.base.add(value)) {
 			// TODO : impossible assign value to this in java.
 		}
-	}
-
-	public COSObjType getType() {
-		return this.base != null ? this.base.getType() : COSObjType.COSUndefinedT;
 	}
 
 	public boolean empty() {

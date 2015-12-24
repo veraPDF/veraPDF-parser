@@ -501,6 +501,10 @@ public class ASAtom {
 
     private String value;
 
+    public ASAtom() {
+        this.value = new String();
+    }
+
     public ASAtom(String value) {
         this.value = value;
     }

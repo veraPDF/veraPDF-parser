@@ -348,4 +348,9 @@ public class Parser {
 		this.token.real = Float.parseFloat(this.token.token);
 	}
 
+	public ASSharedInStream getStream(final long length) {
+		// TODO : implement me
+	}
+
+
 }

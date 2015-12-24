@@ -20,6 +20,10 @@ public class COSDictionary extends COSDirect {
         return new COSObject(new COSDictionary());
     }
 
+    public COSObject getKey(final ASAtom key) {
+        return this.entries.get(key);
+    }
+
     public boolean setKey(final ASAtom key, final COSObject value) {
         if (value.empty()) {
             this.entries.remove(key);

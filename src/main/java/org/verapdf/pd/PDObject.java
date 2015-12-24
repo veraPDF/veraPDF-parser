@@ -7,23 +7,36 @@ import org.verapdf.cos.COSObject;
  */
 public class PDObject {
 
-	private COSObject cosObject;
+	private COSObject object;
 
 	public PDObject() {
+		this.object = new COSObject();
 	}
 
 	public PDObject(final COSObject obj) {
+		setObject(obj);
 	}
 
-	public COSObject getCosObject() {
-		return cosObject;
-	}
-
-	public void setCosObject(COSObject cosObject, boolean update) {
-		this.cosObject = cosObject;
+	public boolean empty() {
+		return this.object.empty();
 	}
 
 	public void clear() {
-		this.cosObject.clear();
+		this.object.clear();
 	}
+
+	public void setObject(COSObject object) {
+		setObject(object, true);
+	}
+
+	public void setObject(COSObject object, boolean update) {
+		this.object = object;
+		if (update) {
+			updateFromObject();
+		}
+	}
+
+	// VIRTUAL METHODS
+	protected void updateFromObject() {}
+
 }
