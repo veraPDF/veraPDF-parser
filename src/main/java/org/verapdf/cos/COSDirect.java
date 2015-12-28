@@ -88,29 +88,125 @@ public class COSDirect extends COSBase {
         return false;
     }
 
-    public void remove(final int i);
-    public boolean setArray();
-    public boolean setArray(final int size, final COSObject[] value);
-    public boolean setArray(final int size, final double[] value);
-    public void clearArray();
+    public void remove(final int i) {
+    }
+
+    public boolean setArray() {
+        return false;
+    }
+
+    public boolean setArray(final int size, final COSObject[] value) {
+        return false;
+    }
+
+    public boolean setArray(final int size, final double[] value) {
+        return false;
+    }
+
+    public void clearArray() {
+    }
 
     // DICTIONARIES
-    public boolean knownKey(final ASAtom key);
-    public COSObject getKey(final ASAtom key);
-    public boolean setKey(final ASAtom key, final COSObject value);
-    public boolean getBooleanKey(final ASAtom key);
-    public boolean setBooleanKey(final ASAtom key, final boolean value);
-    public long getIntegerKey(final ASAtom key);
-    public boolean setIntegerKey(final ASAtom key, final long value);
-    public double getRealKey(final ASAtom key);
-    public boolean setRealKey(final ASAtom key, final double value);
-    public String getStringKey(final ASAtom key);
-    public boolean setRealKey(final ASAtom key, final String value);
-    public ASAtom getNameKey(final ASAtom key);
-    public boolean setNameKey(final ASAtom key, final ASAtom value);
-    public boolean setArrayKey(final ASAtom key);
-    public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value);
-    public boolean setArrayKey(final ASAtom key, final int size, final double[] value);
-    public void removeKey(final ASAtom key);
+    public boolean knownKey(final ASAtom key) {
+        return false;
+    }
+
+    public COSObject getKey(final ASAtom key) {
+        return COSObject.getEmpty();
+    }
+
+    public COSObject getKey(final ASAtom key) {
+        return new COSObject();
+    }
+
+    public boolean setKey(final ASAtom key, final COSObject value) {
+        return false;
+    }
+
+    public boolean getBooleanKey(final ASAtom key) {
+        return false;
+    }
+
+    public boolean setBooleanKey(final ASAtom key, final boolean value) {
+        return false;
+    }
+
+    public long getIntegerKey(final ASAtom key) {
+        return 0;
+    }
+
+    public boolean setIntegerKey(final ASAtom key, final long value) {
+        return false;
+    }
+
+    public double getRealKey(final ASAtom key) {
+        return 0;
+    }
+
+    public boolean setRealKey(final ASAtom key, final double value) {
+        return false;
+    }
+
+    public String getStringKey(final ASAtom key) {
+        return "";
+    }
+
+    public boolean setRealKey(final ASAtom key, final String value) {
+        return false;
+    }
+
+    public ASAtom getNameKey(final ASAtom key) {
+        final ASAtom empty = new ASAtom();
+        return empty;
+    }
+    public boolean setNameKey(final ASAtom key, final ASAtom value) {
+        return false;
+    }
+
+    public boolean setArrayKey(final ASAtom key) {
+        return false;
+    }
+
+    public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
+        return false;
+    }
+
+    public boolean setArrayKey(final ASAtom key, final int size, final double[] value) {
+        return false;
+    }
+
+    public void removeKey(final ASAtom key) {
+    }
+
+    // INDIRECT OBJECT
+    public boolean isIndirect() {
+        return false;
+    }
+
+    public COSKey getKey() {
+        final COSKey empty = new COSKey();
+        return empty;
+    }
+
+    public COSDocument getDocument() {
+        return null;
+    }
+
+    public boolean setKey(final COSKey key, final COSDocument document) {
+        return false;
+    }
+
+    public COSObject getDirect() {
+        return new COSObject(this);
+    }
+
+    public boolean setDirect(final COSObject value) {
+        return false;
+    }
+
+    //! Marks object for incremental update.
+    //! (If object is indirect and its document is known.)
+    public void mark() {
+    }
 
 }

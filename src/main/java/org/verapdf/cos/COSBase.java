@@ -70,11 +70,15 @@ public abstract class COSBase {
 	public abstract boolean setArrayKey(final ASAtom key, final int size, final double[] value);
 	public abstract void removeKey(final ASAtom key);
 
-	// STREAMS
-
+	// INDIRECT OBJECT
+	public abstract boolean isIndirect();
 	public abstract COSKey getKey();
+	public abstract COSDocument getDocument();
+	public abstract boolean setKey(final COSKey key, final COSDocument document);
+	public abstract COSObject getDirect();
+	public abstract boolean setDirect(final COSObject value);
 
-	public abstract COSObject getObject();
+	public abstract void mark();
 
 	//TODO : seems this code is related to memory management. Not required in java
 	public void acquire() {
