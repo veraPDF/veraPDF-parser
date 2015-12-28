@@ -35,6 +35,11 @@ public class COSArray extends COSDirect {
         this.entries.add(i, object);
     }
 
+    //! Object type
+    public COSObjType getType() {
+        return COSObjType.COSArrayT;
+    }
+
     //! Returns COSObject wrapping a new empty COSArray instance
     public static COSObject construct() {
         return new COSObject(new COSArray());
