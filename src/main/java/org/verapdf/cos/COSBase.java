@@ -62,7 +62,7 @@ public abstract class COSBase {
 	public abstract double getRealKey(final ASAtom key);
 	public abstract boolean setRealKey(final ASAtom key, final double value);
 	public abstract String getStringKey(final ASAtom key);
-	public abstract boolean setRealKey(final ASAtom key, final String value);
+	public abstract boolean setStringKey(final ASAtom key, final String value);
 	public abstract ASAtom getNameKey(final ASAtom key);
 	public abstract boolean setNameKey(final ASAtom key, final ASAtom value);
 	public abstract boolean setArrayKey(final ASAtom key);
