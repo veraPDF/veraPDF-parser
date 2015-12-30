@@ -72,10 +72,6 @@ public class COSDirect extends COSBase {
         return COSObject.getEmpty();
     }
 
-    public COSObject at(final int i) {
-        return new COSObject(this);
-    }
-
     public boolean add(final COSObject value) {
         return false;
     }
@@ -115,10 +111,6 @@ public class COSDirect extends COSBase {
         return COSObject.getEmpty();
     }
 
-    public COSObject getKey(final ASAtom key) {
-        return new COSObject();
-    }
-
     public boolean setKey(final ASAtom key, final COSObject value) {
         return false;
     }
@@ -151,7 +143,7 @@ public class COSDirect extends COSBase {
         return "";
     }
 
-    public boolean setRealKey(final ASAtom key, final String value) {
+    public boolean setStringKey(final ASAtom key, final String value) {
         return false;
     }
 

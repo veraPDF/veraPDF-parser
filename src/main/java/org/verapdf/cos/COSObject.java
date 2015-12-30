@@ -27,10 +27,6 @@ public class COSObject {
 		return this.base;
 	}
 
-	public COSBase get() {
-		return this.base;
-	}
-
 	public void set(COSBase base) {
 		// TODO : maybe we need to use overriden equals method here instead of comparing links
 		if (this.base == base) {
@@ -63,7 +59,7 @@ public class COSObject {
 
 	public void setBoolean(final boolean value) {
 		if(this.base == null && !this.base.setBoolean(value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSBoolean(value);
 		}
 	}
 
@@ -74,7 +70,7 @@ public class COSObject {
 
 	public void setInteger(final long value) {
 		if (this.base == null && !this.base.setInteger(value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSInteger(value);
 		}
 	}
 
@@ -85,7 +81,7 @@ public class COSObject {
 
 	public void setReal(final double value) {
 		if (this.base == null && !this.base.setReal(value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSReal(value);
 		}
 	}
 
@@ -98,9 +94,9 @@ public class COSObject {
 		setString(value, false);
 	}
 
-	public void setString(final String value, final boolean ishex) {
-		if (this.base == null && !this.base.setString(value, ishex)) {
-			// TODO : impossible assign value to this in java.
+	public void setString(final String value, final boolean isHex) {
+		if (this.base == null && !this.base.setString(value, isHex)) {
+			this.base = new COSString(value, isHex);
 		}
 	}
 
@@ -112,7 +108,7 @@ public class COSObject {
 
 	public void setName(final ASAtom value) {
 		if (this.base == null && !this.base.setName(value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSName(value);
 		}
 	}
 
@@ -121,60 +117,49 @@ public class COSObject {
 		return this.base != null ? this.base.size() : 0;
 	}
 
-	//! Arrays
-	public COSObject at(final int i) {
-		if (base != null) {
-			final COSObject result = this.base.at(i);
-			if (!result.empty()) {
-				return result;
-			}
-		}
-		return this;
-	}
-
 	public COSObject at(final int i) {
 		return this.base != null ? this.base.at(i) : this;
 	}
 
 	public void add(final COSObject value) {
 		if (this.base == null && !this.base.add(value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSArray(1, value);
 		}
 	}
 
 	public void set(final int i, final COSObject value) {
 		if (this.base == null && !this.base.set(i, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSArray(i, value);
 		}
 	}
 
 	public void insert(final int i, final COSObject value) {
 		if (this.base == null && !this.base.insert(i, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSArray(i, value);
 		}
 	}
 
 	public void remove(final int i) {
-		if (this.base == null && !this.base.remove(i)) {
-			// TODO : impossible assign value to this in java.
+		if (this.base == null) {
+			this.base.remove(i);
 		}
 	}
 
 	public void setArray() {
 		if (this.base == null && !this.base.setArray()) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSArray();
 		}
 	}
 
 	public void setArray(final int size, final COSObject[] value) {
 		if (this.base == null && !this.base.setArray(size, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSArray(size, value);
 		}
 	}
 
 	public void setArray(final int size, final double[] value) {
 		if (this.base == null && !this.base.setArray(size, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSArray(size, value);
 		}
 	}
 
@@ -195,7 +180,7 @@ public class COSObject {
 
 	public void setKey(final ASAtom key, final COSObject value) {
 		if (this.base == null || !this.base.setKey(key, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSDictionary(key, value);
 		}
 	}
 
@@ -205,7 +190,7 @@ public class COSObject {
 
 	public void setBooleanKey(final ASAtom key, final boolean value) {
 		if (this.base == null || !this.base.setBooleanKey(key, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSDictionary(key, value);
 		}
 	}
 
@@ -215,7 +200,7 @@ public class COSObject {
 
 	public void setIntegerKey(final ASAtom key, final long value) {
 		if (this.base == null || !this.base.setIntegerKey(key, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSDictionary(key, value);
 		}
 	}
 
@@ -225,7 +210,7 @@ public class COSObject {
 
 	public void setRealKey(final ASAtom key, final double value) {
 		if (this.base == null || !this.base.setRealKey(key, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSDictionary(key, value);
 		}
 	}
 
@@ -235,7 +220,7 @@ public class COSObject {
 
 	public void setStringKey(final ASAtom key, final String value) {
 		if (this.base == null || !this.base.setStringKey(key, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSDictionary(key, value);
 		}
 	}
 
@@ -246,26 +231,28 @@ public class COSObject {
 
 	public void setNameKey(final ASAtom key, final ASAtom value) {
 		if (this.base == null || !this.base.setNameKey(key, value)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSDictionary(key, value);
 		}
 	}
 
 	public void setArrayKey(final ASAtom key) {
 		if (this.base == null || !this.base.setArrayKey(key)) {
 			COSObject obj = COSArray.construct();
-			// TODO : impossible assign value to this in java.
+			this.base = new COSDictionary(key, obj);
 		}
 	}
 
 	public void setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
 		if (this.base == null || !this.base.setArrayKey(key, size, value)) {
-			// TODO : impossible assign value to this in java.
+			COSObject obj = COSArray.construct(size, value);
+			this.base = new COSDictionary(key, obj);
 		}
 	}
 
 	public void setArrayKey(final ASAtom key, final int size, final double[] value) {
 		if (this.base == null || this.base.setArrayKey(key, size, value)) {
-			// TODO : impossible assign value to this in java.
+			COSObject obj = COSArray.construct(size, value);
+			this.base = new COSDictionary(key, obj);
 		}
 	}
 
@@ -291,7 +278,7 @@ public class COSObject {
 
 	public void setKey(final COSKey key, final COSDocument document) {
 		if (this.base == null || this.base.setKey(key, document)) {
-			// TODO : impossible assign value to this in java.
+			this.base = new COSIndirect(key, document);
 		}
 	}
 
