@@ -14,6 +14,10 @@ public class COSString extends COSDirect {
         this.isHex = false;
     }
 
+    public COSString(String value) {
+        this(value, false);
+    }
+
     public COSString(String value, boolean isHex) {
         super();
         this.value = value;
@@ -28,12 +32,49 @@ public class COSString extends COSDirect {
         return new COSObject(new COSString(initValue, isHex));
     }
 
+
+    public COSObjType getType() {
+        return COSObjType.COSStringT;
+    }
+
+    //! Returns the size of the string
     public long getInteger() {
         return this.value.length();
     }
 
-    public COSObjType getType() {
-        return COSObjType.COSStringT;
+    public double getReal() {
+        return this.value.length();
+    }
+
+    public String getString() {
+        return get();
+    }
+
+    public boolean setString(final String value) {
+        setString(value, false);
+        return true;
+    }
+
+    public boolean setString(final String value, final boolean isHex) {
+        this.value = value;
+        this.isHex = isHex;
+        return true;
+    }
+
+    public String get() {
+        return this.value;
+    }
+
+    public void set(final String value) {
+        this.value = value;
+    }
+
+    public boolean isLiteral() {
+        return !isHex;
+    }
+
+    public boolean isHexadecimal() {
+        return isHex;
     }
 
 }
