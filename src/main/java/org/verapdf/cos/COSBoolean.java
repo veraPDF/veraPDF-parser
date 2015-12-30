@@ -24,7 +24,7 @@ public class COSBoolean extends COSDirect {
     }
 
     public boolean getBoolean() {
-        return this.value;
+        return get();
     }
 
     public boolean setBoolean(final boolean value) {
