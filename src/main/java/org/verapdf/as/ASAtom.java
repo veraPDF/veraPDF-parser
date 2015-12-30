@@ -509,4 +509,8 @@ public class ASAtom {
         this.value = value;
     }
 
+    public String get() {
+        return value;
+    }
+
 }
