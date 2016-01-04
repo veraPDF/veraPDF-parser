@@ -1,6 +1,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.io.IReader;
+import org.verapdf.io.Reader;
 import org.verapdf.pd.PDDocument;
 
 /**
@@ -13,9 +14,11 @@ public class COSDocument {
 	private COSHeader header;
 	private COSBody body;
 	private COSXRefTable xref;
+	private COSTrailer trailer;
 
 	public COSDocument(PDDocument doc) {
 		this.doc = doc;
+		this.reader = new Reader()
 	}
 
 	public COSDocument(String fileName, PDDocument doc) {
