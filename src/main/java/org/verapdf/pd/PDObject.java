@@ -1,5 +1,6 @@
 package org.verapdf.pd;
 
+import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 
 /**
@@ -25,6 +26,10 @@ public class PDObject {
 		this.object.clear();
 	}
 
+	public COSObject getObject() {
+		return this.object;
+	}
+
 	public void setObject(COSObject object) {
 		setObject(object, true);
 	}
@@ -36,7 +41,24 @@ public class PDObject {
 		}
 	}
 
+	public boolean knownKey(final ASAtom key) {
+		return this.object.knownKey(key);
+	}
+
+	public COSObject getKey(final ASAtom key) {
+		return this.object.getKey(key);
+	}
+
+	public void setKey(final ASAtom key, final COSObject value) {
+		this.object.setKey(key, value);
+	}
+
+	public void removeKey(final ASAtom key) {
+		this.object.removeKey(key);
+	}
+
 	// VIRTUAL METHODS
+	protected void updateToObject() {}
 	protected void updateFromObject() {}
 
 }
