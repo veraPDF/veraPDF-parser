@@ -15,13 +15,13 @@ public class PDCatalog extends PDObject {
 		this.pages = new PDPageTree();
 	}
 
-	public PDCatalog(final COSObject object) {
+	public PDCatalog(final COSObject object) throws Exception {
 		super(object);
 		this.pages = new PDPageTree();
 	}
 
-	public PDPageTree getPageTree() {
-		if (this.pages.empty) {
+	public PDPageTree getPageTree() throws Exception {
+		if (this.pages.empty()) {
 			this.pages.setObject(getObject().getKey(ASAtom.PAGES));
 		}
 		return pages;

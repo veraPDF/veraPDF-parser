@@ -17,14 +17,25 @@ public class Parser {
 		this.stream = new InternalInputStream(fileName);
 	}
 
-	public int getOffset() throws IOException {
+	public void closeInputStream() throws IOException {
+		this.stream.close();
+	}
+
+	public long getOffset() throws IOException {
 		return this.stream.tellg();
 	}
 
-	public void seek(final int offset) throws IOException {
+	public void seek(final long offset) throws IOException {
 		this.stream.seekg(offset);
 	}
 
+	public void seekFromEnd(final int pos) throws IOException {
+		this.stream.seekFromEnd(pos);
+	}
+
+	public void seekFromCurPos(final int pos) throws IOException {
+		this.stream.seekFromCurPos(pos);
+	}
 
 	// PROTECTED METHODS
 
@@ -348,9 +359,10 @@ public class Parser {
 		this.token.real = Float.parseFloat(this.token.token);
 	}
 
+	/*
 	public ASSharedInStream getStream(final long length) {
 		// TODO : implement me
 	}
-
+	*/
 
 }

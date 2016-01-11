@@ -3,6 +3,8 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 
+import java.io.IOException;
+
 /**
  * @author Timur Kamalov
  */
@@ -14,7 +16,7 @@ public class PDPageTreeNode extends PDObject {
 		this.parent = new PDPageTreeBranch();
 	}
 
-	public PDPageTreeNode(final COSObject obj) {
+	public PDPageTreeNode(final COSObject obj) throws Exception {
 		super();
 		parent = new PDPageTreeBranch();
 		setObject(obj);
@@ -24,7 +26,7 @@ public class PDPageTreeNode extends PDObject {
 		return this.parent;
 	}
 
-	public void setParent(final PDPageTreeBranch parent) {
+	public void setParent(final PDPageTreeBranch parent) throws IOException {
 		this.parent = parent;
 		if (parent != null) {
 			getObject().setKey(ASAtom.PARENT, parent.getObject());
@@ -43,4 +45,5 @@ public class PDPageTreeNode extends PDObject {
 		index += this.parent.getIndex(this);
 		return parent;
 	}
+
 }

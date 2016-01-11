@@ -16,7 +16,7 @@ public class ASFileInStream implements ASInputStream {
 	private int curPos;
 
 	public ASFileInStream(InputStream stream, final int offset, final int size) {
-		this.stream = new RandomAccessFile();
+		//this.stream = new RandomAccessFile();
 		this.offset = offset;
 		this.size = size;
 		this.curPos = 0;
@@ -31,14 +31,15 @@ public class ASFileInStream implements ASInputStream {
 			size = this.size - this.curPos;
 		}
 
-		int prev = this.stream.getPosition;
+		//int prev = this.stream.getPosition;
 
 		this.stream.seek(this.offset + this.curPos);
 
-		this.stream.read(buffer, size);
+		//this.stream.read(buffer, size);
 		//TODO : deal with this count thing
 
-		return count;
+		//return count;
+		return 0;
 	}
 
 	public int skip(int size) {

@@ -65,14 +65,6 @@ public class COSArray extends COSDirect {
 
     public COSObject at(final int i) {
         if (i >= this.entries.size()) {
-            return COSObject.getEmpty();
-        }
-
-        return _at(i);
-    }
-
-    public COSObject at(final int i) {
-        if (i >= this.entries.size()) {
             return new COSObject();
         }
 

@@ -2,6 +2,8 @@ package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
 
+import java.io.IOException;
+
 /**
  * Created by Timur on 12/17/2015.
  */
@@ -115,55 +117,55 @@ public class COSDirect extends COSBase {
         return false;
     }
 
-    public boolean getBooleanKey(final ASAtom key) {
+    public boolean getBooleanKey(final ASAtom key) throws IOException {
         return false;
     }
 
-    public boolean setBooleanKey(final ASAtom key, final boolean value) {
+    public boolean setBooleanKey(final ASAtom key, final boolean value) throws IOException {
         return false;
     }
 
-    public long getIntegerKey(final ASAtom key) {
+    public long getIntegerKey(final ASAtom key) throws IOException {
         return 0;
     }
 
-    public boolean setIntegerKey(final ASAtom key, final long value) {
+    public boolean setIntegerKey(final ASAtom key, final long value) throws IOException {
         return false;
     }
 
-    public double getRealKey(final ASAtom key) {
+    public double getRealKey(final ASAtom key) throws IOException {
         return 0;
     }
 
-    public boolean setRealKey(final ASAtom key, final double value) {
+    public boolean setRealKey(final ASAtom key, final double value) throws IOException {
         return false;
     }
 
-    public String getStringKey(final ASAtom key) {
+    public String getStringKey(final ASAtom key) throws IOException {
         return "";
     }
 
-    public boolean setStringKey(final ASAtom key, final String value) {
+    public boolean setStringKey(final ASAtom key, final String value) throws IOException {
         return false;
     }
 
-    public ASAtom getNameKey(final ASAtom key) {
+    public ASAtom getNameKey(final ASAtom key) throws IOException {
         final ASAtom empty = new ASAtom();
         return empty;
     }
-    public boolean setNameKey(final ASAtom key, final ASAtom value) {
+    public boolean setNameKey(final ASAtom key, final ASAtom value) throws IOException {
         return false;
     }
 
-    public boolean setArrayKey(final ASAtom key) {
+    public boolean setArrayKey(final ASAtom key) throws IOException {
         return false;
     }
 
-    public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
+    public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) throws IOException {
         return false;
     }
 
-    public boolean setArrayKey(final ASAtom key, final int size, final double[] value) {
+    public boolean setArrayKey(final ASAtom key, final int size, final double[] value) throws IOException {
         return false;
     }
 

@@ -39,12 +39,23 @@ public class InternalInputStream implements ASInputStream {
 		return false;
 	}
 
-	public int tellg() throws IOException {
+	public long tellg() throws IOException {
 		return (int) this.source.getFilePointer();
 	}
 
-	public InternalInputStream seekg(int pos) throws IOException {
+	public InternalInputStream seekg(final long pos) throws IOException {
 		this.source.seek(pos);
+		return this;
+	}
+
+	public InternalInputStream seekFromEnd(final long pos) throws IOException {
+		final long size = this.source.length();
+		this.source.seek(size - pos);
+		return this;
+	}
+
+	public InternalInputStream seekFromCurPos(final long pos) throws IOException {
+		this.source.seek(tellg() + pos);
 		return this;
 	}
 

@@ -6,6 +6,8 @@ import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSIndirect;
 import org.verapdf.cos.COSObject;
 
+import java.io.IOException;
+
 /**
  * Created by Timur on 1/10/2016.
  */
@@ -21,10 +23,10 @@ public class PDPage extends PDPageTreeNode {
     public static double PAGE_SIZE_LEGAL[] = {0, 0, 612, 792};
 
     //private PDContentStream content;
-    private int num;
-    private int totalNum;
+    int num;
+    int totalNum;
 
-    public PDPage(final double bbox[], final COSDocument doc) {
+    public PDPage(final double bbox[], final COSDocument doc) throws Exception {
         super();
         this.num = 0;
         this.totalNum = 0;
@@ -36,18 +38,18 @@ public class PDPage extends PDPageTreeNode {
         setObject(obj);
     }
 
-    public PDPage(final COSObject obj) {
+    public PDPage(final COSObject obj) throws Exception {
         super();
         this.num = 0;
         this.totalNum = 0;
         setObject(obj);
     }
 
-    public void setBBox(final double[] bbox, final ASAtom boxType) {
+    public void setBBox(final double[] bbox, final ASAtom boxType) throws IOException {
         getObject().setArrayKey(boxType, 4, bbox);
     }
 
-    public boolean getBBox(final double[] bbox, final ASAtom boxType) {
+    public boolean getBBox(final double[] bbox, final ASAtom boxType) throws IOException {
         COSObject obj = getKey(boxType);
         if (!obj.empty() && obj.size() >= 4) {
             for (int i = 0; i < 4; i++) {
@@ -81,6 +83,8 @@ public class PDPage extends PDPageTreeNode {
         }
     }
 
+    //TODO : implement this
+    /*
     public PDResources getResources() {
         COSObject resDict = getKey(ASAtom.RESOURCES);
         COSDocument doc = getObject().getDocument();
@@ -94,13 +98,16 @@ public class PDPage extends PDPageTreeNode {
         else
             return PDResources(resDict, doc);
     }
+    */
 
     public int getPageNumber() {
         return this.totalNum;
     }
 
+    //TODO : impelement this
+    /*
     public String getLabel() {
         return this.getPDDoc().getCatalog().getPageLabels().getLabel(getPageNumber());
     }
-
+    */
 }

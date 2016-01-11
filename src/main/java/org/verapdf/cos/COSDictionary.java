@@ -2,6 +2,7 @@ package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,37 +23,37 @@ public class COSDictionary extends COSDirect {
         setKey(key, value);
     }
 
-    protected COSDictionary(final ASAtom key, final boolean value) {
+    protected COSDictionary(final ASAtom key, final boolean value) throws IOException {
         this();
         setBooleanKey(key, value);
     }
 
-    protected COSDictionary(final ASAtom key, final int value) {
+    protected COSDictionary(final ASAtom key, final int value) throws IOException {
         this();
         setIntegerKey(key, value);
     }
 
-    protected COSDictionary(final ASAtom key, final double value) {
+    protected COSDictionary(final ASAtom key, final double value) throws IOException {
         this();
         setRealKey(key, value);
     }
 
-    protected COSDictionary(final ASAtom key, final String value) {
+    protected COSDictionary(final ASAtom key, final String value) throws IOException {
         this();
         setStringKey(key, value);
     }
 
-    protected COSDictionary(final ASAtom key, final ASAtom value) {
+    protected COSDictionary(final ASAtom key, final ASAtom value) throws IOException {
         this();
         setNameKey(key, value);
     }
 
-    protected COSDictionary(final ASAtom key, final int size, final COSObject[] value) {
+    protected COSDictionary(final ASAtom key, final int size, final COSObject[] value) throws IOException {
         this();
         setArrayKey(key, size, value);
     }
 
-    protected COSDictionary(final ASAtom key, final int size, final double[] value) {
+    protected COSDictionary(final ASAtom key, final int size, final double[] value) throws IOException {
         this();
         setArrayKey(key, size, value);
     }
@@ -70,31 +71,31 @@ public class COSDictionary extends COSDirect {
         return new COSObject(new COSDictionary(key, value));
     }
 
-    public static COSObject construct(final ASAtom key, final boolean value) {
+    public static COSObject construct(final ASAtom key, final boolean value) throws IOException {
         return new COSObject(new COSDictionary(key, value));
     }
 
-    public static COSObject construct(final ASAtom key, final int value) {
+    public static COSObject construct(final ASAtom key, final int value) throws IOException {
         return new COSObject(new COSDictionary(key, value));
     }
 
-    public static COSObject construct(final ASAtom key, final double value) {
+    public static COSObject construct(final ASAtom key, final double value) throws IOException {
         return new COSObject(new COSDictionary(key, value));
     }
 
-    public static COSObject construct(final ASAtom key, final String value) {
+    public static COSObject construct(final ASAtom key, final String value) throws IOException {
         return new COSObject(new COSDictionary(key, value));
     }
 
-    public static COSObject construct(final ASAtom key, final ASAtom value) {
+    public static COSObject construct(final ASAtom key, final ASAtom value) throws IOException {
         return new COSObject(new COSDictionary(key, value));
     }
 
-    public static COSObject construct(final ASAtom key, final int size, final COSObject[] value) {
+    public static COSObject construct(final ASAtom key, final int size, final COSObject[] value) throws IOException {
         return new COSObject(new COSDictionary(key, size, value));
     }
 
-    public static COSObject construct(final ASAtom key, final int size, final double[] value) {
+    public static COSObject construct(final ASAtom key, final int size, final double[] value) throws IOException {
         return new COSObject(new COSDictionary(key, size, value));
     }
 
@@ -122,76 +123,76 @@ public class COSDictionary extends COSDirect {
         return true;
     }
 
-    public boolean getBooleanKey(final ASAtom key) {
+    public boolean getBooleanKey(final ASAtom key) throws IOException {
         return getKey(key).getBoolean();
     }
 
-    public boolean setBooleanKey(final ASAtom key, final boolean value) {
+    public boolean setBooleanKey(final ASAtom key, final boolean value) throws IOException {
         COSObject obj = new COSObject();
         obj.setBoolean(value);
         this.entries.put(key, obj);
         return true;
     }
 
-    public long getIntegerKey(final ASAtom key) {
+    public long getIntegerKey(final ASAtom key) throws IOException {
         return getKey(key).getInteger();
     }
 
-    public boolean setIntegerKey(final ASAtom key, final long value) {
+    public boolean setIntegerKey(final ASAtom key, final long value) throws IOException {
         COSObject obj = new COSObject();
         obj.setInteger(value);
         this.entries.put(key, obj);
         return true;
     }
 
-    public double getRealKey(final ASAtom key) {
+    public double getRealKey(final ASAtom key) throws IOException {
         return getKey(key).getReal();
     }
 
-    public boolean setRealKey(final ASAtom key, final double value) {
+    public boolean setRealKey(final ASAtom key, final double value) throws IOException {
         COSObject obj = new COSObject();
         obj.setReal(value);
         this.entries.put(key, obj);
         return true;
     }
 
-    public String getStringKey(final ASAtom key) {
+    public String getStringKey(final ASAtom key) throws IOException {
         return getKey(key).getString();
     }
 
-    public boolean setStringKey(final ASAtom key, final String value) {
+    public boolean setStringKey(final ASAtom key, final String value) throws IOException {
         COSObject obj = new COSObject();
         obj.setString(value);
         this.entries.put(key, obj);
         return true;
     }
 
-    public final ASAtom getNameKey(final ASAtom key) {
+    public final ASAtom getNameKey(final ASAtom key) throws IOException {
         return getKey(key).getName();
     }
 
-    public boolean setNameKey(final ASAtom key, final ASAtom value) {
+    public boolean setNameKey(final ASAtom key, final ASAtom value) throws IOException {
         COSObject obj = new COSObject();
         obj.setName(value);
         this.entries.put(key, obj);
         return true;
     }
 
-    public boolean setArrayKey(final ASAtom key) {
+    public boolean setArrayKey(final ASAtom key) throws IOException {
         COSObject obj = new COSObject();
         obj.setArray();
         this.entries.put(key, obj);
         return true;
     }
 
-    public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
+    public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) throws IOException {
         COSObject obj = new COSObject();
         obj.setArray(size, value);
         this.entries.put(key, obj);
         return true;
     }
 
-    public boolean setArrayKey(final ASAtom key, final int size, final double[] value) {
+    public boolean setArrayKey(final ASAtom key, final int size, final double[] value) throws IOException {
         COSObject obj = new COSObject();
         obj.setArray(size, value);
         this.entries.put(key, obj);

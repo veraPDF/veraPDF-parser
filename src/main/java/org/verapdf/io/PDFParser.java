@@ -1,9 +1,9 @@
 package org.verapdf.io;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.StringExceptions;
 import org.verapdf.cos.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,14 +19,14 @@ public class PDFParser extends Parser {
     private Queue<Long> integers;
     private boolean flag;
 
-    public PDFParser(final String filename) throws FileNotFoundException {
+    public PDFParser(final String filename) throws Exception {
         super(filename);
         this.document = new COSDocument(null);
         this.objects = new LinkedList<COSObject>();
         this.flag = true;
     }
 
-    public PDFParser(final COSDocument document, final String filename) throws FileNotFoundException { //tmp ??
+    public PDFParser(final COSDocument document, final String filename) throws Exception { //tmp ??
         this(filename);
         this.document = document;
     }
@@ -35,7 +35,7 @@ public class PDFParser extends Parser {
         return getLine(0);
     }
 
-    public void getXRefInfo(List<COSXRefInfo> infos) {
+    public void getXRefInfo(List<COSXRefInfo> infos) throws Exception {
         this.getXRefInfo(infos, 0);
     }
 
@@ -173,7 +173,7 @@ public class PDFParser extends Parser {
 				token.keyword != Token.Keyword.KW_ENDOBJ) {
 			closeInputStream();
 			// TODO : replace with ASException
-			throw new IOException("PDFParser::GetObject(...)" + INVALID_PDF_OBJECT);
+			throw new IOException("PDFParser::GetObject(...)" + StringExceptions.INVALID_PDF_OBJECT);
 		}
 
 		return obj;
@@ -183,6 +183,82 @@ public class PDFParser extends Parser {
 		this.objects.clear();
 		this.integers.clear();
 		this.flag = true;
+	}
+
+    private long findLastXRef() throws IOException {
+        seekFromEnd(30);
+		if (findKeyword(Token.Keyword.KW_STARTXREF)) {
+			nextToken();
+			if (getToken().type == Token.Type.TT_INTEGER) {
+				return getToken().integer;
+			}
+		}
+		return 0;
+    }
+
+	private void getXRefSection(final COSXRefSection xrefs) throws IOException {
+		nextToken();
+		if (getToken().type != Token.Type.TT_KEYWORD || getToken().keyword != Token.Keyword.KW_XREF) {
+			closeInputStream();
+			throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+		}
+
+		nextToken();
+		while (getToken().type == Token.Type.TT_INTEGER) {
+			long number = getToken().integer;
+			nextToken();
+			long count = getToken().integer;
+			COSXRefEntry xref = new COSXRefEntry();
+			for (int i = 0; i < count; ++i) {
+				nextToken();
+				xref.offset = getToken().integer;
+				nextToken();
+				xref.generation = getToken().integer;
+				nextToken();
+				xref.free = getToken().token.charAt(0);
+				xrefs.addEntry(number + i, xref);
+			}
+			nextToken();
+		}
+		seekFromCurPos(-7);
+	}
+
+	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws Exception {
+		if (offset == 0) {
+			offset = findLastXRef();
+			if (offset == 0) {
+				closeInputStream();
+				throw new IOException("PDFParser::GetXRefInfo(...)" + StringExceptions.START_XREF_VALIDATION);
+			}
+		}
+		clear();
+		seek(offset);
+
+		COSXRefInfo section = new COSXRefInfo();
+		info.add(0, section);
+
+		section.setStartXRef(offset);
+		getXRefSection(section.getXRefSection());
+		getTrailer(section.getTrailer());
+
+		offset = section.getTrailer().getPrev();
+		if (offset == 0) {
+			return;
+		}
+
+		getXRefInfo(info, offset);
+	}
+
+	private void getTrailer(final COSTrailer trailer) throws Exception {
+		if (findKeyword(Token.Keyword.KW_TRAILER)) {
+			COSObject obj = nextObject();
+			trailer.setObject(obj);
+		}
+
+		if (trailer.knownKey(ASAtom.ENCRYPT)) {
+			closeInputStream();
+			throw new Exception("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+		}
 	}
 
     private COSObject getArray() throws IOException {
@@ -207,7 +283,7 @@ public class PDFParser extends Parser {
         if (token.type != Token.Type.TT_CLOSEARRAY) {
             closeInputStream();
             // TODO : replace with ASException
-            throw new IOException("PDFParser::GetArray()" + INVALID_PDF_ARRAY);
+            throw new IOException("PDFParser::GetArray()" + StringExceptions.INVALID_PDF_ARRAY);
         }
 
         return arr;
@@ -249,7 +325,7 @@ public class PDFParser extends Parser {
         if (token.type != Token.Type.TT_CLOSEDICT) {
             closeInputStream();
             // TODO : replace with ASException
-            throw new IOException("PDFParser::GetDictionary()", INVALID_PDF_DICTONARY);
+            throw new IOException("PDFParser::GetDictionary()" + StringExceptions.INVALID_PDF_DICTONARY);
         }
 
         if (this.flag) {
@@ -279,10 +355,12 @@ public class PDFParser extends Parser {
 			return dict;
 		}
 
-		int offset = getOffset();
+		long offset = getOffset();
 		long size = dict.getKey(ASAtom.LENGTH).getInteger();
 		seek(offset);
 
+        // TODO : stream support
+        /*
 		ASSharedInStream stm = super.getStream(size);
 		dict.setData(stm);
 
@@ -294,6 +372,7 @@ public class PDFParser extends Parser {
 			// TODO : replace with ASException
 			throw new IOException("PDFParser::GetStream(...)" + INVALID_PDF_STREAM);
 		}
+		*/
 
 		return dict;
 	}

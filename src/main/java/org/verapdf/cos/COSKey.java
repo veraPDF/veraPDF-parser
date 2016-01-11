@@ -21,8 +21,6 @@ public class COSKey {
 		this.generation = generation;
 	}
 
-
-
 	public long getNumber() {
 		return number;
 	}
@@ -37,6 +35,18 @@ public class COSKey {
 
 	public void setGeneration(long generation) {
 		this.generation = generation;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		COSKey cosKey = (COSKey) o;
+
+		if (number != cosKey.number) return false;
+		return generation == cosKey.generation;
+
 	}
 
 }

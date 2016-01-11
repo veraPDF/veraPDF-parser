@@ -9,7 +9,10 @@ public class COSXRefInfo {
 	private COSXRefSection xref;
 	private COSTrailer trailer;
 
-	public COSXRefInfo() {
+	public COSXRefInfo() throws Exception {
+		this.startXRef = 0;
+		this.xref = new COSXRefSection();
+		this.trailer = new COSTrailer();
 	}
 
 	public long getStartXRef() {
@@ -32,8 +35,8 @@ public class COSXRefInfo {
 		return this.trailer;
 	}
 
-	public void setTrailer(COSTrailer trailer) {
-		this.trailer = trailer;
+	public void setTrailer(final COSObject object) throws Exception {
+		this.trailer.setObject(object);
 	}
 
 }

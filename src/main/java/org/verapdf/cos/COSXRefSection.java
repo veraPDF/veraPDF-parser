@@ -58,6 +58,14 @@ public class COSXRefSection {
 		}
 	}
 
+	public COSXRefEntry getEntry(final long number) {
+		return this.entries.get(number);
+	}
+
+	public void addEntry(final long number, final COSXRefEntry entry) {
+		this.entries.put(number, entry);
+	}
+
 	private void removeIfNumberEqual(final List<COSKey> keys, final long number) {
 		for (COSKey key : keys) {
 			if (key.getNumber() == number) {
