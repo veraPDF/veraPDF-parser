@@ -13,12 +13,9 @@ public class PDPageTreeNode extends PDObject {
 	private PDPageTreeBranch parent;
 
 	public PDPageTreeNode() {
-		this.parent = new PDPageTreeBranch();
 	}
 
 	public PDPageTreeNode(final COSObject obj) throws Exception {
-		super();
-		parent = new PDPageTreeBranch();
 		setObject(obj);
 	}
 

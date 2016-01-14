@@ -72,7 +72,7 @@ public class Token {
 
 	public static Keyword getKeyword(final String keyword) {
 		for (Map.Entry<Keyword, String> entry : keywords.entrySet()) {
-			if (entry.getValue().equals(keyword)) {
+			if (keyword.equals(entry.getValue())) {
 				return entry.getKey();
 			}
 		}

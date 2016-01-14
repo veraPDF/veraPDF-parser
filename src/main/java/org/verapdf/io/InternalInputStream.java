@@ -59,14 +59,22 @@ public class InternalInputStream implements ASInputStream {
 		return this;
 	}
 
-	public InternalInputStream get(char ch) throws IOException {
+	public InternalInputStream get(Character ch) throws IOException {
 		ch = this.source.readChar();
 		return this;
+	}
+
+	public char get() throws IOException {
+		return (char) this.source.read();
 	}
 
 	public InternalInputStream unread() throws IOException{
 		this.source.seek(this.source.getFilePointer() - 1);
 		return this;
+	}
+
+	public boolean isEof() throws IOException {
+		return this.source.getFilePointer() == this.source.length();
 	}
 
 }

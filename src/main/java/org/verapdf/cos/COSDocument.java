@@ -30,6 +30,7 @@ public class COSDocument {
 
 	public COSDocument(String fileName, PDDocument doc) throws Exception {
 		this.doc = doc;
+		this.body = new COSBody();
 
 		this.reader = new Reader(this, fileName);
 

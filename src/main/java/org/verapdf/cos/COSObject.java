@@ -35,13 +35,11 @@ public class COSObject {
 			return;
 		}
 
-		if (base != null) base.acquire();
-		if (this.base != null) this.base.release();
 		this.base = base;
 	}
 
 	public boolean empty() {
-		return base != null;
+		return base == null;
 	}
 
 	public void clear() {
@@ -60,7 +58,7 @@ public class COSObject {
 	}
 
 	public void setBoolean(final boolean value) throws IOException {
-		if(this.base == null && !this.base.setBoolean(value)) {
+		if(this.base == null || !this.base.setBoolean(value)) {
 			this.base = new COSBoolean(value);
 		}
 	}
@@ -71,7 +69,7 @@ public class COSObject {
 	}
 
 	public void setInteger(final long value) throws IOException {
-		if (this.base == null && !this.base.setInteger(value)) {
+		if (this.base == null || !this.base.setInteger(value)) {
 			this.base = new COSInteger(value);
 		}
 	}
@@ -82,7 +80,7 @@ public class COSObject {
 	}
 
 	public void setReal(final double value) throws IOException {
-		if (this.base == null && !this.base.setReal(value)) {
+		if (this.base == null || !this.base.setReal(value)) {
 			this.base = new COSReal(value);
 		}
 	}
@@ -97,7 +95,7 @@ public class COSObject {
 	}
 
 	public void setString(final String value, final boolean isHex) throws IOException {
-		if (this.base == null && !this.base.setString(value, isHex)) {
+		if (this.base == null || !this.base.setString(value, isHex)) {
 			this.base = new COSString(value, isHex);
 		}
 	}
@@ -109,7 +107,7 @@ public class COSObject {
 	}
 
 	public void setName(final ASAtom value) throws IOException {
-		if (this.base == null && !this.base.setName(value)) {
+		if (this.base == null || !this.base.setName(value)) {
 			this.base = new COSName(value);
 		}
 	}
@@ -124,19 +122,19 @@ public class COSObject {
 	}
 
 	public void add(final COSObject value) throws IOException {
-		if (this.base == null && !this.base.add(value)) {
+		if (this.base == null || !this.base.add(value)) {
 			this.base = new COSArray(1, value);
 		}
 	}
 
 	public void set(final int i, final COSObject value) throws IOException {
-		if (this.base == null && !this.base.set(i, value)) {
+		if (this.base == null || !this.base.set(i, value)) {
 			this.base = new COSArray(i, value);
 		}
 	}
 
 	public void insert(final int i, final COSObject value) throws IOException {
-		if (this.base == null && !this.base.insert(i, value)) {
+		if (this.base == null || !this.base.insert(i, value)) {
 			this.base = new COSArray(i, value);
 		}
 	}
@@ -148,19 +146,19 @@ public class COSObject {
 	}
 
 	public void setArray() throws IOException {
-		if (this.base == null && !this.base.setArray()) {
+		if (this.base == null || !this.base.setArray()) {
 			this.base = new COSArray();
 		}
 	}
 
 	public void setArray(final int size, final COSObject[] value) throws IOException {
-		if (this.base == null && !this.base.setArray(size, value)) {
+		if (this.base == null || !this.base.setArray(size, value)) {
 			this.base = new COSArray(size, value);
 		}
 	}
 
 	public void setArray(final int size, final double[] value) throws IOException {
-		if (this.base == null && !this.base.setArray(size, value)) {
+		if (this.base == null || !this.base.setArray(size, value)) {
 			this.base = new COSArray(size, value);
 		}
 	}
@@ -284,7 +282,6 @@ public class COSObject {
 		}
 	}
 
-	//	const COSObject GetDirect() const;
 	public COSObject getDirect() throws IOException {
 		return this.base != null ? this.base.getDirect() : new COSObject();
 	}

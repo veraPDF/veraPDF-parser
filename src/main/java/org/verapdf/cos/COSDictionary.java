@@ -110,8 +110,19 @@ public class COSDictionary extends COSDirect {
     public boolean knownKey(final ASAtom key) {
         return this.entries.containsKey(key);
     }
+
     public COSObject getKey(final ASAtom key) {
-        return this.entries.get(key);
+        //TODO : don't even think about leaving this nightmare in code
+        //TODO : rewrite ASAtom using Enum and everyone will be happy
+        //COSObject value = this.entries.get(key);
+        COSObject value = null;
+        for (Map.Entry<ASAtom, COSObject> entry : this.entries.entrySet()) {
+            if (entry.getKey().get().equals(key.get())) {
+                value = entry.getValue();
+                break;
+            }
+        }
+        return value != null ? value : COSObject.getEmpty();
     }
 
     public boolean setKey(final ASAtom key, final COSObject value) {
@@ -135,6 +146,7 @@ public class COSDictionary extends COSDirect {
     }
 
     public long getIntegerKey(final ASAtom key) throws IOException {
+
         return getKey(key).getInteger();
     }
 

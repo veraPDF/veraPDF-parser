@@ -5,6 +5,7 @@ import org.verapdf.cos.COSTrailer;
 import org.verapdf.cos.COSXRefInfo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +20,23 @@ public class COSXRefTableReader {
 
 
 	public COSXRefTableReader() {
+		this.startXRef = 0;
+		this.offsets = new HashMap<COSKey, Long>();
+		try {
+			this.trailer = new COSTrailer();
+		} catch (Exception e) {
+			System.err.println();
+		}
 	}
 
 	public COSXRefTableReader(final List<COSXRefInfo> info) {
+		this();
+		set(info);
 	}
 
 	public COSXRefTableReader(final COSXRefInfo info) {
+		this();
+		set(info);
 	}
 
 	public void set(final List<COSXRefInfo> infos) {
@@ -69,11 +81,17 @@ public class COSXRefTableReader {
 	}
 
 	public long getOffset(final COSKey key) {
-		if (this.offsets.containsKey(key)) {
-			return this.offsets.get(key);
-		} else {
-			return 0;
+		Long value = null;
+		//TODO : don't even think about leaving this nightmare in code
+		//TODO : override hashCode in COSKey
+		//COSObject value	= this.table.get(key);
+		for (Map.Entry<COSKey, Long> entry : offsets.entrySet()) {
+			if (entry.getKey().equals(key)) {
+				value = entry.getValue();
+				break;
+			}
 		}
+		return value != null ? value : 0;
 	}
 
 	public COSTrailer getTrailer() {

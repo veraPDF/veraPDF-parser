@@ -23,6 +23,7 @@ public class PDFParser extends Parser {
         super(filename);
         this.document = new COSDocument(null);
         this.objects = new LinkedList<COSObject>();
+        this.integers = new LinkedList<Long>();
         this.flag = true;
     }
 
@@ -208,8 +209,9 @@ public class PDFParser extends Parser {
 			long number = getToken().integer;
 			nextToken();
 			long count = getToken().integer;
-			COSXRefEntry xref = new COSXRefEntry();
+			COSXRefEntry xref;
 			for (int i = 0; i < count; ++i) {
+                xref = new COSXRefEntry();
 				nextToken();
 				xref.offset = getToken().integer;
 				nextToken();
@@ -316,7 +318,7 @@ public class PDFParser extends Parser {
         COSObject dict = COSDictionary.construct();
 
         COSObject key = getName();
-        while(!key.empty()) {
+        while (!key.empty()) {
             COSObject obj = nextObject();
             dict.setKey(key.getName(), obj);
             key = getName();

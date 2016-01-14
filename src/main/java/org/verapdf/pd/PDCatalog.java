@@ -22,6 +22,7 @@ public class PDCatalog extends PDObject {
 
 	public PDPageTree getPageTree() throws Exception {
 		if (this.pages.empty()) {
+			COSObject obj = getObject().getKey(ASAtom.PAGES);
 			this.pages.setObject(getObject().getKey(ASAtom.PAGES));
 		}
 		return pages;

@@ -14,15 +14,15 @@ public abstract class XRefReader implements IReader {
 	private COSXRefTableReader xref;
 
 	//CONSTRUCTORS
-	public XRefReader() {
+	public XRefReader() throws Exception {
 		this.xref = new COSXRefTableReader();
 	}
 
-	public XRefReader(final List<COSXRefInfo> infos) {
+	public XRefReader(final List<COSXRefInfo> infos) throws Exception {
 		this.xref = new COSXRefTableReader(infos);
 	}
 
-	public XRefReader(final COSXRefInfo info) {
+	public XRefReader(final COSXRefInfo info) throws Exception {
 		this.xref = new COSXRefTableReader(info);
 	}
 
