@@ -49,4 +49,11 @@ public class COSKey {
 
 	}
 
+	@Override
+	public int hashCode() {
+		int result = (int) (number ^ (number >>> 32));
+		result = 31 * result + (int) (generation ^ (generation >>> 32));
+		return result;
+	}
+
 }

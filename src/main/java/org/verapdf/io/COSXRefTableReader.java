@@ -81,6 +81,7 @@ public class COSXRefTableReader {
 	}
 
 	public long getOffset(final COSKey key) {
+		/*
 		Long value = null;
 		//TODO : don't even think about leaving this nightmare in code
 		//TODO : override hashCode in COSKey
@@ -90,7 +91,8 @@ public class COSXRefTableReader {
 				value = entry.getValue();
 				break;
 			}
-		}
+		}*/
+		Long value = this.offsets.get(key);
 		return value != null ? value : 0;
 	}
 

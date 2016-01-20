@@ -15,6 +15,9 @@ public class COSBody {
 	}
 
 	public COSObject get(final COSKey key) {
+		COSObject value = this.table.get(key);
+
+		/*
 		COSObject value = null;
 		//TODO : don't even think about leaving this nightmare in code
 		//TODO : override hashCode in COSKey
@@ -25,6 +28,7 @@ public class COSBody {
 				break;
 			}
 		}
+		*/
 		return value != null ? value : COSObject.getEmpty();
 	}
 

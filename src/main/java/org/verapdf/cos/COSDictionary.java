@@ -5,6 +5,7 @@ import org.verapdf.as.ASAtom;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Timur on 12/24/2015.
@@ -112,6 +113,7 @@ public class COSDictionary extends COSDirect {
     }
 
     public COSObject getKey(final ASAtom key) {
+        /*
         //TODO : don't even think about leaving this nightmare in code
         //TODO : rewrite ASAtom using Enum and everyone will be happy
         //COSObject value = this.entries.get(key);
@@ -122,6 +124,8 @@ public class COSDictionary extends COSDirect {
                 break;
             }
         }
+        */
+        COSObject value = this.entries.get(key);
         return value != null ? value : COSObject.getEmpty();
     }
 
@@ -213,6 +217,11 @@ public class COSDictionary extends COSDirect {
 
     public void removeKey(final ASAtom key) {
         this.entries.remove(key);
+    }
+
+    // Instead of iterator
+    public Set<Map.Entry<ASAtom, COSObject>> getEntrySet() {
+        return this.entries.entrySet();
     }
 
 }
