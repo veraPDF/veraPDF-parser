@@ -1,5 +1,7 @@
 package org.verapdf.cos;
 
+import org.verapdf.cos.visitor.IVisitor;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,6 +59,10 @@ public class COSArray extends COSDirect {
     //! Returns COSObject wrapping a new COSArray instance constructed via given object at a given index
     public static COSObject construct(final int i, final COSObject obj) {
         return new COSObject(new COSArray(i, obj));
+    }
+
+    public void accept(IVisitor visitor) {
+        visitor.visitFromArray(this);
     }
 
     public int size() {

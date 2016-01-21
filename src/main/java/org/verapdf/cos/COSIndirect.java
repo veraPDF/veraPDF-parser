@@ -1,6 +1,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.visitor.IVisitor;
 
 import java.io.IOException;
 
@@ -59,6 +60,10 @@ public class COSIndirect extends COSBase {
 
     public static COSObject construct(final COSObject value, final COSDocument doc) throws Exception {
         return new COSObject(new COSIndirect(value, doc));
+    }
+
+    public void accept(final IVisitor visitor) {
+        visitor.visitFromIndirect(this);
     }
 
     //! Boolean values

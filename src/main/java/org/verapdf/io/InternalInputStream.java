@@ -1,6 +1,6 @@
 package org.verapdf.io;
 
-import org.verapdf.as.ASInputStream;
+import org.verapdf.as.io.ASInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -81,17 +81,6 @@ public class COSXRefTableReader {
 	}
 
 	public long getOffset(final COSKey key) {
-		/*
-		Long value = null;
-		//TODO : don't even think about leaving this nightmare in code
-		//TODO : override hashCode in COSKey
-		//COSObject value	= this.table.get(key);
-		for (Map.Entry<COSKey, Long> entry : offsets.entrySet()) {
-			if (entry.getKey().equals(key)) {
-				value = entry.getValue();
-				break;
-			}
-		}*/
 		Long value = this.offsets.get(key);
 		return value != null ? value : 0;
 	}

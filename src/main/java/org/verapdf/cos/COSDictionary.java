@@ -1,6 +1,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.visitor.IVisitor;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -104,6 +105,10 @@ public class COSDictionary extends COSDirect {
         return new COSObject(new COSDictionary(dict));
     }
 
+    public void accept(IVisitor visitor) {
+        visitor.visitFromDictionary(this);
+    }
+
     public int size() {
         return this.entries.size();
     }
@@ -113,18 +118,6 @@ public class COSDictionary extends COSDirect {
     }
 
     public COSObject getKey(final ASAtom key) {
-        /*
-        //TODO : don't even think about leaving this nightmare in code
-        //TODO : rewrite ASAtom using Enum and everyone will be happy
-        //COSObject value = this.entries.get(key);
-        COSObject value = null;
-        for (Map.Entry<ASAtom, COSObject> entry : this.entries.entrySet()) {
-            if (entry.getKey().get().equals(key.get())) {
-                value = entry.getValue();
-                break;
-            }
-        }
-        */
         COSObject value = this.entries.get(key);
         return value != null ? value : COSObject.getEmpty();
     }

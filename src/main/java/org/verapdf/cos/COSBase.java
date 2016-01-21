@@ -1,6 +1,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.visitor.IVisitor;
 
 import java.io.IOException;
 
@@ -14,6 +15,9 @@ public abstract class COSBase {
 
 	// Returns object type
 	public abstract COSObjType getType() throws IOException;
+
+	// VISITOR DESIGN PATTERN
+	public abstract void accept(final IVisitor visitor);
 
 	// BOOLEAN VALUES
 	public abstract boolean getBoolean() throws IOException;

@@ -1,7 +1,7 @@
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.StringExceptions;
+import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.cos.*;
 
 import java.io.IOException;

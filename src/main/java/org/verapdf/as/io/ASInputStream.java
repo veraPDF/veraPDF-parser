@@ -1,4 +1,4 @@
-package org.verapdf.as;
+package org.verapdf.as.io;
 
 import java.io.IOException;
 

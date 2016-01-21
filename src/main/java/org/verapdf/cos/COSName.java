@@ -1,6 +1,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.visitor.IVisitor;
 
 /**
  * Created by Timur on 12/18/2015.
@@ -33,6 +34,10 @@ public class COSName extends COSDirect {
 
     public static COSObject construct(final String value) {
         return new COSObject(new COSName(value));
+    }
+
+    public void accept(final IVisitor visitor) {
+        visitor.visitFromName(this);
     }
 
     //! ASAtom data exchange

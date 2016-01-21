@@ -1,5 +1,7 @@
 package org.verapdf.cos;
 
+import org.verapdf.cos.visitor.IVisitor;
+
 /**
  * Created by Timur on 12/18/2015.
  */
@@ -14,12 +16,16 @@ public class COSReal extends COSNumber {
         this.value = value;
     }
 
+    public COSObjType getType() {
+        return COSObjType.COSRealT;
+    }
+
     public static COSObject construct(final double initValue) {
         return new COSObject(new COSReal(initValue));
     }
 
-    public COSObjType getType() {
-        return COSObjType.COSRealT;
+    public void accept(final IVisitor visitor) {
+        visitor.visitFromReal(this);
     }
 
     public long getInteger() {
