@@ -16,4 +16,8 @@ public class StringExceptions {
 	public static final String INVALID_PDF_DICTONARY = "invalid pdf dictonary";
 	public static final String INVALID_PDF_STREAM = "invalid pdf stream";
 
+	public static final String DUPLICATE_FACTORY_NAMES = "internal library error";
+
+	public static final String WRITE_ERROR = "Error writing document";
+
 }

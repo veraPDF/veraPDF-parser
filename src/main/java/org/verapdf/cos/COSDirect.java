@@ -1,13 +1,12 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
-
-import java.io.IOException;
+import org.verapdf.as.io.ASInputStream;
 
 /**
  * Created by Timur on 12/17/2015.
  */
-public class COSDirect extends COSBase {
+public abstract class COSDirect extends COSBase {
 
     // OBJECT TYPE
     public COSObjType getType() {
@@ -117,59 +116,76 @@ public class COSDirect extends COSBase {
         return false;
     }
 
-    public boolean getBooleanKey(final ASAtom key) throws IOException {
+    public boolean getBooleanKey(final ASAtom key) {
         return false;
     }
 
-    public boolean setBooleanKey(final ASAtom key, final boolean value) throws IOException {
+    public boolean setBooleanKey(final ASAtom key, final boolean value) {
         return false;
     }
 
-    public long getIntegerKey(final ASAtom key) throws IOException {
+    public long getIntegerKey(final ASAtom key) {
         return 0;
     }
 
-    public boolean setIntegerKey(final ASAtom key, final long value) throws IOException {
+    public boolean setIntegerKey(final ASAtom key, final long value) {
         return false;
     }
 
-    public double getRealKey(final ASAtom key) throws IOException {
+    public double getRealKey(final ASAtom key) {
         return 0;
     }
 
-    public boolean setRealKey(final ASAtom key, final double value) throws IOException {
+    public boolean setRealKey(final ASAtom key, final double value) {
         return false;
     }
 
-    public String getStringKey(final ASAtom key) throws IOException {
+    public String getStringKey(final ASAtom key) {
         return "";
     }
 
-    public boolean setStringKey(final ASAtom key, final String value) throws IOException {
+    public boolean setStringKey(final ASAtom key, final String value) {
         return false;
     }
 
-    public ASAtom getNameKey(final ASAtom key) throws IOException {
+    public ASAtom getNameKey(final ASAtom key) {
         final ASAtom empty = new ASAtom();
         return empty;
     }
-    public boolean setNameKey(final ASAtom key, final ASAtom value) throws IOException {
+    public boolean setNameKey(final ASAtom key, final ASAtom value) {
         return false;
     }
 
-    public boolean setArrayKey(final ASAtom key) throws IOException {
+    public boolean setArrayKey(final ASAtom key) {
         return false;
     }
 
-    public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) throws IOException {
+    public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
         return false;
     }
 
-    public boolean setArrayKey(final ASAtom key, final int size, final double[] value) throws IOException {
+    public boolean setArrayKey(final ASAtom key, final int size, final double[] value) {
         return false;
     }
 
     public void removeKey(final ASAtom key) {
+    }
+
+    // STREAMS
+    public ASInputStream getData() {
+        return this.getData(COSStream.FilterFlags.RAW_DATA);
+    }
+
+    public ASInputStream getData(final COSStream.FilterFlags flags) {
+        return null;
+    }
+
+    public boolean setData(final ASInputStream stream) {
+        return this.setData(stream, COSStream.FilterFlags.RAW_DATA);
+    }
+
+    public boolean setData(final ASInputStream stream, final COSStream.FilterFlags flags) {
+        return false;
     }
 
     // INDIRECT OBJECT

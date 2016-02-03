@@ -4,6 +4,8 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSIndirect;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.visitor.IndirectWriter;
+import org.verapdf.cos.visitor.Writer;
 
 /**
  * @author Timur Kamalov
@@ -100,6 +102,25 @@ public class PDDocument {
 		PDPage page = new PDPage(bbox, document);
 		addPage(page, insertAt);
 		return page;
+	}
+
+	public void save() {
+	}
+
+	public void saveAs(final String fileName) throws Exception {
+		Writer out = new IndirectWriter(this.document, fileName, false);
+		saveAs(out, fileName);
+	}
+
+	public void saveAs(final Writer out, final String filename) {
+		if (this.document == null) {
+			return;
+		}
+
+		//getInfo.setTime2();
+
+		this.document.saveAs(out);
+		out.close();
 	}
 
 }

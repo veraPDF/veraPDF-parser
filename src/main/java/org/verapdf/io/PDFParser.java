@@ -2,7 +2,11 @@ package org.verapdf.io;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
+import org.verapdf.cos.xref.COSXRefEntry;
+import org.verapdf.cos.xref.COSXRefInfo;
+import org.verapdf.cos.xref.COSXRefSection;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -16,14 +20,14 @@ public class PDFParser extends Parser {
 
     private COSDocument document;
     private Queue<COSObject> objects;
-    private Queue<Long> integers;
+    private Queue<Integer> integers;
     private boolean flag;
 
     public PDFParser(final String filename) throws Exception {
         super(filename);
         this.document = new COSDocument(null);
         this.objects = new LinkedList<COSObject>();
-        this.integers = new LinkedList<Long>();
+        this.integers = new LinkedList<Integer>();
         this.flag = true;
     }
 
@@ -55,7 +59,7 @@ public class PDFParser extends Parser {
         final Token token = getToken();
 
         if (token.type == Token.Type.TT_INTEGER) {  // looking for indirect reference
-            this.integers.add(token.integer);
+            this.integers.add((int) token.integer);
             if (this.integers.size() == 3) {
                 COSObject result = COSInteger.construct(this.integers.peek());
                 this.integers.remove();
@@ -67,9 +71,9 @@ public class PDFParser extends Parser {
         if (token.type == Token.Type.TT_KEYWORD
                 && token.keyword == Token.Keyword.KW_R
                 && this.integers.size() == 2) {
-            final long number = this.integers.peek();
+            final int number = this.integers.peek();
             this.integers.remove();
-            final long generation = this.integers.peek();
+            final int generation = this.integers.peek();
             this.integers.remove();
             return COSIndirect.construct(new COSKey(number, generation), document);
         }
@@ -206,16 +210,16 @@ public class PDFParser extends Parser {
 
 		nextToken();
 		while (getToken().type == Token.Type.TT_INTEGER) {
-			long number = getToken().integer;
+			int number = (int) getToken().integer;
 			nextToken();
-			long count = getToken().integer;
+			int count = (int) getToken().integer;
 			COSXRefEntry xref;
 			for (int i = 0; i < count; ++i) {
                 xref = new COSXRefEntry();
 				nextToken();
 				xref.offset = getToken().integer;
 				nextToken();
-				xref.generation = getToken().integer;
+				xref.generation = (int) getToken().integer;
 				nextToken();
 				xref.free = getToken().token.charAt(0);
 				xrefs.addEntry(number + i, xref);
@@ -361,9 +365,7 @@ public class PDFParser extends Parser {
 		long size = dict.getKey(ASAtom.LENGTH).getInteger();
 		seek(offset);
 
-        // TODO : stream support
-        /*
-		ASSharedInStream stm = super.getStream(size);
+		ASInputStream stm = super.getStream(size);
 		dict.setData(stm);
 
 		nextToken();
@@ -372,9 +374,8 @@ public class PDFParser extends Parser {
 				token.keyword != Token.Keyword.KW_ENDSTREAM) {
 			closeInputStream();
 			// TODO : replace with ASException
-			throw new IOException("PDFParser::GetStream(...)" + INVALID_PDF_STREAM);
+			throw new IOException("PDFParser::GetStream(...)" + StringExceptions.INVALID_PDF_STREAM);
 		}
-		*/
 
 		return dict;
 	}

@@ -6,8 +6,6 @@ import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSIndirect;
 import org.verapdf.cos.COSObject;
 
-import java.io.IOException;
-
 /**
  * Created by Timur on 1/10/2016.
  */
@@ -26,7 +24,7 @@ public class PDPage extends PDPageTreeNode {
     int num;
     int totalNum;
 
-    public PDPage(final double bbox[], final COSDocument doc) throws Exception {
+    public PDPage(final double bbox[], final COSDocument doc) {
         super();
         this.num = 0;
         this.totalNum = 0;
@@ -38,18 +36,18 @@ public class PDPage extends PDPageTreeNode {
         setObject(obj);
     }
 
-    public PDPage(final COSObject obj) throws Exception {
+    public PDPage(final COSObject obj) {
         super();
         this.num = 0;
         this.totalNum = 0;
         setObject(obj);
     }
 
-    public void setBBox(final double[] bbox, final ASAtom boxType) throws IOException {
+    public void setBBox(final double[] bbox, final ASAtom boxType) {
         getObject().setArrayKey(boxType, 4, bbox);
     }
 
-    public boolean getBBox(final double[] bbox, final ASAtom boxType) throws IOException {
+    public boolean getBBox(final double[] bbox, final ASAtom boxType) {
         COSObject obj = getKey(boxType);
         if (!obj.empty() && obj.size() >= 4) {
             for (int i = 0; i < 4; i++) {

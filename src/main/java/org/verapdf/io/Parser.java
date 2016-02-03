@@ -1,6 +1,8 @@
 package org.verapdf.io;
 
 import org.verapdf.as.CharTable;
+import org.verapdf.as.io.ASFileInStream;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSFilterASCIIHexDecode;
 
 import java.io.FileNotFoundException;
@@ -147,6 +149,13 @@ public class Parser {
 		}
 	}
 
+	public ASInputStream getStream(final long length) throws IOException {
+		skipEOL();
+		ASInputStream result = new ASFileInStream(this.stream.getStream(), this.stream.tellg(), length);
+		stream.seekFromCurPos(length);
+
+		return result;
+	}
 
 	// PRIVATE METHODS
 
@@ -196,9 +205,9 @@ public class Parser {
 
 			if (ch == CharTable.ASCII_CR) {
 				ch = this.stream.get();
-					if (ch != CharTable.ASCII_LF) { // EOL == CR
-						this.stream.unread();
-					} // else EOL == CRLF
+				if (ch != CharTable.ASCII_LF) { // EOL == CR
+					this.stream.unread();
+				} // else EOL == CRLF
 				return;
 			}
 			// else skip regular character
@@ -206,6 +215,8 @@ public class Parser {
 	}
 
 	private void readLitString() throws IOException {
+
+		//TODO : find error with backslash
 		this.token.token = "";
 
 		int parenthesesDepth = 0;
@@ -213,54 +224,77 @@ public class Parser {
 		char ch = this.stream.get();
 		while (!this.stream.isEof()) {
 			switch (ch) {
-				case 'n':
-					this.token.token += CharTable.ASCII_LF;
+				case '(':
+					parenthesesDepth++;
+					this.token.token += ch;
 					break;
-				case 'r':
-					this.token.token += CharTable.ASCII_CR;
-					break;
-				case 't':
-					this.token.token += CharTable.ASCII_HT;
-					break;
-				case 'b':
-					this.token.token += CharTable.ASCII_BS;
-					break;
-				case 'f':
-					this.token.token += CharTable.ASCII_FF;
-					break;
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7': {
-					// look for 1, 2, or 3 octal characters
-					char ch1 = (char) (ch - '0');
-					for (int i = 1; i < 3; i++) {
-						ch = this.stream.get();
-						if (ch < '0' || ch > '7') {
-							this.stream.unread();
-							break;
-						} else {
-							ch1 = (char) ((ch1 << 3) + (ch - '0'));
-						}
+				case ')':
+					if (parenthesesDepth == 0) {
+						return;
 					}
-					this.token.token += ch1;
+
+					parenthesesDepth--;
+					this.token.token += ch;
+					break;
+				case '\\': {
+					switch (ch) {
+						case 'n':
+							this.token.token += CharTable.ASCII_LF;
+							break;
+						case 'r':
+							this.token.token += CharTable.ASCII_CR;
+							break;
+						case 't':
+							this.token.token += CharTable.ASCII_HT;
+							break;
+						case 'b':
+							this.token.token += CharTable.ASCII_BS;
+							break;
+						case 'f':
+							this.token.token += CharTable.ASCII_FF;
+							break;
+						case '0':
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+						case '6':
+						case '7': {
+							// look for 1, 2, or 3 octal characters
+							char ch1 = (char) (ch - '0');
+							for (int i = 1; i < 3; i++) {
+								ch = this.stream.get();
+								if (ch < '0' || ch > '7') {
+									this.stream.unread();
+									break;
+								} else {
+									ch1 = (char) ((ch1 << 3) + (ch - '0'));
+								}
+							}
+							this.token.token += ch1;
+							break;
+						}
+						case CharTable.ASCII_LF:
+							break;
+						case CharTable.ASCII_CR:
+							ch = this.stream.get();
+							if (ch != CharTable.ASCII_LF) {
+								this.stream.unread();
+							}
+							break;
+						default:
+							this.token.token += ch;
+							break;
+					}
 					break;
 				}
-				case CharTable.ASCII_LF:
-					break;
-				case CharTable.ASCII_CR:
-					ch = this.stream.get();
-					if (ch != CharTable.ASCII_LF) {
-						this.stream.unread();
-					}
-					break;
+
 				default:
 					this.token.token += ch;
 			}
+
+			ch = stream.get();
 		}
 	}
 

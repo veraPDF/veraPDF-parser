@@ -11,6 +11,4 @@ public interface ASOutputStream {
 
 	void close() throws IOException;
 
-	void flush() throws IOException;
-
 }

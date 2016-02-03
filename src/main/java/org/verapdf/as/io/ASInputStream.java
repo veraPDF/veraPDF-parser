@@ -17,8 +17,4 @@ public interface ASInputStream {
 
 	void reset() throws IOException;
 
-	boolean isCloneable();
-
-	//TODO : clone method
-
 }

@@ -14,7 +14,7 @@ public interface IVisitor {
 	void visitFromName(final COSName obj);
 	void visitFromArray(final COSArray obj);
 	void visitFromDictionary(final COSDictionary obj);
-	//void visitFromStream(final COSStream obj);
+	void visitFromStream(final COSStream obj);
 	void visitFromNull(final COSNull obj);
 	void visitFromIndirect(final COSIndirect obj);
 

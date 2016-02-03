@@ -3,8 +3,6 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 
-import java.io.IOException;
-
 /**
  * @author Timur Kamalov
  */
@@ -32,35 +30,35 @@ public class PDObject {
 		return this.object;
 	}
 
-	public void setObject(COSObject object) throws Exception {
+	public void setObject(COSObject object) {
 		setObject(object, true);
 	}
 
-	public void setObject(COSObject object, boolean update) throws Exception {
+	public void setObject(COSObject object, boolean update) {
 		this.object = object;
 		if (update) {
 			updateFromObject();
 		}
 	}
 
-	public boolean knownKey(final ASAtom key) throws IOException {
+	public boolean knownKey(final ASAtom key) {
 		return this.object.knownKey(key);
 	}
 
-	public COSObject getKey(final ASAtom key) throws IOException {
+	public COSObject getKey(final ASAtom key) {
 		return this.object.getKey(key);
 	}
 
-	public void setKey(final ASAtom key, final COSObject value) throws IOException {
+	public void setKey(final ASAtom key, final COSObject value) {
 		this.object.setKey(key, value);
 	}
 
-	public void removeKey(final ASAtom key) throws IOException {
+	public void removeKey(final ASAtom key) {
 		this.object.removeKey(key);
 	}
 
 	// VIRTUAL METHODS
-	protected void updateToObject() throws IOException {}
-	protected void updateFromObject() throws Exception {}
+	protected void updateToObject() {}
+	protected void updateFromObject() {}
 
 }

@@ -3,23 +3,21 @@ package org.verapdf.cos;
 import org.verapdf.as.ASAtom;
 import org.verapdf.pd.PDObject;
 
-import java.io.IOException;
-
 /**
  * @author Timur Kamalov
  */
 public class COSTrailer extends PDObject {
 
-	public COSTrailer() throws Exception {
+	public COSTrailer() {
 		super();
 		setObject(COSDictionary.construct(), false);
 	}
 
-	public long getSize() throws IOException {
+	public long getSize() {
 		return getObject().getIntegerKey(ASAtom.SIZE);
 	}
 
-	public void setSize(final long size) throws IOException {
+	public void setSize(final long size) {
 		if (getPrev() != 0) {
 			final long prevSize = getObject().getIntegerKey(ASAtom.SIZE);
 			if (prevSize > size) {
@@ -29,11 +27,11 @@ public class COSTrailer extends PDObject {
 		getObject().setIntegerKey(ASAtom.SIZE, size);
 	}
 
-	public long getPrev() throws IOException {
+	public long getPrev() {
 		return getObject().getIntegerKey(ASAtom.PREV);
 	}
 
-	public void setPrev(final long prev) throws IOException {
+	public void setPrev(final long prev) {
 		if (prev != 0) {
 			getObject().setIntegerKey(ASAtom.PREV, prev);
 		} else {
@@ -41,35 +39,35 @@ public class COSTrailer extends PDObject {
 		}
 	}
 
-	public COSObject getRoot() throws IOException {
+	public COSObject getRoot() {
 		return getKey(ASAtom.ROOT);
 	}
 
-	public void setRoot(final COSObject root) throws IOException {
+	public void setRoot(final COSObject root) {
 		setKey(ASAtom.ROOT, root);
 	}
 
-	public COSObject getEncrypt() throws IOException {
+	public COSObject getEncrypt() {
 		return getKey(ASAtom.ENCRYPT);
 	}
 
-	public void setEncrypt(final COSObject encrypt) throws IOException {
+	public void setEncrypt(final COSObject encrypt) {
 		setKey(ASAtom.ENCRYPT, encrypt);
 	}
 
-	public COSObject getInfo() throws IOException {
+	public COSObject getInfo() {
 		return getKey(ASAtom.INFO);
 	}
 
-	public void setInfo(final COSObject info) throws IOException {
+	public void setInfo(final COSObject info) {
 		setKey(ASAtom.INFO, info);
 	}
 
-	public COSObject getID() throws IOException {
+	public COSObject getID() {
 		return getKey(ASAtom.ID);
 	}
 
-	public void setID(final COSObject id) throws IOException {
+	public void setID(final COSObject id) {
 		COSObject[] ids = new COSObject[2];
 
 		ids[0] = getObject().getKey(ASAtom.ID).at(0);

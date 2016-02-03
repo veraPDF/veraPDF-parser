@@ -1,5 +1,7 @@
 package org.verapdf.cos;
 
+import org.verapdf.cos.visitor.Writer;
+import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.io.IReader;
 import org.verapdf.io.Reader;
 import org.verapdf.pd.PDDocument;
@@ -19,7 +21,7 @@ public class COSDocument {
 	private COSTrailer trailer;
 	private boolean isNew;
 
-	public COSDocument(PDDocument doc) throws Exception {
+	public COSDocument(PDDocument doc) {
 		this.doc = doc;
 		this.header = new COSHeader();
 		this.body = new COSBody();
@@ -52,16 +54,22 @@ public class COSDocument {
 		this.header.set(header);
 	}
 
-	public COSObject getObject(final COSKey key) throws IOException {
-		COSObject obj = this.body.get(key);
-		if (!obj.empty()) {
-			return obj;
+	public COSObject getObject(final COSKey key) {
+		try {
+			COSObject obj = this.body.get(key);
+			if (!obj.empty()) {
+				return obj;
+			}
+
+			COSObject newObj = this.reader.getObject(key);
+
+			this.body.set(key, newObj);
+			return this.body.get(key);
+		} catch (IOException e) {
+			//TODO :
+			throw new RuntimeException("Error while parsing object : " + key.getNumber() +
+									   " " + key.getGeneration());
 		}
-
-		COSObject newObj = this.reader.getObject(key);
-
-		this.body.set(key, newObj);
-		return this.body.get(key);
 	}
 
 	public void setObject(final COSKey key, final COSObject obj) {
@@ -69,7 +77,7 @@ public class COSDocument {
 		this.xref.newKey(key);
 	}
 
-	public COSKey setObject(COSObject obj) throws IOException {
+	public COSKey setObject(COSObject obj) {
 		COSKey key = obj.getKey();
 
 		if (key.equals(new COSKey())) {
@@ -88,6 +96,23 @@ public class COSDocument {
 
 	public PDDocument getPDDoc() {
 		return this.doc;
+	}
+
+	public void save() {
+
+	}
+
+	public void saveAs(final Writer out) {
+		out.writeHeader(getHeader());
+
+		out.addToWrite(this.xref.getAllKeys());
+		out.writeBody();
+
+		out.setTrailer(this.trailer);
+
+		out.writeXRefInfo();
+
+		out.clear();
 	}
 
 }

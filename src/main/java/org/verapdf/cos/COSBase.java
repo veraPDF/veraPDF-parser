@@ -1,9 +1,8 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.visitor.IVisitor;
-
-import java.io.IOException;
 
 /**
  * @author Timur Kamalov
@@ -14,73 +13,80 @@ public abstract class COSBase {
 	}
 
 	// Returns object type
-	public abstract COSObjType getType() throws IOException;
+	public abstract COSObjType getType();
 
 	// VISITOR DESIGN PATTERN
 	public abstract void accept(final IVisitor visitor);
 
 	// BOOLEAN VALUES
-	public abstract boolean getBoolean() throws IOException;
-	public abstract boolean setBoolean(final boolean value) throws IOException;
+	public abstract boolean getBoolean();
+	public abstract boolean setBoolean(final boolean value);
 
 	// INTEGER NUMBERS
-	public abstract long getInteger() throws IOException;
-	public abstract boolean setInteger(final long value) throws IOException;
+	public abstract long getInteger();
+	public abstract boolean setInteger(final long value);
 
 	// REAL NUMBERS
-	public abstract double getReal() throws IOException;
-	public abstract boolean setReal(final double value) throws IOException;
+	public abstract double getReal();
+	public abstract boolean setReal(final double value);
 
 	// STRINGS
-	public abstract String getString() throws IOException;
-	public abstract boolean setString(final String value) throws IOException;
-	public abstract boolean setString(final String value, final boolean isHex) throws IOException;
+	public abstract String getString();
+	public abstract boolean setString(final String value);
+	public abstract boolean setString(final String value, final boolean isHex);
 
 	// NAMES
-	public abstract ASAtom getName() throws IOException;
-	public abstract boolean setName(final ASAtom value) throws IOException;
+	public abstract ASAtom getName();
+	public abstract boolean setName(final ASAtom value);
 
 	// NUMBERS OF ELEMENTS FOR ARRAY AND DICTIONARY
-	public abstract int size() throws IOException;
+	public abstract int size();
 
 	// ARRAYS
-	public abstract COSObject at(final int i) throws IOException;
-	public abstract boolean add(final COSObject value) throws IOException;
-	public abstract boolean set(final int i, final COSObject value) throws IOException;
-	public abstract boolean insert(final int i, final COSObject value) throws IOException;
-	public abstract void remove(final int i) throws IOException;
-	public abstract boolean setArray() throws IOException;
-	public abstract boolean setArray(final int size, final COSObject[] value) throws IOException;
-	public abstract boolean setArray(final int size, final double[] value) throws IOException;
-	public abstract void clearArray() throws IOException;
+	public abstract COSObject at(final int i);
+	public abstract boolean add(final COSObject value);
+	public abstract boolean set(final int i, final COSObject value);
+	public abstract boolean insert(final int i, final COSObject value);
+	public abstract void remove(final int i);
+	public abstract boolean setArray();
+	public abstract boolean setArray(final int size, final COSObject[] value);
+	public abstract boolean setArray(final int size, final double[] value);
+	public abstract void clearArray();
 
 	// DICTIONARIES
-	public abstract boolean knownKey(final ASAtom key) throws IOException;
-	public abstract COSObject getKey(final ASAtom key) throws IOException;
-	public abstract boolean setKey(final ASAtom key, final COSObject value) throws IOException;
-	public abstract boolean getBooleanKey(final ASAtom key) throws IOException;
-	public abstract boolean setBooleanKey(final ASAtom key, final boolean value) throws IOException;
-	public abstract long getIntegerKey(final ASAtom key) throws IOException;
-	public abstract boolean setIntegerKey(final ASAtom key, final long value) throws IOException;
-	public abstract double getRealKey(final ASAtom key) throws IOException;
-	public abstract boolean setRealKey(final ASAtom key, final double value) throws IOException;
-	public abstract String getStringKey(final ASAtom key) throws IOException;
-	public abstract boolean setStringKey(final ASAtom key, final String value) throws IOException;
-	public abstract ASAtom getNameKey(final ASAtom key) throws IOException;
-	public abstract boolean setNameKey(final ASAtom key, final ASAtom value) throws IOException;
-	public abstract boolean setArrayKey(final ASAtom key) throws IOException;
-	public abstract boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) throws IOException;
-	public abstract boolean setArrayKey(final ASAtom key, final int size, final double[] value) throws IOException;
-	public abstract void removeKey(final ASAtom key) throws IOException;
+	public abstract boolean knownKey(final ASAtom key);
+	public abstract COSObject getKey(final ASAtom key);
+	public abstract boolean setKey(final ASAtom key, final COSObject value);
+	public abstract boolean getBooleanKey(final ASAtom key);
+	public abstract boolean setBooleanKey(final ASAtom key, final boolean value);
+	public abstract long getIntegerKey(final ASAtom key);
+	public abstract boolean setIntegerKey(final ASAtom key, final long value);
+	public abstract double getRealKey(final ASAtom key);
+	public abstract boolean setRealKey(final ASAtom key, final double value);
+	public abstract String getStringKey(final ASAtom key);
+	public abstract boolean setStringKey(final ASAtom key, final String value);
+	public abstract ASAtom getNameKey(final ASAtom key);
+	public abstract boolean setNameKey(final ASAtom key, final ASAtom value);
+	public abstract boolean setArrayKey(final ASAtom key);
+	public abstract boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value);
+	public abstract boolean setArrayKey(final ASAtom key, final int size, final double[] value);
+	public abstract void removeKey(final ASAtom key);
+
+	// STREAMS
+	public abstract ASInputStream getData();
+	public abstract ASInputStream getData(final COSStream.FilterFlags flags);
+
+	public abstract boolean setData(final ASInputStream stream);
+	public abstract boolean setData(final ASInputStream stream, final COSStream.FilterFlags flags);
 
 	// INDIRECT OBJECT
 	public abstract boolean isIndirect();
 	public abstract COSKey getKey();
 	public abstract COSDocument getDocument();
 	public abstract boolean setKey(final COSKey key, final COSDocument document);
-	public abstract COSObject getDirect() throws IOException;
+	public abstract COSObject getDirect();
 	public abstract boolean setDirect(final COSObject value);
 
-	public abstract void mark() throws IOException;
+	public abstract void mark();
 
 }

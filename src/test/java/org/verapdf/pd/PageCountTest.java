@@ -10,7 +10,7 @@ public class PageCountTest {
 
 	@Test
 	public void testPageCount() throws Exception {
-		PDDocument document = new PDDocument("/home/timur/Projects/preforma/origin/veraPDF-pdflib/src/test/resources/SmallAndValid.pdf");
+		PDDocument document = new PDDocument("/home/timur/Projects/preforma/origin/veraPDF-pdflib/src/test/resources/SmallAndValid_saved.pdf");
 		System.out.println(document.getNumberOfPages());
 	}
 

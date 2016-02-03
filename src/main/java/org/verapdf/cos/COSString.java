@@ -82,4 +82,55 @@ public class COSString extends COSDirect {
         return isHex;
     }
 
+    @Override
+    public String toString() {
+        return this.isHex ? toHexString() : toLitString();
+    }
+
+    protected String toHexString() {
+        //TODO :
+        return new String();
+    }
+
+    protected String toLitString() {
+        String result = new String();
+
+        result += '(';
+        for (int i = 0; i < this.value.length(); i++) {
+            final char ch = this.value.charAt(i);
+            switch (ch) {
+                case '(':
+                    result += "\\(";
+                    break;
+                case ')':
+                    result += "\\)";
+                    break;
+                case '\n':
+                    result += "\n";
+                    break;
+                case '\r':
+                    result += "\r";
+                    break;
+                case '\t':
+                    result += "\t";
+                    break;
+                case '\b':
+                    result += "\b";
+                    break;
+                case '\f':
+                    result += "\f";
+                    break;
+                case '\\':
+                    result += "\\";
+                    break;
+                default:
+                    result += ch;
+                    break;
+            }
+        }
+        result += ')';
+
+        return result;
+    }
+
 }

@@ -4,7 +4,6 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.cos.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +24,14 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		this.children = new ArrayList<PDPageTreeNode>();
 	}
 
-	public PDPageTreeBranch(final COSObject obj) throws Exception {
+	public PDPageTreeBranch(final COSObject obj) {
 		this.isTerminal = true;
 		this.leafCount = 0;
 		this.children = new ArrayList<PDPageTreeNode>();
 		setObject(obj);
 	}
 
-	private PDPageTreeBranch(final PDPageTreeBranch leftChild, final PDPageTreeBranch rightChild) throws Exception {
+	private PDPageTreeBranch(final PDPageTreeBranch leftChild, final PDPageTreeBranch rightChild) {
 		this.isTerminal = false;
 		this.children = new ArrayList<PDPageTreeNode>();
 
@@ -87,7 +86,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return insertNode(leaf, insertAt);
 	}
 
-	protected void updateFromObject() throws Exception {
+	protected void updateFromObject() {
 		clear();
 
 		COSObject kids = getObject().getKey(ASAtom.KIDS);
@@ -98,11 +97,12 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 
 			if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGE)) {
 				kid_i = new PDPage(obj);
-			} else if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGES) {
+			} else if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGES)) {
 				kid_i = new PDPageTreeBranch(obj);
 				isTerminal = false;
 			} else {
-				throw new Exception("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
+				//TODO : ASException
+				throw new RuntimeException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
 			}
 
 			kid_i.setParent(this);
@@ -113,7 +113,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		this.leafCount = (int) getObject().getIntegerKey(ASAtom.COUNT);
 	}
 
-	protected void updateToObject() throws IOException {
+	protected void updateToObject() {
 		COSObject branch = getObject();
 		COSObject kids = COSArray.construct();
 
@@ -130,7 +130,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		}
 	}
 
-	private void initialize() throws Exception {
+	private void initialize() {
 		COSObject dict = COSDictionary.construct();
 		dict.setNameKey(ASAtom.TYPE, ASAtom.PAGES);
 		dict.setArrayKey(ASAtom.KIDS);
@@ -139,7 +139,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		setObject(branch);
 	}
 
-	private boolean insertNode(final PDPageTreeNode node, int insertAt) throws Exception {
+	private boolean insertNode(final PDPageTreeNode node, int insertAt) {
 		node.setParent(this);
 		this.children.add(insertAt, node);
 		getObject().getKey(ASAtom.KIDS).insert(insertAt, node.getObject());
@@ -160,7 +160,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return false;
 	}
 
-	private void incLeafCount() throws IOException {
+	private void incLeafCount() {
 		PDPageTreeBranch branch = this;
 		while (branch != null) {
 			++branch.leafCount;

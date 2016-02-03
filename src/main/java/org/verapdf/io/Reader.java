@@ -3,7 +3,7 @@ package org.verapdf.io;
 import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSXRefInfo;
+import org.verapdf.cos.xref.COSXRefInfo;
 
 import java.io.IOException;
 import java.util.ArrayList;

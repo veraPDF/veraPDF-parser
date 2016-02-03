@@ -2,7 +2,6 @@ package org.verapdf.as.io;
 
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 /**
@@ -11,44 +10,45 @@ import java.io.RandomAccessFile;
 public class ASFileInStream implements ASInputStream {
 
 	private RandomAccessFile stream;
-	private int offset;
-	private int size;
-	private int curPos;
+	private long offset;
+	private long size;
+	private long curPos;
 
-	public ASFileInStream(InputStream stream, final int offset, final int size) {
-		//this.stream = new RandomAccessFile();
+	public ASFileInStream(RandomAccessFile stream, final long offset, final long size) {
+		this.stream = stream;
 		this.offset = offset;
 		this.size = size;
 		this.curPos = 0;
 	}
 
-	public int read(byte[] buffer, int size) throws IOException {
-		if (size == 0 || this.size != nPos && this.size <= this.curPos) {
+	public int read(byte[] buffer, int sizeToRead) throws IOException {
+		if (sizeToRead == 0 || this.size != nPos && this.size <= this.curPos) {
 			return 0;
 		}
 
-		if (this.size != nPos && size > this.size - this.curPos) {
-			size = this.size - this.curPos;
+		if (this.size != nPos && sizeToRead > this.size - this.curPos) {
+			sizeToRead = (int) (this.size - this.curPos);
 		}
 
-		//int prev = this.stream.getPosition;
+		long prev = this.stream.getFilePointer();
 
 		this.stream.seek(this.offset + this.curPos);
+		int count = this.stream.read(buffer, 0, sizeToRead);
 
-		//this.stream.read(buffer, size);
-		//TODO : deal with this count thing
+		this.stream.seek(prev);
 
-		//return count;
-		return 0;
+		this.curPos += count;
+
+		return count;
 	}
 
-	public int skip(int size) {
+	public int skip(int size) throws IOException {
 		if (size == 0 || this.size != nPos && this.size <= this.curPos) {
 			return 0;
 		}
 
 		if (this.size != nPos && size > this.size - this.curPos) {
-			size = this.size - this.curPos;
+			size = (int) (this.size - this.curPos);
 		}
 
 		this.curPos += size;
@@ -57,7 +57,6 @@ public class ASFileInStream implements ASInputStream {
 	}
 
 	public void close() {
-
 	}
 
 	public void reset() {
@@ -65,7 +64,7 @@ public class ASFileInStream implements ASInputStream {
 	}
 
 	public boolean isCloneable() {
-		return true;
+		return false;
 	}
 
 }

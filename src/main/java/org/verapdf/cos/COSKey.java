@@ -5,35 +5,35 @@ package org.verapdf.cos;
  */
 public class COSKey {
 
-	private long number;
-	private long generation;
+	private int number;
+	private int generation;
 
 	public COSKey() {
 		this(0);
 	}
 
-	public COSKey(long number) {
+	public COSKey(int number) {
 		this(number, 0);
 	}
 
-	public COSKey(long number, long generation) {
+	public COSKey(int number, int generation) {
 		this.number = number;
 		this.generation = generation;
 	}
 
-	public long getNumber() {
+	public int getNumber() {
 		return number;
 	}
 
-	public void setNumber(long number) {
+	public void setNumber(int number) {
 		this.number = number;
 	}
 
-	public long getGeneration() {
+	public int getGeneration() {
 		return generation;
 	}
 
-	public void setGeneration(long generation) {
+	public void setGeneration(int generation) {
 		this.generation = generation;
 	}
 
@@ -51,8 +51,8 @@ public class COSKey {
 
 	@Override
 	public int hashCode() {
-		int result = (int) (number ^ (number >>> 32));
-		result = 31 * result + (int) (generation ^ (generation >>> 32));
+		int result = number;
+		result = 31 * result + generation;
 		return result;
 	}
 

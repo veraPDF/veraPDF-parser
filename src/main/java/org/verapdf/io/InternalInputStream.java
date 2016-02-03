@@ -40,7 +40,7 @@ public class InternalInputStream implements ASInputStream {
 	}
 
 	public long tellg() throws IOException {
-		return (int) this.source.getFilePointer();
+		return this.source.getFilePointer();
 	}
 
 	public InternalInputStream seekg(final long pos) throws IOException {
@@ -59,11 +59,6 @@ public class InternalInputStream implements ASInputStream {
 		return this;
 	}
 
-	public InternalInputStream get(Character ch) throws IOException {
-		ch = this.source.readChar();
-		return this;
-	}
-
 	public char get() throws IOException {
 		return (char) this.source.read();
 	}
@@ -75,6 +70,10 @@ public class InternalInputStream implements ASInputStream {
 
 	public boolean isEof() throws IOException {
 		return this.source.getFilePointer() == this.source.length();
+	}
+
+	public RandomAccessFile getStream() {
+		return this.source;
 	}
 
 }

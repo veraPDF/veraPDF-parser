@@ -1,4 +1,7 @@
-package org.verapdf.cos;
+package org.verapdf.cos.xref;
+
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSTrailer;
 
 /**
  * @author Timur Kamalov

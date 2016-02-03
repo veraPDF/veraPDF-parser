@@ -2,7 +2,7 @@ package org.verapdf.io;
 
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSTrailer;
-import org.verapdf.cos.COSXRefInfo;
+import org.verapdf.cos.xref.COSXRefInfo;
 
 import java.util.List;
 
