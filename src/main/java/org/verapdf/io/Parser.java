@@ -163,7 +163,7 @@ public class Parser {
 		char ch;
 		while (!this.stream.isEof()) {
 			ch = this.stream.get();
-			if (CharTable.isSpace(ch)) {
+			if (CharTable.isSpace((byte) ch)) {
 				continue;
 			}
 			if (ch == '%') {
@@ -301,25 +301,25 @@ public class Parser {
 	private void readHexString() throws IOException {
 		this.token.token = "";
 		char ch = 0;
-		char uc = 0;
-		char hex = 0;
+		byte uc = 0;
+		byte hex = 0;
 
 		boolean odd = false;
 		while (!this.stream.isEof()) {
 			ch = this.stream.get();
-			if (CharTable.isSpace(ch)) {
+			if (CharTable.isSpace((byte) ch)) {
 				continue;
 			} else if (ch == '>') {
 				if (odd) {
-					uc = (char) ((uc << 4) + hex);
+					uc <<= 4;
 					this.token.token += uc;
 				}
 				return;
 			} else {
-				hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
+				hex = COSFilterASCIIHexDecode.decodeLoHex((byte) ch);
 				if (hex < 16) { // skip all non-Hex characters
 					if (odd) {
-						uc = (char) ((uc << 4) + hex);
+						uc = (byte) ((uc << 4) + hex);
 						this.token.token += uc;
 						uc = 0;
 					} else {
@@ -336,28 +336,25 @@ public class Parser {
 		char ch = 0;
 		while (!this.stream.isEof()) {
 			ch = this.stream.get();
-			if (CharTable.isTokenDelimiter(ch)) {
+			if (CharTable.isTokenDelimiter((byte) ch)) {
 				this.stream.unread();
 				break;
 			}
 
 			if (ch == '#') {
-				char ch1 = 0, ch2 = 0, dc = 0;
+				char ch1 = 0, ch2 = 0;
+				byte dc = 0;
 				ch1 = this.stream.get();
-				if (true) { //TODO : && COSFilterASCIIHexDecode::DecodeLoHex(ch1) != COSFilterASCIIHexDecode::er
-					dc = ch1; //TODO : COSFilterASCIIHexDecode::DecodeLoHex(ch1);
-					ch1 = this.stream.get();
-					if (true) { //TODO : && COSFilterASCIIHexDecode::DecodeLoHex(ch1) != COSFilterASCIIHexDecode::er)
-						dc = ch1; //TODO : COSFilterASCIIHexDecode::DecodeLoHex(ch1);
-						ch2 = this.stream.get();
-						if (true) { //TODO : && COSFilterASCIIHexDecode::DecodeLoHex(ch2) != COSFilterASCIIHexDecode::er
-							dc = (char) ((dc << 4) + ch2); //TODO : COSFilterASCIIHexDecode::DecodeLoHex(ch2);
-							this.token.token += dc;
-						} else {
-							this.token.token += ch;
-							this.token.token += ch1;
-							this.stream.unread();
-						}
+				if (!stream.isEof() && COSFilterASCIIHexDecode.decodeLoHex((byte) ch1) != COSFilterASCIIHexDecode.er) {
+					dc = COSFilterASCIIHexDecode.decodeLoHex((byte) ch1);
+					ch2 = this.stream.get();
+					if (!this.stream.isEof() && COSFilterASCIIHexDecode.decodeLoHex((byte) ch2) != COSFilterASCIIHexDecode.er) {
+						dc = (byte) ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex((byte) ch2));
+						this.token.token += dc;
+					} else {
+						this.token.token += ch;
+						this.token.token += ch1;
+						this.stream.unread();
 					}
 				} else {
 					this.token.token += ch;
@@ -372,10 +369,9 @@ public class Parser {
 	private void readToken() throws IOException {
 		this.token.token = "";
 		char ch;
-		// TODO : while isNotEof?
 		while (!this.stream.isEof()) {
 			ch = this.stream.get();
-			if (CharTable.isTokenDelimiter(ch)) {
+			if (CharTable.isTokenDelimiter((byte) ch)) {
 				this.stream.unread();
 				break;
 			}
@@ -390,7 +386,7 @@ public class Parser {
 		char ch;
 		while (!this.stream.isEof()) {
 			ch = this.stream.get();
-			if (CharTable.isTokenDelimiter(ch)) {
+			if (CharTable.isTokenDelimiter((byte) ch)) {
 				this.stream.unread();
 				break;
 			}
@@ -413,11 +409,5 @@ public class Parser {
 			this.token = new Token();
 		}
 	}
-
-	/*
-	public ASSharedInStream getStream(final long length) {
-		// TODO : implement me
-	}
-	*/
 
 }

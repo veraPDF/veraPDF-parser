@@ -88,8 +88,17 @@ public class COSString extends COSDirect {
     }
 
     protected String toHexString() {
-        //TODO :
-        return new String();
+        String result = "";
+
+        result += '<';
+        for (int i = 0; i < this.value.length(); i++) {
+            final char c = this.value.charAt(i);
+            result += COSFilterASCIIHexEncode.asciiHexBig[c];
+            result += COSFilterASCIIHexEncode.asciiHexLittle[c];
+        }
+        result += '>';
+
+        return result;
     }
 
     protected String toLitString() {
@@ -106,22 +115,22 @@ public class COSString extends COSDirect {
                     result += "\\)";
                     break;
                 case '\n':
-                    result += "\n";
+                    result += '\n';
                     break;
                 case '\r':
-                    result += "\r";
+                    result += '\r';
                     break;
                 case '\t':
-                    result += "\t";
+                    result += '\t';
                     break;
                 case '\b':
-                    result += "\b";
+                    result += '\b';
                     break;
                 case '\f':
-                    result += "\f";
+                    result += '\f';
                     break;
                 case '\\':
-                    result += "\\";
+                    result += '\\';
                     break;
                 default:
                     result += ch;

@@ -1,5 +1,7 @@
 package org.verapdf.as;
 
+import org.verapdf.cos.COSFilterASCIIHexEncode;
+
 /**
  * Created by Timur on 12/18/2015.
  */
@@ -502,7 +504,7 @@ public class ASAtom {
     private String value;
 
     public ASAtom() {
-        this.value = new String();
+        this.value = "";
     }
 
     public ASAtom(String value) {
@@ -515,8 +517,20 @@ public class ASAtom {
 
     @Override
     public String toString() {
-        //TODO :
-        return "/" + value;
+        String result = "";
+
+        result += "/";
+        for (int i = 0; i < value.length(); i++) {
+            final char c = value.charAt(i);
+            if ( CharTable.isRegular((byte) c) && c != '#' && c > 32 && c < 127) {
+                result += c;
+            } else {
+                result += '#';
+                result += COSFilterASCIIHexEncode.asciiHexBig[c];
+                result += COSFilterASCIIHexEncode.asciiHexLittle[c];
+            }
+        }
+        return result;
     }
 
     @Override

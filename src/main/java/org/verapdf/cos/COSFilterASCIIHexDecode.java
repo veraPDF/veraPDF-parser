@@ -5,10 +5,10 @@ package org.verapdf.cos;
  */
 public class COSFilterASCIIHexDecode {
 
-	private final static char ws = 17;
-	private final static char er = 0;
+	public final static byte ws = 17;
+	public final static byte er = 0;
 
-	private final static char[] loHexTable = {
+	private final static byte[] loHexTable = {
 			ws, er, er, er, er, er, er, er, er, ws, ws, er, ws, ws, er, er, 	// 0  - 15
 			er, er, er, er, er, er, er, er, er, er, er, er, er, er, er, er, 	// 16 - 31
 			ws, er, er, er, er, er, er, er, er, er, er, er, er, er, er, er, 	// 32 - 47
@@ -27,9 +27,8 @@ public class COSFilterASCIIHexDecode {
 			er, er, er, er, er, er, er, er, er, er, er, er, er, er, er, er  	// 240 - 255
 	};
 
-	public static char decodeLoHex(char val) {
+	public static byte decodeLoHex(byte val) {
 		return loHexTable[val];
 	}
-
 
 }
