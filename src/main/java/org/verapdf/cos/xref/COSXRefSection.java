@@ -12,7 +12,7 @@ public class COSXRefSection {
 	private Map<Integer, COSXRefEntry> entries;
 
 	public COSXRefSection() {
-		this.entries = new HashMap<Integer, COSXRefEntry>();
+		this.entries = new TreeMap<Integer, COSXRefEntry>();
 		this.entries.put(0, new COSXRefEntry(0, 65535, 'f'));
 	}
 

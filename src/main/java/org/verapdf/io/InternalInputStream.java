@@ -59,8 +59,8 @@ public class InternalInputStream implements ASInputStream {
 		return this;
 	}
 
-	public char get() throws IOException {
-		return (char) this.source.read();
+	public byte get() throws IOException {
+		return this.source.readByte();
 	}
 
 	public InternalInputStream unread() throws IOException{

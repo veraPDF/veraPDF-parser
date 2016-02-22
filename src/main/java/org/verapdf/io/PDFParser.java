@@ -23,6 +23,9 @@ public class PDFParser extends Parser {
     private Queue<Integer> integers;
     private boolean flag;
 
+    private static final byte XREF_SEARCH_INC = 32;
+    private static final byte XREF_SEARCH_STEP_MAX = 32;
+
     public PDFParser(final String filename) throws Exception {
         super(filename);
         this.document = new COSDocument(null);
@@ -142,7 +145,7 @@ public class PDFParser extends Parser {
         return new COSObject();
     }
 
-	public COSObject getObject(final int offset) throws IOException {
+	public COSObject getObject(final long offset) throws IOException {
 		clear();
 
 		seek(offset);
@@ -265,6 +268,11 @@ public class PDFParser extends Parser {
 			closeInputStream();
 			throw new Exception("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 		}
+
+        if (trailer.knownKey(ASAtom.XREF_STM)) {
+            closeInputStream();
+            throw new Exception("PDFParser::GetTrailer(...)" + StringExceptions.XREF_STM_NOT_SUPPORTED);
+        }
 	}
 
     private COSObject getArray() throws IOException {

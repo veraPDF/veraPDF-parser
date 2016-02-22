@@ -2,10 +2,15 @@ package org.verapdf.cos;
 
 import org.verapdf.cos.visitor.IVisitor;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Created by Timur on 12/18/2015.
  */
 public class COSReal extends COSNumber {
+
+    private static final NumberFormat formatter = new DecimalFormat("#0.000000");
 
     private double value;
 
@@ -55,7 +60,16 @@ public class COSReal extends COSNumber {
     }
 
     public String toString() {
-        return String.valueOf(this.value);
+        String stringValue = formatter.format(this.value);
+        // remove fraction digit "0" only
+        if (stringValue.indexOf('.') > -1 && !stringValue.endsWith(".0"))
+        {
+            while (stringValue.endsWith("0") && !stringValue.endsWith(".0"))
+            {
+                stringValue = stringValue.substring(0,stringValue.length()-1);
+            }
+        }
+        return stringValue;
     }
 
 }

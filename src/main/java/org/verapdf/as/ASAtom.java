@@ -521,13 +521,13 @@ public class ASAtom {
 
         result += "/";
         for (int i = 0; i < value.length(); i++) {
-            final char c = value.charAt(i);
-            if ( CharTable.isRegular((byte) c) && c != '#' && c > 32 && c < 127) {
-                result += c;
+            final int c = value.charAt(i);
+            if ( CharTable.isRegular(c) && c != '#' && c > 32 && c < 127) {
+                result += (char) c;
             } else {
                 result += '#';
-                result += COSFilterASCIIHexEncode.asciiHexBig[c];
-                result += COSFilterASCIIHexEncode.asciiHexLittle[c];
+                result += (char) COSFilterASCIIHexEncode.asciiHexBig[c];
+                result += (char) COSFilterASCIIHexEncode.asciiHexLittle[c];
             }
         }
         return result;

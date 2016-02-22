@@ -59,7 +59,7 @@ public class Writer implements IVisitor {
 
 	public void visitFromBoolean(COSBoolean obj) {
 		try {
-			this.write(obj.get());
+			this.write(String.valueOf(obj.get()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -189,7 +189,6 @@ public class Writer implements IVisitor {
 			this.write(key);
 			this.write(" R");
 		} catch (IOException e) {
-			//TODO : ASException, message
 			throw new RuntimeException(e.getMessage());
 		}
 	}

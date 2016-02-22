@@ -154,21 +154,32 @@ public class CharTable {
 	public static final byte ASCII_CR = 13;
 	public static final byte ASCII_SPACE = 32;
 
-	public static byte getAttributes(byte c) {
+	public static final byte ASCII_LEFT_PAR = 40;
+	public static final byte ASCII_RIGHT_PAR = 41;
+
+	public static byte getAttributes(int c) {
 		return charAttributes[c];
 	}
 
-	public static boolean isSpace(byte c) {
+	public static boolean isSpace(int c) {
+		if (c < 0 || c > 255) {
+			return false;
+		}
 		return (getAttributes(c) & SPACE) != 0;
 	}
 
-	public static boolean isTokenDelimiter(byte c) {
+	public static boolean isTokenDelimiter(int c) {
+		if (c < 0 || c > 255) {
+			return false;
+		}
 		return (getAttributes(c) & (SPACE | DELIMITER)) != 0;
 	}
 
-	public static boolean isRegular(byte c) {
+	public static boolean isRegular(int c) {
+		if (c < 0 || c > 255) {
+			return false;
+		}
 		return (getAttributes(c) & (SPACE | DELIMITER)) == 0;
 	}
-
 
 }
