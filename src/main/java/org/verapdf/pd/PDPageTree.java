@@ -22,29 +22,29 @@ public class PDPageTree {
 	}
 
 	public COSObject getObject() {
-		return getRoot().getObject();
+		return this.getRoot().getObject();
 	}
 
 	public void setObject(final COSObject object) throws Exception {
-		getRoot().setObject(object);
+		this.getRoot().setObject(object);
 	}
 
 	public boolean empty() {
-		return getRoot().empty();
+		return this.getRoot().empty();
 	}
 
 	public int getPageCount() {
-		return getRoot().getLeafCount();
+		return this.getRoot().getLeafCount();
 	}
 
-	public PDPage getPage(int index) {
-		if (index < getPageCount()) {
-			int totalIndex = index;
-			PDPageTreeBranch term = getRoot().findTerminal(index);
-			PDPage page = (PDPage) term.getChild(index);
+	public PDPage getPage(final int index) {
+		if (index < this.getPageCount()) {
+			final int totalIndex = index;
+			final PDPageTreeBranch term = this.getRoot().findTerminal(index);
+			final PDPage page = (PDPage) term.getChild(index);
 			if (page != null) {
-				page.num = index;
-				page.totalNum = totalIndex;
+				page.pageNumber = index;
+				page.pagesTotal = totalIndex;
 			}
 			return page;
 		} else {
@@ -52,19 +52,19 @@ public class PDPageTree {
 		}
 	}
 
-	public PDPage newPage(int insertAt) throws Exception {
-		PDPage page = new PDPage(null);
-		if (addPage(page, insertAt)) {
-			page.num = insertAt == -1 ? getPageCount() - 1 : insertAt;
+	public PDPage newPage(final int insertAt) throws Exception {
+		final PDPage page = new PDPage(null);
+		if (this.addPage(page, insertAt)) {
+			page.pageNumber = (insertAt == -1 ? this.getPageCount() - 1 : insertAt);
 		}
 		return page;
 	}
 
-	public boolean addPage(PDPage page, int insertAt) throws Exception {
-		PDPageTreeBranch branch = getRoot().findTerminal(insertAt);
+	public boolean addPage(final PDPage page, final int insertAt) throws Exception {
+		final PDPageTreeBranch branch = this.getRoot().findTerminal(insertAt);
 
 		if (branch.insertLeaf(page, insertAt)) {
-			this.root = getRoot().getParent();
+			this.root = this.getRoot().getParent();
 			return true;
 		}
 		return false;

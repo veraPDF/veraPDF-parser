@@ -21,61 +21,63 @@ public class PDPage extends PDPageTreeNode {
     public static double PAGE_SIZE_LEGAL[] = {0, 0, 612, 792};
 
     //private PDContentStream content;
-    int num;
-    int totalNum;
+    int pageNumber;
+    int pagesTotal;
 
-    public PDPage(final double bbox[], final COSDocument doc) {
+    public PDPage(final double bbox[], final COSDocument document) {
         super();
-        this.num = 0;
-        this.totalNum = 0;
-        COSObject page = COSDictionary.construct();
+
+        this.pageNumber = 0;
+        this.pagesTotal = 0;
+
+        final COSObject page = COSDictionary.construct();
         page.setNameKey(ASAtom.TYPE, ASAtom.PAGE);
         page.setArrayKey(ASAtom.MEDIA_BOX, 4, bbox);
         page.setArrayKey(ASAtom.CONTENTS);
-        COSObject obj = COSIndirect.construct(page, doc);
-        setObject(obj);
+        final COSObject indirect = COSIndirect.construct(page, document);
+        this.setObject(indirect);
     }
 
     public PDPage(final COSObject obj) {
         super();
-        this.num = 0;
-        this.totalNum = 0;
-        setObject(obj);
+        this.pageNumber = 0;
+        this.pagesTotal = 0;
+        super.setObject(obj);
     }
 
     public void setBBox(final double[] bbox, final ASAtom boxType) {
-        getObject().setArrayKey(boxType, 4, bbox);
+        this.getObject().setArrayKey(boxType, 4, bbox);
     }
 
     public boolean getBBox(final double[] bbox, final ASAtom boxType) {
-        COSObject obj = getKey(boxType);
-        if (!obj.empty() && obj.size() >= 4) {
+        COSObject object = this.getKey(boxType);
+        if (!object.empty() && object.size() >= 4) {
             for (int i = 0; i < 4; i++) {
-                bbox[i] = obj.at(i).getReal();
+                bbox[i] = object.at(i).getReal();
             }
             return true;
         } else {
-            if (boxType == ASAtom.MEDIA_BOX)
-            {
+            if (boxType == ASAtom.MEDIA_BOX) {
                 // if we are here this means that page media box is missing. Return then the default one
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++) {
                     bbox[i] = PDPage.PAGE_SIZE_LETTER[i];
+                }
             } else if (boxType == ASAtom.CROP_BOX) {
-                getBBox(bbox, ASAtom.MEDIA_BOX);
+                this.getBBox(bbox, ASAtom.MEDIA_BOX);
             } else if (boxType == ASAtom.BLEED_BOX || boxType == ASAtom.TRIM_BOX || boxType == ASAtom.ART_BOX) {
-                getBBox(bbox, ASAtom.CROP_BOX);
+                this.getBBox(bbox, ASAtom.CROP_BOX);
             } else {
-                getBBox(bbox, ASAtom.MEDIA_BOX);
+                this.getBBox(bbox, ASAtom.MEDIA_BOX);
             }
 
             return false;
         }
     }
 
-    public PDDocument getPDDoc() {
-        COSDocument cosDoc = getObject().getDocument();
-        if (cosDoc != null) {
-            return cosDoc.getPDDoc();
+    public PDDocument getPDDocument() {
+        final COSDocument cosDocument = super.getObject().getDocument();
+        if (cosDocument != null) {
+            return cosDocument.getPDDocument();
         } else {
             return null;
         }
@@ -99,7 +101,7 @@ public class PDPage extends PDPageTreeNode {
     */
 
     public int getPageNumber() {
-        return this.totalNum;
+        return pagesTotal;
     }
 
     //TODO : impelement this

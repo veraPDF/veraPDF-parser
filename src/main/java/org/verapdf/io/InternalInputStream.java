@@ -39,11 +39,11 @@ public class InternalInputStream implements ASInputStream {
 		return false;
 	}
 
-	public long tellg() throws IOException {
+	public long getOffset() throws IOException {
 		return this.source.getFilePointer();
 	}
 
-	public InternalInputStream seekg(final long pos) throws IOException {
+	public InternalInputStream seek(final long pos) throws IOException {
 		this.source.seek(pos);
 		return this;
 	}
@@ -54,12 +54,12 @@ public class InternalInputStream implements ASInputStream {
 		return this;
 	}
 
-	public InternalInputStream seekFromCurPos(final long pos) throws IOException {
-		this.source.seek(tellg() + pos);
+	public InternalInputStream seekFromCurrentPosition(final long pos) throws IOException {
+		this.source.seek(getOffset() + pos);
 		return this;
 	}
 
-	public byte get() throws IOException {
+	public byte read() throws IOException {
 		return this.source.readByte();
 	}
 

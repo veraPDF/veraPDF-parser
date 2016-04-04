@@ -25,19 +25,19 @@ public class Parser {
 	}
 
 	public long getOffset() throws IOException {
-		return this.stream.tellg();
+		return this.stream.getOffset();
 	}
 
 	public void seek(final long offset) throws IOException {
-		this.stream.seekg(offset);
+		this.stream.seek(offset);
 	}
 
-	public void seekFromEnd(final int pos) throws IOException {
-		this.stream.seekFromEnd(pos);
+	public void seekFromEnd(final int offset) throws IOException {
+		this.stream.seekFromEnd(offset);
 	}
 
-	public void seekFromCurPos(final int pos) throws IOException {
-		this.stream.seekFromCurPos(pos);
+	public void seekFromCurrentPosition(final int offset) throws IOException {
+		this.stream.seekFromCurrentPosition(offset);
 	}
 
 	// PROTECTED METHODS
@@ -48,15 +48,15 @@ public class Parser {
 
 	protected String getLine(final int offset) throws IOException {
 		initializeToken();
-		this.stream.seekg(offset);
+		this.stream.seek(offset);
 		this.token.token = "";
-		byte ch = this.stream.get();
+		byte ch = this.stream.read();
 		while (!this.stream.isEof()) {
 			if (ch == CharTable.ASCII_LF || ch == CharTable.ASCII_CR) {
 				break;
 			}
 			appendToToken(ch);
-			ch = this.stream.get();
+			ch = this.stream.read();
 		}
 		return this.token.token;
 	}
@@ -78,7 +78,7 @@ public class Parser {
 
 		this.token.type = Token.Type.TT_NONE;
 
-		byte ch = this.stream.get();
+		byte ch = this.stream.read();
 
 		switch (ch) {
 			case '(':
@@ -89,7 +89,7 @@ public class Parser {
 				//error
 				break;
 			case '<':
-				ch = stream.get();
+				ch = stream.read();
 				if (ch == '<') {
 					this.token.type = Token.Type.TT_OPENDICT;
 				} else {
@@ -99,7 +99,7 @@ public class Parser {
 				}
 				break;
 			case '>':
-				ch = this.stream.get();
+				ch = this.stream.read();
 				if (ch == '>') {
 					this.token.type = Token.Type.TT_CLOSEDICT;
 				} else {
@@ -152,8 +152,8 @@ public class Parser {
 
 	public ASInputStream getStream(final long length) throws IOException {
 		skipEOL();
-		ASInputStream result = new ASFileInStream(this.stream.getStream(), this.stream.tellg(), length);
-		stream.seekFromCurPos(length);
+		ASInputStream result = new ASFileInStream(this.stream.getStream(), this.stream.getOffset(), length);
+		stream.seekFromCurrentPosition(length);
 
 		return result;
 	}
@@ -163,7 +163,7 @@ public class Parser {
 	private void skipSpaces() throws IOException {
 		byte ch;
 		while (!this.stream.isEof()) {
-			ch = this.stream.get();
+			ch = this.stream.read();
 			if (CharTable.isSpace(ch)) {
 				continue;
 			}
@@ -179,13 +179,13 @@ public class Parser {
 
 	private void skipEOL() throws IOException {
 		// skips EOL == { CR, LF, CRLF } only if it is the first symbol(s)
-		byte ch = this.stream.get();
+		byte ch = this.stream.read();
 		if (ch == CharTable.ASCII_LF) {
 			return; // EOL == LF
 		}
 
 		if (ch == CharTable.ASCII_CR) {
-			ch = this.stream.get();
+			ch = this.stream.read();
 			if (ch == CharTable.ASCII_LF) {
 				return; // EOL == CRLF
 				// else EOL == CR and ch == next character
@@ -199,13 +199,13 @@ public class Parser {
 		// skips all characters till EOL == { CR, LF, CRLF }
 		byte ch;
 		while (!this.stream.isEof()) {
-			ch = this.stream.get();
+			ch = this.stream.read();
 			if (ch == CharTable.ASCII_LF) {
 				return; // EOL == LF
 			}
 
 			if (ch == CharTable.ASCII_CR) {
-				ch = this.stream.get();
+				ch = this.stream.read();
 				if (ch != CharTable.ASCII_LF) { // EOL == CR
 					this.stream.unread();
 				} // else EOL == CRLF
@@ -220,7 +220,7 @@ public class Parser {
 
 		int parenthesesDepth = 0;
 
-		byte ch = this.stream.get();
+		byte ch = this.stream.read();
 		while (!this.stream.isEof()) {
 			switch (ch) {
 				default:
@@ -239,7 +239,7 @@ public class Parser {
 					appendToToken(ch);
 					break;
 				case '\\': {
-					ch = this.stream.get();
+					ch = this.stream.read();
 					switch (ch) {
 						case '(':
 							appendToToken(CharTable.ASCII_LEFT_PAR);
@@ -273,7 +273,7 @@ public class Parser {
 							// look for 1, 2, or 3 octal characters
 							char ch1 = (char) (ch - '0');
 							for (int i = 1; i < 3; i++) {
-								ch = this.stream.get();
+								ch = this.stream.read();
 								if (ch < '0' || ch > '7') {
 									this.stream.unread();
 									break;
@@ -287,7 +287,7 @@ public class Parser {
 						case CharTable.ASCII_LF:
 							break;
 						case CharTable.ASCII_CR:
-							ch = this.stream.get();
+							ch = this.stream.read();
 							if (ch != CharTable.ASCII_LF) {
 								this.stream.unread();
 							}
@@ -300,7 +300,7 @@ public class Parser {
 				}
 			}
 
-			ch = stream.get();
+			ch = stream.read();
 		}
 	}
 
@@ -312,7 +312,7 @@ public class Parser {
 
 		boolean odd = false;
 		while (!this.stream.isEof()) {
-			ch = this.stream.get();
+			ch = this.stream.read();
 			if (CharTable.isSpace(ch)) {
 				continue;
 			} else if (ch == '>') {
@@ -341,7 +341,7 @@ public class Parser {
 		this.token.token = "";
 		byte ch;
 		while (!this.stream.isEof()) {
-			ch = this.stream.get();
+			ch = this.stream.read();
 			if (CharTable.isTokenDelimiter(ch)) {
 				this.stream.unread();
 				break;
@@ -350,10 +350,10 @@ public class Parser {
 			if (ch == '#') {
 				byte ch1, ch2;
 				int dc;
-				ch1 = this.stream.get();
+				ch1 = this.stream.read();
 				if (!stream.isEof() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.er) {
 					dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
-					ch2 = this.stream.get();
+					ch2 = this.stream.read();
 					if (!this.stream.isEof() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.er) {
 						dc = ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
 						appendToToken(dc);
@@ -376,7 +376,7 @@ public class Parser {
 		this.token.token = "";
 		byte ch;
 		while (!this.stream.isEof()) {
-			ch = this.stream.get();
+			ch = this.stream.read();
 			if (CharTable.isTokenDelimiter(ch)) {
 				this.stream.unread();
 				break;
@@ -391,7 +391,7 @@ public class Parser {
 		this.token.type = Token.Type.TT_INTEGER;
 		byte ch;
 		while (!this.stream.isEof()) {
-			ch = this.stream.get();
+			ch = this.stream.read();
 			if (CharTable.isTokenDelimiter(ch)) {
 				this.stream.unread();
 				break;

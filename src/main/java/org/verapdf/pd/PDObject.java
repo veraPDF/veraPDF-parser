@@ -14,27 +14,27 @@ public class PDObject {
 		this.object = new COSObject();
 	}
 
-	public PDObject(final COSObject obj) throws Exception{
-		setObject(obj);
+	public PDObject(final COSObject obj) throws Exception {
+		this.setObject(obj);
 	}
 
 	public boolean empty() {
-		return this.object.empty();
+		return object.empty();
 	}
 
 	public void clear() {
-		this.object.clear();
+		object.clear();
 	}
 
 	public COSObject getObject() {
-		return this.object;
+		return object;
 	}
 
-	public void setObject(COSObject object) {
-		setObject(object, true);
+	public void setObject(final COSObject object) {
+		this.setObject(object, true);
 	}
 
-	public void setObject(COSObject object, boolean update) {
+	public void setObject(final COSObject object, final boolean update) {
 		this.object = object;
 		if (update) {
 			updateFromObject();
@@ -42,19 +42,19 @@ public class PDObject {
 	}
 
 	public boolean knownKey(final ASAtom key) {
-		return this.object.knownKey(key);
+		return object.knownKey(key);
 	}
 
 	public COSObject getKey(final ASAtom key) {
-		return this.object.getKey(key);
+		return object.getKey(key);
 	}
 
 	public void setKey(final ASAtom key, final COSObject value) {
-		this.object.setKey(key, value);
+		object.setKey(key, value);
 	}
 
 	public void removeKey(final ASAtom key) {
-		this.object.removeKey(key);
+		object.removeKey(key);
 	}
 
 	// VIRTUAL METHODS

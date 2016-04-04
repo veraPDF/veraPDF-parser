@@ -94,7 +94,7 @@ public class COSDocument {
 		return this.trailer;
 	}
 
-	public PDDocument getPDDoc() {
+	public PDDocument getPDDocument() {
 		return this.doc;
 	}
 

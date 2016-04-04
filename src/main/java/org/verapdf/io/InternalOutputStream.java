@@ -21,7 +21,6 @@ public class InternalOutputStream implements ASOutputStream {
 		File file = new File(fileName);
 		if (file.exists()) {
 			if (!file.delete()) {
-				//TODO : ASException
 				throw new RuntimeException("Cannot create file : " + fileName);
 			}
 		}
@@ -31,13 +30,13 @@ public class InternalOutputStream implements ASOutputStream {
 	public long write(final byte[] buffer) throws IOException {
 		long oldPos = this.os.getFilePointer();
 		this.os.write(buffer);
-		return tellp() - oldPos;
+		return getOffset() - oldPos;
 	}
 
 	public long write(final byte[] buffer, final int size) throws IOException {
 		long oldPos = this.os.getFilePointer();
 		this.os.write(buffer, 0, size);
-		return tellp() - oldPos;
+		return getOffset() - oldPos;
 	}
 
 	public void close() throws IOException {
@@ -48,11 +47,11 @@ public class InternalOutputStream implements ASOutputStream {
 		this.os.seek(this.os.length());
 	}
 
-	public long tellp() throws IOException {
+	public long getOffset() throws IOException {
 		return this.os.getFilePointer();
 	}
 
-	public InternalOutputStream seekp(long offset) throws IOException {
+	public InternalOutputStream seek(long offset) throws IOException {
 		this.os.seek(offset);
 		return this;
 	}

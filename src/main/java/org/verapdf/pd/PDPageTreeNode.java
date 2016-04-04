@@ -14,7 +14,7 @@ public class PDPageTreeNode extends PDObject {
 	}
 
 	public PDPageTreeNode(final COSObject obj) {
-		setObject(obj);
+		super.setObject(obj);
 	}
 
 	public PDPageTreeBranch getParent() {
@@ -24,7 +24,7 @@ public class PDPageTreeNode extends PDObject {
 	public void setParent(final PDPageTreeBranch parent) {
 		this.parent = parent;
 		if (parent != null) {
-			getObject().setKey(ASAtom.PARENT, parent.getObject());
+			super.getObject().setKey(ASAtom.PARENT, parent.getObject());
 		}
 	}
 

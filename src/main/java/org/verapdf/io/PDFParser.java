@@ -229,7 +229,7 @@ public class PDFParser extends Parser {
 			}
 			nextToken();
 		}
-		seekFromCurPos(-7);
+		seekFromCurrentPosition(-7);
 	}
 
 	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws Exception {

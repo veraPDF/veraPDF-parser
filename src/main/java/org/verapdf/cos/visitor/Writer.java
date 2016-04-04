@@ -295,7 +295,7 @@ public class Writer implements IVisitor {
 
 	protected long getOffset() {
 		try {
-			return this.os.tellp();
+			return this.os.getOffset();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return 0;
