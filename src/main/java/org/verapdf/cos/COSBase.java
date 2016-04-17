@@ -2,7 +2,11 @@ package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author Timur Kamalov
@@ -17,6 +21,7 @@ public abstract class COSBase {
 
 	// VISITOR DESIGN PATTERN
 	public abstract void accept(final IVisitor visitor);
+	public abstract Object accept(final ICOSVisitor visitor);
 
 	// BOOLEAN VALUES
 	public abstract boolean getBoolean();
@@ -71,6 +76,8 @@ public abstract class COSBase {
 	public abstract boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value);
 	public abstract boolean setArrayKey(final ASAtom key, final int size, final double[] value);
 	public abstract void removeKey(final ASAtom key);
+	public abstract Set<ASAtom> getKeySet();
+	public abstract Collection<COSObject> getValues();
 
 	// STREAMS
 	public abstract ASInputStream getData();

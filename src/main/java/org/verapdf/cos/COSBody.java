@@ -1,6 +1,8 @@
 package org.verapdf.cos;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,6 +14,17 @@ public class COSBody {
 
 	public COSBody() {
 		this.table = new HashMap<COSKey, COSObject>();
+	}
+
+	public List<COSObject> getAll() {
+		List<COSObject> result = new ArrayList<>();
+		for (Map.Entry<COSKey, COSObject> entry : table.entrySet()) {
+			COSObject value = entry.getValue();
+			if (value != null) {
+				result.add(value);
+			}
+		}
+		return result;
 	}
 
 	public COSObject get(final COSKey key) {

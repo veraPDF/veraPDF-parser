@@ -4,6 +4,10 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.visitor.IVisitor;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * @author Timur Kamalov
  */
@@ -276,6 +280,23 @@ public class COSObject {
 			this.base.removeKey(key);
 		}
 	}
+
+	public Set<ASAtom> getKeySet() {
+		if (this.base != null) {
+			return this.base.getKeySet();
+		} else {
+			return Collections.emptySet();
+		}
+	}
+
+	public Collection<COSObject> getValues() {
+		if (this.base != null) {
+			return this.base.getValues();
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
 
 	public ASInputStream getData() {
 		return getData(COSStream.FilterFlags.RAW_DATA);

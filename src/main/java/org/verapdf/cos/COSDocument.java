@@ -7,6 +7,8 @@ import org.verapdf.io.Reader;
 import org.verapdf.pd.PDDocument;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Timur Kamalov
@@ -52,6 +54,30 @@ public class COSDocument {
 
 	public void setHeader(String header) {
 		this.header.set(header);
+	}
+
+	public List<COSObject> getObjects() {
+		List<COSObject> result = new ArrayList<>();
+		COSKey key = new COSKey();
+		try {
+			List<COSObject> objects = this.body.getAll();
+			for (COSObject object : objects) {
+				if (!object.empty()) {
+					result.add(object);
+					continue;
+				}
+
+				key = object.getKey();
+				COSObject newObj = this.reader.getObject(key);
+				this.body.set(key, newObj);
+				result.add(newObj);
+			}
+		} catch (IOException e) {
+			//TODO :
+			throw new RuntimeException("Error while parsing object : " + key.getNumber() +
+					" " + key.getGeneration());
+		}
+		return result;
 	}
 
 	public COSObject getObject(final COSKey key) {

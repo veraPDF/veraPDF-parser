@@ -1,15 +1,17 @@
 package org.verapdf.cos;
 
+import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by Timur on 12/23/2015.
  */
-public class COSArray extends COSDirect {
+public class COSArray extends COSDirect implements Iterable {
 
     private List<COSObject> entries;
 
@@ -65,8 +67,17 @@ public class COSArray extends COSDirect {
         visitor.visitFromArray(this);
     }
 
+    public Object accept(final ICOSVisitor visitor) {
+        return visitor.visitFromArray(this);
+    }
+
     public int size() {
         return this.entries.size();
+    }
+
+    //TODO : cosbase?
+    public Iterator<COSObject> iterator() {
+        return this.entries.iterator();
     }
 
     public COSObject at(final int i) {

@@ -3,6 +3,10 @@ package org.verapdf.cos;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * Created by Timur on 12/17/2015.
  */
@@ -169,6 +173,14 @@ public abstract class COSDirect extends COSBase {
     }
 
     public void removeKey(final ASAtom key) {
+    }
+
+    public Set<ASAtom> getKeySet() {
+        return Collections.emptySet();
+    }
+
+    public Collection<COSObject> getValues() {
+        return Collections.emptyList();
     }
 
     // STREAMS

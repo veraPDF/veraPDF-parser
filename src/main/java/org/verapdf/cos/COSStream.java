@@ -2,6 +2,7 @@ package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 /**
@@ -79,6 +80,10 @@ public class COSStream extends COSDictionary {
 
 	public void accept(final IVisitor visitor) {
 		visitor.visitFromStream(this);
+	}
+
+	public Object accept(final ICOSVisitor visitor) {
+		return visitor.visitFromStream(this);
 	}
 
 	public ASInputStream getData() {

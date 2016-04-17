@@ -1,6 +1,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 /**
@@ -28,6 +29,10 @@ public class COSName extends COSDirect {
         return COSObjType.COSNameT;
     }
 
+    public static COSBase fromValue(final ASAtom value) {
+        return new COSName(value);
+    }
+
     public static COSObject construct(final ASAtom value) {
         return new COSObject(new COSName(value));
     }
@@ -38,6 +43,10 @@ public class COSName extends COSDirect {
 
     public void accept(final IVisitor visitor) {
         visitor.visitFromName(this);
+    }
+
+    public Object accept(final ICOSVisitor visitor) {
+        return visitor.visitFromName(this);
     }
 
     //! ASAtom data exchange

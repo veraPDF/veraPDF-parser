@@ -1,5 +1,6 @@
 package org.verapdf.cos;
 
+import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 /**
@@ -36,6 +37,10 @@ public class COSString extends COSDirect {
 
     public void accept(final IVisitor visitor) {
         visitor.visitFromString(this);
+    }
+
+    public Object accept(final ICOSVisitor visitor) {
+        return visitor.visitFromString(this);
     }
 
     public COSObjType getType() {

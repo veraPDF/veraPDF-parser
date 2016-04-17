@@ -77,6 +77,10 @@ public class PDDocument {
 		return catalog;
 	}
 
+	public COSDocument getDocument() {
+		return document;
+	}
+
 	public int getNumberOfPages() throws Exception {
 		return this.getCatalog().getPageTree().getPageCount();
 	}

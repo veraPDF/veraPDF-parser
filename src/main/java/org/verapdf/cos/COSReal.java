@@ -1,5 +1,6 @@
 package org.verapdf.cos;
 
+import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.text.DecimalFormat;
@@ -31,6 +32,10 @@ public class COSReal extends COSNumber {
 
     public void accept(final IVisitor visitor) {
         visitor.visitFromReal(this);
+    }
+
+    public Object accept(final ICOSVisitor visitor) {
+        return visitor.visitFromReal(this);
     }
 
     public long getInteger() {

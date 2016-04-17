@@ -1,8 +1,10 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -106,6 +108,10 @@ public class COSDictionary extends COSDirect {
 
     public void accept(IVisitor visitor) {
         visitor.visitFromDictionary(this);
+    }
+
+    public Object accept(final ICOSVisitor visitor) {
+        return visitor.visitFromDictionary(this);
     }
 
     public int size() {
@@ -214,6 +220,14 @@ public class COSDictionary extends COSDirect {
     // Instead of iterator
     public Set<Map.Entry<ASAtom, COSObject>> getEntrySet() {
         return this.entries.entrySet();
+    }
+
+    public Set<ASAtom> getKeySet() {
+        return this.entries.keySet();
+    }
+
+    public Collection<COSObject> getValues() {
+        return this.entries.values();
     }
 
 }

@@ -1,11 +1,15 @@
 package org.verapdf.cos;
 
+import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 /**
  * Created by Timur on 12/18/2015.
  */
 public class COSBoolean extends COSDirect {
+
+    public static final COSBoolean TRUE = new COSBoolean(true);
+    public static final COSBoolean FALSE = new COSBoolean(false);
 
     private boolean value;
 
@@ -27,6 +31,10 @@ public class COSBoolean extends COSDirect {
 
     public void accept(final IVisitor visitor) {
         visitor.visitFromBoolean(this);
+    }
+
+    public Object accept(final ICOSVisitor visitor) {
+        return visitor.visitFromBoolean(this);
     }
 
     public boolean getBoolean() {

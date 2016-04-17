@@ -2,7 +2,11 @@ package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created by Timur on 12/17/2015.
@@ -63,6 +67,10 @@ public class COSIndirect extends COSBase {
 
     public void accept(final IVisitor visitor) {
         visitor.visitFromIndirect(this);
+    }
+
+    public Object accept(final ICOSVisitor visitor) {
+        return null;
     }
 
     //! Boolean values
@@ -244,6 +252,15 @@ public class COSIndirect extends COSBase {
 
     public void removeKey(final ASAtom key) {
         getDirect().removeKey(key);
+    }
+
+
+    public Set<ASAtom> getKeySet() {
+        return getDirect().getKeySet();
+    }
+
+    public Collection<COSObject> getValues() {
+        return getDirect().getValues();
     }
 
     // STREAMS
