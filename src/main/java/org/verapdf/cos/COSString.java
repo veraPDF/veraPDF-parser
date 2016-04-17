@@ -147,4 +147,8 @@ public class COSString extends COSDirect {
         return result;
     }
 
+    public String getLitString() {
+        return toLitString();
+    }
+
 }

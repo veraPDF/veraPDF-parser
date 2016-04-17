@@ -18,7 +18,7 @@ public class COSFilters extends PDObject {
 
 	public COSFilters() {
 		super();
-		this.entries = new ArrayList<ASAtom>();
+		this.entries = new ArrayList<>();
 	}
 
 	public COSFilters(final COSObject object) {
@@ -46,6 +46,10 @@ public class COSFilters extends PDObject {
 
 	public int size() {
 		return this.entries.size();
+	}
+
+	public List<ASAtom> getFilters() {
+		return entries;
 	}
 
 	protected void updateToObject() {

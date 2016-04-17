@@ -33,6 +33,10 @@ public class COSName extends COSDirect {
         return new COSName(value);
     }
 
+    public static COSBase fromValue(final String value) {
+        return new COSName(value);
+    }
+
     public static COSObject construct(final ASAtom value) {
         return new COSObject(new COSName(value));
     }
