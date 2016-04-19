@@ -322,6 +322,22 @@ public class COSObject {
 		}
 	}
 
+	public boolean isStreamKeywordCRLFCompliant() {
+		return this.base != null && this.base.isStreamKeywordCRLFCompliant();
+	}
+
+	public void setStreamKeywordCRLFCompliant(final boolean streamKeywordCRLFCompliant) {
+		if (this.base == null || !this.base.setStreamKeywordCRLFCompliant(streamKeywordCRLFCompliant)) {
+			COSObject obj;
+			if (this.base instanceof COSDictionary) {
+				obj = COSStream.construct((COSDictionary) this.base);
+			} else {
+				obj = COSStream.construct();
+			}
+			this.base = obj.base;
+		}
+	}
+
 	//! Indirect object
 	public boolean isIndirect() {
 		return this.base != null && this.base.isIndirect();

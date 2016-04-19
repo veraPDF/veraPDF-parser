@@ -200,6 +200,14 @@ public abstract class COSDirect extends COSBase {
         return false;
     }
 
+    public boolean isStreamKeywordCRLFCompliant() {
+        return false;
+    }
+
+    public boolean setStreamKeywordCRLFCompliant(final boolean streamKeywordCRLFCompliant) {
+        return false;
+    }
+
     // INDIRECT OBJECT
     public boolean isIndirect() {
         return false;

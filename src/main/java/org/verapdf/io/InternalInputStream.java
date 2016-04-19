@@ -68,6 +68,11 @@ public class InternalInputStream implements ASInputStream {
 		return this;
 	}
 
+	public InternalInputStream unread(final int count) throws IOException{
+		this.source.seek(this.source.getFilePointer() - count);
+		return this;
+	}
+
 	public boolean isEof() throws IOException {
 		return this.source.getFilePointer() == this.source.length();
 	}

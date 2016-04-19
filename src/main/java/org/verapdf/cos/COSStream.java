@@ -13,9 +13,13 @@ public class COSStream extends COSDictionary {
 	private ASInputStream stream;
 	private FilterFlags flags;
 
+	private boolean streamKeywordCRLFCompliant;
+
 	protected COSStream() {
 		super();
 		this.flags = FilterFlags.RAW_DATA;
+
+		this.streamKeywordCRLFCompliant = true;
 
 		setIndirectLength(0);
 	}
@@ -24,6 +28,8 @@ public class COSStream extends COSDictionary {
 		super();
 		this.stream = stream;
 		this.flags = FilterFlags.RAW_DATA;
+
+		this.streamKeywordCRLFCompliant = true;
 
 		setIndirectLength(0);
 	}
@@ -105,6 +111,15 @@ public class COSStream extends COSDictionary {
 	public boolean setData(final ASInputStream stream, FilterFlags flags) {
 		this.stream = stream;
 		this.flags = flags;
+		return true;
+	}
+
+	public boolean isStreamKeywordCRLFCompliant() {
+		return streamKeywordCRLFCompliant;
+	}
+
+	public boolean setStreamKeywordCRLFCompliant(boolean streamKeywordCRLFCompliant) {
+		this.streamKeywordCRLFCompliant = streamKeywordCRLFCompliant;
 		return true;
 	}
 

@@ -86,6 +86,9 @@ public abstract class COSBase {
 	public abstract boolean setData(final ASInputStream stream);
 	public abstract boolean setData(final ASInputStream stream, final COSStream.FilterFlags flags);
 
+	public abstract boolean isStreamKeywordCRLFCompliant();
+	public abstract boolean setStreamKeywordCRLFCompliant(final boolean streamKeywordCRLFCompliant);
+
 	// INDIRECT OBJECT
 	public abstract boolean isIndirect();
 	public abstract COSKey getKey();

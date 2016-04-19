@@ -281,6 +281,15 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
+    public boolean isStreamKeywordCRLFCompliant() {
+        return getDirect().isStreamKeywordCRLFCompliant();
+    }
+
+    public boolean setStreamKeywordCRLFCompliant(final boolean streamKeywordCRLFCompliant) {
+        getDirect().setStreamKeywordCRLFCompliant(streamKeywordCRLFCompliant);
+        return true;
+    }
+
     //! Indirect object
     public boolean isIndirect() {
         return true;

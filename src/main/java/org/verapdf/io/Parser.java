@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class Parser {
 
-	private InternalInputStream stream;
+	protected InternalInputStream stream;
 	private Token token;
 
 	public Parser(String fileName) throws FileNotFoundException {

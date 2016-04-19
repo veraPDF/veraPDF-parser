@@ -369,6 +369,9 @@ public class PDFParser extends Parser {
 			return dict;
 		}
 
+        checkStreamSpacings(dict);
+        long originLength = super.stream.getOffset();
+
 		long offset = getOffset();
 		long size = dict.getKey(ASAtom.LENGTH).getInteger();
 		seek(offset);
@@ -377,6 +380,7 @@ public class PDFParser extends Parser {
 		dict.setData(stm);
 
 		nextToken();
+
 
 		if (token.type != Token.Type.TT_KEYWORD ||
 				token.keyword != Token.Keyword.KW_ENDSTREAM) {
@@ -387,5 +391,20 @@ public class PDFParser extends Parser {
 
 		return dict;
 	}
+
+    private void checkStreamSpacings(COSObject stream) throws IOException {
+        byte whiteSpace = super.stream.read();
+        if (whiteSpace == 13) {
+            whiteSpace = super.stream.read();
+            if (whiteSpace != 10) {
+                stream.setStreamKeywordCRLFCompliant(Boolean.FALSE);
+                super.stream.unread();
+            }
+        } else if (whiteSpace != 10) {
+            //LOG.warn("Stream at " + pdfSource.getPosition() + " offset has no EOL marker.");
+            stream.setStreamKeywordCRLFCompliant(Boolean.FALSE);
+            super.stream.unread();
+        }
+    }
 
 }
