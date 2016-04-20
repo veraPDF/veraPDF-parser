@@ -89,6 +89,12 @@ public abstract class COSBase {
 	public abstract boolean isStreamKeywordCRLFCompliant();
 	public abstract boolean setStreamKeywordCRLFCompliant(final boolean streamKeywordCRLFCompliant);
 
+	public abstract long getRealStreamSize();
+	public abstract boolean setRealStreamSize(final long realStreamSize);
+
+	public abstract boolean isEndstreamKeywordCRLFCompliant();
+	public abstract boolean setEndstreamKeywordCRLFCompliant(final boolean endstreamKeywordCRLFCompliant);
+
 	// INDIRECT OBJECT
 	public abstract boolean isIndirect();
 	public abstract COSKey getKey();

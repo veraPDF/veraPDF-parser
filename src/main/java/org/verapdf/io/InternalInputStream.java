@@ -73,6 +73,10 @@ public class InternalInputStream implements ASInputStream {
 		return this;
 	}
 
+	public long getStreamLength() throws IOException {
+		return this.source.length();
+	}
+
 	public boolean isEof() throws IOException {
 		return this.source.getFilePointer() == this.source.length();
 	}

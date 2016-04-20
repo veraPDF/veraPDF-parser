@@ -11,12 +11,9 @@ public class DocumentSaveTest {
 
 	@Test
 	public void test() throws Exception {
-		PDDocument document = new PDDocument("/home/timur/Projects/preforma/origin/veraPDF-pdflib/src/test/resources/test_suite/" + FILE_NAME);
+		PDDocument document = new PDDocument("/home/timur/isartor-6-1-7-t01-fail-a.pdf");
 		document.saveAs("/home/timur/Projects/preforma/origin/veraPDF-pdflib/src/test/resources/SmallAndValid_saved.pdf");
 		System.out.println("Document saved");
-		document = new PDDocument("/home/timur/Projects/preforma/origin/veraPDF-pdflib/src/test/resources/SmallAndValid_saved.pdf");
-		document.saveAs("/home/timur/Projects/preforma/origin/veraPDF-pdflib/src/test/resources/SmallAndValid_saved_twice.pdf");
-		System.out.println("Document saved twice");
 	}
 
 }

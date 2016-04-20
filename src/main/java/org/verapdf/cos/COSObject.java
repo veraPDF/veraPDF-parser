@@ -335,6 +335,41 @@ public class COSObject {
 				obj = COSStream.construct();
 			}
 			this.base = obj.base;
+			this.base.setStreamKeywordCRLFCompliant(streamKeywordCRLFCompliant);
+		}
+	}
+
+	public boolean isEndstreamKeywordCRLFCompliant() {
+		return this.base != null && this.base.isEndstreamKeywordCRLFCompliant();
+	}
+
+	public void setEndstreamKeywordCRLFCompliant(final boolean endstreamKeywordCRLFCompliant) {
+		if (this.base == null || !this.base.setEndstreamKeywordCRLFCompliant(endstreamKeywordCRLFCompliant)) {
+			COSObject obj;
+			if (this.base instanceof COSDictionary) {
+				obj = COSStream.construct((COSDictionary) this.base);
+			} else {
+				obj = COSStream.construct();
+			}
+			this.base = obj.base;
+			this.base.setEndstreamKeywordCRLFCompliant(endstreamKeywordCRLFCompliant);
+		}
+	}
+
+	public long getRealStreamSize() {
+		return this.base != null ? this.base.getRealStreamSize() : 0;
+	}
+
+	public void setRealStreamSize(final long realStreamSize) {
+		if (this.base == null || !this.base.setRealStreamSize(realStreamSize)) {
+			COSObject obj;
+			if (this.base instanceof COSDictionary) {
+				obj = COSStream.construct((COSDictionary) this.base);
+			} else {
+				obj = COSStream.construct();
+			}
+			this.base = obj.base;
+			this.base.setRealStreamSize(realStreamSize);
 		}
 	}
 

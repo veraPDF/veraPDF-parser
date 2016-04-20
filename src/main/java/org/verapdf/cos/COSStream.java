@@ -13,13 +13,13 @@ public class COSStream extends COSDictionary {
 	private ASInputStream stream;
 	private FilterFlags flags;
 
-	private boolean streamKeywordCRLFCompliant;
+	private boolean streamKeywordCRLFCompliant = true;
+	private boolean endstreamKeywordCRLFCompliant = true;
+	private long realStreamSize;
 
 	protected COSStream() {
 		super();
 		this.flags = FilterFlags.RAW_DATA;
-
-		this.streamKeywordCRLFCompliant = true;
 
 		setIndirectLength(0);
 	}
@@ -29,8 +29,6 @@ public class COSStream extends COSDictionary {
 		this.stream = stream;
 		this.flags = FilterFlags.RAW_DATA;
 
-		this.streamKeywordCRLFCompliant = true;
-
 		setIndirectLength(0);
 	}
 
@@ -38,6 +36,10 @@ public class COSStream extends COSDictionary {
 		super();
 		//TODO : Memory in stream
 		this.flags = FilterFlags.RAW_DATA;
+	}
+
+	protected COSStream(final COSDictionary dictionary) {
+		super(dictionary);
 	}
 
 	protected COSStream(final COSDictionary dictionary, final ASInputStream stream, final FilterFlags flags) {
@@ -62,6 +64,10 @@ public class COSStream extends COSDictionary {
 
 	public static COSObject construct(final String string) {
 		return new COSObject(new COSStream(string));
+	}
+
+	public static COSObject construct(final COSDictionary dictionary) {
+		return new COSObject(new COSStream(dictionary));
 	}
 
 	public static COSObject construct(final COSDictionary dictionary, final ASInputStream stream) {
@@ -120,6 +126,24 @@ public class COSStream extends COSDictionary {
 
 	public boolean setStreamKeywordCRLFCompliant(boolean streamKeywordCRLFCompliant) {
 		this.streamKeywordCRLFCompliant = streamKeywordCRLFCompliant;
+		return true;
+	}
+
+	public boolean isEndstreamKeywordCRLFCompliant() {
+		return endstreamKeywordCRLFCompliant;
+	}
+
+	public boolean setEndstreamKeywordCRLFCompliant(boolean endstreamKeywordCRLFCompliant) {
+		this.endstreamKeywordCRLFCompliant = endstreamKeywordCRLFCompliant;
+		return true;
+	}
+
+	public long getRealStreamSize() {
+		return realStreamSize;
+	}
+
+	public boolean setRealStreamSize(long realStreamSize) {
+		this.realStreamSize = realStreamSize;
 		return true;
 	}
 

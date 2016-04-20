@@ -1,5 +1,6 @@
 package org.verapdf.io;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
@@ -17,6 +18,8 @@ import java.util.Queue;
  * @author Timur Kamalov
  */
 public class PDFParser extends Parser {
+
+    private static final Logger LOG = Logger.getLogger(PDFParser.class);
 
     private COSDocument document;
     private Queue<COSObject> objects;
@@ -370,41 +373,114 @@ public class PDFParser extends Parser {
 		}
 
         checkStreamSpacings(dict);
-        long originLength = super.stream.getOffset();
+        long streamStartOffset = getOffset();
 
-		long offset = getOffset();
-		long size = dict.getKey(ASAtom.LENGTH).getInteger();
-		seek(offset);
+        long size = dict.getKey(ASAtom.LENGTH).getInteger();
+        seek(streamStartOffset);
 
-		ASInputStream stm = super.getStream(size);
-		dict.setData(stm);
+        boolean streamLengthValid = checkStreamLength(size);
 
-		nextToken();
+        if (streamLengthValid) {
+            dict.setRealStreamSize(size);
+            ASInputStream stm = super.getStream(size);
+            dict.setData(stm);
+        } else {
+            //trying to find endstream keyword
+            long realStreamSize = -1;
+            int bufferLength = (int) (size > 512 ? 512 : size);
+            byte[] buffer = new byte[bufferLength];
+            while (!isEof()) {
+                int bytesRead = read(buffer, bufferLength);
+                for (int i = 0; i < bytesRead; i++) {
+                    if (buffer[i] == 101) {
+                        long reset = getOffset();
+                        long possibleEndstreamOffset = reset - bytesRead + i;
+                        seek(possibleEndstreamOffset);
+                        nextToken();
+                        if (token.type == Token.Type.TT_KEYWORD &&
+                                token.keyword == Token.Keyword.KW_ENDSTREAM) {
+                            realStreamSize = possibleEndstreamOffset - streamStartOffset;
+                            dict.setRealStreamSize(realStreamSize);
+                            seek(possibleEndstreamOffset);
+                            break;
+                        }
+                        seek(reset);
+                    }
+                }
+                if (realStreamSize != -1) {
+                    break;
+                }
+            }
+            if (realStreamSize == -1) {
+                //TODO : exception?
+            }
+        }
 
-
-		if (token.type != Token.Type.TT_KEYWORD ||
-				token.keyword != Token.Keyword.KW_ENDSTREAM) {
-			closeInputStream();
-			// TODO : replace with ASException
-			throw new IOException("PDFParser::GetStream(...)" + StringExceptions.INVALID_PDF_STREAM);
-		}
+        checkEndstreamSpacings(dict, size);
 
 		return dict;
 	}
 
     private void checkStreamSpacings(COSObject stream) throws IOException {
-        byte whiteSpace = super.stream.read();
+        byte whiteSpace = readByte();
         if (whiteSpace == 13) {
-            whiteSpace = super.stream.read();
+            whiteSpace = readByte();
             if (whiteSpace != 10) {
                 stream.setStreamKeywordCRLFCompliant(Boolean.FALSE);
-                super.stream.unread();
+                unread();
             }
         } else if (whiteSpace != 10) {
-            //LOG.warn("Stream at " + pdfSource.getPosition() + " offset has no EOL marker.");
+            LOG.warn("Stream at " + getOffset() + " offset has no EOL marker.");
             stream.setStreamKeywordCRLFCompliant(Boolean.FALSE);
-            super.stream.unread();
+            unread();
         }
+    }
+
+    private boolean checkStreamLength(long streamLength) throws IOException {
+        boolean validLength = true;
+        long start = getOffset();
+        long expectedEndstreamOffset = start + streamLength;
+        if (expectedEndstreamOffset > getSourceLength()) {
+            validLength = false;
+            LOG.warn("Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
+        } else {
+            seek(expectedEndstreamOffset);
+
+            nextToken();
+            final Token token = getToken();
+            if (token.type != Token.Type.TT_KEYWORD ||
+                    token.keyword != Token.Keyword.KW_ENDSTREAM) {
+                validLength = false;
+                LOG.warn("Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
+            }
+
+            seek(start);
+        }
+        return validLength;
+    }
+
+    private void checkEndstreamSpacings(COSObject stream, long expectedLength) throws IOException {
+        byte eolCount = 0;
+
+        long diff = stream.getRealStreamSize() - expectedLength;
+
+        unread(2);
+        int firstSymbol = readByte();
+        int secondSymbol = readByte();
+        if (secondSymbol == 10) {
+            if (firstSymbol == 13) {
+                eolCount = (byte) (diff == 1 ? 1 : 2);
+            } else {
+                eolCount = 1;
+            }
+        } else if (secondSymbol == 13) {
+            eolCount = 1;
+        } else {
+            LOG.warn("End of stream at " + getOffset() + " offset doesn't contain EOL marker.");
+            stream.setEndstreamKeywordCRLFCompliant(false);
+        }
+
+        stream.setRealStreamSize(stream.getRealStreamSize() - eolCount);
     }
 
 }
