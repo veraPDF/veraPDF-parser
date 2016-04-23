@@ -21,6 +21,9 @@ public class PDFParser extends Parser {
 
     private static final Logger LOG = Logger.getLogger(PDFParser.class);
 
+    private static final String HEADER_PATTERN = "%PDF-";
+    private static final String PDF_DEFAULT_VERSION = "1.4";
+
     private COSDocument document;
     private Queue<COSObject> objects;
     private Queue<Integer> integers;
@@ -42,8 +45,107 @@ public class PDFParser extends Parser {
         this.document = document;
     }
 
-    public String getHeader() throws IOException {
-        return getLine(0);
+    public COSHeader getHeader() throws IOException {
+        return parseHeader();
+    }
+
+    private COSHeader parseHeader() throws IOException {
+        COSHeader result = new COSHeader();
+
+        String header = getLine(0);
+        if (!header.contains(HEADER_PATTERN))
+        {
+            header = getLine();
+            while (!header.contains(HEADER_PATTERN) && !header.contains(HEADER_PATTERN.substring(1))) {
+                if ((header.length() > 0) && (Character.isDigit(header.charAt(0)))) {
+                    break;
+                }
+                header = getLine();
+            }
+        }
+
+        do {
+            unread();
+        } while (isNextByteEOL());
+        readByte();
+
+        final int headerStart = header.indexOf(HEADER_PATTERN);
+        final long headerOffset = getOffset() - header.length() + headerStart;
+
+        result.setHeaderOffset(headerOffset);
+        result.setHeader(header);
+
+        skipSpaces(false);
+
+        if (headerStart > 0) {
+            //trim off any leading characters
+            header = header.substring(headerStart, header.length());
+        }
+
+        // This is used if there is garbage after the header on the same line
+        if (header.startsWith(HEADER_PATTERN) && !header.matches(HEADER_PATTERN + "\\d.\\d"))
+        {
+            if (header.length() < HEADER_PATTERN.length() + 3) {
+                // No version number at all, set to 1.4 as default
+                header = HEADER_PATTERN + PDF_DEFAULT_VERSION;
+                LOG.warn("No version found, set to " + PDF_DEFAULT_VERSION + " as default.");
+            } else {
+                // trying to parse header version if it has some garbage
+                Integer pos = null;
+                if (header.indexOf(37) > -1) {
+                    pos = Integer.valueOf(header.indexOf(37));
+                } else if (header.contains("PDF-")) {
+                    pos = Integer.valueOf(header.indexOf("PDF-"));
+                }
+                if (pos != null) {
+                    Integer length = Math.min(8, header.substring(pos).length());
+                    header = header.substring(pos, pos + length);
+                }
+            }
+        }
+        float headerVersion = 1.4f;
+        try {
+            String[] headerParts = header.split("-");
+            if (headerParts.length == 2) {
+                headerVersion = Float.parseFloat(headerParts[1]);
+            }
+        }
+        catch (NumberFormatException e) {
+            LOG.warn("Can't parse the header version.", e);
+        }
+
+        result.setVersion(headerVersion);
+        checkComment(result);
+
+        // rewind
+        seek(0);
+        return result;
+    }
+
+    /** check second line of pdf header
+     */
+    private void checkComment(final COSHeader header) throws IOException {
+        String comment = getLine();
+        boolean isValidComment = true;
+
+        if (comment != null && !comment.isEmpty()) {
+            if (comment.charAt(0) != '%') {
+                isValidComment = false;
+            }
+
+            int pos = comment.indexOf('%') > -1 ? comment.indexOf('%') + 1 : 0;
+            if (comment.substring(pos).length() < 4) {
+                isValidComment = false;
+            }
+        } else {
+            isValidComment = false;
+        }
+        if (isValidComment) {
+            header.setBinaryHeaderBytes(comment.charAt(1), comment.charAt(2),
+                                        comment.charAt(3), comment.charAt(4));
+        } else {
+            header.setBinaryHeaderBytes(-1, -1, -1, -1);
+        }
     }
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws Exception {

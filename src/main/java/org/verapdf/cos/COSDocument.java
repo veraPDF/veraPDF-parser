@@ -48,12 +48,8 @@ public class COSDocument {
 		return this.isNew;
 	}
 
-	public String getHeader() {
-		return this.header.get();
-	}
-
 	public void setHeader(String header) {
-		this.header.set(header);
+		this.header.setHeader(header);
 	}
 
 	public List<COSObject> getObjects() {
@@ -124,12 +120,20 @@ public class COSDocument {
 		return this.doc;
 	}
 
+	public COSHeader getHeader() {
+		return header;
+	}
+
+	public void setHeader(COSHeader header) {
+		this.header = header;
+	}
+
 	public void save() {
 
 	}
 
 	public void saveAs(final Writer out) {
-		out.writeHeader(getHeader());
+		out.writeHeader(this.header.getHeader());
 
 		out.addToWrite(this.xref.getAllKeys());
 		out.writeBody();

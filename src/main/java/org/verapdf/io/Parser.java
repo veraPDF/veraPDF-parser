@@ -8,6 +8,9 @@ import org.verapdf.cos.COSFilterASCIIHexDecode;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import static org.verapdf.as.CharTable.ASCII_CR;
+import static org.verapdf.as.CharTable.ASCII_LF;
+
 /**
  * @author Timur Kamalov
  */
@@ -70,13 +73,27 @@ public class Parser {
 		return this.token;
 	}
 
+	protected String getLine() throws IOException {
+		initializeToken();
+		this.token.token = "";
+		byte ch = this.source.read();
+		while (!this.source.isEof()) {
+			if (ch == ASCII_LF || ch == ASCII_CR) {
+				break;
+			}
+			appendToToken(ch);
+			ch = this.source.read();
+		}
+		return this.token.token;
+	}
+
 	protected String getLine(final int offset) throws IOException {
 		initializeToken();
 		this.source.seek(offset);
 		this.token.token = "";
 		byte ch = this.source.read();
 		while (!this.source.isEof()) {
-			if (ch == CharTable.ASCII_LF || ch == CharTable.ASCII_CR) {
+			if (ch == ASCII_LF || ch == ASCII_CR) {
 				break;
 			}
 			appendToToken(ch);
@@ -94,7 +111,7 @@ public class Parser {
 	}
 
 	protected void nextToken() throws IOException {
-		skipSpaces();
+		skipSpaces(true);
 		if (this.source.isEof()) {
 			this.token.type = Token.Type.TT_EOF;
 			return;
@@ -182,16 +199,31 @@ public class Parser {
 		return result;
 	}
 
-	// PRIVATE METHODS
+	protected boolean isNextByteEOL() throws IOException {
+		byte c = this.source.peak();
+		return isLF(c) || isCR(c);
+	}
 
-	private void skipSpaces() throws IOException {
+	protected void skipSingleEol() throws IOException {
+		byte c = this.source.read();
+		if (isCR(c)) {
+			c = this.source.read();
+			if (!isLF(c)) {
+				this.source.unread();
+			}
+		} else if (!isLF(c)) {
+			this.source.unread();
+		}
+	}
+
+	protected void skipSpaces(boolean skipComment) throws IOException {
 		byte ch;
 		while (!this.source.isEof()) {
 			ch = this.source.read();
 			if (CharTable.isSpace(ch)) {
 				continue;
 			}
-			if (ch == '%') {
+			if (ch == '%' && skipComment) {
 				skipComment();
 				continue;
 			}
@@ -201,16 +233,25 @@ public class Parser {
 		}
 	}
 
+	// PRIVATE METHODS
+	private boolean isLF(int c) {
+		return ASCII_LF == c;
+	}
+
+	private boolean isCR(int c) {
+		return ASCII_CR == c;
+	}
+
 	private void skipEOL() throws IOException {
 		// skips EOL == { CR, LF, CRLF } only if it is the first symbol(s)
 		byte ch = this.source.read();
-		if (ch == CharTable.ASCII_LF) {
+		if (isLF(ch)) {
 			return; // EOL == LF
 		}
 
-		if (ch == CharTable.ASCII_CR) {
+		if (isCR(ch)) {
 			ch = this.source.read();
-			if (ch == CharTable.ASCII_LF) {
+			if (isLF(ch)) {
 				return; // EOL == CRLF
 				// else EOL == CR and ch == next character
 			}
@@ -224,13 +265,13 @@ public class Parser {
 		byte ch;
 		while (!this.source.isEof()) {
 			ch = this.source.read();
-			if (ch == CharTable.ASCII_LF) {
+			if (isLF(ch)) {
 				return; // EOL == LF
 			}
 
-			if (ch == CharTable.ASCII_CR) {
+			if (isCR(ch)) {
 				ch = this.source.read();
-				if (ch != CharTable.ASCII_LF) { // EOL == CR
+				if (isLF(ch)) { // EOL == CR
 					this.source.unread();
 				} // else EOL == CRLF
 				return;
@@ -272,10 +313,10 @@ public class Parser {
 							appendToToken(CharTable.ASCII_RIGHT_PAR);
 							break;
 						case 'n':
-							appendToToken(CharTable.ASCII_LF);
+							appendToToken(ASCII_LF);
 							break;
 						case 'r':
-							appendToToken(CharTable.ASCII_CR);
+							appendToToken(ASCII_CR);
 							break;
 						case 't':
 							appendToToken(CharTable.ASCII_HT);
@@ -308,11 +349,11 @@ public class Parser {
 							appendToToken(ch1);
 							break;
 						}
-						case CharTable.ASCII_LF:
+						case ASCII_LF:
 							break;
-						case CharTable.ASCII_CR:
+						case ASCII_CR:
 							ch = this.source.read();
-							if (ch != CharTable.ASCII_LF) {
+							if (ch != ASCII_LF) {
 								this.source.unread();
 							}
 							break;

@@ -1,6 +1,7 @@
 package org.verapdf.io;
 
 import org.verapdf.cos.COSDocument;
+import org.verapdf.cos.COSHeader;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.xref.COSXRefInfo;
@@ -15,7 +16,7 @@ import java.util.List;
 public class Reader extends XRefReader {
 
 	private PDFParser parser;
-	private String header;
+	private COSHeader header;
 
 	public Reader(final COSDocument document, final String fileName) throws Exception {
 		super();
@@ -25,7 +26,7 @@ public class Reader extends XRefReader {
 
 	//PUBLIC METHODS
 	public String getHeader() {
-		return this.header;
+		return this.header.getHeader();
 	}
 
 	public COSObject getObject(final COSKey key) throws IOException {
