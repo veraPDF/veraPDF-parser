@@ -154,6 +154,9 @@ public class CharTable {
 	public static final byte ASCII_CR = 13;
 	public static final byte ASCII_SPACE = 32;
 
+	public static final byte ASCII_ZERO = 48;
+	public static final byte ASCII_NINE = 57;
+
 	public static final byte ASCII_LEFT_PAR = 40;
 	public static final byte ASCII_RIGHT_PAR = 41;
 

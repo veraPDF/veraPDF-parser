@@ -2,6 +2,7 @@ package org.verapdf.io;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.CharTable;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
@@ -316,7 +317,29 @@ public class PDFParser extends Parser {
 			throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
 		}
 
+        //check spacings after "xref" keyword
+        //pdf/a-1b specification, clause 6.1.4
+        byte space = readByte();
+        if (isCR(space)) {
+            if (isLF(peek())) {
+                readByte();
+            }
+            if (!isDigit()) {
+                document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
+            }
+        } else if (isLF(space) || !isDigit()) {
+            document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
+        }
+
 		nextToken();
+
+        //check spacings between header elements
+        //pdf/a-1b specification, clause 6.1.4
+        space = readByte();
+        if (!CharTable.isSpace(space) || !isDigit()) {
+            document.setSubsectionHeaderSpaceSeparated(Boolean.FALSE);
+        }
+
 		while (getToken().type == Token.Type.TT_INTEGER) {
 			int number = (int) getToken().integer;
 			nextToken();

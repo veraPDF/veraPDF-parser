@@ -63,7 +63,7 @@ public class InternalInputStream implements ASInputStream {
 		return this.source.readByte();
 	}
 
-	public byte peak() throws IOException {
+	public byte peek() throws IOException {
 		byte result = this.source.readByte();
 		unread();
 		return result;

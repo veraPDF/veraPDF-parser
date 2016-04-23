@@ -16,6 +16,9 @@ import static org.verapdf.as.CharTable.ASCII_LF;
  */
 public class Parser {
 
+	private static final byte ASCII_ZERO = 48;
+	private static final byte ASCII_NINE = 57;
+
 	private InternalInputStream source;
 	private Token token;
 
@@ -41,6 +44,10 @@ public class Parser {
 
 	public byte readByte() throws IOException {
 		return this.source.read();
+	}
+
+	public byte peek() throws IOException {
+		return this.source.peek();
 	}
 
 	public void unread() throws IOException{
@@ -200,7 +207,7 @@ public class Parser {
 	}
 
 	protected boolean isNextByteEOL() throws IOException {
-		byte c = this.source.peak();
+		byte c = this.source.peek();
 		return isLF(c) || isCR(c);
 	}
 
@@ -233,14 +240,23 @@ public class Parser {
 		}
 	}
 
-	// PRIVATE METHODS
-	private boolean isLF(int c) {
+	protected boolean isDigit() throws IOException {
+		return isDigit(peek());
+	}
+
+	protected boolean isDigit(byte c) {
+		return c >= ASCII_ZERO && c <= ASCII_NINE;
+	}
+
+	protected boolean isLF(int c) {
 		return ASCII_LF == c;
 	}
 
-	private boolean isCR(int c) {
+	protected boolean isCR(int c) {
 		return ASCII_CR == c;
 	}
+
+	// PRIVATE METHODS
 
 	private void skipEOL() throws IOException {
 		// skips EOL == { CR, LF, CRLF } only if it is the first symbol(s)

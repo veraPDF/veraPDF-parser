@@ -23,6 +23,9 @@ public class COSDocument {
 	private COSTrailer trailer;
 	private boolean isNew;
 
+	private boolean xrefEOLMarkersComplyPDFA;
+	private boolean subsectionHeaderSpaceSeparated;
+
 	public COSDocument(PDDocument doc) {
 		this.doc = doc;
 		this.header = new COSHeader();
@@ -30,6 +33,9 @@ public class COSDocument {
 		this.xref = new COSXRefTable();
 		this.trailer = new COSTrailer();
 		this.isNew = true;
+
+		this.xrefEOLMarkersComplyPDFA = true;
+		this.subsectionHeaderSpaceSeparated = true;
 	}
 
 	public COSDocument(String fileName, PDDocument doc) throws Exception {
@@ -42,6 +48,9 @@ public class COSDocument {
 		this.xref = new COSXRefTable();
 		this.xref.set(this.reader.getKeys());
 		this.trailer = reader.getTrailer();
+
+		this.xrefEOLMarkersComplyPDFA = true;
+		this.subsectionHeaderSpaceSeparated = true;
 	}
 
 	public boolean isNew() {
@@ -126,6 +135,22 @@ public class COSDocument {
 
 	public void setHeader(COSHeader header) {
 		this.header = header;
+	}
+
+	public boolean isXrefEOLMarkersComplyPDFA() {
+		return xrefEOLMarkersComplyPDFA;
+	}
+
+	public void setXrefEOLMarkersComplyPDFA(boolean xrefEOLMarkersComplyPDFA) {
+		this.xrefEOLMarkersComplyPDFA = xrefEOLMarkersComplyPDFA;
+	}
+
+	public boolean isSubsectionHeaderSpaceSeparated() {
+		return subsectionHeaderSpaceSeparated;
+	}
+
+	public void setSubsectionHeaderSpaceSeparated(boolean subsectionHeaderSpaceSeparated) {
+		this.subsectionHeaderSpaceSeparated = subsectionHeaderSpaceSeparated;
 	}
 
 	public void save() {
