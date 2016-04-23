@@ -258,11 +258,28 @@ public class PDFParser extends Parser {
 
 		final Token token = getToken();
 
+        boolean headerOfObjectComplyPDFA = true;
+        boolean headerFormatComplyPDFA = true;
+        boolean endOfObjectComplyPDFA = true;
+
+        //Check that if offset doesn't point to obj key there is eol character before obj key
+        //pdf/a-1b spec, clause 6.1.8
+        skipSpaces(false);
+        seek(getOffset() - 1);
+        if (!isNextByteEOL()) {
+            headerOfObjectComplyPDFA = false;
+        }
+
 		nextToken();
 		if (token.type != Token.Type.TT_INTEGER) {
 			return new COSObject();
 		}
 		long number = token.integer;
+
+        if ((readByte() != 32) || CharTable.isSpace(peek())) {
+            //check correct spacing (6.1.8 clause)
+            headerFormatComplyPDFA = false;
+        }
 
 		nextToken();
 		if (token.type != Token.Type.TT_INTEGER) {
@@ -275,6 +292,11 @@ public class PDFParser extends Parser {
 				token.keyword != Token.Keyword.KW_OBJ) {
 			return new COSObject();
 		}
+
+        if (!isNextByteEOL()) {
+            // eol marker shall follow the "obj" keyword
+            headerOfObjectComplyPDFA = false;
+        }
 
 		COSObject obj = nextObject();
 
@@ -289,6 +311,14 @@ public class PDFParser extends Parser {
 			// TODO : replace with ASException
 			throw new IOException("PDFParser::GetObject(...)" + StringExceptions.INVALID_PDF_OBJECT);
 		}
+
+        if (!isNextByteEOL()) {
+            endOfObjectComplyPDFA = false;
+        }
+
+        obj.setIsHeaderOfObjectComplyPDFA(headerOfObjectComplyPDFA);
+        obj.setIsHeaderFormatComplyPDFA(headerFormatComplyPDFA);
+        obj.setIsEndOfObjectComplyPDFA(endOfObjectComplyPDFA);
 
 		return obj;
 	}

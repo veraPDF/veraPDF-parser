@@ -17,6 +17,11 @@ public class COSObject {
 
 	private COSBase base;
 
+	//pdf/a validation specific things
+	private boolean isHeaderOfObjectComplyPDFA = true;
+	private boolean isEndOfObjectComplyPDFA = true;
+	private boolean isHeaderFormatComplyPDFA = true;
+
 	public COSObject() {
 	}
 
@@ -413,6 +418,31 @@ public class COSObject {
 
 	public static COSObject getEmpty() {
 		return empty;
+	}
+
+	//GETTERS & SETTERS
+	public Boolean getIsHeaderOfObjectComplyPDFA() {
+		return isHeaderOfObjectComplyPDFA;
+	}
+
+	public void setIsHeaderOfObjectComplyPDFA(Boolean isHeaderOfObjectComplyPDFA) {
+		this.isHeaderOfObjectComplyPDFA = isHeaderOfObjectComplyPDFA;
+	}
+
+	public Boolean getIsEndOfObjectComplyPDFA() {
+		return isEndOfObjectComplyPDFA;
+	}
+
+	public void setIsEndOfObjectComplyPDFA(Boolean isEndOfObjectComplyPDFA) {
+		this.isEndOfObjectComplyPDFA = isEndOfObjectComplyPDFA;
+	}
+
+	public Boolean getIsHeaderFormatComplyPDFA() {
+		return isHeaderFormatComplyPDFA;
+	}
+
+	public void setIsHeaderFormatComplyPDFA(Boolean isHeaderFormatComplyPDFA) {
+		this.isHeaderFormatComplyPDFA = isHeaderFormatComplyPDFA;
 	}
 
 }
