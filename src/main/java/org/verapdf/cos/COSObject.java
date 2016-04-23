@@ -421,7 +421,7 @@ public class COSObject {
 	}
 
 	//GETTERS & SETTERS
-	public Boolean getIsHeaderOfObjectComplyPDFA() {
+	public Boolean isHeaderOfObjectComplyPDFA() {
 		return isHeaderOfObjectComplyPDFA;
 	}
 
@@ -429,7 +429,7 @@ public class COSObject {
 		this.isHeaderOfObjectComplyPDFA = isHeaderOfObjectComplyPDFA;
 	}
 
-	public Boolean getIsEndOfObjectComplyPDFA() {
+	public Boolean isEndOfObjectComplyPDFA() {
 		return isEndOfObjectComplyPDFA;
 	}
 
@@ -437,7 +437,7 @@ public class COSObject {
 		this.isEndOfObjectComplyPDFA = isEndOfObjectComplyPDFA;
 	}
 
-	public Boolean getIsHeaderFormatComplyPDFA() {
+	public Boolean isHeaderFormatComplyPDFA() {
 		return isHeaderFormatComplyPDFA;
 	}
 
