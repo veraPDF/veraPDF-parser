@@ -11,6 +11,10 @@ public class COSString extends COSDirect {
     private String value;
     private boolean isHex;
 
+    //fields specific for pdf/a validation of strings
+    private boolean containsOnlyHex = true;
+    private long hexCount = 0;
+
     public COSString() {
         super();
         this.value = new String();
@@ -27,12 +31,22 @@ public class COSString extends COSDirect {
         this.isHex = isHex;
     }
 
+    public COSString(String value, boolean isHex, long hexCount, boolean containsOnlyHex) {
+        this(value, isHex);
+        this.hexCount = hexCount;
+        this.containsOnlyHex = containsOnlyHex;
+    }
+
     public static COSObject construct(final String initValue) {
         return construct(initValue, false);
     }
 
     public static COSObject construct(final String initValue, final boolean isHex) {
         return new COSObject(new COSString(initValue, isHex));
+    }
+
+    public static COSObject construct(final String initValue, final boolean isHex, final long hexCount, final boolean containsOnlyHex) {
+        return new COSObject(new COSString(initValue, isHex, hexCount, containsOnlyHex));
     }
 
     public void accept(final IVisitor visitor) {
@@ -149,6 +163,22 @@ public class COSString extends COSDirect {
 
     public String getLitString() {
         return toLitString();
+    }
+
+    public boolean isContainsOnlyHex() {
+        return containsOnlyHex;
+    }
+
+    public void setContainsOnlyHex(boolean containsOnlyHex) {
+        this.containsOnlyHex = containsOnlyHex;
+    }
+
+    public long getHexCount() {
+        return hexCount;
+    }
+
+    public void setHexCount(long hexCount) {
+        this.hexCount = hexCount;
     }
 
 }

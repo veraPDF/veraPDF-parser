@@ -232,7 +232,7 @@ public class PDFParser extends Parser {
             case TT_LITSTRING:
                 return COSString.construct(token.token);
             case TT_HEXSTRING:
-                return COSString.construct(token.token, true);
+                return COSString.construct(token.token, true, token.getHexCount(), token.isContainsOnlyHex());
             case TT_NAME:
                 return COSName.construct(token.token);
             case TT_OPENARRAY:

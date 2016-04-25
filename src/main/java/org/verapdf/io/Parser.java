@@ -248,6 +248,12 @@ public class Parser {
 		return c >= ASCII_ZERO && c <= ASCII_NINE;
 	}
 
+	protected boolean isHexDigit(byte ch) {
+		return isDigit(ch)
+				|| (ch >= 'a' && ch <= 'f')
+				|| (ch >= 'A' && ch <= 'F');
+	}
+
 	protected boolean isLF(int c) {
 		return ASCII_LF == c;
 	}
@@ -391,6 +397,10 @@ public class Parser {
 		int uc = 0;
 		int hex;
 
+		//these are required for pdf/a validation
+		boolean containsOnlyHex = true;
+		long hexCount = 0;
+
 		boolean odd = false;
 		while (!this.source.isEof()) {
 			ch = this.source.read();
@@ -404,7 +414,8 @@ public class Parser {
 				return;
 			} else {
 				hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
-				if (hex < 16) { // skip all non-Hex characters
+				hexCount++;
+				if (hex < 16 && hex > -1) { // skip all non-Hex characters
 					if (odd) {
 						uc = (uc << 4) + hex;
 						appendToToken(uc);
@@ -413,9 +424,14 @@ public class Parser {
 						uc = hex;
 					}
 					odd = !odd;
+				} else {
+					containsOnlyHex = false;
 				}
 			}
 		}
+
+		this.token.setContainsOnlyHex(containsOnlyHex);
+		this.token.setHexCount(hexCount);
 	}
 
 	private void readName() throws IOException {

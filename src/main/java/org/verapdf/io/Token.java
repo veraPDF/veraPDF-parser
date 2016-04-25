@@ -14,6 +14,10 @@ public class Token {
 	public double real;
 	public Keyword keyword;
 
+	//fields specific for pdf/a validation of strings
+	private boolean containsOnlyHex = true;
+	private long hexCount = 0;
+
 	public void toKeyword() {
 		this.type = Type.TT_KEYWORD;
 		this.keyword = getKeyword(token);
@@ -78,6 +82,23 @@ public class Token {
 		}
 		//TODO : not sure it's correct
 		return Keyword.KW_NONE;
+	}
+
+	//GETTERS & SETTERS
+	public boolean isContainsOnlyHex() {
+		return containsOnlyHex;
+	}
+
+	public void setContainsOnlyHex(boolean containsOnlyHex) {
+		this.containsOnlyHex = containsOnlyHex;
+	}
+
+	public Long getHexCount() {
+		return hexCount;
+	}
+
+	public void setHexCount(Long hexCount) {
+		this.hexCount = hexCount;
 	}
 
 }

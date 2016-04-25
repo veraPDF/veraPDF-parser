@@ -6,7 +6,7 @@ package org.verapdf.cos;
 public class COSFilterASCIIHexDecode {
 
 	public final static byte ws = 17;
-	public final static byte er = 0;
+	public final static byte er = 127;
 
 	private final static byte[] loHexTable = {
 			ws, er, er, er, er, er, er, er, er, ws, ws, er, ws, ws, er, er, 	// 0  - 15
