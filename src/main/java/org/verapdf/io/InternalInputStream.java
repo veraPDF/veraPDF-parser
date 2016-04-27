@@ -2,9 +2,7 @@ package org.verapdf.io;
 
 import org.verapdf.as.io.ASInputStream;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 
 /**
  * @author Timur Kamalov
@@ -17,6 +15,10 @@ public class InternalInputStream implements ASInputStream {
 
 	public InternalInputStream(final String fileName) throws FileNotFoundException {
 		this.source = new RandomAccessFile(fileName, READ_ONLY_MODE);
+	}
+
+	public InternalInputStream(final InputStream fileStream) throws IOException {
+		this.source = new RandomAccessFile(createTempFile(fileStream), READ_ONLY_MODE);
 	}
 
 	public int read(byte[] buffer, int size) throws IOException {
@@ -89,6 +91,29 @@ public class InternalInputStream implements ASInputStream {
 
 	public RandomAccessFile getStream() {
 		return this.source;
+	}
+
+	private File createTempFile(InputStream input) throws IOException {
+		FileOutputStream output = null;
+		try {
+			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
+			output = new FileOutputStream(tmpFile);
+
+			//copy stream content
+			byte[] buffer = new byte[4096];
+			int n;
+			while ((n = input.read(buffer)) != -1) {
+				output.write(buffer, 0, n);
+			}
+
+			return tmpFile;
+		}
+		finally {
+			input.close();
+			if (output != null) {
+				output.close();
+			}
+		}
 	}
 
 }

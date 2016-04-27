@@ -7,6 +7,8 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
 
+import java.io.InputStream;
+
 /**
  * @author Timur Kamalov
  */
@@ -27,6 +29,11 @@ public class PDDocument {
 		this.document = new COSDocument(filename, this);
 	}
 
+	public PDDocument(final InputStream fileStream) throws Exception {
+		this.catalog = new PDCatalog();
+		this.document = new COSDocument(fileStream, this);
+	}
+
 	private void constructDocument() throws Exception {
 		document = new COSDocument(this);
 		document.setHeader(PDF_HEADER_DEFAULT);
@@ -38,6 +45,12 @@ public class PDDocument {
 		this.close();
 
 		document = new COSDocument(filename, this);
+	}
+
+	public void open(final InputStream inputStream) throws Exception {
+		this.close();
+
+		document = new COSDocument(inputStream, this);
 	}
 
 	public void close() {

@@ -7,6 +7,7 @@ import org.verapdf.cos.COSFilterASCIIHexDecode;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.verapdf.as.CharTable.ASCII_CR;
 import static org.verapdf.as.CharTable.ASCII_LF;
@@ -24,6 +25,10 @@ public class Parser {
 
 	public Parser(String fileName) throws FileNotFoundException {
 		this.source = new InternalInputStream(fileName);
+	}
+
+	public Parser(InputStream fileStream) throws IOException {
+		this.source = new InternalInputStream(fileStream);
 	}
 
 	public void closeInputStream() throws IOException {

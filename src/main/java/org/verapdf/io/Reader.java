@@ -7,6 +7,7 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.xref.COSXRefInfo;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,12 @@ public class Reader extends XRefReader {
 	public Reader(final COSDocument document, final String fileName) throws Exception {
 		super();
 		this.parser = new PDFParser(document, fileName);
+		init();
+	}
+
+	public Reader(final COSDocument document, final InputStream fileStream) throws Exception {
+		super();
+		this.parser = new PDFParser(document, fileStream);
 		init();
 	}
 

@@ -7,6 +7,7 @@ import org.verapdf.io.Reader;
 import org.verapdf.pd.PDDocument;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +27,8 @@ public class COSDocument {
 	private boolean xrefEOLMarkersComplyPDFA;
 	private boolean subsectionHeaderSpaceSeparated;
 
-	public COSDocument(PDDocument doc) {
-		this.doc = doc;
+	public COSDocument(final PDDocument document) {
+		this.doc = document;
 		this.header = new COSHeader();
 		this.body = new COSBody();
 		this.xref = new COSXRefTable();
@@ -38,11 +39,21 @@ public class COSDocument {
 		this.subsectionHeaderSpaceSeparated = true;
 	}
 
-	public COSDocument(String fileName, PDDocument doc) throws Exception {
-		this.doc = doc;
-		this.body = new COSBody();
+	public COSDocument(final String fileName, final PDDocument document) throws Exception {
+		initReader(fileName);
 
-		this.reader = new Reader(this, fileName);
+		initCOSDocument(document);
+	}
+
+	public COSDocument(final InputStream fileStream, final PDDocument document) throws Exception {
+		initReader(fileStream);
+
+		initCOSDocument(document);
+	}
+
+	private void initCOSDocument(final PDDocument document) {
+		this.doc = document;
+		this.body = new COSBody();
 
 		this.header = new COSHeader(this.reader.getHeader());
 		this.xref = new COSXRefTable();
@@ -51,6 +62,14 @@ public class COSDocument {
 
 		this.xrefEOLMarkersComplyPDFA = true;
 		this.subsectionHeaderSpaceSeparated = true;
+	}
+
+	private void initReader(final InputStream fileStream) throws Exception {
+		this.reader = new Reader(this, fileStream);
+	}
+
+	private void initReader(final String fileName) throws Exception {
+		this.reader = new Reader(this, fileName);
 	}
 
 	public boolean isNew() {
@@ -154,20 +173,20 @@ public class COSDocument {
 	}
 
 	public void save() {
-
+		//TODO : implement this
 	}
 
-	public void saveAs(final Writer out) {
-		out.writeHeader(this.header.getHeader());
+	public void saveAs(final Writer writer) {
+		writer.writeHeader(this.header.getHeader());
 
-		out.addToWrite(this.xref.getAllKeys());
-		out.writeBody();
+		writer.addToWrite(this.xref.getAllKeys());
+		writer.writeBody();
 
-		out.setTrailer(this.trailer);
+		writer.setTrailer(this.trailer);
 
-		out.writeXRefInfo();
+		writer.writeXRefInfo();
 
-		out.clear();
+		writer.clear();
 	}
 
 }

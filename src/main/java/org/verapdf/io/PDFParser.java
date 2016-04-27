@@ -11,6 +11,7 @@ import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -35,15 +36,28 @@ public class PDFParser extends Parser {
 
     public PDFParser(final String filename) throws Exception {
         super(filename);
-        this.document = new COSDocument(null);
-        this.objects = new LinkedList<COSObject>();
-        this.integers = new LinkedList<Integer>();
-        this.flag = true;
+        init();
+    }
+
+    public PDFParser(final InputStream fileStream) throws Exception {
+        super(fileStream);
+        init();
     }
 
     public PDFParser(final COSDocument document, final String filename) throws Exception { //tmp ??
         this(filename);
         this.document = document;
+    }
+
+    public PDFParser(final COSDocument document, final InputStream fileStream) throws Exception { //tmp ??
+        this(fileStream);
+        this.document = document;
+    }
+
+    private void init() {
+        this.objects = new LinkedList<>();
+        this.integers = new LinkedList<>();
+        this.flag = true;
     }
 
     public COSHeader getHeader() throws IOException {
