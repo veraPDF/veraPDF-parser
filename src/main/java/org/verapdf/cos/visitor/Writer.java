@@ -198,7 +198,7 @@ public class Writer implements IVisitor {
 			this.write(header);
 			this.write(EOL);
 
-			String comment = new String(new char[] { 0xE2, 0xE3, 0xCF, 0xD3 });
+			String comment = new String(new char[] { '%', 0xE2, 0xE3, 0xCF, 0xD3 });
 			this.write(comment);
 			this.write(EOL);
 		} catch (IOException e) {

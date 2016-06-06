@@ -24,6 +24,12 @@ public class ASOutFilter implements ASOutputStream {
 		return this.storedOutputStream != null ? this.storedOutputStream.write(buffer) : 0;
 	}
 
+
+
+	public void flush() {
+		this.storedOutputStream.flush();
+	}
+
 	public void close() {
 		this.storedOutputStream = null;
 	}

@@ -7,8 +7,9 @@ import java.io.IOException;
  */
 public interface ASOutputStream {
 
-	long write(final byte[] buffer) throws IOException;
+	long write(final byte[] buffer) throws IOException; // TODO: should we add method write(byte [], int)?
 
 	void close() throws IOException;
 
+	void flush();
 }
