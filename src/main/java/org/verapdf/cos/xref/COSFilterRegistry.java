@@ -1,13 +1,16 @@
 package org.verapdf.cos.xref;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
+import org.verapdf.as.filters.ASFilterFactory;
 import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.filters.ASOutFilter;
 import org.verapdf.as.filters.IASFilterFactory;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,9 +19,17 @@ import java.util.Map;
 public class COSFilterRegistry {
 
 	private static Map<ASAtom, IASFilterFactory> registeredFactories;
+	private static final Logger LOGGER = Logger.getLogger(COSFilterRegistry.class);
 
 	static {
-		//TODO : register factories
+		registeredFactories = new HashMap<>();
+		try {
+			registerFactory(ASAtom.FLATE_DECODE, new ASFilterFactory(ASAtom.FLATE_DECODE));
+		} catch (Exception e) {
+			if(e instanceof IllegalArgumentException) {
+				LOGGER.error("Unknown filter", e);
+			}
+		}
 	}
 
 	//singleton

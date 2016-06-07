@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Created by Timur on 12/17/2015.
+ * @author Timur Kamalov
  */
 public abstract class COSDirect extends COSBase {
 
@@ -73,8 +73,12 @@ public abstract class COSDirect extends COSBase {
     }
 
     // ARRAYS
-    public COSObject at(final int i) {
-        return COSObject.getEmpty();
+    public COSObject at(int i) {    // Treating COSDirect like one-object array
+        if(i == 0) {
+            return new COSObject(this);
+        } else {
+            return new COSObject();
+        }
     }
 
     public boolean add(final COSObject value) {

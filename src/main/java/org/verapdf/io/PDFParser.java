@@ -6,16 +6,20 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.zip.Inflater;
 
 /**
  * @author Timur Kamalov
@@ -364,80 +368,92 @@ public class PDFParser extends Parser {
 			throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
 		}
         if(this.getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
-            //check spacings after "xref" keyword
-            //pdf/a-1b specification, clause 6.1.4
-            byte space = readByte();
-            if (isCR(space)) {
-                if (isLF(peek())) {
-                    readByte();
-                }
-                if (!isDigit()) {
-                    document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
-                }
-            } else if (isLF(space) || !isDigit()) {
-                document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
-            }
-
-            nextToken();
-
-            //check spacings between header elements
-            //pdf/a-1b specification, clause 6.1.4
-            space = readByte();
-            if (!CharTable.isSpace(space) || !isDigit()) {
-                document.setSubsectionHeaderSpaceSeparated(Boolean.FALSE);
-            }
-
-            while (getToken().type == Token.Type.TT_INTEGER) {
-                int number = (int) getToken().integer;
-                nextToken();
-                int count = (int) getToken().integer;
-                COSXRefEntry xref;
-                for (int i = 0; i < count; ++i) {
-                    xref = new COSXRefEntry();
-                    nextToken();
-                    xref.offset = getToken().integer;
-                    nextToken();
-                    xref.generation = (int) getToken().integer;
-                    nextToken();
-                    xref.free = getToken().token.charAt(0);
-                    xrefs.addEntry(number + i, xref);
-                }
-                nextToken();
-            }
-            seekFromCurrentPosition(-7);
+            parseXrefTable(xrefs);
         } else {
-            nextToken();
-            if(this.getToken().type != Token.Type.TT_INTEGER) {
-                closeInputStream();
-                throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
-            }
-            nextToken();
-            if(this.getToken().type != Token.Type.TT_KEYWORD ||
-                    this.getToken().keyword != Token.Keyword.KW_OBJ) {
-                closeInputStream();
-                throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
-            }
-            COSObject xrefCOSStream = getDictionary();
-            InputStream xrefInputStream = null; // TODO: get filtered stream from COSStream
-            COSArray fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).get();  //TODO: check if has exactly 3 elements
-            byte [] field0 = new byte [(int) fieldSizes.at(0).getInteger()];
-            byte [] field1 = new byte [(int) fieldSizes.at(1).getInteger()];
-            byte [] field2 = new byte [(int) fieldSizes.at(2).getInteger()];
-            COSXRefEntry xref;
-            while(true) {   // TODO: write adequate while
-                xrefInputStream.read(field0);   //TODO: find out what to do with spaces
-                xrefInputStream.read(field1);
-                xrefInputStream.read(field2);
-                xref = new COSXRefEntry();
-                int type = Integer.parseInt(new String(field0));
-                xref.free = type == 0 ? 'f' : 'n';
-                xref.offset = type == 2 ? -Long.parseLong(new String(field1)) :
-                        Long.parseLong(new String(field1)); // TODO: what to do in case type == 0? Is that correct?
-                xref.generation = Integer.parseInt(new String(field2)); // If object is written into stream then generation indicates index of object within stream
-                //TODO: get object number
-            }
+            parseXrefStream(xrefs);
         }
 	}
+
+    private void parseXrefTable(final COSXRefSection xrefs) throws IOException {
+        //check spacings after "xref" keyword
+        //pdf/a-1b specification, clause 6.1.4
+        byte space = readByte();
+        if (isCR(space)) {
+            if (isLF(peek())) {
+                readByte();
+            }
+            if (!isDigit()) {
+                document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
+            }
+        } else if (isLF(space) || !isDigit()) {
+            document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
+        }
+
+        nextToken();
+
+        //check spacings between header elements
+        //pdf/a-1b specification, clause 6.1.4
+        space = readByte();
+        if (!CharTable.isSpace(space) || !isDigit()) {
+            document.setSubsectionHeaderSpaceSeparated(Boolean.FALSE);
+        }
+
+        while (getToken().type == Token.Type.TT_INTEGER) {
+            int number = (int) getToken().integer;
+            nextToken();
+            int count = (int) getToken().integer;
+            COSXRefEntry xref;
+            for (int i = 0; i < count; ++i) {
+                xref = new COSXRefEntry();
+                nextToken();
+                xref.offset = getToken().integer;
+                nextToken();
+                xref.generation = (int) getToken().integer;
+                nextToken();
+                xref.free = getToken().token.charAt(0);
+                xrefs.addEntry(number + i, xref);
+            }
+            nextToken();
+        }
+        seekFromCurrentPosition(-7);
+    }
+
+    private void parseXrefStream(final COSXRefSection xrefs) throws IOException {
+        nextToken();
+        if(this.getToken().type != Token.Type.TT_INTEGER) {
+            closeInputStream();
+            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+        }
+        nextToken();
+        if(this.getToken().type != Token.Type.TT_KEYWORD ||
+                this.getToken().keyword != Token.Keyword.KW_OBJ) {
+            closeInputStream();
+            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+        }
+        COSObject xrefCOSStream = getDictionary();
+        if(!(xrefCOSStream.get() instanceof COSStream)) {
+            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+        }
+        ASInputStream xrefInputStream =
+                xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
+        COSArray fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).get();  //TODO: check if has exactly 3 elements
+        byte [] field0 = new byte [(int) fieldSizes.at(0).getInteger()];
+        byte [] field1 = new byte [(int) fieldSizes.at(1).getInteger()];
+        byte [] field2 = new byte [(int) fieldSizes.at(2).getInteger()];
+        COSXRefEntry xref;
+        while(true) {   // TODO: write adequate while
+            xrefInputStream.read(field0, field0.length);   //TODO: find out what to do with spaces
+            xrefInputStream.read(field1, field1.length);
+            xrefInputStream.read(field2, field2.length);
+            xref = new COSXRefEntry();
+            int type = Integer.parseInt(new String(field0));
+            xref.free = type == 0 ? 'f' : 'n';
+            xref.offset = type == 2 ? -Long.parseLong(new String(field1)) :
+                    Long.parseLong(new String(field1)); // TODO: what to do in case type == 0? Is that correct?
+            xref.generation = Integer.parseInt(new String(field2)); // If object is written into stream then generation indicates index of object within stream
+            //TODO: get object number
+        }
+    }
 
 	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws Exception {
 		if (offset == 0) {
@@ -621,7 +637,7 @@ public class PDFParser extends Parser {
         }
 
         checkEndstreamSpacings(dict, size);
-		return dict;
+        return dict;
 	}
 
     private void checkStreamSpacings(COSObject stream) throws IOException {
