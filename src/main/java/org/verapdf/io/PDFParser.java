@@ -559,7 +559,7 @@ public class PDFParser extends Parser {
             int bufferLength = (int) (size > 512 ? 512 : size);
             byte[] buffer = new byte[bufferLength];
             while (!isEof()) {
-                int bytesRead = read(buffer, bufferLength);
+                long bytesRead = read(buffer, bufferLength);
                 for (int i = 0; i < bytesRead; i++) {
                     if (buffer[i] == 101) {
                         long reset = getOffset();
