@@ -21,12 +21,12 @@ public class InternalInputStream implements ASInputStream {
 		this.source = new RandomAccessFile(createTempFile(fileStream), READ_ONLY_MODE);
 	}
 
-	public int read(byte[] buffer, int size) throws IOException {
-		return this.source.read(buffer, 0, size);
+	public long read(byte[] buffer, long size) throws IOException {
+		return this.source.read(buffer, 0, (int) size);
 	}
 
-	public int skip(int size) throws IOException {
-		return this.source.skipBytes(size);
+	public long skip(long size) throws IOException {
+		return this.source.skipBytes((int) size);
 	}
 
 	public void close() throws IOException {

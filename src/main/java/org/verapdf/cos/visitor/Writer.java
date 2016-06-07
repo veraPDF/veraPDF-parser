@@ -145,7 +145,7 @@ public class Writer implements IVisitor {
 			length = getOffset();
 
 			byte[] buffer = new byte[1024];
-			int count = 0;
+			long count = 0;
 
 			in.reset();
 
@@ -154,7 +154,7 @@ public class Writer implements IVisitor {
 				if (count == 0) {
 					break;
 				}
-				this.os.write(buffer, count);
+				this.os.write(buffer, (int) count);
 			}
 
 			length = getOffset() - length;
@@ -198,7 +198,7 @@ public class Writer implements IVisitor {
 			this.write(header);
 			this.write(EOL);
 
-			String comment = new String(new char[] { 0xE2, 0xE3, 0xCF, 0xD3 });
+			String comment = new String(new char[] { '%', 0xE2, 0xE3, 0xCF, 0xD3 });
 			this.write(comment);
 			this.write(EOL);
 		} catch (IOException e) {
