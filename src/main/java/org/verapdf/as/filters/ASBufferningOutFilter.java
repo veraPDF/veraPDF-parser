@@ -2,6 +2,8 @@ package org.verapdf.as.filters;
 
 import org.verapdf.as.io.ASOutputStream;
 
+import java.io.IOException;
+
 /**
  * @author Sergey Shemyakov
  */
@@ -26,11 +28,6 @@ public class ASBufferningOutFilter extends ASOutFilter {
     @Override
     public void close() {
         super.close();
-    }
-
-    @Override
-    public void flush() {
-        write(internalBuffer, bufferSize())
     }
 
     /**

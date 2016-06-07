@@ -59,11 +59,11 @@ public class ASBufferingInFilter extends ASInFilter {
      * @param bytesToRead amount of bytes to read.
      * @return amount of bytes actually placed into buffer.
      */
-    public int feedBuffer(int bytesToRead) throws IOException {
+    public long feedBuffer(int bytesToRead) throws IOException {
         bytesToRead = Math.min(bytesToRead, bufferCapacity);
-        int actuallyRead = this.getInputStream().read(internalBuffer, bytesToRead);
+        long actuallyRead = this.getInputStream().read(internalBuffer, bytesToRead);
         bufferBegin = 0;
-        bufferEnd = actuallyRead;
+        bufferEnd = (int) actuallyRead;
         return actuallyRead;
     }
 

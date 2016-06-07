@@ -7,11 +7,11 @@ import java.io.IOException;
  */
 public interface ASInputStream {
 
-	int nPos = -1;
+	long nPos = -1;
 
-	int read(byte[] buffer, int size) throws IOException;
+	long read(byte[] buffer, long size) throws IOException;
 
-	int skip(int size) throws IOException;
+	long skip(long size) throws IOException;
 
 	void close() throws IOException;
 

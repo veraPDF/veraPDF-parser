@@ -43,7 +43,7 @@ public class Parser {
 		return this.source.getOffset();
 	}
 
-	public int read(byte[] buffer, int size) throws IOException {
+	public long read(byte[] buffer, int size) throws IOException {
 		return this.source.read(buffer, size);
 	}
 
