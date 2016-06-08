@@ -27,15 +27,12 @@ public class COSFilterFlateDecode extends ASBufferingInFilter{
     @Override
     public long read(byte[] buffer, long size) throws IOException {
         try {
-            long fedBuffer = this.feedBuffer(this.getBufferCapacity());
             if (size == 0) {
                 return 0;
             }
             Inflater inflater = new Inflater();
-            inflater.setInput(this.internalBuffer, 0, (int) fedBuffer);
-            int res = inflater.inflate(buffer);
-            inflater.end();
-            return res;
+            inflater.setInput(this.internalBuffer);
+            return inflater.inflate(buffer, 0, (int) size);
         } catch (DataFormatException ex) {
             throw new IOException("Can't inflate data", ex);
         }

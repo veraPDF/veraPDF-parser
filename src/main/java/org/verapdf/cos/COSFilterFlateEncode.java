@@ -1,6 +1,6 @@
 package org.verapdf.cos;
 
-import org.verapdf.as.filters.ASBufferningOutFilter;
+import org.verapdf.as.filters.ASBufferingOutFilter;
 import org.verapdf.as.io.ASOutputStream;
 
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.zip.Deflater;
 /**
  * @author Sergey Shemyakov
  */
-public class COSFilterFlateEncode extends ASBufferningOutFilter {
+public class COSFilterFlateEncode extends ASBufferingOutFilter {
 
     public COSFilterFlateEncode(ASOutputStream stream) {
         super(stream);
