@@ -7,7 +7,7 @@ import org.verapdf.cos.COSIndirect;
 import org.verapdf.cos.COSObject;
 
 /**
- * Created by Timur on 1/10/2016.
+ * @author Timur Kamalov
  */
 public class PDPage extends PDPageTreeNode {
 

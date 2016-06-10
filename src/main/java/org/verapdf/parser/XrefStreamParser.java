@@ -1,10 +1,11 @@
-package org.verapdf.io;
+package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
+import org.verapdf.parser.EncodingPredictor;
 
 import java.io.IOException;
 import java.util.ArrayList;

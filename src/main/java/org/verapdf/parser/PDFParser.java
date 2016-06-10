@@ -4,10 +4,7 @@ import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.cos.COSDocument;
-import org.verapdf.cos.COSHeader;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSTrailer;
+import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
@@ -241,19 +238,30 @@ public class PDFParser extends COSParser {
 		return 0;
     }
 
-	private void getXRefSection(final COSXRefSection xrefs) throws IOException {
-		nextToken();
-		if (getToken().type != Token.Type.TT_KEYWORD || getToken().keyword != Token.Keyword.KW_XREF) {
-			closeInputStream();
-			throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
-		}
+    private void getXRefSectionAndTrailer(final COSXRefInfo section) throws Exception {
+        nextToken();
+        if ((getToken().type != Token.Type.TT_KEYWORD ||
+                getToken().keyword != Token.Keyword.KW_XREF) &&
+                (getToken().type != Token.Type.TT_INTEGER)) {
+            closeInputStream();
+            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+        }
+        if(this.getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
+            parseXrefTable(section.getXRefSection());
+            getTrailer(section.getTrailer());
 
+        } else {
+            parseXrefStream(section);
+        }
+    }
+
+    private void parseXrefTable(final COSXRefSection xrefs) throws IOException {
         //check spacings after "xref" keyword
         //pdf/a-1b specification, clause 6.1.4
-        byte space = source.read();
+        byte space = this.source.read();
         if (isCR(space)) {
-            if (isLF(source.peek())) {
-                source.read();
+            if (isLF(this.source.peek())) {
+                this.source.read();
             }
             if (!isDigit()) {
                 document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
@@ -262,34 +270,54 @@ public class PDFParser extends COSParser {
             document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
         }
 
-		nextToken();
+        nextToken();
 
         //check spacings between header elements
         //pdf/a-1b specification, clause 6.1.4
-        space = source.read();
+        space = this.source.read();
         if (!CharTable.isSpace(space) || !isDigit()) {
             document.setSubsectionHeaderSpaceSeparated(Boolean.FALSE);
         }
 
-		while (getToken().type == Token.Type.TT_INTEGER) {
-			int number = (int) getToken().integer;
-			nextToken();
-			int count = (int) getToken().integer;
-			COSXRefEntry xref;
-			for (int i = 0; i < count; ++i) {
+        while (getToken().type == Token.Type.TT_INTEGER) {
+            int number = (int) getToken().integer;
+            nextToken();
+            int count = (int) getToken().integer;
+            COSXRefEntry xref;
+            for (int i = 0; i < count; ++i) {
                 xref = new COSXRefEntry();
-				nextToken();
-				xref.offset = getToken().integer;
-				nextToken();
-				xref.generation = (int) getToken().integer;
-				nextToken();
-				xref.free = getToken().token.charAt(0);
-				xrefs.addEntry(number + i, xref);
-			}
-			nextToken();
-		}
-        source.seekFromCurrentPosition(-7);
-	}
+                nextToken();
+                xref.offset = getToken().integer;
+                nextToken();
+                xref.generation = (int) getToken().integer;
+                nextToken();
+                xref.free = getToken().token.charAt(0);
+                xrefs.addEntry(number + i, xref);
+            }
+            nextToken();
+        }
+        this.source.seekFromCurrentPosition(-7);
+    }
+
+    private void parseXrefStream(final COSXRefInfo section) throws IOException {
+        nextToken();
+        if(this.getToken().type != Token.Type.TT_INTEGER) {
+            closeInputStream();
+            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+        }
+        nextToken();
+        if(this.getToken().type != Token.Type.TT_KEYWORD ||
+                this.getToken().keyword != Token.Keyword.KW_OBJ) {
+            closeInputStream();
+            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+        }
+        COSObject xrefCOSStream = getDictionary();
+        if(!(xrefCOSStream.get().getType().equals(COSObjType.COSStreamT))) {
+            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+        }
+        XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.get());
+        xrefStreamParser.parseStreamAndTrailer();
+    }
 
 	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws Exception {
 		if (offset == 0) {
@@ -306,10 +334,9 @@ public class PDFParser extends COSParser {
 		info.add(0, section);
 
 		section.setStartXRef(offset);
-		getXRefSection(section.getXRefSection());
-		getTrailer(section.getTrailer());
+        getXRefSectionAndTrailer(section);
 
-		offset = section.getTrailer().getPrev();
+        offset = section.getTrailer().getPrev();
 		if (offset == 0) {
 			return;
 		}
