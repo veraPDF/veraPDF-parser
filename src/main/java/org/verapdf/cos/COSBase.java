@@ -24,15 +24,15 @@ public abstract class COSBase {
 	public abstract Object accept(final ICOSVisitor visitor);
 
 	// BOOLEAN VALUES
-	public abstract boolean getBoolean();
+	public abstract Boolean getBoolean();
 	public abstract boolean setBoolean(final boolean value);
 
 	// INTEGER NUMBERS
-	public abstract long getInteger();
+	public abstract Long getInteger();
 	public abstract boolean setInteger(final long value);
 
 	// REAL NUMBERS
-	public abstract double getReal();
+	public abstract Double getReal();
 	public abstract boolean setReal(final double value);
 
 	// STRINGS
@@ -45,7 +45,7 @@ public abstract class COSBase {
 	public abstract boolean setName(final ASAtom value);
 
 	// NUMBERS OF ELEMENTS FOR ARRAY AND DICTIONARY
-	public abstract int size();
+	public abstract Integer size();
 
 	// ARRAYS
 	public abstract COSObject at(final int i);
@@ -59,14 +59,14 @@ public abstract class COSBase {
 	public abstract void clearArray();
 
 	// DICTIONARIES
-	public abstract boolean knownKey(final ASAtom key);
+	public abstract Boolean knownKey(final ASAtom key);
 	public abstract COSObject getKey(final ASAtom key);
 	public abstract boolean setKey(final ASAtom key, final COSObject value);
-	public abstract boolean getBooleanKey(final ASAtom key);
+	public abstract Boolean getBooleanKey(final ASAtom key);
 	public abstract boolean setBooleanKey(final ASAtom key, final boolean value);
-	public abstract long getIntegerKey(final ASAtom key);
+	public abstract Long getIntegerKey(final ASAtom key);
 	public abstract boolean setIntegerKey(final ASAtom key, final long value);
-	public abstract double getRealKey(final ASAtom key);
+	public abstract Double getRealKey(final ASAtom key);
 	public abstract boolean setRealKey(final ASAtom key, final double value);
 	public abstract String getStringKey(final ASAtom key);
 	public abstract boolean setStringKey(final ASAtom key, final String value);
@@ -86,17 +86,17 @@ public abstract class COSBase {
 	public abstract boolean setData(final ASInputStream stream);
 	public abstract boolean setData(final ASInputStream stream, final COSStream.FilterFlags flags);
 
-	public abstract boolean isStreamKeywordCRLFCompliant();
+	public abstract Boolean isStreamKeywordCRLFCompliant();
 	public abstract boolean setStreamKeywordCRLFCompliant(final boolean streamKeywordCRLFCompliant);
 
-	public abstract long getRealStreamSize();
+	public abstract Long getRealStreamSize();
 	public abstract boolean setRealStreamSize(final long realStreamSize);
 
-	public abstract boolean isEndstreamKeywordCRLFCompliant();
+	public abstract Boolean isEndstreamKeywordCRLFCompliant();
 	public abstract boolean setEndstreamKeywordCRLFCompliant(final boolean endstreamKeywordCRLFCompliant);
 
 	// INDIRECT OBJECT
-	public abstract boolean isIndirect();
+	public abstract Boolean isIndirect();
 	public abstract COSKey getKey();
 	public abstract COSDocument getDocument();
 	public abstract boolean setKey(final COSKey key, final COSDocument document);

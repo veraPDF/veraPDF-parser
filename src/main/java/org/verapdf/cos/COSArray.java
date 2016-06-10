@@ -71,7 +71,7 @@ public class COSArray extends COSDirect implements Iterable {
         return visitor.visitFromArray(this);
     }
 
-    public int size() {
+    public Integer size() {
         return this.entries.size();
     }
 

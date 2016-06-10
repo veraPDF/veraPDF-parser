@@ -120,7 +120,7 @@ public class COSStream extends COSDictionary {
 		return true;
 	}
 
-	public boolean isStreamKeywordCRLFCompliant() {
+	public Boolean isStreamKeywordCRLFCompliant() {
 		return streamKeywordCRLFCompliant;
 	}
 
@@ -129,7 +129,7 @@ public class COSStream extends COSDictionary {
 		return true;
 	}
 
-	public boolean isEndstreamKeywordCRLFCompliant() {
+	public Boolean isEndstreamKeywordCRLFCompliant() {
 		return endstreamKeywordCRLFCompliant;
 	}
 
@@ -138,7 +138,7 @@ public class COSStream extends COSDictionary {
 		return true;
 	}
 
-	public long getRealStreamSize() {
+	public Long getRealStreamSize() {
 		return realStreamSize;
 	}
 

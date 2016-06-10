@@ -62,12 +62,12 @@ public class COSString extends COSDirect {
     }
 
     //! Returns the size of the string
-    public long getInteger() {
-        return this.value.length();
+    public Long getInteger() {
+        return (long) this.value.length();
     }
 
-    public double getReal() {
-        return this.value.length();
+    public Double getReal() {
+        return (double) this.value.length();
     }
 
     public String getString() {
