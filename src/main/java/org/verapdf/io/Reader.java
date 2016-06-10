@@ -5,6 +5,7 @@ import org.verapdf.cos.COSHeader;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.xref.COSXRefInfo;
+import org.verapdf.parser.PDFParser;
 
 import java.io.IOException;
 import java.io.InputStream;
