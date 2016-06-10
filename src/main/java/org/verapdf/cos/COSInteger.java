@@ -10,9 +10,6 @@ public class COSInteger extends COSNumber {
 
     private long value;
 
-    protected COSInteger() {
-    }
-
     protected COSInteger(final long value) {
         this.value = value;
     }
@@ -33,7 +30,7 @@ public class COSInteger extends COSNumber {
         return visitor.visitFromInteger(this);
     }
 
-    public long getInteger() {
+    public Long getInteger() {
         return get();
     }
 
@@ -42,8 +39,8 @@ public class COSInteger extends COSNumber {
         return true;
     }
 
-    public double getReal() {
-        return get();
+    public Double getReal() {
+        return (double) get();
     }
 
     public boolean setReal(final double value) {

@@ -74,7 +74,7 @@ public class COSIndirect extends COSBase {
     }
 
     //! Boolean values
-    public boolean getBoolean() {
+    public Boolean getBoolean() {
         return getDirect().getBoolean();
     }
 
@@ -84,7 +84,7 @@ public class COSIndirect extends COSBase {
     }
 
     //! Integer numbers
-    public long getInteger() {
+    public Long getInteger() {
         return getDirect().getInteger();
     }
 
@@ -94,7 +94,7 @@ public class COSIndirect extends COSBase {
     }
 
     //! Real numbers
-    public double getReal() {
+    public Double getReal() {
         return getDirect().getReal();
     }
 
@@ -128,7 +128,7 @@ public class COSIndirect extends COSBase {
     }
 
     //! Number of elements for array and dictionary
-    public int size() {
+    public Integer size() {
         return getDirect().size();
     }
 
@@ -177,7 +177,7 @@ public class COSIndirect extends COSBase {
     }
 
     //! Dictionaries
-    public boolean knownKey(final ASAtom key) {
+    public Boolean knownKey(final ASAtom key) {
         return getDirect().knownKey(key);
     }
 
@@ -190,7 +190,7 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
-    public boolean getBooleanKey(final ASAtom key) {
+    public Boolean getBooleanKey(final ASAtom key) {
         return getDirect().getBooleanKey(key);
     }
 
@@ -199,7 +199,7 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
-    public long getIntegerKey(final ASAtom key) {
+    public Long getIntegerKey(final ASAtom key) {
         return getDirect().getIntegerKey(key);
     }
 
@@ -208,7 +208,7 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
-    public double getRealKey(final ASAtom key) {
+    public Double getRealKey(final ASAtom key) {
         return getDirect().getRealKey(key);
     }
 
@@ -281,7 +281,7 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
-    public boolean isStreamKeywordCRLFCompliant() {
+    public Boolean isStreamKeywordCRLFCompliant() {
         return getDirect().isStreamKeywordCRLFCompliant();
     }
 
@@ -290,7 +290,7 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
-    public boolean isEndstreamKeywordCRLFCompliant() {
+    public Boolean isEndstreamKeywordCRLFCompliant() {
         return getDirect().isEndstreamKeywordCRLFCompliant();
     }
 
@@ -299,7 +299,7 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
-    public long getRealStreamSize() {
+    public Long getRealStreamSize() {
         return getDirect().getRealStreamSize();
     }
 
@@ -309,7 +309,7 @@ public class COSIndirect extends COSBase {
     }
 
     //! Indirect object
-    public boolean isIndirect() {
+    public Boolean isIndirect() {
         return true;
     }
 

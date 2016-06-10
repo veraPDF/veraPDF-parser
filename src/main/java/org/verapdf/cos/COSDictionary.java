@@ -114,11 +114,11 @@ public class COSDictionary extends COSDirect {
         return visitor.visitFromDictionary(this);
     }
 
-    public int size() {
+    public Integer size() {
         return this.entries.size();
     }
 
-    public boolean knownKey(final ASAtom key) {
+    public Boolean knownKey(final ASAtom key) {
         return this.entries.containsKey(key);
     }
 
@@ -136,7 +136,7 @@ public class COSDictionary extends COSDirect {
         return true;
     }
 
-    public boolean getBooleanKey(final ASAtom key) {
+    public Boolean getBooleanKey(final ASAtom key) {
         return getKey(key).getBoolean();
     }
 
@@ -147,7 +147,7 @@ public class COSDictionary extends COSDirect {
         return true;
     }
 
-    public long getIntegerKey(final ASAtom key) {
+    public Long getIntegerKey(final ASAtom key) {
 
         return getKey(key).getInteger();
     }
@@ -159,7 +159,7 @@ public class COSDictionary extends COSDirect {
         return true;
     }
 
-    public double getRealKey(final ASAtom key) {
+    public Double getRealKey(final ASAtom key) {
         return getKey(key).getReal();
     }
 

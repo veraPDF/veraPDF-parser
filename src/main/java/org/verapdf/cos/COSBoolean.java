@@ -37,7 +37,7 @@ public class COSBoolean extends COSDirect {
         return visitor.visitFromBoolean(this);
     }
 
-    public boolean getBoolean() {
+    public Boolean getBoolean() {
         return get();
     }
 

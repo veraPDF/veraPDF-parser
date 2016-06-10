@@ -38,7 +38,7 @@ public class COSReal extends COSNumber {
         return visitor.visitFromReal(this);
     }
 
-    public long getInteger() {
+    public Long getInteger() {
         return (long) get();
     }
 
@@ -47,7 +47,7 @@ public class COSReal extends COSNumber {
         return true;
     }
 
-    public double getReal() {
+    public Double getReal() {
         return get();
     }
 
