@@ -1,25 +1,20 @@
 package org.verapdf.io;
 
-import com.sun.javafx.fxml.expression.Expression;
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.zip.Inflater;
 
 /**
  * @author Timur Kamalov
@@ -359,7 +354,7 @@ public class PDFParser extends Parser {
 		return 0;
     }
 
-	private void getXRefSection(final COSXRefSection xrefs) throws IOException {
+	private void getXRefSectionAndTrailer(final COSXRefInfo section) throws Exception {
 		nextToken();
 		if ((getToken().type != Token.Type.TT_KEYWORD ||
                 getToken().keyword != Token.Keyword.KW_XREF) &&
@@ -368,9 +363,11 @@ public class PDFParser extends Parser {
 			throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
 		}
         if(this.getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
-            parseXrefTable(xrefs);
+            parseXrefTable(section.getXRefSection());
+            getTrailer(section.getTrailer());
+
         } else {
-            parseXrefStream(xrefs);
+            parseXrefStream(section);
         }
 	}
 
@@ -418,7 +415,7 @@ public class PDFParser extends Parser {
         seekFromCurrentPosition(-7);
     }
 
-    private void parseXrefStream(final COSXRefSection xrefs) throws IOException {
+    private void parseXrefStream(final COSXRefInfo section) throws IOException {
         nextToken();
         if(this.getToken().type != Token.Type.TT_INTEGER) {
             closeInputStream();
@@ -434,25 +431,7 @@ public class PDFParser extends Parser {
         if(!(xrefCOSStream.get() instanceof COSStream)) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
-        ASInputStream xrefInputStream =
-                xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
-        COSArray fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).get();  //TODO: check if has exactly 3 elements
-        byte [] field0 = new byte [(int) fieldSizes.at(0).getInteger()];
-        byte [] field1 = new byte [(int) fieldSizes.at(1).getInteger()];
-        byte [] field2 = new byte [(int) fieldSizes.at(2).getInteger()];
-        COSXRefEntry xref;
-        while(true) {   // TODO: write adequate while
-            xrefInputStream.read(field0, field0.length);   //TODO: find out what to do with spaces
-            xrefInputStream.read(field1, field1.length);
-            xrefInputStream.read(field2, field2.length);
-            xref = new COSXRefEntry();
-            int type = Integer.parseInt(new String(field0));
-            xref.free = type == 0 ? 'f' : 'n';
-            xref.offset = type == 2 ? -Long.parseLong(new String(field1)) :
-                    Long.parseLong(new String(field1)); // TODO: what to do in case type == 0? Is that correct?
-            xref.generation = Integer.parseInt(new String(field2)); // If object is written into stream then generation indicates index of object within stream
-            //TODO: get object number
-        }
+        XrefStreamParser.parseStreamAndTrailer(section, (COSStream) xrefCOSStream.get());
     }
 
 	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws Exception {
@@ -470,8 +449,7 @@ public class PDFParser extends Parser {
 		info.add(0, section);
 
 		section.setStartXRef(offset);
-		getXRefSection(section.getXRefSection());
-		getTrailer(section.getTrailer());
+		getXRefSectionAndTrailer(section);
 
 		offset = section.getTrailer().getPrev();
 		if (offset == 0) {

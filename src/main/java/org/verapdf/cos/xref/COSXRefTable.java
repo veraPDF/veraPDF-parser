@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Timur on 12/18/2015.
+ * @author Timur Kamalov
  */
 public class COSXRefTable {
 
