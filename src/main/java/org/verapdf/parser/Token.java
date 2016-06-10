@@ -1,4 +1,4 @@
-package org.verapdf.io;
+package org.verapdf.parser;
 
 import java.util.HashMap;
 import java.util.Map;

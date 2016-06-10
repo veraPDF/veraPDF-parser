@@ -1,9 +1,10 @@
-package org.verapdf.io;
+package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSFilterASCIIHexDecode;
+import org.verapdf.io.InternalInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,68 +16,24 @@ import static org.verapdf.as.CharTable.ASCII_LF;
 /**
  * @author Timur Kamalov
  */
-public class Parser {
+public class BaseParser {
 
 	private static final byte ASCII_ZERO = 48;
 	private static final byte ASCII_NINE = 57;
 
-	private InternalInputStream source;
+	protected InternalInputStream source;
 	private Token token;
 
-	public Parser(String fileName) throws FileNotFoundException {
+	public BaseParser(String fileName) throws FileNotFoundException {
 		this.source = new InternalInputStream(fileName);
 	}
 
-	public Parser(InputStream fileStream) throws IOException {
+	public BaseParser(InputStream fileStream) throws IOException {
 		this.source = new InternalInputStream(fileStream);
 	}
 
 	public void closeInputStream() throws IOException {
 		this.source.close();
-	}
-
-	public long getSourceLength() throws IOException {
-		return this.source.getStreamLength();
-	}
-
-	public long getOffset() throws IOException {
-		return this.source.getOffset();
-	}
-
-	public long read(byte[] buffer, int size) throws IOException {
-		return this.source.read(buffer, size);
-	}
-
-	public byte readByte() throws IOException {
-		return this.source.read();
-	}
-
-	public byte peek() throws IOException {
-		return this.source.peek();
-	}
-
-	public void unread() throws IOException{
-		this.source.unread();
-	}
-
-	public void unread(final int count) throws IOException{
-		this.source.unread(count);
-	}
-
-	public void seek(final long offset) throws IOException {
-		this.source.seek(offset);
-	}
-
-	public void seekFromEnd(final int offset) throws IOException {
-		this.source.seekFromEnd(offset);
-	}
-
-	public void seekFromCurrentPosition(final int offset) throws IOException {
-		this.source.seekFromCurrentPosition(offset);
-	}
-
-	public boolean isEof() throws IOException {
-		return this.source.isEof();
 	}
 
 	// PROTECTED METHODS
@@ -246,7 +203,7 @@ public class Parser {
 	}
 
 	protected boolean isDigit() throws IOException {
-		return isDigit(peek());
+		return isDigit(this.source.peek());
 	}
 
 	protected boolean isDigit(byte c) {
