@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by Timur on 12/23/2015.
+ * @author Timur Kamalov
  */
 public class COSArray extends COSDirect implements Iterable {
 

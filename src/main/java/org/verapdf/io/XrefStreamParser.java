@@ -14,43 +14,54 @@ import java.util.List;
 /**
  * This class parses xref stream to obtain xref entries with object numbers,
  * generations and byte offsets.
+ *
  * @author Sergey Shemyakov
  */
-public class XrefStreamParser {
+class XrefStreamParser {
 
-    private static COSArray index;
-    private static ASInputStream xrefInputStream;
-    private static COSArray fieldSizes;
-    private static List<Long> objIDs;
+    private COSArray index;
+    private ASInputStream xrefInputStream;
+    private COSArray fieldSizes;
+    private List<Long> objIDs;
+    private COSXRefInfo section;
+    private COSStream xrefCOSStream;
 
     /**
-     * Empty constructor that does nothing.
+     * Constructor.
+     *
+     * @param section       is xref section, where xref entries and trailer
+     *                      information will be written.
+     * @param xrefCOSStream is xref COSStream.
      */
-    public XrefStreamParser() {
+    XrefStreamParser(COSXRefInfo section, COSStream xrefCOSStream) {
+        this.section = section;
+        this.xrefCOSStream = xrefCOSStream;
     }
 
     /**
      * This is an entry point for parsing xref stream and trailer.
-     * @param section is xref section, where xref entries and trailer
-     *                information will be written.
-     * @param xrefCOSStream is xref COSStream.
+     *
      * @throws IOException
      */
-    public static void parseStreamAndTrailer(COSXRefInfo section,
-                                             COSStream xrefCOSStream) throws IOException {
+    void parseStreamAndTrailer() throws IOException {
 
         xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
         fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).get();
         if (fieldSizes.size() != 3) {
             throw new IOException("W array in xref stream has not 3 elements."); //TODO: what to do with exceptions?
         }
-        initializeIndex(xrefCOSStream);
+        initializeIndex();
         initializeObjIDs();
-        parseStream(section);
-        setTrailer(section, xrefCOSStream);
+        parseStream();
+        setTrailer();
     }
 
-    private static void initializeIndex(COSStream xrefCOSStream)
+    /**
+     * This method makes sure that Index array is correctly initialized.
+     *
+     * @throws IOException
+     */
+    private void initializeIndex()
             throws IOException {
         index = (COSArray) xrefCOSStream.getKey(ASAtom.INDEX).get();
 
@@ -64,7 +75,11 @@ public class XrefStreamParser {
         }
     }
 
-    private static void initializeObjIDs() {
+    /**
+     * This method calculates object ID for all objects, described in this xref
+     * stream using Index array.
+     */
+    private void initializeObjIDs() {
         objIDs = new ArrayList<>();
         for (int i = 0; i < index.size() / 2; ++i) {
             COSInteger firstID = (COSInteger) index.at(2 * i).get();
@@ -75,21 +90,28 @@ public class XrefStreamParser {
         }
     }
 
-    private static void parseStream(COSXRefInfo section) throws IOException {
+    /**
+     * This method does low-level parsing of xref stream.
+     *
+     * @throws IOException
+     */
+    private void parseStream() throws IOException {
         byte[] field0 = new byte[(int) fieldSizes.at(0).getInteger()];
         byte[] field1 = new byte[(int) fieldSizes.at(1).getInteger()];
         byte[] field2 = new byte[(int) fieldSizes.at(2).getInteger()];
         byte[] buffer = new byte[2048]; //TODO: 2048 can be not enough for some streams
-        xrefInputStream.read(buffer, 2048);
+        long actualLength = xrefInputStream.read(buffer, 2048); // Getting flate decoded data
+        buffer = Arrays.copyOf(buffer, (int) actualLength);
+        buffer = getPredictorResult(buffer);
         int pointer = 0;
 
         COSXRefEntry xref;
-        for (Long id : objIDs) {    // TODO: obtained bytes are not the final decoded bytes somehow. See org.apache.pdfbox.filter.Predictor for
-            field0 = Arrays.copyOfRange(buffer, pointer, pointer + field0.length);  //TODO: information what should be done + consult Boris.
+        for (Long id : objIDs) {
+            System.arraycopy(buffer, pointer, field0, 0, field0.length);
             pointer += field0.length;
-            field1 = Arrays.copyOfRange(buffer, pointer, pointer + field1.length);
+            System.arraycopy(buffer, pointer, field1, 0, field1.length);
             pointer += field1.length;
-            field2 = Arrays.copyOfRange(buffer, pointer, pointer + field2.length);
+            System.arraycopy(buffer, pointer, field2, 0, field2.length);
             pointer += field2.length;
             int type = 1;   // Default value for type
             if (field0.length > 0) {
@@ -124,7 +146,11 @@ public class XrefStreamParser {
         }
     }
 
-    private static void setTrailer(COSXRefInfo section, COSStream xrefCOSStream) {  // TODO: anything else?
+    /**
+     * This method puts all necessary information into trailer of this xref
+     * section.
+     */
+    private void setTrailer() {  // TODO: anything else?
         COSTrailer trailer = section.getTrailer();
         if (xrefCOSStream.getKey(ASAtom.SIZE).get() != null) {
             trailer.setSize(((COSInteger) xrefCOSStream.getKey(ASAtom.SIZE).get()).get());
@@ -146,11 +172,59 @@ public class XrefStreamParser {
         }
     }
 
-    private static long numberFromBytes(byte[] num) {
+    /**
+     * This is a helper method for low-level parsing, it converts number
+     * represented with array of bytes into long.
+     *
+     * @param num is byte array to be converted.
+     * @return long obtained from given bytes.
+     */
+    private long numberFromBytes(byte[] num) {
         long res = 0;
         for (int i = 0; i < num.length; ++i) {
             res += (num[i] & 0x00FF) << ((num.length - i - 1) * 8);
         }
         return res;
+    }
+
+    /**
+     * This helper method applies predictor to given byte array in a way
+     * determined by /DecodeParams of xref COSStream dictionary.
+     *
+     * @param data byte array for which predictor should be applied.
+     * @return byte array after predictor processing.
+     */
+    private byte[] getPredictorResult(byte[] data) {  // TODO: process case of multiple filters
+        //default values
+        int predictor,
+                colors = 1,
+                bitsPerComponent = 8,
+                columns = 1;    // TODO: EarlyChange?
+
+        COSBase decodeParams = xrefCOSStream.getKey(ASAtom.DECODE_PARMS).get();
+        if (decodeParams.getType().equals(COSObjType.COSDictT)) {   // DecodeParams can be array or dict
+            if (decodeParams.knownKey(ASAtom.PREDICTOR)) {
+                predictor = decodeParams.getIntegerKey(ASAtom.PREDICTOR).intValue();
+            } else {
+                return data;
+            }
+            if (predictor == 1) {
+                return data;
+            }
+            if (decodeParams.knownKey(ASAtom.COLORS)) {
+                colors = decodeParams.getIntegerKey(ASAtom.COLORS).intValue();
+            }
+            if (decodeParams.knownKey(ASAtom.BITS_PER_COMPONENT)) {
+                bitsPerComponent = decodeParams.getIntegerKey(ASAtom.BITS_PER_COMPONENT).intValue();
+            }
+            if (decodeParams.knownKey(ASAtom.COLUMNS)) {
+                columns = decodeParams.getIntegerKey(ASAtom.COLUMNS).intValue();
+            }
+        } else {
+            throw new RuntimeException("Case when DecodeParams of xref is " +
+                    decodeParams.getType() + "in not supported yet.");
+        }
+        return EncodingPredictor.decodePredictor(predictor, colors,
+                bitsPerComponent, columns, data);
     }
 }

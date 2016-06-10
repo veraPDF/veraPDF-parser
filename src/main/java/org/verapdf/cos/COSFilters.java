@@ -64,12 +64,17 @@ public class COSFilters extends PDObject {
 
 	protected void updateFromObject() {
 		COSObject filters = getObject();
-		int size = filters.size();
+		if(filters.getType().equals(COSObjType.COSArrayT)) {
+			int size = filters.size();
 
-		this.entries.clear();
+			this.entries.clear();
 
-		for (int i = 0; i < size; i++) {
-			this.entries.add(filters.at(i).getName());
+			for (int i = 0; i < size; i++) {
+				this.entries.add(filters.at(i).getName());
+			}
+		} else if (filters.getType().equals(COSObjType.COSNameT)) {
+			this.entries.clear();
+			this.entries.add(filters.getName());
 		}
 	}
 

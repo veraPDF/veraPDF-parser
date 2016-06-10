@@ -1,7 +1,7 @@
 package org.verapdf.cos;
 
 /**
- * Created by Timur on 12/17/2015.
+ * @author Timur Kamalov
  */
 public abstract class COSNumber extends COSDirect {
 

@@ -4,7 +4,7 @@ import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 /**
- * Created by Timur on 12/18/2015.
+ * @author Timur Kamalov
  */
 public class COSNull extends COSDirect {
 

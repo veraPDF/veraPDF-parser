@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * Created by Timur on 12/17/2015.
+ * @author Timur Kamalov
  */
 public class COSIndirect extends COSBase {
 
