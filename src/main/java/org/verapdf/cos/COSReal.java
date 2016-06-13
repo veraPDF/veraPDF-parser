@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
- * Created by Timur on 12/18/2015.
+ * @author Timur Kamalov
  */
 public class COSReal extends COSNumber {
 

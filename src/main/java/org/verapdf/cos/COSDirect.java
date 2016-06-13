@@ -5,10 +5,11 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 /**
- * Created by Timur on 12/17/2015.
+ * @author Timur Kamalov
  */
 public abstract class COSDirect extends COSBase {
 

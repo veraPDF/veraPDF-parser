@@ -3,7 +3,7 @@ package org.verapdf.as;
 import org.verapdf.cos.COSFilterASCIIHexEncode;
 
 /**
- * Created by Timur on 12/18/2015.
+ * @author Timur Kamalov
  */
 public class ASAtom {
 

@@ -4,7 +4,7 @@ import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 /**
- * Created by Timur on 12/17/2015.
+ * @author Timur Kamalov
  */
 public class COSInteger extends COSNumber {
 

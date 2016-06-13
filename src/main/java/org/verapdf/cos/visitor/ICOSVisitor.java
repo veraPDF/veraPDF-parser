@@ -3,7 +3,7 @@ package org.verapdf.cos.visitor;
 import org.verapdf.cos.*;
 
 /**
- * Created by Timur on 4/16/2016.
+ * @author Timur Kamalov
  */
 public interface ICOSVisitor {
 

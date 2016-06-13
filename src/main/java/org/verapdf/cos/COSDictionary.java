@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by Timur on 12/24/2015.
+ * @author Timur Kamalov
  */
 public class COSDictionary extends COSDirect {
 
@@ -64,6 +64,11 @@ public class COSDictionary extends COSDirect {
     protected COSDictionary(final COSDictionary dict) {
         super();
         this.entries = dict.entries;
+    }
+
+    //! Object type
+    public COSObjType getType() {
+        return COSObjType.COSDictT;
     }
 
     public static COSObject construct() {

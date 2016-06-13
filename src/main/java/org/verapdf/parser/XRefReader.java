@@ -1,8 +1,10 @@
-package org.verapdf.io;
+package org.verapdf.parser;
 
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSTrailer;
 import org.verapdf.cos.xref.COSXRefInfo;
+import org.verapdf.io.COSXRefTableReader;
+import org.verapdf.io.IReader;
 
 import java.util.List;
 

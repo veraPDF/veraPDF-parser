@@ -10,5 +10,4 @@ public interface ASOutputStream {
 	long write(final byte[] buffer) throws IOException;
 
 	void close() throws IOException;
-
 }
