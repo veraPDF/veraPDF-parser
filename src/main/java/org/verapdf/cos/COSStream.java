@@ -1,14 +1,19 @@
 package org.verapdf.cos;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
+import java.io.IOException;
+
 /**
  * @author Timur Kamalov
  */
 public class COSStream extends COSDictionary {
+
+	private static final Logger LOGGER = Logger.getLogger(COSStream.class);
 
 	private ASInputStream stream;
 	private FilterFlags flags;
@@ -102,12 +107,17 @@ public class COSStream extends COSDictionary {
 		return getData(FilterFlags.RAW_DATA);
 	}
 
-	public ASInputStream getData(final FilterFlags flags) {
+	public ASInputStream getData(final FilterFlags flags)  {
 		if (flags == FilterFlags.RAW_DATA || this.flags != FilterFlags.RAW_DATA) {
 			return this.stream;
 		}
 
-		return getFilters().getInputStream(stream);
+		try {
+			return getFilters().getInputStream(stream);
+		} catch (IOException e) {
+			LOGGER.error("Can't get stream data", e);
+			return null;
+		}
 	}
 
 	public boolean setData(final ASInputStream stream) {

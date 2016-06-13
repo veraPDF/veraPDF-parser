@@ -5,7 +5,6 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
-import org.verapdf.parser.EncodingPredictor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ class XrefStreamParser {
         xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
         fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).get();
         if (fieldSizes.size() != 3) {
-            throw new IOException("W array in xref stream has not 3 elements."); //TODO: what to do with exceptions?
+            throw new IOException("W array in xref should have 3 elements.");
         }
         initializeIndex();
         initializeObjIDs();
@@ -72,7 +71,7 @@ class XrefStreamParser {
             defaultIndex[1] = xrefCOSStream.getKey(ASAtom.SIZE);
             index = (COSArray) COSArray.construct(2, defaultIndex).get();
         } else if (index.size() % 2 != 0) {
-            throw new IOException("Index array in xref stream has odd amount of elements.");//TODO: what to do with exceptions?
+            throw new IOException("Index array in xref stream has odd amount of elements.");
         }
     }
 
@@ -100,19 +99,25 @@ class XrefStreamParser {
         byte[] field0 = new byte[(int) fieldSizes.at(0).getInteger()];
         byte[] field1 = new byte[(int) fieldSizes.at(1).getInteger()];
         byte[] field2 = new byte[(int) fieldSizes.at(2).getInteger()];
-        byte[] buffer = new byte[2048]; //TODO: 2048 can be not enough for some streams
-        long actualLength = xrefInputStream.read(buffer, 2048); // Getting flate decoded data
-        buffer = Arrays.copyOf(buffer, (int) actualLength);
-        buffer = getPredictorResult(buffer);
+        byte[] buffer = new byte[2048];
+        byte[] decodedStream = new byte[0];
+        while (true) {
+            long read = xrefInputStream.read(buffer, 2048);
+            if (read == 0) {
+                break;
+            }
+            decodedStream = concatenate(decodedStream, buffer, (int) read);
+        }
+        decodedStream = getPredictorResult(decodedStream);
         int pointer = 0;
 
         COSXRefEntry xref;
         for (Long id : objIDs) {
-            System.arraycopy(buffer, pointer, field0, 0, field0.length);
+            System.arraycopy(decodedStream, pointer, field0, 0, field0.length);
             pointer += field0.length;
-            System.arraycopy(buffer, pointer, field1, 0, field1.length);
+            System.arraycopy(decodedStream, pointer, field1, 0, field1.length);
             pointer += field1.length;
-            System.arraycopy(buffer, pointer, field2, 0, field2.length);
+            System.arraycopy(decodedStream, pointer, field2, 0, field2.length);
             pointer += field2.length;
             int type = 1;   // Default value for type
             if (field0.length > 0) {
@@ -142,7 +147,7 @@ class XrefStreamParser {
                             xref.generation), xref.offset);
                     break;
                 default:
-                    throw new IOException("Error in parsing xref stream");  //TODO: what to do with exceptions?
+                    throw new IOException("Error in parsing xref stream");
             }
         }
     }
@@ -227,5 +232,18 @@ class XrefStreamParser {
         }
         return EncodingPredictor.decodePredictor(predictor, colors,
                 bitsPerComponent, columns, data);
+    }
+
+    private byte[] concatenate(byte[] decodeResult, byte[] buffer, int bufferLength) {
+        if (decodeResult.length == 0) {
+            return Arrays.copyOfRange(buffer, 0, bufferLength);
+        }
+        if (bufferLength == 0) {
+            return decodeResult;
+        }
+        byte[] res = new byte[decodeResult.length + bufferLength];
+        System.arraycopy(decodeResult, 0, res, 0, decodeResult.length);
+        System.arraycopy(buffer, 0, res, decodeResult.length, bufferLength);
+        return res;
     }
 }

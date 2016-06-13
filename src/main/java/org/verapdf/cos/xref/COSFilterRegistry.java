@@ -10,6 +10,7 @@ import org.verapdf.as.filters.IASFilterFactory;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,9 +27,7 @@ public class COSFilterRegistry {
 		try {
 			registerFactory(ASAtom.FLATE_DECODE, new ASFilterFactory(ASAtom.FLATE_DECODE));
 		} catch (Exception e) {
-			if(e instanceof IllegalArgumentException) {
-				LOGGER.error("Unknown filter", e);
-			}
+			LOGGER.warn("Trying to register factory twice", e);
 		}
 	}
 
@@ -48,7 +47,8 @@ public class COSFilterRegistry {
 		}
 	}
 
-	public static ASInFilter getDecodeFilter(final ASAtom filterName, final ASInputStream inputStream) {
+	public static ASInFilter getDecodeFilter(final ASAtom filterName,
+											 final ASInputStream inputStream) throws IOException {
 		final IASFilterFactory filterFactory = factoryByName(filterName);
 		if (filterFactory != null) {
 			return filterFactory.getInFilter(inputStream);
@@ -57,7 +57,8 @@ public class COSFilterRegistry {
 		}
 	}
 
-	public static ASOutFilter getEncodeFilter(final ASAtom filterName, ASOutputStream outputStream) {
+	public static ASOutFilter getEncodeFilter(final ASAtom filterName,
+											  ASOutputStream outputStream) throws IOException {
 		final IASFilterFactory filterFactory = factoryByName(filterName);
 		if (filterFactory != null) {
 			return filterFactory.getOutFilter(outputStream);

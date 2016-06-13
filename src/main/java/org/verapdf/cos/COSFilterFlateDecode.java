@@ -13,8 +13,12 @@ import java.util.zip.Inflater;
  */
 public class COSFilterFlateDecode extends ASBufferingInFilter {
 
-    public COSFilterFlateDecode(ASInputStream stream) {
+    private final Inflater inflater = new Inflater();
+
+    public COSFilterFlateDecode(ASInputStream stream) throws IOException {
         super(stream);
+        long dataLength = feedBuffer(getBufferCapacity());
+        inflater.setInput(this.internalBuffer, 0, (int) dataLength);
     }
 
     /**
@@ -29,12 +33,9 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
     @Override
     public long read(byte[] buffer, long size) throws IOException {
         try {
-            if (size == 0) {
+            if (size == 0 || inflater.finished() || inflater.needsDictionary()) {
                 return 0;
             }
-            long dataLength = feedBuffer(getBufferCapacity());
-            Inflater inflater = new Inflater();
-            inflater.setInput(this.internalBuffer, 0, (int) dataLength);
             return inflater.inflate(buffer, 0, (int) size);
         } catch (DataFormatException ex) {
             throw new IOException("Can't inflate data", ex);

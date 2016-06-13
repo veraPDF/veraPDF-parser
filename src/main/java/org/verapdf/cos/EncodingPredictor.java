@@ -1,4 +1,4 @@
-package org.verapdf.parser;
+package org.verapdf.cos;
 
 import java.util.Arrays;
 
@@ -8,12 +8,12 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-class EncodingPredictor {
+public class EncodingPredictor {
 
     private EncodingPredictor() {
     }
 
-    static byte[] decodePredictor(int predictor, int colors, int bitsPerComponent,
+    public static byte[] decodePredictor(int predictor, int colors, int bitsPerComponent,
                                   int columns, byte[] input) {
         if (predictor == 1) {
             //No prediction

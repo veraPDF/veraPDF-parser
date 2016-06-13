@@ -6,6 +6,7 @@ import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.xref.COSFilterRegistry;
 import org.verapdf.pd.PDObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class COSFilters extends PDObject {
 		setObject(object);
 	}
 
-	public ASInputStream getInputStream(ASInputStream inputStream) {
+	public ASInputStream getInputStream(ASInputStream inputStream) throws IOException {
 		for (ASAtom asAtom : entries) {
 			inputStream = COSFilterRegistry.getDecodeFilter(asAtom, inputStream);
 
@@ -35,7 +36,7 @@ public class COSFilters extends PDObject {
 		return inputStream;
 	}
 
-	public ASOutputStream getOutputStream(ASOutputStream outputStream) {
+	public ASOutputStream getOutputStream(ASOutputStream outputStream) throws IOException {
 		for (ASAtom asAtom : entries) {
 			outputStream = COSFilterRegistry.getEncodeFilter(asAtom, outputStream);
 
