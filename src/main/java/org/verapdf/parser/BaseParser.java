@@ -445,7 +445,7 @@ public class BaseParser {
 		}
 	}
 
-	private void readNumber() throws IOException {
+	public void readNumber() throws IOException {
 		this.token.token = "";
 		this.token.type = Token.Type.TT_INTEGER;
 		byte ch;

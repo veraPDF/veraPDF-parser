@@ -44,7 +44,11 @@ public class Reader extends XRefReader {
 	}
 
 	public COSObject getObject(final long offset) throws IOException {
-		return this.parser.getObject(offset);
+		if (offset >= 0) {
+			return this.parser.getObject(offset);
+		} else {
+			return null;// TODO: object streams
+		}
 	}
 
 

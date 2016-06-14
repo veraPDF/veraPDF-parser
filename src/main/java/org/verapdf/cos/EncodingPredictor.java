@@ -8,7 +8,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class EncodingPredictor {
+public class EncodingPredictor {    //TODO: make package "filters" or something like that. Move it from here.
 
     private EncodingPredictor() {
     }

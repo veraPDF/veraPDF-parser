@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Sergey Shemyakov
  */
-class XrefStreamParser {
+public class XrefStreamParser {
 
     private COSArray index;
     private ASInputStream xrefInputStream;
@@ -25,6 +25,7 @@ class XrefStreamParser {
     private List<Long> objIDs;
     private COSXRefInfo section;
     private COSStream xrefCOSStream;
+    private static final int DEFAULT_BUFFER_SIZE = 2048;
 
     /**
      * Constructor.
@@ -99,10 +100,10 @@ class XrefStreamParser {
         byte[] field0 = new byte[(int) fieldSizes.at(0).getInteger()];
         byte[] field1 = new byte[(int) fieldSizes.at(1).getInteger()];
         byte[] field2 = new byte[(int) fieldSizes.at(2).getInteger()];
-        byte[] buffer = new byte[2048];
+        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];  // TODO: move logic of decoding somewhere else. It is repeated in SavedDecodedObjectStream.
         byte[] decodedStream = new byte[0];
         while (true) {
-            long read = xrefInputStream.read(buffer, 2048);
+            long read = xrefInputStream.read(buffer, (long) buffer.length);
             if (read == 0) {
                 break;
             }
@@ -156,7 +157,7 @@ class XrefStreamParser {
      * This method puts all necessary information into trailer of this xref
      * section.
      */
-    private void setTrailer() {  // TODO: anything else?
+    private void setTrailer() {
         COSTrailer trailer = section.getTrailer();
         if (xrefCOSStream.getKey(ASAtom.SIZE).get() != null) {
             trailer.setSize(((COSInteger) xrefCOSStream.getKey(ASAtom.SIZE).get()).get());
@@ -234,7 +235,15 @@ class XrefStreamParser {
                 bitsPerComponent, columns, data);
     }
 
-    private byte[] concatenate(byte[] decodeResult, byte[] buffer, int bufferLength) {
+    /**
+     * Method concatenates decoded buffer to existing result array taking into
+     * account actual amount of useful data in buffer.
+     * @param decodeResult is result array to which buffer will be concatenated.
+     * @param buffer is a portion of decoded data.
+     * @param bufferLength is length of decoded data in buffer array.
+     * @return result of concatenation.
+     */
+    public static byte[] concatenate(byte[] decodeResult, byte[] buffer, int bufferLength) {   // TODO: move it somewhere. Maybe in separate class in package "filters".
         if (decodeResult.length == 0) {
             return Arrays.copyOfRange(buffer, 0, bufferLength);
         }
