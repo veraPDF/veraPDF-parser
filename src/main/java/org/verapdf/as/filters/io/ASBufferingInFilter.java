@@ -1,5 +1,6 @@
-package org.verapdf.as.filters;
+package org.verapdf.as.filters.io;
 
+import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.io.ASInputStream;
 
 import java.io.IOException;

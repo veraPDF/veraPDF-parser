@@ -32,6 +32,10 @@ public class COSParser extends BaseParser {
 		super(fileStream);
 	}
 
+	public COSParser(ASInputStream asInputStream) throws IOException {
+		super(asInputStream);
+	}
+
 	public COSParser(final COSDocument document, final String filename) throws Exception { //tmp ??
 		this(filename);
 		this.document = document;

@@ -10,8 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.verapdf.as.CharTable.ASCII_CR;
-import static org.verapdf.as.CharTable.ASCII_LF;
+import static org.verapdf.as.CharTable.*;
 
 /**
  * @author Timur Kamalov
@@ -30,6 +29,10 @@ public class BaseParser {
 
 	public BaseParser(InputStream fileStream) throws IOException {
 		this.source = new InternalInputStream(fileStream);
+	}
+
+	public BaseParser(ASInputStream asInputStream) throws IOException {
+		this.source = new InternalInputStream(asInputStream);
 	}
 
 	public void closeInputStream() throws IOException {
@@ -68,6 +71,18 @@ public class BaseParser {
 			appendToToken(ch);
 			ch = this.source.read();
 		}
+		return this.token.token;
+	}
+
+	protected String readUntilWhitespace() throws IOException {
+		initializeToken();
+		this.token.token = "";
+		byte ch = this.source.read();
+		while (!this.source.isEof() || !isSpace(ch)) {
+			appendToToken(ch);
+			ch = this.source.read();
+		}
+		this.source.unread();
 		return this.token.token;
 	}
 
@@ -183,6 +198,10 @@ public class BaseParser {
 		} else if (!isLF(c)) {
 			this.source.unread();
 		}
+	}
+
+	protected void skipSpaces() throws IOException {
+		this.skipSpaces(false);
 	}
 
 	protected void skipSpaces(boolean skipComment) throws IOException {

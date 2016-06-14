@@ -1,10 +1,9 @@
 package org.verapdf.cos;
 
-import org.verapdf.as.filters.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -31,12 +30,12 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
      * @throws IOException
      */
     @Override
-    public long read(byte[] buffer, long size) throws IOException {
+    public int read(byte[] buffer, int size) throws IOException {
         try {
             if (size == 0 || inflater.finished() || inflater.needsDictionary()) {
                 return 0;
             }
-            return inflater.inflate(buffer, 0, (int) size);
+            return inflater.inflate(buffer, 0, size);
         } catch (DataFormatException ex) {
             throw new IOException("Can't inflate data", ex);
         }

@@ -14,7 +14,7 @@ public class PDObject {
 		this.object = new COSObject();
 	}
 
-	public PDObject(final COSObject obj) throws Exception {
+	public PDObject(final COSObject obj) {
 		this.setObject(obj);
 	}
 
