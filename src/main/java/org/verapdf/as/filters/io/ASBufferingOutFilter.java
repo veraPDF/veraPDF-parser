@@ -1,23 +1,22 @@
-package org.verapdf.as.filters;
+package org.verapdf.as.filters.io;
 
+import org.verapdf.as.filters.ASOutFilter;
 import org.verapdf.as.io.ASOutputStream;
-
-import java.io.IOException;
 
 /**
  * @author Sergey Shemyakov
  */
-public class ASBufferningOutFilter extends ASOutFilter {
+public class ASBufferingOutFilter extends ASOutFilter {
 
     private int bufferCapacity;
     protected byte [] internalBuffer;
     private int bufferWriter, bufferEnd;
 
-    public ASBufferningOutFilter(ASOutputStream stream) {
+    public ASBufferingOutFilter(ASOutputStream stream) {
         this(stream, ASBufferingInFilter.BF_BUFFER_SIZE);
     }
 
-    public ASBufferningOutFilter(ASOutputStream stream, int bufferCapacity) {
+    public ASBufferingOutFilter(ASOutputStream stream, int bufferCapacity) {
         super(stream);
         this.bufferCapacity = bufferCapacity;
         internalBuffer = new byte[bufferCapacity];

@@ -21,11 +21,11 @@ public class ASInFilter implements ASInputStream {
 		}
 	}
 
-	public long read(byte[] buffer, long size) throws IOException {
+	public int read(byte[] buffer, int size) throws IOException {
 		return this.storedInStream != null ? this.storedInStream.read(buffer, size) : 0;
 	}
 
-	public long skip(long size) throws IOException {
+	public int skip(int size) throws IOException {
 		return this.storedInStream != null ? this.storedInStream.skip(size) : 0;
 	}
 

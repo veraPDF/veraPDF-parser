@@ -1,6 +1,6 @@
 package org.verapdf.cos;
 
-import org.verapdf.as.filters.ASBufferingOutFilter;
+import org.verapdf.as.filters.io.ASBufferingOutFilter;
 import org.verapdf.as.io.ASOutputStream;
 
 import java.io.IOException;

@@ -21,7 +21,7 @@ public class ASFileInStream implements ASInputStream {
 		this.curPos = 0;
 	}
 
-	public long read(byte[] buffer, long sizeToRead) throws IOException {
+	public int read(byte[] buffer, int sizeToRead) throws IOException {
 		if (sizeToRead == 0 || this.size != nPos && this.size <= this.curPos) {
 			return 0;
 		}
@@ -33,7 +33,7 @@ public class ASFileInStream implements ASInputStream {
 		long prev = this.stream.getFilePointer();
 
 		this.stream.seek(this.offset + this.curPos);
-		int count = this.stream.read(buffer, 0, (int) sizeToRead);
+		int count = this.stream.read(buffer, 0, sizeToRead);
 
 		this.stream.seek(prev);
 
@@ -42,7 +42,7 @@ public class ASFileInStream implements ASInputStream {
 		return count;
 	}
 
-	public long skip(long size) throws IOException {
+	public int skip(int size) throws IOException {
 		if (size == 0 || this.size != nPos && this.size <= this.curPos) {
 			return 0;
 		}

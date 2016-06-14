@@ -20,7 +20,7 @@ public class PDPage extends PDPageTreeNode {
     public static double PAGE_SIZE_LETTER[] = {0, 0, 612, 1008};
     public static double PAGE_SIZE_LEGAL[] = {0, 0, 612, 792};
 
-    //private PDContentStream content;
+    private PDContentStream content;
     int pageNumber;
     int pagesTotal;
 
@@ -81,6 +81,14 @@ public class PDPage extends PDPageTreeNode {
         } else {
             return null;
         }
+    }
+
+    public PDContentStream getContent() {
+        return content;
+    }
+
+    public void setContent(PDContentStream content) {
+        this.content = content;
     }
 
     //TODO : implement this
