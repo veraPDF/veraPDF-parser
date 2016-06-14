@@ -233,17 +233,4 @@ class XrefStreamParser {
         return EncodingPredictor.decodePredictor(predictor, colors,
                 bitsPerComponent, columns, data);
     }
-
-    private byte[] concatenate(byte[] decodeResult, byte[] buffer, int bufferLength) {
-        if (decodeResult.length == 0) {
-            return Arrays.copyOfRange(buffer, 0, bufferLength);
-        }
-        if (bufferLength == 0) {
-            return decodeResult;
-        }
-        byte[] res = new byte[decodeResult.length + bufferLength];
-        System.arraycopy(decodeResult, 0, res, 0, decodeResult.length);
-        System.arraycopy(buffer, 0, res, decodeResult.length, bufferLength);
-        return res;
-    }
 }

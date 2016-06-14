@@ -7,12 +7,13 @@ import java.io.IOException;
 /**
  * @author Timur Kamalov
  */
-public class ASInFilter implements ASInputStream {
+public abstract class ASInFilter implements ASInputStream {
 
 	private ASInputStream storedInStream;
 
-	protected ASInFilter(ASInputStream inputStream) {
+	protected ASInFilter(ASInputStream inputStream) throws IOException {
 		this.storedInStream = inputStream;
+		decode();
 	}
 
 	protected ASInFilter(final ASInFilter filter) {
@@ -42,5 +43,7 @@ public class ASInFilter implements ASInputStream {
 	protected ASInputStream getInputStream() {
 		return this.storedInStream;
 	}
+
+	protected abstract void decode() throws IOException;
 
 }

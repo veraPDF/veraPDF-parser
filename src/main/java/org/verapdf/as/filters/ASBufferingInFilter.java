@@ -120,4 +120,6 @@ public class ASBufferingInFilter extends ASInFilter {
         super.reset();
         bufferEnd = bufferBegin = 0;
     }
+
+    protected void decode() throws IOException {}
 }

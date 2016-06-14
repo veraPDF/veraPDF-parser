@@ -41,4 +41,45 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
             throw new IOException("Can't inflate data", ex);
         }
     }
+
+    protected void decode() throws IOException {
+        byte [] encodedData = new byte[0];
+        long read = feedBuffer(getBufferCapacity());
+        while(read != 0) {
+            encodedData = concatenate(encodedData, encodedData.length,
+                    internalBuffer, (int) read);
+            read = feedBuffer(getBufferCapacity());
+        }
+        byte[] buffer = new byte[2048];
+        byte[] decodedStream = new byte[0];
+        while (true) {
+            read = read(buffer, 2048);
+            if (read == 0) {
+                break;
+            }
+            decodedStream = concatenate(decodedStream, decodedStream.length, buffer, (int) read);
+        }
+        this.getInputStream() = new
+    }
+
+    private static byte[] concatenate(byte[] one, int lengthOne, byte[] two, int lengthTwo) {  // Can return passed array, use with care
+        if (lengthOne == 0) {
+            if(lengthTwo != two.length) {
+                return Arrays.copyOfRange(two, 0, lengthTwo);
+            } else {
+                return two;
+            }
+        }
+        if (lengthTwo == 0) {
+            if(lengthOne != one.length) {
+                return Arrays.copyOfRange(one, 0, lengthOne);
+            } else {
+                return one;
+            }
+        }
+        byte[] res = new byte[lengthOne + lengthTwo];
+        System.arraycopy(one, 0, res, 0, lengthOne);
+        System.arraycopy(two, 0, res, lengthOne, lengthTwo);
+        return res;
+    }
 }
