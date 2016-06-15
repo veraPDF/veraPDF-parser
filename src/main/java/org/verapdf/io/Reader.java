@@ -1,17 +1,18 @@
 package org.verapdf.io;
 
-import org.verapdf.cos.COSDocument;
-import org.verapdf.cos.COSHeader;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSObject;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefInfo;
+import org.verapdf.parser.DecodedObjectStreamParser;
 import org.verapdf.parser.PDFParser;
 import org.verapdf.parser.XRefReader;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Timur Kamalov
@@ -20,16 +21,19 @@ public class Reader extends XRefReader {
 
 	private PDFParser parser;
 	private COSHeader header;
+	private Map<Long, DecodedObjectStreamParser> objectStreams;
 
 	public Reader(final COSDocument document, final String fileName) throws Exception {
 		super();
 		this.parser = new PDFParser(document, fileName);
+		this.objectStreams = new HashMap<>();
 		init();
 	}
 
 	public Reader(final COSDocument document, final InputStream fileStream) throws Exception {
 		super();
 		this.parser = new PDFParser(document, fileStream);
+		this.objectStreams = new HashMap<>();
 		init();
 	}
 
@@ -40,15 +44,31 @@ public class Reader extends XRefReader {
 
 	public COSObject getObject(final COSKey key) throws IOException {
 		final long offset = getOffset(key);
-		return getObject(offset);
+		if(offset > 0) {
+			return getObject(offset);
+		} else {
+			DecodedObjectStreamParser parser = objectStreams.get(-offset);
+			if(parser != null) {
+				return parser.getObject(key.getNumber());
+			} else {
+				COSKey newKey = new COSKey(- (int)offset, 0);
+				COSObject object = getObject(newKey);
+				if(!object.getType().equals(COSObjType.COSStreamT)) {
+					throw new IOException("Object number " + (-offset) + " should" +
+							" be object stream, but in fact it is " + object.getType());
+				}
+				COSStream objectStream = (COSStream) object.get();
+				parser = new DecodedObjectStreamParser(
+						objectStream.getData(COSStream.FilterFlags.DECODE),
+						objectStream, new COSKey((int) -offset, 0));
+				objectStreams.put(-offset, parser);
+				return parser.getObject(key.getNumber());
+			}
+		}
 	}
 
 	public COSObject getObject(final long offset) throws IOException {
-		if (offset >= 0) {
-			return this.parser.getObject(offset);
-		} else {
-			return null;// TODO: object streams
-		}
+		return this.parser.getObject(offset);
 	}
 
 

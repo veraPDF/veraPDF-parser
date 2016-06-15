@@ -127,6 +127,9 @@ public class ASBufferingInFilter extends ASInFilter {
     }
 
     public static byte[] concatenate(byte[] one, int lengthOne, byte[] two, int lengthTwo) {
+        if(lengthTwo == -1) {
+            lengthTwo = 0;
+        }
         if (lengthOne == 0) {
             return Arrays.copyOfRange(two, 0, lengthTwo);
         }

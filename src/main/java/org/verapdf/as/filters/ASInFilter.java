@@ -29,7 +29,7 @@ public abstract class ASInFilter implements ASInputStream {
 	}
 
 	public int read(byte[] buffer, int size) throws IOException {
-		return this.storedInStream != null ? this.storedInStream.read(buffer, size) : 0;
+		return this.storedInStream != null ? this.storedInStream.read(buffer, size) : -1;
 	}
 
 	public int skip(int size) throws IOException {

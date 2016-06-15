@@ -35,7 +35,7 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
         byte[] encodedData = new byte[0];
         byte[] buffer = new byte[BF_BUFFER_SIZE];
         int read = this.getInputStream().read(buffer, BF_BUFFER_SIZE);
-        while (read != 0) {
+        while (read != -1) {
             encodedData = concatenate(encodedData, encodedData.length,
                     buffer, read);
             read = this.getInputStream().read(buffer, BF_BUFFER_SIZE);

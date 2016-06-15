@@ -104,7 +104,7 @@ class XrefStreamParser {
         byte[] decodedStream = new byte[0];
         while (true) {
             long read = xrefInputStream.read(buffer, ASBufferingInFilter.BF_BUFFER_SIZE);
-            if (read == 0) {
+            if (read == -1) {
                 break;
             }
             decodedStream = ASBufferingInFilter.concatenate(decodedStream,
@@ -143,8 +143,8 @@ class XrefStreamParser {
                     xref = new COSXRefEntry();
                     xref.offset = -numberFromBytes(field1);
                     if (field2.length > 0) {
-                        xref.generation = (int) numberFromBytes(field2); // If object is written into stream then generation indicates
-                    }                                               // index of object within stream. Generation number shall be implicitly 0.
+                        xref.generation = 0;
+                    }
                     section.getXRefSection().add(new COSKey(id.intValue(),
                             xref.generation), xref.offset);
                     break;
