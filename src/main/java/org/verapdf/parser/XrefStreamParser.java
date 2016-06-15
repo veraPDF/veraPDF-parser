@@ -1,6 +1,7 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
@@ -99,14 +100,15 @@ class XrefStreamParser {
         byte[] field0 = new byte[(int) fieldSizes.at(0).getInteger()];
         byte[] field1 = new byte[(int) fieldSizes.at(1).getInteger()];
         byte[] field2 = new byte[(int) fieldSizes.at(2).getInteger()];
-        byte[] buffer = new byte[2048];
+        byte[] buffer = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
         byte[] decodedStream = new byte[0];
         while (true) {
-            long read = xrefInputStream.read(buffer, 2048);
+            long read = xrefInputStream.read(buffer, ASBufferingInFilter.BF_BUFFER_SIZE);
             if (read == 0) {
                 break;
             }
-            decodedStream = concatenate(decodedStream, buffer, (int) read);
+            decodedStream = ASBufferingInFilter.concatenate(decodedStream,
+                    decodedStream.length, buffer, (int) read);
         }
         decodedStream = getPredictorResult(decodedStream);
         int pointer = 0;
@@ -156,7 +158,7 @@ class XrefStreamParser {
      * This method puts all necessary information into trailer of this xref
      * section.
      */
-    private void setTrailer() {  // TODO: anything else?
+    private void setTrailer() {
         COSTrailer trailer = section.getTrailer();
         if (xrefCOSStream.getKey(ASAtom.SIZE).get() != null) {
             trailer.setSize(((COSInteger) xrefCOSStream.getKey(ASAtom.SIZE).get()).get());

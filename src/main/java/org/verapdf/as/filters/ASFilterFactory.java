@@ -1,6 +1,8 @@
 package org.verapdf.as.filters;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferingOutFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.COSFilterFlateDecode;
