@@ -9,10 +9,12 @@ import java.util.Map;
 public class Token {
 
 	public Type type;
-	public String token;
+	public Keyword keyword;
+
 	public long integer;
 	public double real;
-	public Keyword keyword;
+
+	public String token;
 
 	//fields specific for pdf/a validation of strings
 	private boolean containsOnlyHex = true;

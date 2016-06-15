@@ -21,12 +21,16 @@ public class InternalInputStream implements ASInputStream {
 		this.source = new RandomAccessFile(createTempFile(fileStream), READ_ONLY_MODE);
 	}
 
-	public long read(byte[] buffer, long size) throws IOException {
-		return this.source.read(buffer, 0, (int) size);
+	public InternalInputStream(final ASInputStream asInputStream) throws IOException {
+		this.source = new RandomAccessFile(createTempFile(asInputStream), READ_ONLY_MODE);
 	}
 
-	public long skip(long size) throws IOException {
-		return this.source.skipBytes((int) size);
+	public int read(byte[] buffer, int size) throws IOException {
+		return this.source.read(buffer, 0, size);
+	}
+
+	public int skip(int size) throws IOException {
+		return this.source.skipBytes(size);
 	}
 
 	public void close() throws IOException {
@@ -103,6 +107,29 @@ public class InternalInputStream implements ASInputStream {
 			byte[] buffer = new byte[4096];
 			int n;
 			while ((n = input.read(buffer)) != -1) {
+				output.write(buffer, 0, n);
+			}
+
+			return tmpFile;
+		}
+		finally {
+			input.close();
+			if (output != null) {
+				output.close();
+			}
+		}
+	}
+
+	private File createTempFile(ASInputStream input) throws IOException {
+		FileOutputStream output = null;
+		try {
+			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
+			output = new FileOutputStream(tmpFile);
+
+			//copy stream content
+			byte[] buffer = new byte[4096];
+			int n;
+			while ((n = input.read(buffer, 4096)) != -1) {
 				output.write(buffer, 0, n);
 			}
 

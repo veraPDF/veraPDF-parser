@@ -13,7 +13,7 @@ public class COSBody {
 	private Map<COSKey, COSObject> table;
 
 	public COSBody() {
-		this.table = new HashMap<COSKey, COSObject>();
+		this.table = new HashMap<>();
 	}
 
 	public List<COSObject> getAll() {
