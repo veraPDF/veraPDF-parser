@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * @author Timur Kamalov
  */
-public class ASOutFilter implements ASOutputStream {
+public abstract class ASOutFilter implements ASOutputStream {
 
 	private ASOutputStream storedOutputStream;
 
