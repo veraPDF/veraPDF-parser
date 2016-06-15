@@ -1,6 +1,8 @@
 package org.verapdf.as.filters;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferingOutFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.COSFilterFlateDecode;
@@ -30,7 +32,7 @@ public class ASFilterFactory implements IASFilterFactory{
     public ASInFilter getInFilter(ASInputStream inputStream) throws IOException {
         switch (filterType.get()) {
             case "ASCIIHexDecode":
-                return new ASInFilter(inputStream);
+                return new ASBufferingInFilter(inputStream);
             case "FlateDecode":
                 return new COSFilterFlateDecode(inputStream);
             default:
@@ -49,7 +51,7 @@ public class ASFilterFactory implements IASFilterFactory{
     public ASOutFilter getOutFilter(ASOutputStream outputStream) throws IOException {
         switch (filterType.get()) {
             case "ASCIIHexDecode":
-                return new ASOutFilter(outputStream);
+                return new ASBufferingOutFilter(outputStream);
             case "FlateDecode":
                 return new COSFilterFlateEncode(outputStream);
             default:

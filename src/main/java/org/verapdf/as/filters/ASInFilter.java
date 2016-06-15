@@ -7,12 +7,19 @@ import java.io.IOException;
 /**
  * @author Timur Kamalov
  */
-public class ASInFilter implements ASInputStream {
+public abstract class ASInFilter implements ASInputStream {
 
 	private ASInputStream storedInStream;
 
-	protected ASInFilter(ASInputStream inputStream) {
+	/**
+	 * Constructor. It decodes data and uses decoded stream as internal input
+	 * stream.
+	 * @param inputStream is stream with initial encoded data.
+	 * @throws IOException
+     */
+	protected ASInFilter(ASInputStream inputStream) throws IOException {
 		this.storedInStream = inputStream;
+		decode();
 	}
 
 	protected ASInFilter(final ASInFilter filter) {
@@ -42,5 +49,11 @@ public class ASInFilter implements ASInputStream {
 	protected ASInputStream getInputStream() {
 		return this.storedInStream;
 	}
+
+	protected void setInputStream(ASInputStream inputStream) {
+		this.storedInStream = inputStream;
+	}
+
+	protected abstract void decode() throws IOException;
 
 }

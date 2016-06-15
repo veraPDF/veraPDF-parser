@@ -1,6 +1,7 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
@@ -17,7 +18,7 @@ import java.util.List;
  *
  * @author Sergey Shemyakov
  */
-public class XrefStreamParser {
+class XrefStreamParser {
 
     private COSArray index;
     private ASInputStream xrefInputStream;
@@ -25,7 +26,6 @@ public class XrefStreamParser {
     private List<Long> objIDs;
     private COSXRefInfo section;
     private COSStream xrefCOSStream;
-    private static final int DEFAULT_BUFFER_SIZE = 2048;
 
     /**
      * Constructor.
@@ -100,14 +100,15 @@ public class XrefStreamParser {
         byte[] field0 = new byte[(int) fieldSizes.at(0).getInteger()];
         byte[] field1 = new byte[(int) fieldSizes.at(1).getInteger()];
         byte[] field2 = new byte[(int) fieldSizes.at(2).getInteger()];
-        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];  // TODO: move logic of decoding somewhere else. It is repeated in SavedDecodedObjectStream.
+        byte[] buffer = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
         byte[] decodedStream = new byte[0];
         while (true) {
-            long read = xrefInputStream.read(buffer, (long) buffer.length);
+            long read = xrefInputStream.read(buffer, ASBufferingInFilter.BF_BUFFER_SIZE);
             if (read == 0) {
                 break;
             }
-            decodedStream = concatenate(decodedStream, buffer, (int) read);
+            decodedStream = ASBufferingInFilter.concatenate(decodedStream,
+                    decodedStream.length, buffer, (int) read);
         }
         decodedStream = getPredictorResult(decodedStream);
         int pointer = 0;
@@ -233,26 +234,5 @@ public class XrefStreamParser {
         }
         return EncodingPredictor.decodePredictor(predictor, colors,
                 bitsPerComponent, columns, data);
-    }
-
-    /**
-     * Method concatenates decoded buffer to existing result array taking into
-     * account actual amount of useful data in buffer.
-     * @param decodeResult is result array to which buffer will be concatenated.
-     * @param buffer is a portion of decoded data.
-     * @param bufferLength is length of decoded data in buffer array.
-     * @return result of concatenation.
-     */
-    public static byte[] concatenate(byte[] decodeResult, byte[] buffer, int bufferLength) {   // TODO: move it somewhere. Maybe in separate class in package "filters".
-        if (decodeResult.length == 0) {
-            return Arrays.copyOfRange(buffer, 0, bufferLength);
-        }
-        if (bufferLength == 0) {
-            return decodeResult;
-        }
-        byte[] res = new byte[decodeResult.length + bufferLength];
-        System.arraycopy(decodeResult, 0, res, 0, decodeResult.length);
-        System.arraycopy(buffer, 0, res, decodeResult.length, bufferLength);
-        return res;
     }
 }

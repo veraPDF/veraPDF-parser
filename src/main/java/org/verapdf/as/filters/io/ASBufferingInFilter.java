@@ -8,21 +8,22 @@ import java.util.Arrays;
 
 /**
  * Class provides buffered input from input stream.
+ *
  * @author Sergey Shemyakov
  */
 public class ASBufferingInFilter extends ASInFilter {
 
-    public static final int BF_BUFFER_SIZE = 4096;
+    public static final int BF_BUFFER_SIZE = 2048;
 
     private int bufferCapacity;
-    protected byte [] internalBuffer;
+    protected byte[] internalBuffer;
     private int bufferBegin, bufferEnd;
 
-    public ASBufferingInFilter(ASInputStream stream) {
+    public ASBufferingInFilter(ASInputStream stream) throws IOException {
         this(stream, BF_BUFFER_SIZE);
     }
 
-    public ASBufferingInFilter(ASInputStream stream, int buffCapacity) {
+    public ASBufferingInFilter(ASInputStream stream, int buffCapacity) throws IOException {
         super(stream);
         this.bufferCapacity = buffCapacity;
         internalBuffer = new byte[buffCapacity];
@@ -35,7 +36,7 @@ public class ASBufferingInFilter extends ASInFilter {
         internalBuffer = new byte[bufferCapacity];
         this.bufferBegin = filter.bufferBegin;
         this.bufferEnd = filter.bufferEnd;
-        if(this.bufferSize() > 0) {
+        if (this.bufferSize() > 0) {
             internalBuffer = Arrays.copyOfRange(filter.internalBuffer,
                     filter.bufferBegin, filter.bufferEnd);
         }
@@ -44,6 +45,7 @@ public class ASBufferingInFilter extends ASInFilter {
     /**
      * Shifts begin marker by up to bytesToProceed bytes to the right of to the
      * end of the buffer if bytesToProceed is too big.
+     *
      * @param bytesToProcess amount of bytes to shift.
      * @return amount of bytes actually processed.
      */
@@ -57,6 +59,7 @@ public class ASBufferingInFilter extends ASInFilter {
      * Reads next portion of data from the underlying stream to the internal
      * buffer, updates begin and end pointers and returns number of bytes
      * actually placed in buffer.
+     *
      * @param bytesToRead amount of bytes to read.
      * @return amount of bytes actually placed into buffer.
      */
@@ -84,6 +87,7 @@ public class ASBufferingInFilter extends ASInFilter {
 
     /**
      * Returns the character pointed by buffer begin marker and advances it.
+     *
      * @return character, pointed by buffer begin marker.
      */
     public byte bufferPop() {
@@ -120,5 +124,21 @@ public class ASBufferingInFilter extends ASInFilter {
     public void reset() throws IOException {
         super.reset();
         bufferEnd = bufferBegin = 0;
+    }
+
+    public static byte[] concatenate(byte[] one, int lengthOne, byte[] two, int lengthTwo) {
+        if (lengthOne == 0) {
+            return Arrays.copyOfRange(two, 0, lengthTwo);
+        }
+        if (lengthTwo == 0) {
+            return Arrays.copyOfRange(one, 0, lengthOne);
+        }
+        byte[] res = new byte[lengthOne + lengthTwo];
+        System.arraycopy(one, 0, res, 0, lengthOne);
+        System.arraycopy(two, 0, res, lengthOne, lengthTwo);
+        return res;
+    }
+
+    protected void decode() throws IOException {
     }
 }
