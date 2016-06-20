@@ -1,5 +1,7 @@
 package org.verapdf.cos;
 
+import org.verapdf.as.filters.io.ASBufferingInFilter;
+
 import java.util.Arrays;
 
 /**
@@ -21,7 +23,8 @@ public class EncodingPredictor {
         } else {
             int inputPointer = 0, linePredictor = predictor;
             int outputPointer = 0;
-            byte[] output = new byte[2048];
+            byte [] res = new byte[0];
+            byte[] output = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
             //Calculate sizes
             int bitsPerPixel = colors * bitsPerComponent;
             int bytesPerPixel = (bitsPerPixel + 7) / 8;
@@ -126,8 +129,13 @@ public class EncodingPredictor {
                 System.arraycopy(actline, 0, output, outputPointer, rowlength);
                 System.arraycopy(actline, 0, lastline, 0, rowlength);
                 outputPointer += rowlength;
+                if(outputPointer + rowlength >= ASBufferingInFilter.BF_BUFFER_SIZE) {
+                    ASBufferingInFilter.concatenate(res, res.length, output, outputPointer);
+                    outputPointer = 0;
+                }
             }
-            return Arrays.copyOfRange(output, 0, outputPointer);
+            ASBufferingInFilter.concatenate(res, res.length, output, outputPointer);    // TODO: check this buffer after merging with object-streams-branch
+            return res;
         }
     }
 }

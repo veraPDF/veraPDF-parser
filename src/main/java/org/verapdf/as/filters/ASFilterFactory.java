@@ -1,14 +1,13 @@
 package org.verapdf.as.filters;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.filters.io.ASBufferingOutFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
+import org.verapdf.cos.COSFilterASCIIHexDecode;
 import org.verapdf.cos.COSFilterFlateDecode;
 import org.verapdf.cos.COSFilterFlateEncode;
 
-import java.io.IOError;
 import java.io.IOException;
 
 /**
@@ -32,7 +31,7 @@ public class ASFilterFactory implements IASFilterFactory{
     public ASInFilter getInFilter(ASInputStream inputStream) throws IOException {
         switch (filterType.get()) {
             case "ASCIIHexDecode":
-                return new ASBufferingInFilter(inputStream);
+                return new COSFilterASCIIHexDecode(inputStream);
             case "FlateDecode":
                 return new COSFilterFlateDecode(inputStream);
             default:

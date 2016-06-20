@@ -13,15 +13,18 @@ import java.util.zip.Inflater;
  */
 public class COSFilterFlateDecode extends ASBufferingInFilter {
 
+    /**
+     * Constructor from encoded stream.
+     * @param stream is flate encoded stream.
+     * @throws IOException
+     */
     public COSFilterFlateDecode(ASInputStream stream) throws IOException {
         super(stream);
     }
 
     /**
-     * Decodes given flate compressed buffer and reads up to size bytes of
-     * decompressed data.
-     *
-     * @param buffer is flate encoded data.
+     * Reads up to size bytes of flate decompressed data into buffer.
+     * @param buffer is byte array where decoded data will be read.
      * @param size   is maximal amount of decompressed bytes.
      * @return amount of actually read bytes.
      * @throws IOException
@@ -31,6 +34,7 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
         return super.read(buffer, size);
     }
 
+    @Override
     protected void decode() throws IOException {    // TODO: add here checking of size of decoded data and, possibly, decoding into file.
         byte[] encodedData = new byte[0];
         byte[] buffer = new byte[BF_BUFFER_SIZE];
