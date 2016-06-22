@@ -8,7 +8,7 @@ import org.verapdf.cos.COSDictionary;
 import java.io.IOException;
 
 /**
- * Filter representing predictor that is applied to Flate and LZW encodings.
+ * This filter represents predictor that is applied to Flate and LZW encodings.
  *
  * @author Sergey Shemyakov
  */
@@ -23,11 +23,12 @@ public class COSPredictorDecode extends ASBufferingInFilter {
             lineLength;
     private byte predictor;
     private byte[] previousLine = null;
-    boolean streamEnded = false;
+    private boolean streamEnded = false;
 
     /**
      * Constructor from stream and decode parameters.
-     * @param stream is unpredicted stream.
+     *
+     * @param stream       is unpredicted stream.
      * @param decodeParams is COSDictionary containing decode parameters.
      * @throws IOException
      */
@@ -56,12 +57,12 @@ public class COSPredictorDecode extends ASBufferingInFilter {
 
     @Override
     public int read(byte[] buffer, int size) throws IOException {
-        if(streamEnded) {
+        if (streamEnded) {
             return -1;
         }
         if (predictor == 1) {
             int popped = bufferPopArray(buffer, size);
-            if(this.bufferSize() == 0) {
+            if (this.bufferSize() == 0) {
                 if (this.feedBuffer(getBufferCapacity()) == -1) {
                     this.streamEnded = true;
                 }
@@ -89,7 +90,7 @@ public class COSPredictorDecode extends ASBufferingInFilter {
 
             int read;
             if ((read = bufferPopArray(currentLine, lineLength)) != lineLength) {
-                if (this.feedBuffer(this.getBufferCapacity()) == -1) {    // TODO: check this != -1
+                if (this.feedBuffer(this.getBufferCapacity()) == -1) {
                     this.streamEnded = true;
                 }
                 byte[] extraBytes = new byte[lineLength - read];

@@ -12,8 +12,7 @@ public abstract class ASInFilter implements ASInputStream {
 	private ASInputStream storedInStream;
 
 	/**
-	 * Constructor. It decodes data and uses decoded stream as internal input
-	 * stream.
+	 * Constructor from encoded stream.
 	 * @param inputStream is stream with initial encoded data.
 	 * @throws IOException
      */
@@ -52,7 +51,4 @@ public abstract class ASInFilter implements ASInputStream {
 	protected void setInputStream(ASInputStream inputStream) {
 		this.storedInStream = inputStream;
 	}
-
-	protected abstract void decode() throws IOException;	//TODO: I think we should remove this
-
 }
