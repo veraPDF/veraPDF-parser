@@ -29,7 +29,7 @@ public class COSFilters extends PDObject {
 
 	public ASInputStream getInputStream(ASInputStream inputStream) throws IOException {
 		for (ASAtom asAtom : entries) {
-			inputStream = COSFilterRegistry.getDecodeFilter(asAtom, inputStream);
+			inputStream = COSFilterRegistry.getDecodeFilter(asAtom, inputStream);	// TODO: pass decodeParams here
 
 			//TODO : if (!is.Get()) break;
 		}

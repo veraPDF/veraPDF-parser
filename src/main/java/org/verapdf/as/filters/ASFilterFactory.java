@@ -29,7 +29,7 @@ public class ASFilterFactory implements IASFilterFactory{
      * @throws IOException if decode filter for given stream is not supported.
      */
     @Override
-    public ASInFilter getInFilter(ASInputStream inputStream) throws IOException {
+    public ASInFilter getInFilter(ASInputStream inputStream) throws IOException {   //TODO: decode params
         switch (filterType.get()) {
             case "ASCIIHexDecode":
                 return new ASBufferingInFilter(inputStream);

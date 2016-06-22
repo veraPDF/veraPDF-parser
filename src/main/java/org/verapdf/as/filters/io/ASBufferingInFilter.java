@@ -130,6 +130,9 @@ public class ASBufferingInFilter extends ASInFilter {
         if(lengthTwo == -1) {
             lengthTwo = 0;
         }
+        if(lengthOne == -1) {
+            lengthOne = 0;
+        }
         if (lengthOne == 0) {
             return Arrays.copyOfRange(two, 0, lengthTwo);
         }

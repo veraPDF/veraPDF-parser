@@ -51,7 +51,7 @@ public class COSFilterRegistry {
 											 final ASInputStream inputStream) throws IOException {
 		final IASFilterFactory filterFactory = factoryByName(filterName);
 		if (filterFactory != null) {
-			return filterFactory.getInFilter(inputStream);
+			return filterFactory.getInFilter(inputStream);	// TODO: pass decodeParams here
 		} else {
 			return null;
 		}

@@ -10,8 +10,8 @@ import java.io.IOException;
  */
 public interface IASFilterFactory {
 
-	ASInFilter getInFilter(ASInputStream inputStream) throws IOException;
+	ASInFilter getInFilter(ASInputStream inputStream) throws IOException;	//TODO: add decodeParams here
 
-	ASOutFilter getOutFilter(ASOutputStream outputStream) throws IOException;
+	ASOutFilter getOutFilter(ASOutputStream outputStream) throws IOException;	//TODO: add decodeParams here
 
 }

@@ -1,6 +1,8 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.EncodingPredictorDecode;
+import org.verapdf.as.filters.EncodingPredictorResult;
 import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
@@ -54,6 +56,7 @@ class XrefStreamParser {
         initializeIndex();
         initializeObjIDs();
         parseStream();
+        EncodingPredictorDecode.resetPreviousLine();
         setTrailer();
     }
 
@@ -100,56 +103,71 @@ class XrefStreamParser {
         byte[] field0 = new byte[(int) fieldSizes.at(0).getInteger()];
         byte[] field1 = new byte[(int) fieldSizes.at(1).getInteger()];
         byte[] field2 = new byte[(int) fieldSizes.at(2).getInteger()];
-        byte[] buffer = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+        byte[] buffer;
         byte[] decodedStream = new byte[0];
+        byte[] unpredictedBytes = new byte[0];
+        int objIdIndex = 0;
+
         while (true) {
-            long read = xrefInputStream.read(buffer, ASBufferingInFilter.BF_BUFFER_SIZE);
+            buffer = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+            long read = xrefInputStream.read(buffer, ASBufferingInFilter.BF_BUFFER_SIZE);   //reading new portion of deflated unpredicted data
             if (read == -1) {
                 break;
             }
-            decodedStream = ASBufferingInFilter.concatenate(decodedStream,
-                    decodedStream.length, buffer, (int) read);
-        }
-        decodedStream = getPredictorResult(decodedStream);
-        int pointer = 0;
+            unpredictedBytes = ASBufferingInFilter.concatenate(unpredictedBytes, unpredictedBytes.length,
+                    buffer, (int) read);    //adding unpredicted data from previous step to the beginning
+            EncodingPredictorResult res = getPredictorResult(unpredictedBytes); //applying Predictor to the whole buffer of unpredicted data
+            unpredictedBytes = res.getUnpredictedData();    //remembering unpredicted bytes
+            buffer = res.getPredictedData();    //getting data that can be processed
+            decodedStream = ASBufferingInFilter.concatenate(decodedStream, decodedStream.length,
+                    buffer, buffer.length); //adding predicted data from previous iteration
 
-        COSXRefEntry xref;
-        for (Long id : objIDs) {
-            System.arraycopy(decodedStream, pointer, field0, 0, field0.length);
-            pointer += field0.length;
-            System.arraycopy(decodedStream, pointer, field1, 0, field1.length);
-            pointer += field1.length;
-            System.arraycopy(decodedStream, pointer, field2, 0, field2.length);
-            pointer += field2.length;
-            int type = 1;   // Default value for type
-            if (field0.length > 0) {
-                type = (int) numberFromBytes(field0);
-            }
-            switch (type) {
-                case 0:
+            int pointer = 0;
+            COSXRefEntry xref;
+            for (; objIdIndex < objIDs.size(); ++objIdIndex) {
+                if(pointer + field0.length + field1.length + field2.length >
+                        decodedStream.length) {
+                    decodedStream = Arrays.copyOfRange(decodedStream, pointer,
+                            decodedStream.length);
                     break;
-                case 1:
-                    xref = new COSXRefEntry();
-                    xref.offset = numberFromBytes(field1);
-                    if (field2.length > 0) {
-                        xref.generation = (int) numberFromBytes(field2);
-                    } else {
-                        xref.generation = 0;
-                    }
-                    section.getXRefSection().add(new COSKey(id.intValue(),
-                            xref.generation), xref.offset);
-                    break;
-                case 2:
-                    xref = new COSXRefEntry();
-                    xref.offset = -numberFromBytes(field1);
-                    if (field2.length > 0) {
-                        xref.generation = 0;
-                    }
-                    section.getXRefSection().add(new COSKey(id.intValue(),
-                            xref.generation), xref.offset);
-                    break;
-                default:
-                    throw new IOException("Error in parsing xref stream");
+                }
+                Long id = objIDs.get(objIdIndex);
+                System.arraycopy(decodedStream, pointer, field0, 0, field0.length);
+                pointer += field0.length;
+                System.arraycopy(decodedStream, pointer, field1, 0, field1.length);
+                pointer += field1.length;
+                System.arraycopy(decodedStream, pointer, field2, 0, field2.length);
+                pointer += field2.length;
+                int type = 1;   // Default value for type
+                if (field0.length > 0) {
+                    type = (int) numberFromBytes(field0);
+                }
+                switch (type) {
+                    case 0:
+                        break;
+                    case 1:
+                        xref = new COSXRefEntry();
+                        xref.offset = numberFromBytes(field1);
+                        if (field2.length > 0) {
+                            xref.generation = (int) numberFromBytes(field2);
+                        } else {
+                            xref.generation = 0;
+                        }
+                        section.getXRefSection().add(new COSKey(id.intValue(),
+                                xref.generation), xref.offset);
+                        break;
+                    case 2:
+                        xref = new COSXRefEntry();
+                        xref.offset = -numberFromBytes(field1);
+                        if (field2.length > 0) {
+                            xref.generation = 0;
+                        }
+                        section.getXRefSection().add(new COSKey(id.intValue(),
+                                xref.generation), xref.offset);
+                        break;
+                    default:
+                        throw new IOException("Error in parsing xref stream");
+                }
             }
         }
     }
@@ -202,7 +220,7 @@ class XrefStreamParser {
      * @param data byte array for which predictor should be applied.
      * @return byte array after predictor processing.
      */
-    private byte[] getPredictorResult(byte[] data) {  // TODO: process case of multiple filters
+    private EncodingPredictorResult getPredictorResult(byte[] data) throws IOException {  // TODO: process case of multiple filters
         //default values
         int predictor,
                 colors = 1,
@@ -214,10 +232,10 @@ class XrefStreamParser {
             if (decodeParams.knownKey(ASAtom.PREDICTOR)) {
                 predictor = decodeParams.getIntegerKey(ASAtom.PREDICTOR).intValue();
             } else {
-                return data;
+                return new EncodingPredictorResult(data, new byte[0]);
             }
             if (predictor == 1) {
-                return data;
+                return new EncodingPredictorResult(data, new byte[0]);
             }
             if (decodeParams.knownKey(ASAtom.COLORS)) {
                 colors = decodeParams.getIntegerKey(ASAtom.COLORS).intValue();
@@ -232,7 +250,7 @@ class XrefStreamParser {
             throw new RuntimeException("Case when DecodeParams of xref is " +
                     decodeParams.getType() + "in not supported yet.");
         }
-        return EncodingPredictor.decodePredictor(predictor, colors,
+        return EncodingPredictorDecode.decodePredictor(predictor, colors,
                 bitsPerComponent, columns, data);
     }
 }

@@ -19,7 +19,6 @@ public abstract class ASInFilter implements ASInputStream {
      */
 	protected ASInFilter(ASInputStream inputStream) throws IOException {
 		this.storedInStream = inputStream;
-		decode();
 	}
 
 	protected ASInFilter(final ASInFilter filter) {
@@ -54,6 +53,6 @@ public abstract class ASInFilter implements ASInputStream {
 		this.storedInStream = inputStream;
 	}
 
-	protected abstract void decode() throws IOException;
+	protected abstract void decode() throws IOException;	//TODO: I think we should remove this
 
 }

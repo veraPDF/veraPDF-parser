@@ -13,8 +13,13 @@ import java.util.zip.Inflater;
  */
 public class COSFilterFlateDecode extends ASBufferingInFilter {
 
+    Inflater inflater;
+
     public COSFilterFlateDecode(ASInputStream stream) throws IOException {
         super(stream);
+        int bytesFed = (int) this.feedBuffer(getBufferCapacity());
+        inflater = new Inflater();
+        inflater.setInput(this.internalBuffer, 0, bytesFed);
     }
 
     /**
@@ -28,7 +33,18 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
      */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
-        return super.read(buffer, size);
+        if(inflater.getRemaining() == 0) {
+            int bytesFed = (int) this.feedBuffer(getBufferCapacity());
+            if(bytesFed == -1) {
+                return -1;
+            }
+            inflater.setInput(this.internalBuffer, 0, bytesFed);
+        }
+        try {
+            return inflater.inflate(buffer, 0, size);
+        } catch (DataFormatException e) {
+            throw new IOException("Can't decode Flate encoded data", e);
+        }
     }
 
     protected void decode() throws IOException {    // TODO: add here checking of size of decoded data and, possibly, decoding into file.
