@@ -27,9 +27,35 @@ public class COSFilters extends PDObject {
 		setObject(object);
 	}
 
-	public ASInputStream getInputStream(ASInputStream inputStream) throws IOException {
-		for (ASAtom asAtom : entries) {
-			inputStream = COSFilterRegistry.getDecodeFilter(asAtom, inputStream);	// TODO: pass decodeParams here
+	public ASInputStream getInputStream(ASInputStream inputStream,
+										COSObject decodeParams) throws IOException {
+		List<COSDictionary> decodeParameters = null;
+		if(!decodeParams.equals(COSObject.getEmpty())) {
+			if(decodeParams.getType().equals(COSObjType.COSDictT)) {
+				decodeParameters = new ArrayList<>(1);
+				decodeParameters.add((COSDictionary) decodeParams.get());
+			} else if (decodeParams.getType().equals(COSObjType.COSArrayT)) {
+				decodeParameters = new ArrayList<>(decodeParams.size());
+				for(int i = 0; i < decodeParams.size(); ++i) {
+					if(!decodeParams.at(i).getType().equals(COSObjType.COSDictT)) {
+						throw new IOException("DecodeParams shall be a dictionary or array of dictionaries.");
+					}
+					decodeParameters.add((COSDictionary) decodeParams.at(i).get());
+				}
+			}
+		}
+		if(decodeParameters == null) {
+			decodeParameters = new ArrayList<>(entries.size());
+			for(int i = 0; i < entries.size(); ++i) {
+				decodeParameters.add((COSDictionary) COSDictionary.construct().get());
+			}
+		}
+		if(decodeParameters.size() != entries.size()) {
+			throw new IOException("Amount of DecodeParams dictionaries and amount of decode filters in COSStream shall be equal.");
+		}
+		for (int i = 0; i < entries.size(); ++i) {
+			inputStream = COSFilterRegistry.getDecodeFilter(entries.get(i),
+					inputStream, decodeParameters.get(i));
 
 			//TODO : if (!is.Get()) break;
 		}

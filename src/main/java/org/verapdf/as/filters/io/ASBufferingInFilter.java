@@ -95,6 +95,26 @@ public class ASBufferingInFilter extends ASInFilter {
     }
 
     /**
+     * Reads data from internal buffer into passed byte array and advances begin
+     * marker.
+     *
+     * @param buffer is byte array where data will be read.
+     * @param read   maximal amount of bytes to read.
+     * @return amount of actually read bytes.
+     * @throws IOException if passed buffer is too small to contain necessary
+     *                     amount of bytes.
+     */
+    public int bufferPopArray(byte[] buffer, int read) throws IOException {
+        int actualRead = Math.min(read, bufferSize());
+        if (buffer.length < actualRead) {
+            throw new IOException("Passed buffer is too small");
+        }
+        System.arraycopy(this.internalBuffer, bufferBegin, buffer, 0, actualRead);
+        bufferBegin += actualRead;
+        return actualRead;
+    }
+
+    /**
      * @return the number of bytes currently available in the buffer.
      */
     public int bufferSize() {

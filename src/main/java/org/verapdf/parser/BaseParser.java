@@ -3,7 +3,7 @@ package org.verapdf.parser;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.COSFilterASCIIHexDecode;
+import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.io.InternalInputStream;
 
 import java.io.FileNotFoundException;

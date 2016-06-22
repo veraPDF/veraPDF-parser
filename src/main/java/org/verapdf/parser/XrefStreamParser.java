@@ -1,11 +1,10 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.EncodingPredictorDecode;
-import org.verapdf.as.filters.EncodingPredictorResult;
 import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
+import org.verapdf.cos.filters.COSPredictorDecode;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 
@@ -56,7 +55,6 @@ class XrefStreamParser {
         initializeIndex();
         initializeObjIDs();
         parseStream();
-        EncodingPredictorDecode.resetPreviousLine();
         setTrailer();
     }
 
@@ -104,39 +102,32 @@ class XrefStreamParser {
         byte[] field1 = new byte[(int) fieldSizes.at(1).getInteger()];
         byte[] field2 = new byte[(int) fieldSizes.at(2).getInteger()];
         byte[] buffer;
-        byte[] decodedStream = new byte[0];
-        byte[] unpredictedBytes = new byte[0];
+        byte[] remainedBytes = new byte[0];
         int objIdIndex = 0;
 
         while (true) {
             buffer = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
-            long read = xrefInputStream.read(buffer, ASBufferingInFilter.BF_BUFFER_SIZE);   //reading new portion of deflated unpredicted data
+            long read = xrefInputStream.read(buffer, ASBufferingInFilter.BF_BUFFER_SIZE);
             if (read == -1) {
                 break;
             }
-            unpredictedBytes = ASBufferingInFilter.concatenate(unpredictedBytes, unpredictedBytes.length,
-                    buffer, (int) read);    //adding unpredicted data from previous step to the beginning
-            EncodingPredictorResult res = getPredictorResult(unpredictedBytes); //applying Predictor to the whole buffer of unpredicted data
-            unpredictedBytes = res.getUnpredictedData();    //remembering unpredicted bytes
-            buffer = res.getPredictedData();    //getting data that can be processed
-            decodedStream = ASBufferingInFilter.concatenate(decodedStream, decodedStream.length,
-                    buffer, buffer.length); //adding predicted data from previous iteration
+            buffer = ASBufferingInFilter.concatenate(remainedBytes, remainedBytes.length,
+                    buffer, (int) read);
 
             int pointer = 0;
             COSXRefEntry xref;
             for (; objIdIndex < objIDs.size(); ++objIdIndex) {
                 if(pointer + field0.length + field1.length + field2.length >
-                        decodedStream.length) {
-                    decodedStream = Arrays.copyOfRange(decodedStream, pointer,
-                            decodedStream.length);
+                        buffer.length) {
+                    remainedBytes = Arrays.copyOfRange(buffer, pointer, (int) read);
                     break;
                 }
                 Long id = objIDs.get(objIdIndex);
-                System.arraycopy(decodedStream, pointer, field0, 0, field0.length);
+                System.arraycopy(buffer, pointer, field0, 0, field0.length);
                 pointer += field0.length;
-                System.arraycopy(decodedStream, pointer, field1, 0, field1.length);
+                System.arraycopy(buffer, pointer, field1, 0, field1.length);
                 pointer += field1.length;
-                System.arraycopy(decodedStream, pointer, field2, 0, field2.length);
+                System.arraycopy(buffer, pointer, field2, 0, field2.length);
                 pointer += field2.length;
                 int type = 1;   // Default value for type
                 if (field0.length > 0) {
@@ -211,46 +202,5 @@ class XrefStreamParser {
             res += (num[i] & 0x00FF) << ((num.length - i - 1) * 8);
         }
         return res;
-    }
-
-    /**
-     * This helper method applies predictor to given byte array in a way
-     * determined by /DecodeParams of xref COSStream dictionary.
-     *
-     * @param data byte array for which predictor should be applied.
-     * @return byte array after predictor processing.
-     */
-    private EncodingPredictorResult getPredictorResult(byte[] data) throws IOException {  // TODO: process case of multiple filters
-        //default values
-        int predictor,
-                colors = 1,
-                bitsPerComponent = 8,
-                columns = 1;    // TODO: EarlyChange?
-
-        COSBase decodeParams = xrefCOSStream.getKey(ASAtom.DECODE_PARMS).get();
-        if (decodeParams.getType().equals(COSObjType.COSDictT)) {   // DecodeParams can be array or dict
-            if (decodeParams.knownKey(ASAtom.PREDICTOR)) {
-                predictor = decodeParams.getIntegerKey(ASAtom.PREDICTOR).intValue();
-            } else {
-                return new EncodingPredictorResult(data, new byte[0]);
-            }
-            if (predictor == 1) {
-                return new EncodingPredictorResult(data, new byte[0]);
-            }
-            if (decodeParams.knownKey(ASAtom.COLORS)) {
-                colors = decodeParams.getIntegerKey(ASAtom.COLORS).intValue();
-            }
-            if (decodeParams.knownKey(ASAtom.BITS_PER_COMPONENT)) {
-                bitsPerComponent = decodeParams.getIntegerKey(ASAtom.BITS_PER_COMPONENT).intValue();
-            }
-            if (decodeParams.knownKey(ASAtom.COLUMNS)) {
-                columns = decodeParams.getIntegerKey(ASAtom.COLUMNS).intValue();
-            }
-        } else {
-            throw new RuntimeException("Case when DecodeParams of xref is " +
-                    decodeParams.getType() + "in not supported yet.");
-        }
-        return EncodingPredictorDecode.decodePredictor(predictor, colors,
-                bitsPerComponent, columns, data);
     }
 }
