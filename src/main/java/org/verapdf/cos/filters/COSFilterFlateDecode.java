@@ -24,9 +24,7 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
      */
     public COSFilterFlateDecode(ASInputStream stream) throws IOException {
         super(stream);
-        int bytesFed = (int) this.feedBuffer(getBufferCapacity());
         inflater = new Inflater();
-        inflater.setInput(this.internalBuffer, 0, bytesFed);
     }
 
     /**

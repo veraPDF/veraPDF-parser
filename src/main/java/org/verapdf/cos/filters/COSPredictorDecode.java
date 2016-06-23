@@ -35,7 +35,6 @@ public class COSPredictorDecode extends ASBufferingInFilter {
     public COSPredictorDecode(ASInputStream stream,
                               COSDictionary decodeParams) throws IOException {
         super(stream);
-        this.feedBuffer(getBufferCapacity());
         initializePredictorArguments(
                 predictorFromParams(decodeParams),
                 colorsFromParams(decodeParams),
@@ -59,6 +58,11 @@ public class COSPredictorDecode extends ASBufferingInFilter {
     public int read(byte[] buffer, int size) throws IOException {
         if (streamEnded) {
             return -1;
+        }
+        if (this.bufferSize() == 0) {
+            if (this.feedBuffer(getBufferCapacity()) == -1) {
+                this.streamEnded = true;
+            }
         }
         if (predictor == 1) {
             int popped = bufferPopArray(buffer, size);
