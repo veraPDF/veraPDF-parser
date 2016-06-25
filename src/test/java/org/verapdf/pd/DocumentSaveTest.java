@@ -11,7 +11,8 @@ public class DocumentSaveTest {
 
 	@Test
 	public void test() throws Exception {
-		PDDocument document = new PDDocument("/home/shemyakovsergey/PDFs/signed.pdf");
+		//PDDocument document = new PDDocument("/home/shemyakovsergey/PDFs/signed.pdf");
+		PDDocument document = new PDDocument("/home/shemyakovsergey/Documents/Work/Books/PDF32000_2008.pdf");
 		document.saveAs("/home/shemyakovsergey/SmallAndValid_saved.pdf");
 		System.out.println("Document saved");
 	}

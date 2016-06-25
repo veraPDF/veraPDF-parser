@@ -14,6 +14,7 @@ public class COSFilterASCIIHexDecode extends ASBufferingInFilter {
 
     public final static byte ws = 17;
     public final static byte er = 127;
+    COSFilterASCIIReader reader;
 
     private final static byte[] loHexTable = {
             ws, er, er, er, er, er, er, er, er, ws, ws, er, ws, ws, er, er,    // 0  - 15
@@ -41,6 +42,7 @@ public class COSFilterASCIIHexDecode extends ASBufferingInFilter {
      */
     public COSFilterASCIIHexDecode(ASInputStream stream) throws IOException {
         super(stream);
+        reader = new COSFilterASCIIReader(stream, true);
     }
 
     /**
@@ -53,15 +55,27 @@ public class COSFilterASCIIHexDecode extends ASBufferingInFilter {
      */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
-        return super.read(buffer, size);
+        int pointer = 0;
+        byte[] twoBytes = reader.getNextBytes();
+        byte res;
+        for(int i = 0; i < size; ++i) {
+            if(twoBytes == null) {
+                break;
+            }
+            res = (byte) (decodeLoHex(twoBytes[0]) * 16);
+            res += decodeLoHex(twoBytes[1]);
+            buffer[pointer++] = res;
+            twoBytes = reader.getNextBytes();
+        }
+        return pointer;
     }
 
     public static byte decodeLoHex(byte val) {
         return loHexTable[val];
     }
 
-    @Override
-    protected void decode() throws IOException {    // TODO: add here checking of size of decoded data and, possibly, decoding into file.
+    @Override   // TODO: remove this
+    protected void decode() throws IOException {
         byte[] decodedBuffer = new byte[BF_BUFFER_SIZE];
         byte[] decodedData = new byte[0];
         int decodedDataPointer = 0;
@@ -72,9 +86,8 @@ public class COSFilterASCIIHexDecode extends ASBufferingInFilter {
         byte res;
 
         while(twoBytes != null) {
-            res = (byte) (decodeLoHex(twoBytes[0]) * 16);
-            res += decodeLoHex(twoBytes[1]);
-            decodedBuffer[decodedDataPointer++] = res;
+
+            //decodedBuffer[decodedDataPointer++] = res;
             if(decodedDataPointer == decodedBuffer.length) {
                 concatenate(decodedData, decodedData.length, decodedBuffer, decodedDataPointer);
                 decodedDataPointer = 0;

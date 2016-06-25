@@ -19,7 +19,6 @@ public abstract class ASInFilter implements ASInputStream {
      */
 	protected ASInFilter(ASInputStream inputStream) throws IOException {
 		this.storedInStream = inputStream;
-		decode();
 	}
 
 	protected ASInFilter(final ASInFilter filter) {
