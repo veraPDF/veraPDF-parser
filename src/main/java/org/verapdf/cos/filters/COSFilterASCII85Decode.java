@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public class COSFilterASCII85Decode extends ASBufferingInFilter {
 
-    COSFilterASCIIReader reader;
+    private COSFilterASCIIReader reader;
 
     /**
      * Constructor from encoded stream.

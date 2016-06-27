@@ -5,10 +5,7 @@ import org.verapdf.as.filters.io.ASBufferingOutFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
-import org.verapdf.cos.filters.COSFilterFlateDecode;
-import org.verapdf.cos.filters.COSFilterFlateEncode;
-import org.verapdf.cos.filters.COSPredictorDecode;
+import org.verapdf.cos.filters.*;
 
 import java.io.IOException;
 
@@ -37,6 +34,8 @@ public class ASFilterFactory implements IASFilterFactory{
                 return new COSFilterASCIIHexDecode(inputStream);
             case "FlateDecode":
                 return new COSPredictorDecode(new COSFilterFlateDecode(inputStream), decodeParams);
+            case "ASCII85Decode":
+                return new COSFilterASCII85Decode(inputStream);
             default:
                 throw new IOException("Filter " + filterType.get() +
                         " is not supported.");
