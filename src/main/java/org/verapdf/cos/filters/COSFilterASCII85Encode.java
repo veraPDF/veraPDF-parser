@@ -1,4 +1,4 @@
-package org.verapdf.cos;
+package org.verapdf.cos.filters;
 
 /**
  * @author Sergey Shemyakov
