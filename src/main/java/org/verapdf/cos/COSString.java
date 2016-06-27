@@ -1,5 +1,6 @@
 package org.verapdf.cos;
 
+import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 

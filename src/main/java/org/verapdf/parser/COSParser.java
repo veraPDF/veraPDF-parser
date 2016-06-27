@@ -28,7 +28,7 @@ public class COSParser extends BaseParser {
 		super(filename);
 	}
 
-	public COSParser(final InputStream fileStream) throws Exception {
+	public COSParser(final InputStream fileStream) throws IOException {
 		super(fileStream);
 	}
 

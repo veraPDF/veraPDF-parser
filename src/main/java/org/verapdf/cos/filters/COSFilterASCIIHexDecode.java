@@ -1,4 +1,4 @@
-package org.verapdf.cos;
+package org.verapdf.cos.filters;
 
 import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.filters.io.COSFilterASCIIReader;
