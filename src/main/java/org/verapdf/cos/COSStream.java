@@ -113,7 +113,7 @@ public class COSStream extends COSDictionary {
 		}
 
 		try {
-			return getFilters().getInputStream(stream);
+			return getFilters().getInputStream(stream, this.getKey(ASAtom.DECODE_PARMS));
 		} catch (IOException e) {
 			LOGGER.error("Can't get stream data", e);
 			return null;

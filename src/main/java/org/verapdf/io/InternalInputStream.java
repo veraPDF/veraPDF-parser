@@ -1,5 +1,6 @@
 package org.verapdf.io;
 
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 
 import java.io.*;
@@ -127,9 +128,9 @@ public class InternalInputStream implements ASInputStream {
 			output = new FileOutputStream(tmpFile);
 
 			//copy stream content
-			byte[] buffer = new byte[4096];
+			byte[] buffer = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
 			int n;
-			while ((n = input.read(buffer, 4096)) != -1) {
+			while ((n = input.read(buffer, buffer.length)) != -1) {
 				output.write(buffer, 0, n);
 			}
 

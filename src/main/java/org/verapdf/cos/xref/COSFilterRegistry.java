@@ -9,6 +9,7 @@ import org.verapdf.as.filters.ASOutFilter;
 import org.verapdf.as.filters.IASFilterFactory;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
+import org.verapdf.cos.COSDictionary;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -48,10 +49,11 @@ public class COSFilterRegistry {
 	}
 
 	public static ASInFilter getDecodeFilter(final ASAtom filterName,
-											 final ASInputStream inputStream) throws IOException {
+											 final ASInputStream inputStream,
+											 COSDictionary decodeParams) throws IOException {
 		final IASFilterFactory filterFactory = factoryByName(filterName);
 		if (filterFactory != null) {
-			return filterFactory.getInFilter(inputStream);
+			return filterFactory.getInFilter(inputStream, decodeParams);
 		} else {
 			return null;
 		}

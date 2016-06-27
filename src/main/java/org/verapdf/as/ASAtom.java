@@ -1,6 +1,6 @@
 package org.verapdf.as;
 
-import org.verapdf.cos.COSFilterASCIIHexEncode;
+import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 
 /**
  * @author Timur Kamalov

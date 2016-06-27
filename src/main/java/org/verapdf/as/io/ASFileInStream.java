@@ -23,7 +23,7 @@ public class ASFileInStream implements ASInputStream {
 
 	public int read(byte[] buffer, int sizeToRead) throws IOException {
 		if (sizeToRead == 0 || this.size != nPos && this.size <= this.curPos) {
-			return 0;
+			return -1;
 		}
 
 		if (this.size != nPos && sizeToRead > this.size - this.curPos) {

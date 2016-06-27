@@ -59,6 +59,9 @@ public class ASMemoryInStream implements ASInputStream {
      */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
+        if (currentPosition == bufferSize) {
+            return -1;
+        }
         int available = Math.min(bufferSize - currentPosition, size);
         System.arraycopy(this.buffer, currentPosition, buffer, 0, available);
         currentPosition += available;

@@ -151,7 +151,7 @@ public class Writer implements IVisitor {
 
 			while(true) {
 				count = in.read(buffer, 1024);
-				if (count == 0) {
+				if (count == -1) {
 					break;
 				}
 				this.os.write(buffer, (int) count);
