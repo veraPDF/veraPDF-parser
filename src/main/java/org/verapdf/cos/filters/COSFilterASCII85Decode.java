@@ -49,23 +49,6 @@ public class COSFilterASCII85Decode extends ASBufferingInFilter {
         return pointer;
     }
 
-    @Override   //TODO: probably remove that
-    protected void decode() throws IOException {
-        byte[] decodedBuffer = new byte[(BF_BUFFER_SIZE / 4) * 4];
-        byte[] decodedData = new byte[0];
-        int decodedBufferPointer = 0;
-        COSFilterASCIIReader reader =
-                new COSFilterASCIIReader(this.getInputStream(), false);
-        byte[] fiveBytes = reader.getNextBytes();
-        byte[] decodedBytes = new byte[4];
-        while (fiveBytes != null) {
-            if(fiveBytes.length == 5) {
-                decodeFiveBytes(fiveBytes, decodedBytes);
-            }
-
-        }
-    }
-
     private int decodeFiveBytes(byte[] fiveBytes, byte[] fourBytes) {
         long value = 0;
         for(int i = 0; i < fiveBytes.length; ++i) {

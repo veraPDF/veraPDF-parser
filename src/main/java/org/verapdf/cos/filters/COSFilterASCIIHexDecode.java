@@ -3,7 +3,6 @@ package org.verapdf.cos.filters;
 import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.filters.io.COSFilterASCIIReader;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.io.ASMemoryInStream;
 
 import java.io.IOException;
 
@@ -72,29 +71,5 @@ public class COSFilterASCIIHexDecode extends ASBufferingInFilter {
 
     public static byte decodeLoHex(byte val) {
         return loHexTable[val];
-    }
-
-    @Override   // TODO: remove this
-    protected void decode() throws IOException {
-        byte[] decodedBuffer = new byte[BF_BUFFER_SIZE];
-        byte[] decodedData = new byte[0];
-        int decodedDataPointer = 0;
-        COSFilterASCIIReader reader =
-                new COSFilterASCIIReader(this.getInputStream(), true);
-        byte[] twoBytes = reader.getNextBytes();
-
-        byte res;
-
-        while(twoBytes != null) {
-
-            //decodedBuffer[decodedDataPointer++] = res;
-            if(decodedDataPointer == decodedBuffer.length) {
-                concatenate(decodedData, decodedData.length, decodedBuffer, decodedDataPointer);
-                decodedDataPointer = 0;
-            }
-            twoBytes = reader.getNextBytes();
-        }
-        concatenate(decodedData, decodedData.length, decodedBuffer, decodedDataPointer);
-        this.setInputStream(new ASMemoryInStream(decodedData, decodedData.length, false));
     }
 }
