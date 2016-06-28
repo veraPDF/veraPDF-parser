@@ -27,6 +27,8 @@ public class COSFilterRegistry {
 		registeredFactories = new HashMap<>();
 		try {
 			registerFactory(ASAtom.FLATE_DECODE, new ASFilterFactory(ASAtom.FLATE_DECODE));
+			registerFactory(ASAtom.ASCII_HEX_DECODE, new ASFilterFactory(ASAtom.ASCII_HEX_DECODE));
+			registerFactory(ASAtom.ASCII85_DECODE, new ASFilterFactory(ASAtom.ASCII85_DECODE));
 		} catch (Exception e) {
 			LOGGER.warn("Trying to register factory twice", e);
 		}
