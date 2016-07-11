@@ -24,6 +24,8 @@ public class COSDocument {
 	private COSTrailer trailer;
 	private boolean isNew;
 
+	private byte postEOFDataSize;
+
 	private boolean xrefEOLMarkersComplyPDFA;
 	private boolean subsectionHeaderSpaceSeparated;
 
@@ -154,6 +156,14 @@ public class COSDocument {
 
 	public void setHeader(COSHeader header) {
 		this.header = header;
+	}
+
+	public byte getPostEOFDataSize() {
+		return postEOFDataSize;
+	}
+
+	public void setPostEOFDataSize(byte postEOFDataSize) {
+		this.postEOFDataSize = postEOFDataSize;
 	}
 
 	public boolean isXrefEOLMarkersComplyPDFA() {
