@@ -70,6 +70,9 @@ public class COSFilterASCIIHexDecode extends ASBufferingInFilter {
     }
 
     public static byte decodeLoHex(byte val) {
+        if(val < 0) {
+            return er;
+        }
         return loHexTable[val];
     }
 }
