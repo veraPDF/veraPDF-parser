@@ -18,7 +18,7 @@ class CodeSpace {
      * @param begin is array of bytes, representing codespace range beginning.
      * @param end   is array of bytes, representing codespace range end.
      */
-    public CodeSpace(byte[] begin, byte[] end) {
+    CodeSpace(byte[] begin, byte[] end) {
         if (begin.length == end.length) {
             for (int i = 0; i < begin.length; ++i) {
                 int beginNum = begin[i] & 0xFF;
@@ -90,11 +90,10 @@ class CodeSpace {
             int end1 = this.end[i] & 0xFF;
             int end2 = another.end[i] & 0xFF;
             if ((begin2 > end1 && end2 > end1) || (begin2 < begin1 && end2 < begin1)) {
-                continue;
+                return false;
             }
-            return true;
         }
-        return false;
+        return true;
     }
 
     private int getLength() {

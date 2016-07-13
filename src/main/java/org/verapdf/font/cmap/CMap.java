@@ -1,8 +1,8 @@
 package org.verapdf.font.cmap;
 
-import org.apache.log4j.Logger;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class represents cmap.
@@ -14,20 +14,14 @@ public class CMap {
     private String registry, ordering;
     private String name;
 
-    private static final Logger LOGGER = Logger.getLogger(CMap.class);
-
-    //This contains all CIDs specified in cidchar and notdefchar
-    private Map<Integer, Integer> singleCidMapping;
-
-    private List<CIDInterval> cidMappingIntervals;
+    private List<CIDMappable> cidMappings;
     private List<CodeSpace> codeSpaces;
-    private List<NotDefInterval> notDefIntervals;
+    private List<CIDMappable> notDefMappings;
 
     public CMap() {
-        this.singleCidMapping = new HashMap<>();
-        this.cidMappingIntervals = new LinkedList<>();
+        this.cidMappings = new LinkedList<>();
         this.codeSpaces = new ArrayList<>();
-        this.notDefIntervals = new ArrayList<>();
+        this.notDefMappings = new ArrayList<>();
         wMode = 0; // default
     }
 
@@ -35,28 +29,23 @@ public class CMap {
      * Gets CID for given character.
      *
      * @param character is code of character, for which CID is calculated.
-     * @return CID for given character.
+     * @return CID for given character or 0 if it cannot be obtained.
      */
     public int toCID(int character) {
-        Integer cid = singleCidMapping.get(character);
-        if (cid != null) {
-            return cid;
-        } else {
-            for (CIDInterval interval : cidMappingIntervals) {
-                if (interval.contains(character)) {
-                    return interval.getCID(character);
-                }
+        for (CIDMappable cidMapping : cidMappings) {
+            int res = cidMapping.getCID(character);
+            if (res != -1) {
+                return res;
             }
-            return 0;
         }
-    }
 
-    void addSingleMapping(int key, int value) {
-        if (!singleMappingNotRepeating(key)) {
-            LOGGER.warn("CMap " + this.name + " contains overlapping CID information");
-            return;
+        for (CIDMappable notDefMapping : notDefMappings) {
+            int res = notDefMapping.getCID(character);
+            if (res != -1) {
+                return res;
+            }
         }
-        this.singleCidMapping.put(key, value);
+        return 0;  //TODO: probably change that to something else.
     }
 
     /**
@@ -69,7 +58,7 @@ public class CMap {
     /**
      * Setter for writing mode of given CMap.
      */
-    public void setwMode(int wMode) {
+    void setwMode(int wMode) {
         this.wMode = wMode;
     }
 
@@ -83,7 +72,7 @@ public class CMap {
     /**
      * Setter for Registry.
      */
-    public void setRegistry(String registry) {
+    void setRegistry(String registry) {
         this.registry = registry;
     }
 
@@ -97,14 +86,14 @@ public class CMap {
     /**
      * Setter for Ordering.
      */
-    public void setOrdering(String ordering) {
+    void setOrdering(String ordering) {
         this.ordering = ordering;
     }
 
     /**
      * Setter for name of CMap.
      */
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name;
     }
 
@@ -115,20 +104,30 @@ public class CMap {
         this.codeSpaces = codeSpaces;
     }
 
-    private boolean singleMappingNotRepeating(int key) {
-        if (singleCidMapping.containsKey(key)) {
-            return true;
-        }
-        for (CIDInterval interval : cidMappingIntervals) {
-            if (interval.contains(key)) {
-                return true;
-            }
-        }
-        for (NotDefInterval interval : notDefIntervals) {
-            if (interval.contains(key)) {
-                return true;
-            }
-        }
-        return false;
+    /**
+     * @return name of this CMap.
+     */
+    public String getName() {
+        return name;
+    }
+
+    void addNotDefInterval(NotDefInterval interval) {
+        this.notDefMappings.add(interval);
+    }
+
+    List<CodeSpace> getCodeSpaces() {
+        return codeSpaces;
+    }
+
+    void addCidInterval(CIDInterval interval) {
+        this.cidMappings.add(0, interval);
+    }
+
+    void addSingleCidMapping(SingleCIDMapping mapping) {
+        this.cidMappings.add(0, mapping);
+    }
+
+    void addSingleNotDefMapping(SingleCIDMapping mapping) {
+        this.notDefMappings.add(mapping);
     }
 }

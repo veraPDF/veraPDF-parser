@@ -8,7 +8,7 @@ package org.verapdf.font.cmap;
  */
 class NotDefInterval extends CIDInterval {
 
-    public NotDefInterval(int intervalStart, int intervalEnd, int startingCID) {
+    NotDefInterval(int intervalStart, int intervalEnd, int startingCID) {
         super(intervalStart, intervalEnd, startingCID);
     }
 
@@ -17,6 +17,9 @@ class NotDefInterval extends CIDInterval {
      */
     @Override
     public int getCID(int character) {
+        if(!contains(character)) {
+            return -1;
+        }
         return startingCID;
     }
 }

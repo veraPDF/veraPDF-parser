@@ -5,7 +5,7 @@ package org.verapdf.font.cmap;
  *
  * @author Sergey Shemyakov
  */
-class CIDInterval {
+class CIDInterval implements CIDMappable {
 
     private int intervalStart, intervalEnd;
     protected int startingCID;
@@ -34,6 +34,9 @@ class CIDInterval {
      * @return CID of given character.
      */
     public int getCID(int character) {
+        if (!contains(character)) {
+            return -1;
+        }
         return startingCID + character - intervalStart;
     }
 }
