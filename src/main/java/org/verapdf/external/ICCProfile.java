@@ -29,7 +29,7 @@ public class ICCProfile extends PDObject {
 	/** Offset of subversion byte */
 	public static final int SUBVERSION_BYTE = 9;
 
-	private byte[] profileHeader;
+	private byte[] profileHeader = new byte[0];
 
 	private ICCProfile(COSObject profileStream) {
 		super(profileStream);
