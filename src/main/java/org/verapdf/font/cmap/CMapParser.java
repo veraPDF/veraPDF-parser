@@ -159,6 +159,9 @@ public class CMapParser extends BaseParser {
         }
         if (!overlaps) {
             cMap.getCodeSpaces().add(codeSpace);
+            if (begin.length < cMap.shortestCodeSpaceLength) {
+                cMap.shortestCodeSpaceLength = begin.length;
+            }
         } else {
             LOGGER.debug("CMap " + cMap.getName() + " has overlapping codespace ranges.");
         }
@@ -216,7 +219,7 @@ public class CMapParser extends BaseParser {
                 (int) getToken().integer));
     }
 
-    private long numberFromBytes(byte[] num) {
+    static long numberFromBytes(byte[] num) {
         long res = 0;
         for (int i = 0; i < num.length; ++i) {
             res += (num[i] & 0x00FF) << ((num.length - i - 1) * 8);

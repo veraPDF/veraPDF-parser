@@ -96,7 +96,7 @@ class CodeSpace {
         return true;
     }
 
-    private int getLength() {
+    int getLength() {
         return this.begin.length;
     }
 }

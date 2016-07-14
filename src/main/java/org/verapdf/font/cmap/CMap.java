@@ -1,6 +1,11 @@
 package org.verapdf.font.cmap;
 
+import org.apache.log4j.Logger;
+import org.verapdf.as.io.ASInputStream;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,9 +15,13 @@ import java.util.List;
  * @author Sergey Shemyakov
  */
 public class CMap {
+
+    private static final Logger LOGGER = Logger.getLogger(CMap.class);
+
     private int wMode;
     private String registry, ordering;
     private String name;
+    int shortestCodeSpaceLength;
 
     private List<CIDMappable> cidMappings;
     private List<CodeSpace> codeSpaces;
@@ -23,6 +32,7 @@ public class CMap {
         this.codeSpaces = new ArrayList<>();
         this.notDefMappings = new ArrayList<>();
         wMode = 0; // default
+        shortestCodeSpaceLength = Integer.MAX_VALUE;
     }
 
     /**
@@ -45,7 +55,57 @@ public class CMap {
                 return res;
             }
         }
-        return 0;  //TODO: probably change that to something else.
+        return -1;  //TODO: probably change that to something else.
+    }
+
+    /**
+     * Reads character code from input stream and returnes it's CID. This uses
+     * codespace information from CMap. Details are described in PDF32000 in
+     * 9.7.6.2 "CMap Mapping".
+     *
+     * @param stream is stream from which character codes will be read.
+     * @return CID of read code.
+     */
+    public int getCIDFromStream(ASInputStream stream) throws IOException {
+        byte[] charCode = new byte[4];
+        byte[] temp = new byte[1];
+        int previousShortestMatchingCodeSpaceLength = this.shortestCodeSpaceLength;
+
+        for (int i = 0; i <= 4; ++i) {
+            stream.read(temp, 1);
+            System.arraycopy(temp, 0, charCode, i, 1);
+            byte[] currentCode = Arrays.copyOf(charCode, i + 1);
+            for (CodeSpace codeSpace : codeSpaces) {     // Looking for complete match
+                if (codeSpace.contains(currentCode)) {
+                    int res = toCID((int) CMapParser.numberFromBytes(currentCode));
+                    if (res != -1) {
+                        return res;
+                    } else {
+                        LOGGER.debug("CMap " + this.name + " has invalid codespace information.");
+                    }
+                }
+            }
+            int shortestMatchingCodeSpaceLength = Integer.MAX_VALUE;
+            for (CodeSpace codeSpace : codeSpaces) { // Looking for partial matches on bytes 0, ..., i
+                boolean partialMatch = true;
+                for (int j = 0; j <= i; ++j) {
+                    if (!codeSpace.isPartialMatch(charCode[j], j)) {
+                        partialMatch = false;
+                        break;
+                    }
+                }
+                if (partialMatch && shortestMatchingCodeSpaceLength >
+                        codeSpace.getLength()) {
+                    shortestMatchingCodeSpaceLength = codeSpace.getLength();    // Remembering length of shortest partially matching codespace
+                }
+            }
+            if (shortestMatchingCodeSpaceLength == Integer.MAX_VALUE) {
+                stream.read(charCode, previousShortestMatchingCodeSpaceLength - i - 1);    // No described partial matching, reading necessary amount of bytes and returning 0
+                return 0;
+            }
+            previousShortestMatchingCodeSpaceLength = shortestMatchingCodeSpaceLength;
+        }
+        return 0;
     }
 
     /**
@@ -100,7 +160,7 @@ public class CMap {
     /**
      * Setter for codespace ranges.
      */
-    public void setCodeSpaces(List<CodeSpace> codeSpaces) {
+    void setCodeSpaces(List<CodeSpace> codeSpaces) {
         this.codeSpaces = codeSpaces;
     }
 
