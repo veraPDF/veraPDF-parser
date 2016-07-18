@@ -496,7 +496,7 @@ public class BaseParser {
 		}
 	}
 
-	private void initializeToken() {
+	protected void initializeToken() {
 		if (this.token == null) {
 			this.token = new Token();
 		}

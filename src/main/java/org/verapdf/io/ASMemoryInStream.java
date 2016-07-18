@@ -18,6 +18,16 @@ public class ASMemoryInStream implements ASInputStream {
     private boolean copiedBuffer;
 
     /**
+     * Constructor from byte array. Buffer is copied while initializing
+     * ASMemoryInStream.
+     *
+     * @param buffer byte array containing data.
+     */
+    public ASMemoryInStream(byte[] buffer) {
+        this(buffer, buffer.length);
+    }
+
+    /**
      * Constructor from byte array and actual data length. Buffer is copied
      * while initializing ASMemoryInStream.
      *
@@ -63,7 +73,11 @@ public class ASMemoryInStream implements ASInputStream {
             return -1;
         }
         int available = Math.min(bufferSize - currentPosition, size);
-        System.arraycopy(this.buffer, currentPosition, buffer, 0, available);
+        try {
+            System.arraycopy(this.buffer, currentPosition, buffer, 0, available);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new IOException("Can't write bytes into passed buffer: too small.");
+        }
         currentPosition += available;
         return available;
     }
@@ -102,6 +116,13 @@ public class ASMemoryInStream implements ASInputStream {
     @Override
     public void reset() throws IOException {
         currentPosition = 0;
+    }
+
+    /**
+     * @return the amount of bytes left in stream.
+     */
+    public int available() {
+        return bufferSize - currentPosition;
     }
 
     /**
