@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * @author Timur Kamalov
  */
-public interface ASInputStream {
+public interface ASInputStream extends AutoCloseable {
 
 	int nPos = -1;
 
