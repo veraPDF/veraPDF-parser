@@ -1,12 +1,12 @@
 package org.verapdf.external;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.pd.PDObject;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -15,6 +15,8 @@ import java.util.*;
  * @author Maksim Bezrukov
  */
 public class ICCProfile extends PDObject {
+
+	private static final Logger LOGGER = Logger.getLogger(ICCProfile.class);
 
 	/** Length of icc profile header */
 	public static final int HEADER_LENGTH = 128;
@@ -87,9 +89,7 @@ public class ICCProfile extends PDObject {
 			parseTags(data);
 		} catch (IOException e) {
 			this.isLooksValid = false;
-			// TODO: clear next two lines of code
-			System.out.println("Exception during obtaining ICCProfile header");
-			e.printStackTrace();
+			LOGGER.debug("Exception during obtaining ICCProfile header", e);
 		}
 	}
 
@@ -205,8 +205,7 @@ public class ICCProfile extends PDObject {
 			byte[] buffer = Arrays.copyOfRange(bytes, start, start + length);
 			return new String(buffer);
 		}
-		// TODO: clear next two lines
-		System.out.println("Length of given byte array less than " + (start + length));
+		LOGGER.debug("Length of given byte array less than " + (start + length));
 		return null;
 	}
 
@@ -221,8 +220,7 @@ public class ICCProfile extends PDObject {
 
 			return Double.valueOf(version.toString());
 		}
-		// TODO: clear next two lines
-		System.out.println("ICC profile contain less than 10 bytes of data.");
+		LOGGER.debug("ICC profile contain less than 10 bytes of data.");
 		return null;
 	}
 
