@@ -92,7 +92,7 @@ public class COSStream extends COSDictionary {
 	}
 
 	public COSObjType getType() {
-		return COSObjType.COSStreamT;
+		return COSObjType.COS_STREAM;
 	}
 
 	public void accept(final IVisitor visitor) {

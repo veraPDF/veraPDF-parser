@@ -5,7 +5,6 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -66,7 +65,7 @@ public class COSObject {
 
 	// OBJECT TYPE
 	public COSObjType getType() {
-		return this.base != null ? this.base.getType() : COSObjType.COSUndefinedT;
+		return this.base != null ? this.base.getType() : COSObjType.COS_UNDEFINED;
 	}
 
 	// VISITOR DESIGN PATTERN
@@ -77,8 +76,8 @@ public class COSObject {
 	}
 
 	// BOOLEAN VALUES
-	public boolean getBoolean() {
-		return this.base != null ? this.base.getBoolean() : false;
+	public Boolean getBoolean() {
+		return this.base != null ? this.base.getBoolean() : null;
 	}
 
 	public void setBoolean(final boolean value) {
@@ -88,8 +87,8 @@ public class COSObject {
 	}
 
 	// INTEGER NUMBERS
-	public long getInteger() {
-		return this.base != null ? this.base.getInteger() : 0;
+	public Long getInteger() {
+		return this.base != null ? this.base.getInteger() : null;
 	}
 
 	public void setInteger(final long value) {
@@ -99,8 +98,8 @@ public class COSObject {
 	}
 
 	//! Real numbers
-	public double getReal() {
-		return this.base != null ? this.base.getReal() : 0;
+	public Double getReal() {
+		return this.base != null ? this.base.getReal() : null;
 	}
 
 	public void setReal(final double value) {
@@ -111,7 +110,7 @@ public class COSObject {
 
 	//! Strings
 	public String getString() {
-		return this.base != null ? this.base.getString() : "";
+		return this.base != null ? this.base.getString() : null;
 	}
 
 	public void setString(final String value) {
@@ -126,8 +125,7 @@ public class COSObject {
 
 	//! Names
 	public ASAtom getName() {
-		final ASAtom empty = new ASAtom();
-		return this.base != null ? this.base.getName() : empty;
+		return this.base != null ? this.base.getName() : null;
 	}
 
 	public void setName(final ASAtom value) {
@@ -137,8 +135,8 @@ public class COSObject {
 	}
 
 	//! Number of elements in array and dictionary
-	public int size() {
-		return this.base != null ? this.base.size() : 0;
+	public Integer size() {
+		return this.base != null ? this.base.size() : null;
 	}
 
 	public COSObject at(final int i) {
@@ -164,7 +162,7 @@ public class COSObject {
 	}
 
 	public void remove(final int i) {
-		if (this.base == null) {
+		if (this.base != null) {
 			this.base.remove(i);
 		}
 	}
@@ -194,12 +192,12 @@ public class COSObject {
 	}
 
 	//! Dictionaries
-	public boolean knownKey(final ASAtom key) {
-		return this.base != null ? this.base.knownKey(key) : false;
+	public Boolean knownKey(final ASAtom key) {
+		return this.base != null ? this.base.knownKey(key) : null;
 	}
 
 	public COSObject getKey(final ASAtom key) {
-		return this.base != null ? this.base.getKey(key) : new COSObject();
+		return this.base != null ? this.base.getKey(key) : null;
 	}
 
 	public void setKey(final ASAtom key, final COSObject value) {
@@ -208,8 +206,8 @@ public class COSObject {
 		}
 	}
 
-	public boolean getBooleanKey(final ASAtom key) {
-		return this.base != null ? this.base.getBoolean() : false;
+	public Boolean getBooleanKey(final ASAtom key) {
+		return this.base != null ? this.base.getBoolean() : true;
 	}
 
 	public void setBooleanKey(final ASAtom key, final boolean value) {
@@ -218,8 +216,8 @@ public class COSObject {
 		}
 	}
 
-	public long getIntegerKey(final ASAtom key) {
-		return this.base != null ? this.base.getIntegerKey(key) : 0;
+	public Long getIntegerKey(final ASAtom key) {
+		return this.base != null ? this.base.getIntegerKey(key) : null;
 	}
 
 	public void setIntegerKey(final ASAtom key, final long value) {
@@ -228,8 +226,8 @@ public class COSObject {
 		}
 	}
 
-	public double getRealKey(final ASAtom key) {
-		return this.base != null ? this.base.getRealKey(key) : 0;
+	public Double getRealKey(final ASAtom key) {
+		return this.base != null ? this.base.getRealKey(key) : null;
 	}
 
 	public void setRealKey(final ASAtom key, final double value) {
@@ -239,7 +237,7 @@ public class COSObject {
 	}
 
 	public String getStringKey(final ASAtom key) {
-		return this.base != null ? this.base.getStringKey(key) : "";
+		return this.base != null ? this.base.getStringKey(key) : null;
 	}
 
 	public void setStringKey(final ASAtom key, final String value) {
@@ -249,8 +247,7 @@ public class COSObject {
 	}
 
 	public ASAtom getNameKey(final ASAtom key) {
-		final ASAtom empty = new ASAtom();
-		return this.base != null ? this.base.getNameKey(key) : empty;
+		return this.base != null ? this.base.getNameKey(key) : null;
 	}
 
 	public void setNameKey(final ASAtom key, final ASAtom value) {
@@ -289,17 +286,15 @@ public class COSObject {
 	public Set<ASAtom> getKeySet() {
 		if (this.base != null) {
 			return this.base.getKeySet();
-		} else {
-			return Collections.emptySet();
 		}
+		return null;
 	}
 
 	public Collection<COSObject> getValues() {
 		if (this.base != null) {
 			return this.base.getValues();
-		} else {
-			return Collections.emptyList();
 		}
+		return null;
 	}
 
 
@@ -327,8 +322,8 @@ public class COSObject {
 		}
 	}
 
-	public boolean isStreamKeywordCRLFCompliant() {
-		return this.base != null && this.base.isStreamKeywordCRLFCompliant();
+	public Boolean isStreamKeywordCRLFCompliant() {
+		return this.base != null ? this.base.isStreamKeywordCRLFCompliant() : null;
 	}
 
 	public void setStreamKeywordCRLFCompliant(final boolean streamKeywordCRLFCompliant) {
@@ -344,8 +339,8 @@ public class COSObject {
 		}
 	}
 
-	public boolean isEndstreamKeywordCRLFCompliant() {
-		return this.base != null && this.base.isEndstreamKeywordCRLFCompliant();
+	public Boolean isEndstreamKeywordCRLFCompliant() {
+		return this.base != null ? this.base.isEndstreamKeywordCRLFCompliant() : null;
 	}
 
 	public void setEndstreamKeywordCRLFCompliant(final boolean endstreamKeywordCRLFCompliant) {
@@ -361,8 +356,8 @@ public class COSObject {
 		}
 	}
 
-	public long getRealStreamSize() {
-		return this.base != null ? this.base.getRealStreamSize() : 0;
+	public Long getRealStreamSize() {
+		return this.base != null ? this.base.getRealStreamSize() : null;
 	}
 
 	public void setRealStreamSize(final long realStreamSize) {
@@ -379,13 +374,12 @@ public class COSObject {
 	}
 
 	//! Indirect object
-	public boolean isIndirect() {
-		return this.base != null && this.base.isIndirect();
+	public Boolean isIndirect() {
+		return this.base != null ? this.base.isIndirect() : null;
 	}
 
 	public COSKey getKey() {
-		final COSKey key = new COSKey();
-		return this.base != null ? this.base.getKey() : key;
+		return this.base != null ? this.base.getKey() : null;
 	}
 
 	public COSDocument getDocument() {
@@ -399,7 +393,7 @@ public class COSObject {
 	}
 
 	public COSObject getDirect() {
-		return this.base != null ? this.base.getDirect() : new COSObject();
+		return this.base != null ? this.base.getDirect() : null;
 	}
 
 	public void setDirect(final COSObject value) {
@@ -422,7 +416,7 @@ public class COSObject {
 
 	//GETTERS & SETTERS
 	public Boolean isHeaderOfObjectComplyPDFA() {
-		return isHeaderOfObjectComplyPDFA;
+		return this.isHeaderOfObjectComplyPDFA;
 	}
 
 	public void setIsHeaderOfObjectComplyPDFA(Boolean isHeaderOfObjectComplyPDFA) {
@@ -430,7 +424,7 @@ public class COSObject {
 	}
 
 	public Boolean isEndOfObjectComplyPDFA() {
-		return isEndOfObjectComplyPDFA;
+		return this.isEndOfObjectComplyPDFA;
 	}
 
 	public void setIsEndOfObjectComplyPDFA(Boolean isEndOfObjectComplyPDFA) {
@@ -438,7 +432,7 @@ public class COSObject {
 	}
 
 	public Boolean isHeaderFormatComplyPDFA() {
-		return isHeaderFormatComplyPDFA;
+		return this.isHeaderFormatComplyPDFA;
 	}
 
 	public void setIsHeaderFormatComplyPDFA(Boolean isHeaderFormatComplyPDFA) {

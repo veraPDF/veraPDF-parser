@@ -23,7 +23,7 @@ public class COSReal extends COSNumber {
     }
 
     public COSObjType getType() {
-        return COSObjType.COSRealT;
+        return COSObjType.COS_REAL;
     }
 
     public static COSObject construct(final double initValue) {
