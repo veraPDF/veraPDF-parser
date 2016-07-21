@@ -24,7 +24,7 @@ public abstract class PDCIEDictionaryBased extends PDColorSpace {
     }
 
     private static PDTristimulus getTristimulus(COSObject object) {
-        if (object != null && object.getType() == COSObjType.COSArrayT) {
+        if (object != null && object.getType() == COSObjType.COS_ARRAY) {
             return new PDTristimulus(object);
         }
         return null;
