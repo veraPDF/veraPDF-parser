@@ -15,7 +15,7 @@ public class COSInteger extends COSNumber {
     }
 
     public COSObjType getType() {
-        return COSObjType.COSIntegerT;
+        return COSObjType.COS_INTEGER;
     }
 
     public static COSObject construct(final long initValue) {

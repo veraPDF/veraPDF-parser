@@ -26,7 +26,7 @@ public class COSName extends COSDirect {
     }
 
     public COSObjType getType() {
-        return COSObjType.COSNameT;
+        return COSObjType.COS_NAME;
     }
 
     public static COSBase fromValue(final ASAtom value) {

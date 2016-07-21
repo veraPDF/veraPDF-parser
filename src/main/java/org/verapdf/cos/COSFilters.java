@@ -31,13 +31,13 @@ public class COSFilters extends PDObject {
 										COSObject decodeParams) throws IOException {
 		List<COSDictionary> decodeParameters = null;
 		if(!decodeParams.equals(COSObject.getEmpty())) {
-			if(decodeParams.getType().equals(COSObjType.COSDictT)) {
+			if(decodeParams.getType().equals(COSObjType.COS_DICT)) {
 				decodeParameters = new ArrayList<>(1);
 				decodeParameters.add((COSDictionary) decodeParams.get());
-			} else if (decodeParams.getType().equals(COSObjType.COSArrayT)) {
+			} else if (decodeParams.getType().equals(COSObjType.COS_ARRAY)) {
 				decodeParameters = new ArrayList<>(decodeParams.size());
 				for(int i = 0; i < decodeParams.size(); ++i) {
-					if(!decodeParams.at(i).getType().equals(COSObjType.COSDictT)) {
+					if(!decodeParams.at(i).getType().equals(COSObjType.COS_DICT)) {
 						throw new IOException("DecodeParams shall be a dictionary or array of dictionaries.");
 					}
 					decodeParameters.add((COSDictionary) decodeParams.at(i).get());
@@ -91,7 +91,7 @@ public class COSFilters extends PDObject {
 
 	protected void updateFromObject() {
 		COSObject filters = getObject();
-		if(filters.getType().equals(COSObjType.COSArrayT)) {
+		if(filters.getType().equals(COSObjType.COS_ARRAY)) {
 			int size = filters.size();
 
 			this.entries.clear();
@@ -99,7 +99,7 @@ public class COSFilters extends PDObject {
 			for (int i = 0; i < size; i++) {
 				this.entries.add(filters.at(i).getName());
 			}
-		} else if (filters.getType().equals(COSObjType.COSNameT)) {
+		} else if (filters.getType().equals(COSObjType.COS_NAME)) {
 			this.entries.clear();
 			this.entries.add(filters.getName());
 		}

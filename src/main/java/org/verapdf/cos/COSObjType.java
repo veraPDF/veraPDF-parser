@@ -5,15 +5,15 @@ package org.verapdf.cos;
  */
 public enum COSObjType {
 
-	COSUndefinedT,
-	COSNullT,
-	COSIntegerT,
-	COSRealT,
-	COSBooleanT,
-	COSNameT,
-	COSStringT,
-	COSDictT,
-	COSArrayT,
-	COSStreamT
+	COS_UNDEFINED,
+	COS_NULL,
+	COS_INTEGER,
+	COS_REAL,
+	COS_BOOLEAN,
+	COS_NAME,
+	COS_STRING,
+	COS_DICT,
+	COS_ARRAY,
+	COS_STREAM
 
 }

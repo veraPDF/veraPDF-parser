@@ -59,7 +59,7 @@ public class COSString extends COSDirect {
     }
 
     public COSObjType getType() {
-        return COSObjType.COSStringT;
+        return COSObjType.COS_STRING;
     }
 
     //! Returns the size of the string

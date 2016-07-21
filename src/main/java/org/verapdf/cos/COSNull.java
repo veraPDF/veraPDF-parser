@@ -11,7 +11,7 @@ public class COSNull extends COSDirect {
     public static final COSNull NULL = new COSNull();
 
     public COSObjType getType() {
-        return COSObjType.COSNullT;
+        return COSObjType.COS_NULL;
     }
 
     public static COSObject construct() {
