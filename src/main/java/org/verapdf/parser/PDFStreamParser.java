@@ -5,14 +5,77 @@ import org.verapdf.cos.*;
 import org.verapdf.operator.Operator;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * @author Timur Kamalov
  */
 public class PDFStreamParser extends COSParser {
 
-	public PDFStreamParser(COSStream stream) throws Exception {
+	private final List<Object> tokens;
+
+	public PDFStreamParser(COSStream stream) throws IOException {
 		super(stream.getData());
+
+		this.tokens = new ArrayList<>();
+	}
+
+	public void parseTokens() throws IOException {
+		Object token = parseNextToken();
+		while (token != null) {
+			tokens.add(token);
+			token = parseNextToken();
+		}
+	}
+
+	public List<Object> getTokens()
+	{
+		return this.tokens;
+	}
+
+	public Iterator<Object> getTokensIterator() {
+		return new Iterator<Object>() {
+
+			private Object token;
+
+			private void tryNext() {
+				try {
+					if (token == null) {
+						token = parseNextToken();
+					}
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+			/** {@inheritDoc} */
+			@Override
+			public boolean hasNext() {
+				tryNext();
+				return token != null;
+			}
+
+			/** {@inheritDoc} */
+			@Override
+			public Object next() {
+				tryNext();
+				Object tmp = token;
+				if (tmp == null) {
+					throw new NoSuchElementException();
+				}
+				token = null;
+				return tmp;
+			}
+
+			/** {@inheritDoc} */
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
 	}
 
 	/**
