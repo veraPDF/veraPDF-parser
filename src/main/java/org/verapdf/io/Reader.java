@@ -1,6 +1,5 @@
 package org.verapdf.io;
 
-import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.parser.DecodedObjectStreamParser;
@@ -53,7 +52,7 @@ public class Reader extends XRefReader {
 			} else {
 				COSKey newKey = new COSKey(- (int)offset, 0);
 				COSObject object = getObject(newKey);
-				if(!object.getType().equals(COSObjType.COSStreamT)) {
+				if(!object.getType().equals(COSObjType.COS_STREAM)) {
 					throw new IOException("Object number " + (-offset) + " should" +
 							" be object stream, but in fact it is " + object.getType());
 				}

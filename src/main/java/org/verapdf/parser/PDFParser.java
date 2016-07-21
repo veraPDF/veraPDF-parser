@@ -361,7 +361,7 @@ public class PDFParser extends COSParser {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         COSObject xrefCOSStream = getDictionary();
-        if(!(xrefCOSStream.get().getType().equals(COSObjType.COSStreamT))) {
+        if(!(xrefCOSStream.get().getType().equals(COSObjType.COS_STREAM))) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.get());
