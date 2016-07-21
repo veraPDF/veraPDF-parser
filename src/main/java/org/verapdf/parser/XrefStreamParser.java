@@ -4,7 +4,6 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
-import org.verapdf.cos.filters.COSPredictorDecode;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 
@@ -98,9 +97,9 @@ class XrefStreamParser {
      * @throws IOException
      */
     private void parseStream() throws IOException {
-        byte[] field0 = new byte[(int) fieldSizes.at(0).getInteger()];
-        byte[] field1 = new byte[(int) fieldSizes.at(1).getInteger()];
-        byte[] field2 = new byte[(int) fieldSizes.at(2).getInteger()];
+        byte[] field0 = new byte[fieldSizes.at(0).getInteger().intValue()];
+        byte[] field1 = new byte[fieldSizes.at(1).getInteger().intValue()];
+        byte[] field2 = new byte[fieldSizes.at(2).getInteger().intValue()];
         byte[] buffer;
         byte[] remainedBytes = new byte[0];
         int objIdIndex = 0;

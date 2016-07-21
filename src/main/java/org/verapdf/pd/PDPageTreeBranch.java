@@ -111,7 +111,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 			this.children.add(kid_i);
 		}
 
-		this.leafCount = (int) getObject().getIntegerKey(ASAtom.COUNT);
+		this.leafCount = getObject().getIntegerKey(ASAtom.COUNT).intValue();
 	}
 
 	protected void updateToObject() {
