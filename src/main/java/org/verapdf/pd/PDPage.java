@@ -42,7 +42,17 @@ public class PDPage extends PDPageTreeNode {
         super();
         this.pageNumber = 0;
         this.pagesTotal = 0;
+
+        initializeContents(obj);
+
         super.setObject(obj);
+    }
+
+    private void initializeContents(final COSObject pageDict) {
+        COSObject contents = pageDict.getKey(ASAtom.CONTENTS);
+        if (!contents.empty()) {
+            this.content = new PDPageContentStream(contents);
+        }
     }
 
     public void setBBox(final double[] bbox, final ASAtom boxType) {
