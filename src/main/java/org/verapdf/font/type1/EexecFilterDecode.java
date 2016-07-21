@@ -33,7 +33,7 @@ public class EexecFilterDecode extends ASBufferingInFilter {
     public EexecFilterDecode(ASBufferingInFilter stream, boolean isCharstring,
                              int lenIV) {
         super(stream);
-        if(!isCharstring) {
+        if (!isCharstring) {
             bytesToDiscard = EEXEC_NUMBER_OF_RANDOM_BYTES;
             r = EEXEC_ENCRYPTION_KEY;
         } else {
@@ -64,6 +64,7 @@ public class EexecFilterDecode extends ASBufferingInFilter {
     @Override
     public int read(byte[] buffer, int size) throws IOException {
         int bytesRead = (int) this.feedBuffer(bytesToDiscard + size);
+        int res = bytesRead - bytesToDiscard;
         if (bytesRead == -1) {
             return -1;
         }
@@ -77,6 +78,6 @@ public class EexecFilterDecode extends ASBufferingInFilter {
         }
         bytesToDiscard = (bytesToDiscard - bytesRead) < 0 ? 0 :
                 (bytesToDiscard - bytesRead);
-        return bytesRead;
+        return res;
     }
 }

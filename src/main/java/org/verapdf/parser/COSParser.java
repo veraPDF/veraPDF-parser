@@ -24,7 +24,7 @@ public class COSParser extends BaseParser {
 
 	protected boolean flag = true;
 
-	public COSParser(final String filename) throws Exception {
+	public COSParser(final String filename) throws IOException {
 		super(filename);
 	}
 

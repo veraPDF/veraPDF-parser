@@ -1,28 +1,35 @@
 package org.verapdf.font.type1;
 
-import org.verapdf.as.CharTable;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSObject;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
-import org.verapdf.parser.BaseParser;
+import org.verapdf.io.ASMemoryInStream;
+import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class does parsing of Type 1 font files.
  *
  * @author Sergey Shemyakov
  */
-public class Type1Parser extends BaseParser {
+public class Type1Parser extends COSParser {
+
+    private double[] fontMatrix = {0.001, 0, 0, 0.001, 0, 0};
+    private Map<Integer, String> encoding;
 
     /**
      * {@inheritDoc}
      */
-    public Type1Parser(String fileName) throws FileNotFoundException {
+    public Type1Parser(String fileName) throws IOException {
         super(fileName);
+        encoding = new HashMap<>();
     }
 
     /**
@@ -30,6 +37,7 @@ public class Type1Parser extends BaseParser {
      */
     public Type1Parser(InputStream fileStream) throws IOException {
         super(fileStream);
+        encoding = new HashMap<>();
     }
 
     /**
@@ -37,6 +45,7 @@ public class Type1Parser extends BaseParser {
      */
     public Type1Parser(ASInputStream asInputStream) throws IOException {
         super(asInputStream);
+        encoding = new HashMap<>();
     }
 
     /**
@@ -60,6 +69,37 @@ public class Type1Parser extends BaseParser {
             case TT_NAME:
                 switch (getToken().token) {
                     //Do processing of all necessary names like /FontName, /FamilyName, etc.
+                    case "FontMatrix":
+                        this.skipSpaces();
+                        this.nextToken();
+                        if(this.getToken().type == Token.Type.TT_OPENARRAY) {
+                            COSObject cosFontMatrix = this.nextObject();
+                            if(cosFontMatrix.size() == 6) {
+                                for (int i = 0; i < 6; ++i) {
+                                    fontMatrix[i] = cosFontMatrix.at(i).getReal();
+                                }
+                            }
+                        }
+                        break;
+                    case "Encoding":
+                        do {
+                            nextToken();
+                        } while (!this.getToken().token.equals("dup"));
+                        this.source.unread(3);
+
+                        while(true) {
+                            nextToken();
+                            if(this.getToken().token.equals("readonly")) {
+                                break;
+                            }
+                            this.skipSpaces();
+                            this.readNumber();
+                            long key = this.getToken().integer;
+                            this.nextToken();
+                            encoding.put((int) key, this.getToken().token);
+                            this.nextToken();
+                        }
+                        break;
                 }
                 break;
             case TT_NONE:
@@ -67,55 +107,33 @@ public class Type1Parser extends BaseParser {
                     //Do processing of keywords like eexec
                     case "eexec":
                         this.skipSpaces();
-                        this.readEexecData();   //TODO: do something with this data.
+                        ASFileInStream eexecEncoded = new ASFileInStream(
+                                this.source.getStream(), this.source.getOffset(),
+                                this.source.getStreamLength() - this.source.getOffset());
+                        ASBufferingInFilter eexecDecoded = new EexecFilterDecode(
+                                new COSFilterASCIIHexDecode(eexecEncoded), false);
 
+                        break;
                 }
                 break;
         }
     }
 
-    private byte[] readEexecData() throws IOException {
+    private ASBufferingInFilter readEexecData() throws IOException {
         byte ch;
         long dataBeginning = this.source.getOffset();
         ch = this.source.read();
         while (!this.source.isEof()) {
-            if (ch == 'c' && source.peek() == 'l') { // Probably got to "clearmark"
+            if (ch == 'c' && source.peek() == 'l') { // Probably got to "cleartomark"
                 break;
             }
             ch = this.source.read();
         }
         long dataEnding = this.source.getOffset() - 512;    // Skipping 512 zeroes
-        byte[] res = new byte[(int) (dataEnding - dataBeginning + 1) / 2];
-        int resPointer = 0;
+        byte[] res = new byte[(int) (dataEnding - dataBeginning)];
 
         this.source.seek(dataBeginning);
-        while (this.source.getOffset() < dataEnding) {
-            res[resPointer++] = this.readASCIIHexByte();
-        }
-        return Arrays.copyOf(res, resPointer);
-    }
-
-    private byte readASCIIHexByte() throws IOException {
-        byte res = 0;
-        byte ch = this.source.read();
-        while (CharTable.isSpace(ch)) {
-            ch = this.source.read();
-        }
-        if (COSFilterASCIIHexDecode.decodeLoHex(ch) == COSFilterASCIIHexDecode.er) {
-            throw new IOException("Corrupted ASCII Hex string in eexec encoded data");
-        }
-        res = COSFilterASCIIHexDecode.decodeLoHex(ch);
-        res = (byte) (res << 4);
-
-        ch = this.source.read();
-        while (CharTable.isSpace(ch)) {
-            ch = this.source.read();
-        }
-
-        if (COSFilterASCIIHexDecode.decodeLoHex(ch) == COSFilterASCIIHexDecode.er) {
-            throw new IOException("Corrupted ASCII Hex string in eexec encoded data");
-        }
-        res += COSFilterASCIIHexDecode.decodeLoHex(ch);
-        return res;
+        this.source.read(res, res.length);
+        return new COSFilterASCIIHexDecode(new ASMemoryInStream(res, res.length, false));
     }
 }
