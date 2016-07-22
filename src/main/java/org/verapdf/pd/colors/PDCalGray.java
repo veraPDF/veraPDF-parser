@@ -1,13 +1,15 @@
 package org.verapdf.pd.colors;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 
 /**
  * @author Maksim Bezrukov
  */
 public class PDCalGray extends PDCIEDictionaryBased {
+
+    public PDCalGray() {
+    }
 
     public PDCalGray(COSObject obj) {
         super(obj);

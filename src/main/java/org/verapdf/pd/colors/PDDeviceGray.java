@@ -7,6 +7,9 @@ public class PDDeviceGray extends PDColorSpace {
 
     public static final PDDeviceGray INSTANCE = new PDDeviceGray();
 
+    private PDDeviceGray() {
+    }
+
     @Override
     public int getNumberOfComponents() {
         return 1;

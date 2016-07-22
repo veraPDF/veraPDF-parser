@@ -7,6 +7,9 @@ public class PDDeviceRGB extends PDColorSpace {
 
     public static final PDDeviceRGB INSTANCE = new PDDeviceRGB();
 
+    private PDDeviceRGB() {
+    }
+
     @Override
     public int getNumberOfComponents() {
         return 3;

@@ -5,14 +5,14 @@ import org.verapdf.cos.COSObject;
 /**
  * @author Maksim Bezrukov
  */
-public class PDResources extends PDObject {
+public class PDResource extends PDObject {
 
     private boolean isInherited = false;
 
-    public PDResources() {
+    public PDResource() {
     }
 
-    protected PDResources(COSObject obj) {
+    protected PDResource(COSObject obj) {
         super(obj);
     }
 
