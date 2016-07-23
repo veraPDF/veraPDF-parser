@@ -1,5 +1,7 @@
 package org.verapdf.pd.colors;
 
+import org.verapdf.as.ASAtom;
+
 /**
  * @author Maksim Bezrukov
  */
@@ -13,5 +15,10 @@ public class PDDeviceGray extends PDColorSpace {
     @Override
     public int getNumberOfComponents() {
         return 1;
+    }
+
+    @Override
+    public ASAtom getName() {
+        return ASAtom.DEVICEGRAY;
     }
 }

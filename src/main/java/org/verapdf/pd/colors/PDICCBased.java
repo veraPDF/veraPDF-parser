@@ -46,14 +46,18 @@ public class PDICCBased extends PDColorSpace {
 		return this.numberOfComponents;
 	}
 
+	@Override
+	public ASAtom getName() {
+		return ASAtom.ICCBASED;
+	}
+
 	public double[] getRange() {
 		return this.iccProfile == null ? null : this.iccProfile.getRange();
 	}
 
-//	TODO: implement me
-//	public PDColorSpace getAlternate() {
-//		return this.iccProfile == null ? null : this.iccProfile.getAlternate();
-//	}
+	public PDColorSpace getAlternate() {
+		return this.iccProfile == null ? null : this.iccProfile.getAlternate();
+	}
 
 //	TODO: implement me
 //	public PDMetadata getMetadata() {

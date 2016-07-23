@@ -20,6 +20,11 @@ public class PDCalRGB extends PDCIEDictionaryBased {
         return 3;
     }
 
+    @Override
+    public ASAtom getName() {
+        return ASAtom.CALRGB;
+    }
+
     public double[] getGamma() {
         return getRealArray(getObject().getKey(ASAtom.GAMMA), 3, "Gamma");
     }

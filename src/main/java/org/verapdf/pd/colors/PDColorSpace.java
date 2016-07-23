@@ -1,5 +1,6 @@
 package org.verapdf.pd.colors;
 
+import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResource;
 
@@ -16,4 +17,6 @@ public abstract class PDColorSpace extends PDResource {
     }
 
     public abstract int getNumberOfComponents();
+
+    public abstract ASAtom getName();
 }

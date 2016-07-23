@@ -6,7 +6,9 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
+import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDObject;
+import org.verapdf.pd.colors.PDColorSpace;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -423,10 +425,9 @@ public class ICCProfile extends PDObject {
 		return null;
 	}
 
-//	TODO: implement me
-//	public PDColorSpace getAlternate() {
-//		return null;
-//	}
+	public PDColorSpace getAlternate() {
+		return ColorSpaceFactory.getColorSpace(getKey(ASAtom.ALTERNATE));
+	}
 
 //	TODO: implement me
 //	public PDMetadata getMetadata() {

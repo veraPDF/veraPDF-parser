@@ -20,6 +20,11 @@ public class PDLab extends PDCIEDictionaryBased {
         return 3;
     }
 
+    @Override
+    public ASAtom getName() {
+        return ASAtom.LAB;
+    }
+
     public double[] getRange() {
         return getRealArray(getObject().getKey(ASAtom.RANGE), 4, "Range");
     }
