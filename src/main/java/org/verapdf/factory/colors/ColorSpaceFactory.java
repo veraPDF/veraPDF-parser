@@ -11,6 +11,9 @@ import org.verapdf.pd.colors.*;
  */
 public class ColorSpaceFactory {
 
+    private ColorSpaceFactory() {
+    }
+
     private static final Logger LOGGER = Logger.getLogger(ColorSpaceFactory.class);
 
     public static PDColorSpace getColorSpace(COSObject base) {
