@@ -68,7 +68,7 @@ public class COSDictionary extends COSDirect {
 
     //! Object type
     public COSObjType getType() {
-        return COSObjType.COSDictT;
+        return COSObjType.COS_DICT;
     }
 
     public static COSObject construct() {

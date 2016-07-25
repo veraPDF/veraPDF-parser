@@ -1,22 +1,24 @@
 package org.verapdf.pd;
 
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
 
 /**
  * @author Timur Kamalov
  */
-public class PDPageContentStream extends PDObject implements PDContentStream {
+public class PDPageContentStream extends PDContentStream {
 
-	private COSObject stream;
-
-	public PDPageContentStream(COSObject stream) {
-		super(stream);
+	public PDPageContentStream(COSObject contents) {
+		super(contents);
 	}
 
 	@Override
-	public COSStream getContents() {
-		return (COSStream) this.stream.get();
+	public COSObject getContents() {
+		return super.getObject();
+	}
+
+	@Override
+	public void setContents(final COSObject contents) {
+		super.setObject(contents);
 	}
 
 }

@@ -1,12 +1,18 @@
 package org.verapdf.pd;
 
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.COSObject;
 
 /**
  * @author Timur Kamalov
  */
-public interface PDContentStream {
+public abstract class PDContentStream extends PDObject {
 
-	COSStream getContents();
+	protected PDContentStream(COSObject contents) {
+		super(contents);
+	}
+
+	public abstract COSObject getContents();
+
+	public abstract void setContents(final COSObject contents);
 
 }

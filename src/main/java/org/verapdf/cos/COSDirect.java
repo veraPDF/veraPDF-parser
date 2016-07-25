@@ -5,7 +5,6 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -23,7 +22,7 @@ public abstract class COSDirect extends COSBase {
 
     // OBJECT TYPE
     public COSObjType getType() {
-        return COSObjType.COSUndefinedT;
+        return COSObjType.COS_UNDEFINED;
     }
 
     // BOOLEAN VALUES

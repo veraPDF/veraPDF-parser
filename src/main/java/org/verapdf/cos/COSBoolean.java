@@ -22,7 +22,7 @@ public class COSBoolean extends COSDirect {
     }
 
     public COSObjType getType() {
-        return COSObjType.COSBooleanT;
+        return COSObjType.COS_BOOLEAN;
     }
 
     public static COSObject construct(final boolean initValue) {

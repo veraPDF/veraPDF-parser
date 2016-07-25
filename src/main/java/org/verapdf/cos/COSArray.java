@@ -41,7 +41,7 @@ public class COSArray extends COSDirect implements Iterable {
 
     //! Object type
     public COSObjType getType() {
-        return COSObjType.COSArrayT;
+        return COSObjType.COS_ARRAY;
     }
 
     //! Returns COSObject wrapping a new empty COSArray instance
