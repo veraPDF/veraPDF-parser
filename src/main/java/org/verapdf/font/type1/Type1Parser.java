@@ -1,16 +1,15 @@
 package org.verapdf.font.type1;
 
-import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
-import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +22,8 @@ public class Type1Parser extends COSParser {
 
     private double[] fontMatrix = {0.001, 0, 0, 0.001, 0, 0};
     private Map<Integer, String> encoding;
+    private Map<String, Double> glyphWidths;
+    private static final byte[] CLEAR_TO_MARK_BYTES = "cleartomark".getBytes();
 
     /**
      * {@inheritDoc}
@@ -51,7 +52,7 @@ public class Type1Parser extends COSParser {
     /**
      * This method is entry point for parsing process.
      *
-     * @throws IOException
+     * @throws IOException if stream reading error occurs.
      */
     public void parse() throws IOException {
         initializeToken();
@@ -72,9 +73,10 @@ public class Type1Parser extends COSParser {
                     case "FontMatrix":
                         this.skipSpaces();
                         this.nextToken();
-                        if(this.getToken().type == Token.Type.TT_OPENARRAY) {
+                        if (this.getToken().type == Token.Type.TT_OPENARRAY) {
+                            this.source.unread();
                             COSObject cosFontMatrix = this.nextObject();
-                            if(cosFontMatrix.size() == 6) {
+                            if (cosFontMatrix.size() == 6) {
                                 for (int i = 0; i < 6; ++i) {
                                     fontMatrix[i] = cosFontMatrix.at(i).getReal();
                                 }
@@ -87,9 +89,9 @@ public class Type1Parser extends COSParser {
                         } while (!this.getToken().token.equals("dup"));
                         this.source.unread(3);
 
-                        while(true) {
+                        while (true) {
                             nextToken();
-                            if(this.getToken().token.equals("readonly")) {
+                            if (this.getToken().token.equals("readonly")) {
                                 break;
                             }
                             this.skipSpaces();
@@ -107,33 +109,36 @@ public class Type1Parser extends COSParser {
                     //Do processing of keywords like eexec
                     case "eexec":
                         this.skipSpaces();
+                        long clearToMarkOffset = this.findOffsetCleartomark();
                         ASFileInStream eexecEncoded = new ASFileInStream(
                                 this.source.getStream(), this.source.getOffset(),
-                                this.source.getStreamLength() - this.source.getOffset());
-                        ASBufferingInFilter eexecDecoded = new EexecFilterDecode(
+                                clearToMarkOffset - this.source.getOffset());
+                        ASInputStream eexecDecoded = new EexecFilterDecode(
                                 new COSFilterASCIIHexDecode(eexecEncoded), false);
-
+                        Type1PrivateParser parser = new Type1PrivateParser(
+                                eexecDecoded, fontMatrix);
+                        parser.parse();
+                        this.glyphWidths = parser.getGlyphWidths();
+                        this.source.seek(clearToMarkOffset);
                         break;
                 }
                 break;
         }
     }
 
-    private ASBufferingInFilter readEexecData() throws IOException {
-        byte ch;
-        long dataBeginning = this.source.getOffset();
-        ch = this.source.read();
-        while (!this.source.isEof()) {
-            if (ch == 'c' && source.peek() == 'l') { // Probably got to "cleartomark"
-                break;
-            }
-            ch = this.source.read();
+    private long findOffsetCleartomark() throws IOException {
+        long startingOffset = this.source.getOffset();
+        int length = CLEAR_TO_MARK_BYTES.length;
+        this.source.seek(this.source.getStreamLength() - length);
+        byte[] buf = new byte[length];
+        this.source.read(buf, length);
+        while (!Arrays.equals(buf, CLEAR_TO_MARK_BYTES)) {
+            this.source.unread(length + 1);
+            this.source.read(buf, length);
         }
-        long dataEnding = this.source.getOffset() - 512;    // Skipping 512 zeroes
-        byte[] res = new byte[(int) (dataEnding - dataBeginning)];
-
-        this.source.seek(dataBeginning);
-        this.source.read(res, res.length);
-        return new COSFilterASCIIHexDecode(new ASMemoryInStream(res, res.length, false));
+        long res = this.source.getOffset() - length;
+        this.source.seek(startingOffset);
+        return res;
     }
+
 }
