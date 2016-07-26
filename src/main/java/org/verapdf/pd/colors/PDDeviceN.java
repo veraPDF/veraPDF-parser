@@ -11,19 +11,19 @@ import java.util.List;
  */
 public class PDDeviceN extends PDColorSpace {
 
-    private final List<ASAtom> names;
+    private final List<COSObject> names;
     private final PDColorSpace alternateSpace;
     private final COSObject tintTransform;
     private final COSObject attributes;
 
-    public PDDeviceN(List<ASAtom> names, PDColorSpace alternateSpace, COSObject tintTransform, COSObject attributes) {
+    public PDDeviceN(List<COSObject> names, PDColorSpace alternateSpace, COSObject tintTransform, COSObject attributes) {
         this.names = names;
         this.alternateSpace = alternateSpace;
         this.tintTransform = tintTransform;
         this.attributes = attributes;
     }
 
-    public List<ASAtom> getNames() {
+    public List<COSObject> getNames() {
         return names == null ? null : Collections.unmodifiableList(names);
     }
 

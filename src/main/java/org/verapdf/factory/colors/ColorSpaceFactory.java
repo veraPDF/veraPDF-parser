@@ -66,7 +66,7 @@ public class ColorSpaceFactory {
         } else if (ASAtom.ICCBASED.equals(name)) {
             return new PDICCBased(base.at(1));
         } else if (ASAtom.SEPARATION.equals(name)) {
-            return new PDSeparation(base.at(1).getName(), ColorSpaceFactory.getColorSpace(base.at(2)), base.at(3));
+            return new PDSeparation(base.at(1), ColorSpaceFactory.getColorSpace(base.at(2)), base.at(3));
         } else if (ASAtom.DEVICEN.equals(name)) {
             return new PDDeviceN(getListOfNames(base.at(1)), ColorSpaceFactory.getColorSpace(base.at(2)),
                     base.at(3), base.at(4));
@@ -92,11 +92,11 @@ public class ColorSpaceFactory {
         }
     }
 
-    private static List<ASAtom> getListOfNames(COSObject object) {
+    private static List<COSObject> getListOfNames(COSObject object) {
         if (object.getType() == COSObjType.COS_ARRAY) {
-            List<ASAtom> names = new ArrayList<>();
+            List<COSObject> names = new ArrayList<>();
             for (int i = 0; i < object.size(); ++i) {
-                names.add(object.at(i).getName());
+                names.add(object.at(i));
             }
         }
         return null;

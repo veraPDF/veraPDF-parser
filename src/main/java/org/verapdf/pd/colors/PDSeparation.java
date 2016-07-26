@@ -8,17 +8,17 @@ import org.verapdf.cos.COSObject;
  */
 public class PDSeparation extends PDColorSpace {
 
-    private final ASAtom colorantName;
+    private final COSObject colorantName;
     private final PDColorSpace alternate;
     private final COSObject tintTransform;
 
-    public PDSeparation(ASAtom colorantName, PDColorSpace alternate, COSObject tintTransform) {
+    public PDSeparation(COSObject colorantName, PDColorSpace alternate, COSObject tintTransform) {
         this.colorantName = colorantName;
         this.alternate = alternate;
         this.tintTransform = tintTransform;
     }
 
-    public ASAtom getColorantName() {
+    public COSObject getColorantName() {
         return this.colorantName;
     }
 
