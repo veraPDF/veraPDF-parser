@@ -18,5 +18,5 @@ public abstract class PDColorSpace extends PDResource {
 
     public abstract int getNumberOfComponents();
 
-    public abstract ASAtom getName();
+    public abstract ASAtom getType();
 }

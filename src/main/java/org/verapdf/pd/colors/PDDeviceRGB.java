@@ -18,7 +18,7 @@ public class PDDeviceRGB extends PDColorSpace {
     }
 
     @Override
-    public ASAtom getName() {
+    public ASAtom getType() {
         return ASAtom.DEVICERGB;
     }
 }

@@ -47,7 +47,7 @@ public class PDICCBased extends PDColorSpace {
 	}
 
 	@Override
-	public ASAtom getName() {
+	public ASAtom getType() {
 		return ASAtom.ICCBASED;
 	}
 

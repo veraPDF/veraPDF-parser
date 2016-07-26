@@ -21,7 +21,7 @@ public class PDCalRGB extends PDCIEDictionaryBased {
     }
 
     @Override
-    public ASAtom getName() {
+    public ASAtom getType() {
         return ASAtom.CALRGB;
     }
 

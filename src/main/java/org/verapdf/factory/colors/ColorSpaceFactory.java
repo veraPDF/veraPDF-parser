@@ -2,9 +2,15 @@ package org.verapdf.factory.colors;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
+import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.pd.colors.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Maksim Bezrukov
@@ -59,10 +65,41 @@ public class ColorSpaceFactory {
             return new PDLab(base.at(1));
         } else if (ASAtom.ICCBASED.equals(name)) {
             return new PDICCBased(base.at(1));
+        } else if (ASAtom.SEPARATION.equals(name)) {
+            return new PDSeparation(base.at(1).getName(), ColorSpaceFactory.getColorSpace(base.at(2)), base.at(3));
+        } else if (ASAtom.DEVICEN.equals(name)) {
+            return new PDDeviceN(getListOfNames(base.at(1)), ColorSpaceFactory.getColorSpace(base.at(2)),
+                    base.at(3), base.at(4));
+        } else if (ASAtom.INDEXED.equals(name)) {
+            return new PDIndexed(ColorSpaceFactory.getColorSpace(base.at(1)), base.at(2).getInteger(), getLookup(base.at(3)));
         } else {
             LOGGER.debug("Unknown ColorSpace name");
             return null;
         }
+    }
+
+    private static ASInputStream getLookup(COSObject object) {
+        COSObjType type = object.getType();
+        if (type == COSObjType.COS_STRING) {
+            return new ASMemoryInStream(object.getString().getBytes());
+        } else if (type == COSObjType.COS_STREAM) {
+            return object.getData(COSStream.FilterFlags.DECODE);
+        } else {
+            if (!object.empty()) {
+                LOGGER.debug("Unknown lookup type");
+            }
+            return null;
+        }
+    }
+
+    private static List<ASAtom> getListOfNames(COSObject object) {
+        if (object.getType() == COSObjType.COS_ARRAY) {
+            List<ASAtom> names = new ArrayList<>();
+            for (int i = 0; i < object.size(); ++i) {
+                names.add(object.at(i).getName());
+            }
+        }
+        return null;
     }
 
 }

@@ -21,7 +21,7 @@ public class PDLab extends PDCIEDictionaryBased {
     }
 
     @Override
-    public ASAtom getName() {
+    public ASAtom getType() {
         return ASAtom.LAB;
     }
 

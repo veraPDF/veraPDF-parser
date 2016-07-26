@@ -18,7 +18,7 @@ public class PDDeviceCMYK extends PDColorSpace {
     }
 
     @Override
-    public ASAtom getName() {
+    public ASAtom getType() {
         return ASAtom.DEVICECMYK;
     }
 }
