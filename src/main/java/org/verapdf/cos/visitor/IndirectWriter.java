@@ -3,6 +3,7 @@ package org.verapdf.cos.visitor;
 import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSKey;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,9 +14,9 @@ public class IndirectWriter extends Writer {
 
 	private Map<COSKey, COSKey> renum;
 
-	public IndirectWriter(COSDocument document, String filename, boolean append) throws Exception {
+	public IndirectWriter(COSDocument document, String filename, boolean append) throws IOException {
 		super(document, filename, append);
-		this.renum = new HashMap<COSKey, COSKey>();
+		this.renum = new HashMap<>();
 		renum.put(new COSKey(0, 65535), new COSKey(0, 65535));
 	}
 
