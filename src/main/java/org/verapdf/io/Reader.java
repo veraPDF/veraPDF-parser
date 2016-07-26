@@ -22,14 +22,14 @@ public class Reader extends XRefReader {
 	private COSHeader header;
 	private Map<Long, DecodedObjectStreamParser> objectStreams;
 
-	public Reader(final COSDocument document, final String fileName) throws Exception {
+	public Reader(final COSDocument document, final String fileName) throws IOException {
 		super();
 		this.parser = new PDFParser(document, fileName);
 		this.objectStreams = new HashMap<>();
 		init();
 	}
 
-	public Reader(final COSDocument document, final InputStream fileStream) throws Exception {
+	public Reader(final COSDocument document, final InputStream fileStream) throws IOException {
 		super();
 		this.parser = new PDFParser(document, fileStream);
 		this.objectStreams = new HashMap<>();
@@ -72,7 +72,7 @@ public class Reader extends XRefReader {
 
 
 	// PRIVATE METHODS
-	private void init() throws Exception {
+	private void init() throws IOException {
 		this.header = this.parser.getHeader();
 
 		List<COSXRefInfo> infos = new ArrayList<COSXRefInfo>();

@@ -12,7 +12,7 @@ public class COSXRefInfo {
 	private COSXRefSection xref;
 	private COSTrailer trailer;
 
-	public COSXRefInfo() throws Exception {
+	public COSXRefInfo() {
 		this.startXRef = 0;
 		this.xref = new COSXRefSection();
 		this.trailer = new COSTrailer();

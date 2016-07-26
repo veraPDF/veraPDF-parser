@@ -29,19 +29,19 @@ public class PDFParser extends COSParser {
     private static final byte XREF_SEARCH_INC = 32;
     private static final byte XREF_SEARCH_STEP_MAX = 32;
 
-    public PDFParser(final String filename) throws Exception {
+    public PDFParser(final String filename) throws IOException {
         super(filename);
     }
 
-    public PDFParser(final InputStream fileStream) throws Exception {
+    public PDFParser(final InputStream fileStream) throws IOException {
         super(fileStream);
     }
 
-    public PDFParser(final COSDocument document, final String filename) throws Exception { //tmp ??
+    public PDFParser(final COSDocument document, final String filename) throws IOException { //tmp ??
         super(document, filename);
     }
 
-    public PDFParser(final COSDocument document, final InputStream fileStream) throws Exception { //tmp ??
+    public PDFParser(final COSDocument document, final InputStream fileStream) throws IOException { //tmp ??
         super(document, fileStream);
     }
 
@@ -146,7 +146,7 @@ public class PDFParser extends COSParser {
         }
     }
 
-    public void getXRefInfo(List<COSXRefInfo> infos) throws Exception {
+    public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         this.getXRefInfo(infos, 0);
     }
 
@@ -287,7 +287,7 @@ public class PDFParser extends COSParser {
         return postEOFDataSize;
     }
 
-    private void getXRefSectionAndTrailer(final COSXRefInfo section) throws Exception {
+    private void getXRefSectionAndTrailer(final COSXRefInfo section) throws IOException {
         nextToken();
         if ((getToken().type != Token.Type.TT_KEYWORD ||
                 getToken().keyword != Token.Keyword.KW_XREF) &&
@@ -368,7 +368,7 @@ public class PDFParser extends COSParser {
         xrefStreamParser.parseStreamAndTrailer();
     }
 
-	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws Exception {
+	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws IOException {
 		if (offset == 0) {
 			offset = findLastXRef();
 			if (offset == 0) {
@@ -394,7 +394,7 @@ public class PDFParser extends COSParser {
 		getXRefInfo(info, offset);
 	}
 
-	private void getTrailer(final COSTrailer trailer) throws Exception {
+	private void getTrailer(final COSTrailer trailer) throws IOException {
 		if (findKeyword(Token.Keyword.KW_TRAILER)) {
 			COSObject obj = nextObject();
 			trailer.setObject(obj);
@@ -402,12 +402,12 @@ public class PDFParser extends COSParser {
 
 		if (trailer.knownKey(ASAtom.ENCRYPT)) {
 			closeInputStream();
-			throw new Exception("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+			throw new IOException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 		}
 
         if (trailer.knownKey(ASAtom.XREF_STM)) {
             closeInputStream();
-            throw new Exception("PDFParser::GetTrailer(...)" + StringExceptions.XREF_STM_NOT_SUPPORTED);
+            throw new IOException("PDFParser::GetTrailer(...)" + StringExceptions.XREF_STM_NOT_SUPPORTED);
         }
 	}
 
