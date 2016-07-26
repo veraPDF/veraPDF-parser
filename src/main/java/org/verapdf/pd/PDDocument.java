@@ -8,6 +8,8 @@ import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Timur Kamalov
@@ -96,6 +98,15 @@ public class PDDocument {
 
 	public int getNumberOfPages() throws Exception {
 		return this.getCatalog().getPageTree().getPageCount();
+	}
+
+	public List<PDPage> getPages() throws Exception {
+		final List<PDPage> pages = new ArrayList<>();
+		final int pageCount = this.getCatalog().getPageTree().getPageCount();
+		for (int i = 0; i < pageCount; i++) {
+			pages.add(this.getPage(i));
+		}
+		return pages;
 	}
 
 	public PDPage getPage(final int number) throws Exception {
