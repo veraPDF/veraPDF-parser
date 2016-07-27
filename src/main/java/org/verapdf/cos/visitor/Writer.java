@@ -40,11 +40,11 @@ public class Writer implements IVisitor {
 
 	public static final String EOL = "\r\n";
 
-	public Writer(final COSDocument document, final String filename) throws Exception {
+	public Writer(final COSDocument document, final String filename) throws IOException {
 		this(document, filename, true);
 	}
 
-	public Writer(final COSDocument document, final String filename, final boolean append) throws Exception {
+	public Writer(final COSDocument document, final String filename, final boolean append) throws IOException {
 		this.document = document;
 		this.os = new InternalOutputStream(filename);
 		this.info = new COSXRefInfo();

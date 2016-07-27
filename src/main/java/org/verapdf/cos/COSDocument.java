@@ -41,13 +41,13 @@ public class COSDocument {
 		this.subsectionHeaderSpaceSeparated = true;
 	}
 
-	public COSDocument(final String fileName, final PDDocument document) throws Exception {
+	public COSDocument(final String fileName, final PDDocument document) throws IOException {
 		initReader(fileName);
 
 		initCOSDocument(document);
 	}
 
-	public COSDocument(final InputStream fileStream, final PDDocument document) throws Exception {
+	public COSDocument(final InputStream fileStream, final PDDocument document) throws IOException {
 		initReader(fileStream);
 
 		initCOSDocument(document);
@@ -66,11 +66,11 @@ public class COSDocument {
 		this.subsectionHeaderSpaceSeparated = true;
 	}
 
-	private void initReader(final InputStream fileStream) throws Exception {
+	private void initReader(final InputStream fileStream) throws IOException {
 		this.reader = new Reader(this, fileStream);
 	}
 
-	private void initReader(final String fileName) throws Exception {
+	private void initReader(final String fileName) throws IOException {
 		this.reader = new Reader(this, fileName);
 	}
 

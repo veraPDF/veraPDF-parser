@@ -7,6 +7,7 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,35 +22,35 @@ public class PDDocument {
 	private PDCatalog catalog;
 	private COSDocument document;
 
-	public PDDocument() throws Exception {
+	public PDDocument() throws IOException {
 		this.catalog = new PDCatalog();
 		this.constructDocument();
 	}
 
-	public PDDocument(final String filename) throws Exception {
+	public PDDocument(final String filename) throws IOException {
 		this.catalog = new PDCatalog();
 		this.document = new COSDocument(filename, this);
 	}
 
-	public PDDocument(final InputStream fileStream) throws Exception {
+	public PDDocument(final InputStream fileStream) throws IOException {
 		this.catalog = new PDCatalog();
 		this.document = new COSDocument(fileStream, this);
 	}
 
-	private void constructDocument() throws Exception {
+	private void constructDocument() throws IOException {
 		document = new COSDocument(this);
 		document.setHeader(PDF_HEADER_DEFAULT);
 		//initialize catalog
 		this.getCatalog();
 	}
 
-	public void open(final String filename) throws Exception {
+	public void open(final String filename) throws IOException {
 		this.close();
 
 		document = new COSDocument(filename, this);
 	}
 
-	public void open(final InputStream inputStream) throws Exception {
+	public void open(final InputStream inputStream) throws IOException {
 		this.close();
 
 		document = new COSDocument(inputStream, this);
@@ -62,7 +63,7 @@ public class PDDocument {
 		//this.info.clear;
 	}
 
-	public PDCatalog getCatalog() throws Exception {
+	public PDCatalog getCatalog() throws IOException {
 		if (!catalog.empty() || document == null) {
 			return catalog;
 		}
@@ -96,11 +97,11 @@ public class PDDocument {
 		return document;
 	}
 
-	public int getNumberOfPages() throws Exception {
+	public int getNumberOfPages() throws IOException {
 		return this.getCatalog().getPageTree().getPageCount();
 	}
 
-	public List<PDPage> getPages() throws Exception {
+	public List<PDPage> getPages() throws IOException {
 		final List<PDPage> pages = new ArrayList<>();
 		final int pageCount = this.getCatalog().getPageTree().getPageCount();
 		for (int i = 0; i < pageCount; i++) {
@@ -109,11 +110,11 @@ public class PDDocument {
 		return pages;
 	}
 
-	public PDPage getPage(final int number) throws Exception {
+	public PDPage getPage(final int number) throws IOException {
 		return this.getCatalog().getPageTree().getPage(number);
 	}
 
-	public void addPage(final PDPage page, final int number) throws Exception {
+	public void addPage(final PDPage page, final int number) throws IOException {
 		if (document == null) {
 			return;
 		}
@@ -128,7 +129,7 @@ public class PDDocument {
 		document.setObject(obj);
 	}
 
-	public PDPage newPage(final double[] bbox, final int insertAt) throws Exception {
+	public PDPage newPage(final double[] bbox, final int insertAt) throws IOException {
 		final PDPage page = new PDPage(bbox, document);
 		this.addPage(page, insertAt);
 		return page;
@@ -138,7 +139,7 @@ public class PDDocument {
 		//TODO : implement me
 	}
 
-	public void saveAs(final String fileName) throws Exception {
+	public void saveAs(final String fileName) throws IOException {
 		final Writer out = new IndirectWriter(this.document, fileName, false);
 		this.saveAs(out, fileName);
 	}

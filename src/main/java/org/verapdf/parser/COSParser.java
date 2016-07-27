@@ -24,7 +24,7 @@ public class COSParser extends BaseParser {
 
 	protected boolean flag = true;
 
-	public COSParser(final String filename) throws Exception {
+	public COSParser(final String filename) throws IOException {
 		super(filename);
 	}
 
@@ -36,12 +36,12 @@ public class COSParser extends BaseParser {
 		super(asInputStream);
 	}
 
-	public COSParser(final COSDocument document, final String filename) throws Exception { //tmp ??
+	public COSParser(final COSDocument document, final String filename) throws IOException { //tmp ??
 		this(filename);
 		this.document = document;
 	}
 
-	public COSParser(final COSDocument document, final InputStream fileStream) throws Exception { //tmp ??
+	public COSParser(final COSDocument document, final InputStream fileStream) throws IOException { //tmp ??
 		this(fileStream);
 		this.document = document;
 	}
