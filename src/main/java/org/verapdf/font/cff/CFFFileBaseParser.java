@@ -134,6 +134,19 @@ public class CFFFileBaseParser {
         }
     }
 
+    protected String getStringBySID(int sid) throws IOException {
+        try {
+            if (sid < CFFStandardStrings.N_STD_STRINGS) {
+                return CFFStandardStrings.STANDARD_STRINGS[sid];
+            } else {
+                return new String(this.definedNames.get(sid -
+                        CFFStandardStrings.N_STD_STRINGS));
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new IOException("Can't get string with given SID", e);
+        }
+    }
+
     /**
      * Instance of this class can represent int or double.
      */

@@ -400,4 +400,6 @@ public class CFFStandardStrings {
             "Roman",
             "Semibold",
     };
+
+    public static final int N_STD_STRINGS = STANDARD_STRINGS.length;
 }

@@ -30,43 +30,47 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
     }
 
     protected void parseTopDict() throws IOException {
-        int next = this.source.peek() & 0xFF;
-        if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
-            this.stack.add(readNumber());
-        } else {
-            this.source.read();
-            if (next > -1 && next < 22) {
-                switch (next) {
-                    case 15:    // charset
-                        this.charSetOffset = this.stack.get(0).getInteger();
-                        this.stack.clear();
-                        break;
-                    case 17:    // CharStrings
-                        this.charStringsOffset = this.stack.get(0).getInteger();
-                        this.stack.clear();
-                        break;
-                    case 18:    // Private
-                        this.privateDictSize = this.stack.get(0).getInteger();
-                        this.privateDictOffset = this.stack.get(1).getInteger();
-                        this.stack.clear();
-                        break;
-                    case 12:
-                        next = this.source.read() & 0xFF;
-                        switch (next) {
-                            case 7:     // FontMatrix
-                                for (int i = 0; i < 6; ++i) {
-                                    fontMatrix[i] = this.stack.get(i).getReal();
-                                }
-                                this.stack.clear();
-                                break;
-                            default:
-                                parseTopDictTwoByteOps(next, this.stack);
-                        }
-                        break;
-                    default:
-                        parseTopDictOneByteOps(next, this.stack);
+        try {
+            int next = this.source.peek() & 0xFF;
+            if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
+                this.stack.add(readNumber());
+            } else {
+                this.source.read();
+                if (next > -1 && next < 22) {
+                    switch (next) {
+                        case 15:    // charset
+                            this.charSetOffset = this.stack.get(0).getInteger();
+                            this.stack.clear();
+                            break;
+                        case 17:    // CharStrings
+                            this.charStringsOffset = this.stack.get(0).getInteger();
+                            this.stack.clear();
+                            break;
+                        case 18:    // Private
+                            this.privateDictSize = this.stack.get(0).getInteger();
+                            this.privateDictOffset = this.stack.get(1).getInteger();
+                            this.stack.clear();
+                            break;
+                        case 12:
+                            next = this.source.read() & 0xFF;
+                            switch (next) {
+                                case 7:     // FontMatrix
+                                    for (int i = 0; i < 6; ++i) {
+                                        fontMatrix[i] = this.stack.get(i).getReal();
+                                    }
+                                    this.stack.clear();
+                                    break;
+                                default:
+                                    parseTopDictTwoByteOps(next, this.stack);
+                            }
+                            break;
+                        default:
+                            parseTopDictOneByteOps(next, this.stack);
+                    }
                 }
             }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new IOException("Error with stack in processing Top DICT in CFF file", e);
         }
     }
 

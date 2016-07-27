@@ -41,24 +41,43 @@ public class CFFType1SubfontParser extends CFFInnerFontParser {
 
         } else {
             int format = this.readCard8() & 0xFF;
+            int amount;
             switch (format) {
                 case 0:
-                    byte amount = this.readCard8();
+                case 128:
+                    amount = this.readCard8() & 0xFF;
                     for(int i = 0; i < amount; ++i) {
                         this.encoding[i] = this.readCard8();
                     }
+                    if(format == 0) {
+                        break;
+                    }
+                    // TODO: supplement
                     break;
                 case 1:
-
-                    break;
-                case 128:
-                    // like 0 with Supplements
-                    break;
                 case 129:
-                    // like 1 with Supplements
+                    amount = this.readCard8() & 0xFF;
+                    int encodingPointer = 0;
+                    for(int i = 0; i < amount; ++i) {
+                        int first = this.readCard8() & 0xFF;
+                        int nLeft = this.readCard8() & 0xFF;
+                        for(int j = 0; j <= nLeft; ++j) {
+                            encoding[encodingPointer++] = (byte) (first + j);
+                        }
+                    }
+                    if(format == 1) {
+                        break;
+                    }
+                    // TODO: supplement
                     break;
             }
         }
     }
 
+
+    public static void main(String[] args) {    //TODO:remove
+        byte b = (byte) 250;
+        int i = b;
+        System.out.println(b); //TODO: remove
+    }
 }
