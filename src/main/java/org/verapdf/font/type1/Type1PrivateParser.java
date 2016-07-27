@@ -111,7 +111,7 @@ class Type1PrivateParser extends BaseParser {
     }
 
     private int applyFontMatrix(int width) {
-        return (int) (width * fontMatrix[0] + fontMatrix[4]) * 1000;
+        return (int) (width * fontMatrix[0]) * 1000;
     }
 
     Map<String, Integer> getGlyphWidths() {

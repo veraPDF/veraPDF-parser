@@ -24,7 +24,8 @@ public class Type1Parser extends COSParser {
     private double[] fontMatrix = DEFAULT_FONT_MATRIX;
     private String[] encoding;
     private Map<String, Integer> glyphWidths;
-    private static final byte[] CLEAR_TO_MARK_BYTES = "cleartomark".getBytes();
+    private static final byte[] CLEAR_TO_MARK_BYTES =
+            Type1StringConstants.CLEARTOMARK_STRING.getBytes();
 
     /**
      * {@inheritDoc}
