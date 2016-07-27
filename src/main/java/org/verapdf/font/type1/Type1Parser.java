@@ -10,7 +10,6 @@ import org.verapdf.parser.Token;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,9 +19,11 @@ import java.util.Map;
  */
 public class Type1Parser extends COSParser {
 
-    private double[] fontMatrix = {0.001, 0, 0, 0.001, 0, 0};
-    private Map<Integer, String> encoding;
-    private Map<String, Double> glyphWidths;
+    static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
+
+    private double[] fontMatrix = DEFAULT_FONT_MATRIX;
+    private String[] encoding;
+    private Map<String, Integer> glyphWidths;
     private static final byte[] CLEAR_TO_MARK_BYTES = "cleartomark".getBytes();
 
     /**
@@ -30,7 +31,7 @@ public class Type1Parser extends COSParser {
      */
     public Type1Parser(String fileName) throws IOException {
         super(fileName);
-        encoding = new HashMap<>();
+        encoding = new String[256];
     }
 
     /**
@@ -38,7 +39,7 @@ public class Type1Parser extends COSParser {
      */
     public Type1Parser(InputStream fileStream) throws IOException {
         super(fileStream);
-        encoding = new HashMap<>();
+        encoding = new String[256];
     }
 
     /**
@@ -46,7 +47,7 @@ public class Type1Parser extends COSParser {
      */
     public Type1Parser(ASInputStream asInputStream) throws IOException {
         super(asInputStream);
-        encoding = new HashMap<>();
+        encoding = new String[256];
     }
 
     /**
@@ -70,7 +71,7 @@ public class Type1Parser extends COSParser {
             case TT_NAME:
                 switch (getToken().token) {
                     //Do processing of all necessary names like /FontName, /FamilyName, etc.
-                    case "FontMatrix":
+                    case Type1StringConstants.FONT_MATRIX_STRING:
                         this.skipSpaces();
                         this.nextToken();
                         if (this.getToken().type == Token.Type.TT_OPENARRAY) {
@@ -83,22 +84,24 @@ public class Type1Parser extends COSParser {
                             }
                         }
                         break;
-                    case "Encoding":
+                    case Type1StringConstants.ENCODING_STRING:
                         do {
                             nextToken();
-                        } while (!this.getToken().token.equals("dup"));
+                        } while (!this.getToken().token.equals(
+                                Type1StringConstants.DUP_STRING));
                         this.source.unread(3);
 
                         while (true) {
                             nextToken();
-                            if (this.getToken().token.equals("readonly")) {
+                            if (this.getToken().token.equals(
+                                    Type1StringConstants.READONLY_STRING)) {
                                 break;
                             }
                             this.skipSpaces();
                             this.readNumber();
                             long key = this.getToken().integer;
                             this.nextToken();
-                            encoding.put((int) key, this.getToken().token);
+                            encoding[(int) key] = this.getToken().token;
                             this.nextToken();
                         }
                         break;
@@ -107,7 +110,7 @@ public class Type1Parser extends COSParser {
             case TT_NONE:
                 switch (getToken().token) {
                     //Do processing of keywords like eexec
-                    case "eexec":
+                    case Type1StringConstants.EEXEC_STRING:
                         this.skipSpaces();
                         long clearToMarkOffset = this.findOffsetCleartomark();
                         ASFileInStream eexecEncoded = new ASFileInStream(
@@ -138,7 +141,7 @@ public class Type1Parser extends COSParser {
         }
         long res = this.source.getOffset() - length;
         this.source.seek(startingOffset);
-        return res;
+        return res - 512;
     }
 
 }

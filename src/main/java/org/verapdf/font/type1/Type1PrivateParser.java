@@ -7,6 +7,7 @@ import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,8 +20,9 @@ import java.util.Map;
 class Type1PrivateParser extends BaseParser {
 
     private int lenIV;
-    private Map<String, Double> glyphWidths;
+    private Map<String, Integer> glyphWidths;
     private double[] fontMatrix;
+    private boolean isDefaultFontMatrix;
 
     /**
      * {@inheritDoc}
@@ -29,6 +31,8 @@ class Type1PrivateParser extends BaseParser {
         super(stream);
         glyphWidths = new HashMap<>();
         this.fontMatrix = fontMatrix;
+        isDefaultFontMatrix = Arrays.equals(this.fontMatrix,
+                Type1Parser.DEFAULT_FONT_MATRIX);
         this.lenIV = 4;
     }
 
@@ -47,7 +51,7 @@ class Type1PrivateParser extends BaseParser {
         switch (this.getToken().type) {
             case TT_NAME:
                 switch (this.getToken().token) {
-                    case "CharStrings":
+                    case Type1StringConstants.CHAR_STRINGS_STRING:
                         nextToken();
                         int amountOfGlyphs = (int) this.getToken().integer;
                         nextToken();    // reading "dict"
@@ -57,7 +61,7 @@ class Type1PrivateParser extends BaseParser {
                             decodeCharString();
                         }
                         break;
-                    case "LenIV":
+                    case Type1StringConstants.LEN_IV_STRING:
                         this.nextToken();
                         if (this.getToken().type == Token.Type.TT_INTEGER) {
                             this.lenIV = (int) this.getToken().integer;
@@ -91,7 +95,11 @@ class Type1PrivateParser extends BaseParser {
         ASInputStream decodedCharString = new EexecFilterDecode(
                 charString, true, this.getLenIV());
         CharStringParser parser = new CharStringParser(decodedCharString);
-        glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth()));
+        if(!isDefaultFontMatrix) {
+            glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth()));
+        } else {
+            glyphWidths.put(glyphName, parser.getWidth());
+        }
         this.nextToken();
     }
 
@@ -102,11 +110,11 @@ class Type1PrivateParser extends BaseParser {
         }
     }
 
-    private double applyFontMatrix(int width) {
-        return width * fontMatrix[0] + fontMatrix[4];
+    private int applyFontMatrix(int width) {
+        return (int) (width * fontMatrix[0] + fontMatrix[4]) * 1000;
     }
 
-    Map<String, Double> getGlyphWidths() {
+    Map<String, Integer> getGlyphWidths() {
         return glyphWidths;
     }
 }
