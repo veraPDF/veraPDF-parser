@@ -8,13 +8,13 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-class Index {
+class CFFIndex {
 
     private int count;
     private int[] offset;
     private byte[] data;
 
-    Index(int count, int[] offset, byte[] data) {
+    CFFIndex(int count, int[] offset, byte[] data) {
         this.count = count;
         this.offset = offset;
         this.data = data;

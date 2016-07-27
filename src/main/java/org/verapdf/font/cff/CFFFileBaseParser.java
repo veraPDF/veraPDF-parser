@@ -1,6 +1,7 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
 
@@ -11,29 +12,21 @@ import java.io.IOException;
  */
 public class CFFFileBaseParser {
 
-    private byte offSize;
-    private byte hdrSize;
-    private ASInputStream source;
-    private double[] fontMatrix = {0.001, 0, 0, 0.001, 0, 0};
+    protected byte offSize;
+    protected byte hdrSize;
+    protected InternalInputStream source;
+    protected CFFIndex definedNames;
 
-    CFFFileBaseParser(ASInputStream source) {
-        this.source = source;
+    CFFFileBaseParser(ASInputStream source) throws IOException {
+        this.source = new InternalInputStream(source);
     }
 
     protected byte readCard8() throws IOException {
-        byte[] buf = new byte[1];
-        if (source.read(buf, 1) != 1) {
-            throw new IOException("End of stream is reached");
-        }
-        return buf[0];
+        return this.source.read();
     }
 
     protected int readCard16() throws IOException {
-        byte[] buf = new byte[2];
-        if (source.read(buf, 2) != 2) {
-            throw new IOException("End of stream is reached");
-        }
-        return (buf[0] << 8) | buf[1];
+        return (this.source.read() << 8) | this.source.read();
     }
 
     protected int readOffset() throws IOException {
@@ -41,23 +34,19 @@ public class CFFFileBaseParser {
     }
 
     protected int readOffset(int offSize) throws IOException {
-        byte[] buf = new byte[offSize];
-        if (source.read(buf, offSize) != offSize) {
-            throw new IOException("End of stream is reached");
-        }
         int res = 0;
         for (int i = 0; i < offSize - 1; ++i) {
-            res |= buf[i];
+            res |= this.source.read();
             res <<= 8;
         }
-        res |= buf[offSize - 1];
+        res |= this.source.read();
         return res;
     }
 
-    protected Index readIndex() throws IOException {
+    protected CFFIndex readIndex() throws IOException {
         int count = readCard16();
         if (count == 0) {
-            return new Index(0, new int[0], new byte[0]);
+            return new CFFIndex(0, new int[0], new byte[0]);
         }
         byte offSize = readCard8();
         int[] offset = new int[count + 1];
@@ -68,7 +57,7 @@ public class CFFFileBaseParser {
         if (source.read(data, data.length) != data.length) {
             throw new IOException("End of stream is reached");
         }
-        return new Index(count, offset, data);
+        return new CFFIndex(count, offset, data);
     }
 
     protected void readHeader() throws IOException {
@@ -133,6 +122,47 @@ public class CFFFileBaseParser {
             return (readCard16() << 16) | readCard16();
         } else {    // Shouldn't be reached
             throw new IOException("Can't read integer");
+        }
+    }
+
+    protected CFFNumber readNumber() throws IOException {
+        byte first = this.source.read();
+        if(first == 0x1E) {
+            return new CFFNumber(this.readReal());
+        } else {
+            return new CFFNumber(this.readInteger(first));
+        }
+    }
+
+    /**
+     * Instance of this class can represent int or double.
+     */
+    protected class CFFNumber {
+
+        private int integer;
+        private double real;
+        boolean isInteger;
+
+        CFFNumber(int integer) {
+            this.integer = integer;
+            this.isInteger = true;
+        }
+
+        CFFNumber(double real) {
+            this.real = real;
+            this.isInteger = false;
+        }
+
+        boolean isInteger() {
+            return isInteger;
+        }
+
+        int getInteger() {
+            return integer;
+        }
+
+        double getReal() {
+            return real;
         }
     }
 }
