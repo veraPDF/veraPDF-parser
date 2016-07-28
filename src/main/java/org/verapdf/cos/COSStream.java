@@ -222,7 +222,6 @@ public class COSStream extends COSDictionary {
 	private boolean equalsStreams(ASInputStream first, ASInputStream second) throws IOException {
 		byte[] tempOne = new byte[1024];
 		byte[] tempTwo = new byte[1024];
-
 		int readFromOne;
 		int readFromTwo;
 		do {
