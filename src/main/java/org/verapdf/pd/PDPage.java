@@ -20,7 +20,10 @@ public class PDPage extends PDPageTreeNode {
     public static double PAGE_SIZE_LETTER[] = {0, 0, 612, 1008};
     public static double PAGE_SIZE_LEGAL[] = {0, 0, 612, 792};
 
+    private PDResources resources;
+
     private PDContentStream content;
+
     int pageNumber;
     int pagesTotal;
 
@@ -93,6 +96,28 @@ public class PDPage extends PDPageTreeNode {
         }
     }
 
+    public PDResources getResources() {
+        if (this.resources != null) {
+            return this.resources;
+        } else {
+            COSObject resources = getInheritableResources();
+            if (resources != null) {
+                this.resources = new PDResources(resources);
+            }
+        }
+
+        return this.resources;
+    }
+
+    public void setResources(PDResources resources) {
+        this.resources = resources;
+        if (resources != null) {
+            getObject().setKey(ASAtom.RESOURCES, resources.getObject());
+        } else {
+            getObject().removeKey(ASAtom.RESOURCES);
+        }
+    }
+
     public PDContentStream getContent() {
         return content;
     }
@@ -122,7 +147,7 @@ public class PDPage extends PDPageTreeNode {
         return pagesTotal;
     }
 
-    //TODO : impelement this
+    //TODO : implement this
     /*
     public String getLabel() {
         return this.getPDDoc().getCatalog().getPageLabels().getLabel(getPageNumber());
