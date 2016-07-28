@@ -41,4 +41,17 @@ public class PDPageTreeNode extends PDObject {
 		return parent;
 	}
 
+	protected COSObject getInheritableResources() {
+		COSObject value = getObject().getKey(ASAtom.RESOURCES);
+		if (value != null && !value.empty()) {
+			return value;
+		}
+
+		if (parent != null)	{
+			return parent.getInheritableResources();
+		}
+
+		return null;
+	}
+
 }
