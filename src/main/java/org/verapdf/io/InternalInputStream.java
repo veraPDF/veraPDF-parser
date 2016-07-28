@@ -8,7 +8,7 @@ import java.io.*;
 /**
  * @author Timur Kamalov
  */
-public class InternalInputStream implements ASInputStream {
+public class InternalInputStream extends ASInputStream {
 
 	private final static String READ_ONLY_MODE = "r";
 
@@ -66,7 +66,7 @@ public class InternalInputStream implements ASInputStream {
 		return this;
 	}
 
-	public byte read() throws IOException {
+	public byte readByte() throws IOException {
 		return this.source.readByte();
 	}
 

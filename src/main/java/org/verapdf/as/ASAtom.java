@@ -2,10 +2,16 @@ package org.verapdf.as;
 
 import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Timur Kamalov
  */
 public class ASAtom {
+
+    private static Map<String, ASAtom> predefinedPDFNames = new HashMap<>();
+    private static Map<String, ASAtom> cachedPDFNames = new HashMap<>();
 
     // A
     public static final ASAtom A = new ASAtom("A");
@@ -490,6 +496,7 @@ public class ASAtom {
     public static final ASAtom WIDTH = new ASAtom("Width");
     public static final ASAtom WIDTHS = new ASAtom("Widths");
     public static final ASAtom WIN_ANSI_ENCODING = new ASAtom("WinAnsiEncoding");
+    public static final ASAtom W_MODE = new ASAtom("WMode");
     // X
     public static final ASAtom XFA = new ASAtom("XFA");
     public static final ASAtom X_STEP = new ASAtom("XStep");
@@ -503,15 +510,37 @@ public class ASAtom {
 
     private String value;
 
-    public ASAtom() {
-        this.value = "";
+    private ASAtom(String value) {
+        this(value, true);
     }
 
-    public ASAtom(String value) {
-        this.value = value;
+    private ASAtom(String value, boolean predefinedValue) {
+        if (predefinedValue) {
+            predefinedPDFNames.put(value, this);
+        } else {
+            if (!cachedPDFNames.containsKey(value)) {
+                cachedPDFNames.put(value, this);
+            }
+        }
     }
 
-    public String get() {
+    public static ASAtom getASAtom(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        if (predefinedPDFNames.containsKey(value)) {
+            return predefinedPDFNames.get(value);
+        } else if (cachedPDFNames.containsKey(value)) {
+            return cachedPDFNames.get(value);
+        } else {
+            ASAtom result = new ASAtom(value, false);
+            cachedPDFNames.put(value, result);
+            return result;
+        }
+    }
+
+    public String getValue() {
         return value;
     }
 

@@ -28,7 +28,7 @@ public class CMapFile {
      * @return the value of the WMode entry in the parent CMap dictionary.
      */
     public int getDictWMode() {
-        return this.parentStream.getIntegerKey(new ASAtom("WMode")).intValue();
+        return this.parentStream.getIntegerKey(ASAtom.W_MODE).intValue();
     }
 
     /**

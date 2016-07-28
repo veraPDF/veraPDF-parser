@@ -5,7 +5,7 @@ import org.verapdf.cos.COSObject;
 /**
  * @author Timur Kamalov
  */
-public class PDPageContentStream extends PDContentStream {
+public class PDPageContentStream extends PDObject implements PDContentStream {
 
 	public PDPageContentStream(COSObject contents) {
 		super(contents);

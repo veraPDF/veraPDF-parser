@@ -22,7 +22,7 @@ public class COSName extends COSDirect {
 
     protected COSName(final String value) {
         super();
-        this.value = new ASAtom(value);
+        this.value = ASAtom.getASAtom(value);
     }
 
     public COSObjType getType() {
@@ -72,7 +72,7 @@ public class COSName extends COSDirect {
     }
 
     public void set(final String value) {
-        this.value = new ASAtom(value);
+        this.value = ASAtom.getASAtom(value);
     }
 
     //! String data exchange
@@ -80,7 +80,7 @@ public class COSName extends COSDirect {
 		    whenever possible. See method GetName().
 		*/
     public String getString() {
-        return this.value.get();
+        return this.value.getValue();
     }
 
     public boolean setString(final String value) {

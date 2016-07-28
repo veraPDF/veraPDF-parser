@@ -66,7 +66,7 @@ public class PDFParser extends COSParser {
         do {
             source.unread();
         } while (isNextByteEOL());
-        source.read();
+        source.readByte();
 
         final int headerStart = header.indexOf(HEADER_PATTERN);
         final long headerOffset = source.getOffset() - header.length() + headerStart;
@@ -175,7 +175,7 @@ public class PDFParser extends COSParser {
         }
         long number = token.integer;
 
-        if ((source.read() != 32) || CharTable.isSpace(source.peek())) {
+        if ((source.readByte() != 32) || CharTable.isSpace(source.peek())) {
             //check correct spacing (6.1.8 clause)
             headerFormatComplyPDFA = false;
         }
@@ -307,10 +307,10 @@ public class PDFParser extends COSParser {
     private void parseXrefTable(final COSXRefSection xrefs) throws IOException {
         //check spacings after "xref" keyword
         //pdf/a-1b specification, clause 6.1.4
-        byte space = this.source.read();
+        byte space = this.source.readByte();
         if (isCR(space)) {
             if (isLF(this.source.peek())) {
-                this.source.read();
+                this.source.readByte();
             }
             if (!isDigit()) {
                 document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
@@ -323,7 +323,7 @@ public class PDFParser extends COSParser {
 
         //check spacings between header elements
         //pdf/a-1b specification, clause 6.1.4
-        space = this.source.read();
+        space = this.source.readByte();
         if (!CharTable.isSpace(space) || !isDigit()) {
             document.setSubsectionHeaderSpaceSeparated(Boolean.FALSE);
         }

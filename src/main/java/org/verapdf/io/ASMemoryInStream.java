@@ -10,7 +10,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class ASMemoryInStream implements ASInputStream {
+public class ASMemoryInStream extends ASInputStream {
 
     private int bufferSize;
     private int currentPosition;
