@@ -2,6 +2,7 @@ package org.verapdf.pd.colors;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
+import org.verapdf.tools.TypeConverter;
 
 /**
  * @author Maksim Bezrukov
@@ -26,6 +27,6 @@ public class PDLab extends PDCIEDictionaryBased {
     }
 
     public double[] getRange() {
-        return getRealArray(getObject().getKey(ASAtom.RANGE), 4, "Range");
+        return TypeConverter.getRealArray(getObject().getKey(ASAtom.RANGE), 4, "Range");
     }
 }

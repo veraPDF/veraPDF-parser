@@ -2,6 +2,7 @@ package org.verapdf.pd.colors;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
+import org.verapdf.tools.TypeConverter;
 
 /**
  * @author Maksim Bezrukov
@@ -26,10 +27,10 @@ public class PDCalRGB extends PDCIEDictionaryBased {
     }
 
     public double[] getGamma() {
-        return getRealArray(getObject().getKey(ASAtom.GAMMA), 3, "Gamma");
+        return TypeConverter.getRealArray(getObject().getKey(ASAtom.GAMMA), 3, "Gamma");
     }
 
     public double[] getMatrix() {
-        return getRealArray(getObject().getKey(ASAtom.MATRIX), 9, "Matrix");
+        return TypeConverter.getRealArray(getObject().getKey(ASAtom.MATRIX), 9, "Matrix");
     }
 }

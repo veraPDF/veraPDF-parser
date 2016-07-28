@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.tools.TypeConverter;
 
 /**
  * @author Maksim Bezrukov
@@ -27,25 +28,7 @@ public class PDShadingPattern extends PDPattern {
     }
 
     public double[] getMatrix() {
-        COSObject bboxObject = getObject().getKey(ASAtom.MATRIX);
-        if (bboxObject != null && bboxObject.getType() == COSObjType.COS_ARRAY) {
-            int size = bboxObject.size();
-            if (size != 6) {
-                LOGGER.debug("Matrix array doesn't consist of 6 elements");
-            }
-            double[] res = new double[size];
-            for (int i = 0; i < size; ++i) {
-                COSObject number = bboxObject.at(i);
-                if (number == null || number.getReal() == null) {
-                    LOGGER.debug("Matrix array contains non number value");
-                    return null;
-                } else {
-                    res[i] = number.getReal();
-                }
-            }
-            return res;
-        }
-        return null;
+        return TypeConverter.getRealArray(getKey(ASAtom.MATRIX), 6, "Matrix");
     }
 
 //    TODO: implement me

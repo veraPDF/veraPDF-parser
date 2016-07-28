@@ -17,10 +17,10 @@ import java.util.List;
  */
 public class ColorSpaceFactory {
 
+    private static final Logger LOGGER = Logger.getLogger(ColorSpaceFactory.class);
+
     private ColorSpaceFactory() {
     }
-
-    private static final Logger LOGGER = Logger.getLogger(ColorSpaceFactory.class);
 
     public static PDColorSpace getColorSpace(COSObject base) {
         if (base == null) {
