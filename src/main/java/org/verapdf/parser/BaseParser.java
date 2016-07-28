@@ -464,7 +464,7 @@ public class BaseParser {
 		}
 	}
 
-	public void readNumber() throws IOException {
+	protected void readNumber() throws IOException {
 		initializeToken();
 		this.token.token = "";
 		this.token.type = Token.Type.TT_INTEGER;
@@ -510,4 +510,11 @@ public class BaseParser {
 		this.token.token += (char) ch;
 	}
 
+	protected byte[] getRawBytes(String string) {
+		byte[] res = new byte[string.length()];
+		for (int i = 0; i < string.length(); ++i) {
+			res[i] = (byte) string.charAt(i);
+		}
+		return res;
+	}
 }

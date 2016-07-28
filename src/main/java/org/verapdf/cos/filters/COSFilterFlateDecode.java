@@ -28,10 +28,10 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
     }
 
     /**
-     * Decodes given flate compressed buffer and reads up to size bytes of
-     * decompressed data.
+     * Decodes given flate compressed data from stream and reads up to
+     * <code>size</code> bytes of decompressed data into given array.
      *
-     * @param buffer is flate encoded data.
+     * @param buffer is array into which data will be decompressed.
      * @param size   is maximal amount of decompressed bytes.
      * @return amount of actually read bytes.
      * @throws IOException

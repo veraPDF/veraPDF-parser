@@ -45,7 +45,7 @@ public class ASMemoryInStream implements ASInputStream {
      * @param buffer     byte array containing data.
      * @param bufferSize actual length of data in buffer.
      * @param copyBuffer is true if buffer should be copied deeply. Note that if
-     *                   it is set into false, internal buffer can be changed
+     *                   it is set into false then internal buffer can be changed
      *                   from outside of this class.
      */
     public ASMemoryInStream(byte[] buffer, int bufferSize, boolean copyBuffer) {
