@@ -21,12 +21,8 @@ public class COSXRefTableReader {
 
 	public COSXRefTableReader() {
 		this.startXRef = 0;
-		this.offsets = new HashMap<COSKey, Long>();
-		try {
-			this.trailer = new COSTrailer();
-		} catch (Exception e) {
-			System.err.println();
-		}
+		this.offsets = new HashMap<>();
+		this.trailer = new COSTrailer();
 	}
 
 	public COSXRefTableReader(final List<COSXRefInfo> info) {

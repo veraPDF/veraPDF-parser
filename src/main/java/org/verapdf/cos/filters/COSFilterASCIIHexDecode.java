@@ -57,16 +57,19 @@ public class COSFilterASCIIHexDecode extends ASBufferingInFilter {
         int pointer = 0;
         byte[] twoBytes = reader.getNextBytes();
         byte res;
-        for(int i = 0; i < size; ++i) {
+        for(int i = 0; i < size - 1; ++i) {
             if(twoBytes == null) {
-                break;
+                return pointer == 0 ? -1 : pointer;
             }
-            res = (byte) (decodeLoHex(twoBytes[0]) * 16);
+            res = (byte) (decodeLoHex(twoBytes[0]) << 4);
             res += decodeLoHex(twoBytes[1]);
             buffer[pointer++] = res;
             twoBytes = reader.getNextBytes();
         }
-        return pointer;
+        res = (byte) (decodeLoHex(twoBytes[0]) << 4);
+        res += decodeLoHex(twoBytes[1]);
+        buffer[pointer++] = res;
+        return pointer == 0 ? -1 : pointer;
     }
 
     public static byte decodeLoHex(byte val) {

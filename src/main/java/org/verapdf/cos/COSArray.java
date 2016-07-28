@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author Timur Kamalov
  */
-public class COSArray extends COSDirect implements Iterable {
+public class COSArray extends COSDirect implements Iterable<COSObject> {
 
     private List<COSObject> entries;
 

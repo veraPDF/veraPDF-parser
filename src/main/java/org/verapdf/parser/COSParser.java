@@ -24,7 +24,7 @@ public class COSParser extends BaseParser {
 
 	protected boolean flag = true;
 
-	public COSParser(final String filename) throws Exception {
+	public COSParser(final String filename) throws IOException {
 		super(filename);
 	}
 
@@ -36,12 +36,12 @@ public class COSParser extends BaseParser {
 		super(asInputStream);
 	}
 
-	public COSParser(final COSDocument document, final String filename) throws Exception { //tmp ??
+	public COSParser(final COSDocument document, final String filename) throws IOException { //tmp ??
 		this(filename);
 		this.document = document;
 	}
 
-	public COSParser(final COSDocument document, final InputStream fileStream) throws Exception { //tmp ??
+	public COSParser(final COSDocument document, final InputStream fileStream) throws IOException { //tmp ??
 		this(fileStream);
 		this.document = document;
 	}
@@ -289,9 +289,9 @@ public class COSParser extends BaseParser {
 
 
 	private void checkStreamSpacings(COSObject stream) throws IOException {
-		byte whiteSpace = source.read();
+		byte whiteSpace = source.readByte();
 		if (whiteSpace == 13) {
-			whiteSpace = source.read();
+			whiteSpace = source.readByte();
 			if (whiteSpace != 10) {
 				stream.setStreamKeywordCRLFCompliant(Boolean.FALSE);
 				source.unread();
@@ -332,8 +332,8 @@ public class COSParser extends BaseParser {
 		long diff = stream.getRealStreamSize() - expectedLength;
 
 		source.unread(2);
-		int firstSymbol = source.read();
-		int secondSymbol = source.read();
+		int firstSymbol = source.readByte();
+		int secondSymbol = source.readByte();
 		if (secondSymbol == 10) {
 			if (firstSymbol == 13) {
 				eolCount = (byte) (diff == 1 ? 1 : 2);

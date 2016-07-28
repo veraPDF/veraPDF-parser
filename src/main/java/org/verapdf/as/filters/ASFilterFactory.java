@@ -29,7 +29,7 @@ public class ASFilterFactory implements IASFilterFactory{
     @Override
     public ASInFilter getInFilter(ASInputStream inputStream,
                                   COSDictionary decodeParams) throws IOException {
-        switch (filterType.get()) {
+        switch (filterType.getValue()) {
             case "ASCIIHexDecode":
                 return new COSFilterASCIIHexDecode(inputStream);
             case "FlateDecode":
@@ -37,7 +37,7 @@ public class ASFilterFactory implements IASFilterFactory{
             case "ASCII85Decode":
                 return new COSFilterASCII85Decode(inputStream);
             default:
-                throw new IOException("Filter " + filterType.get() +
+                throw new IOException("Filter " + filterType.getValue() +
                         " is not supported.");
         }
     }
@@ -50,13 +50,13 @@ public class ASFilterFactory implements IASFilterFactory{
      */
     @Override
     public ASOutFilter getOutFilter(ASOutputStream outputStream) throws IOException {
-        switch (filterType.get()) {
+        switch (filterType.getValue()) {
             case "ASCIIHexDecode":
                 return new ASBufferingOutFilter(outputStream);
             case "FlateDecode":
                 return new COSFilterFlateEncode(outputStream);
             default:
-                throw new IOException("Filter " + filterType.get() +
+                throw new IOException("Filter " + filterType.getValue() +
                         " is not supported.");
         }
     }

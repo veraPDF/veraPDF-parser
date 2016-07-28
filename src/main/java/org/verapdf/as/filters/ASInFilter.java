@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * @author Timur Kamalov
  */
-public abstract class ASInFilter implements ASInputStream {
+public abstract class ASInFilter extends ASInputStream {
 
 	private ASInputStream storedInStream;
 
@@ -21,8 +21,8 @@ public abstract class ASInFilter implements ASInputStream {
 	}
 
 	protected ASInFilter(final ASInFilter filter) {
-		if (filter.storedInStream != null) {
-			this.storedInStream = filter.storedInStream;
+		if (filter != null) {
+			this.storedInStream = filter;
 		}
 	}
 

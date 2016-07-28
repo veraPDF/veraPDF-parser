@@ -29,19 +29,19 @@ public class PDFParser extends COSParser {
     private static final byte XREF_SEARCH_INC = 32;
     private static final byte XREF_SEARCH_STEP_MAX = 32;
 
-    public PDFParser(final String filename) throws Exception {
+    public PDFParser(final String filename) throws IOException {
         super(filename);
     }
 
-    public PDFParser(final InputStream fileStream) throws Exception {
+    public PDFParser(final InputStream fileStream) throws IOException {
         super(fileStream);
     }
 
-    public PDFParser(final COSDocument document, final String filename) throws Exception { //tmp ??
+    public PDFParser(final COSDocument document, final String filename) throws IOException { //tmp ??
         super(document, filename);
     }
 
-    public PDFParser(final COSDocument document, final InputStream fileStream) throws Exception { //tmp ??
+    public PDFParser(final COSDocument document, final InputStream fileStream) throws IOException { //tmp ??
         super(document, fileStream);
     }
 
@@ -66,7 +66,7 @@ public class PDFParser extends COSParser {
         do {
             source.unread();
         } while (isNextByteEOL());
-        source.read();
+        source.readByte();
 
         final int headerStart = header.indexOf(HEADER_PATTERN);
         final long headerOffset = source.getOffset() - header.length() + headerStart;
@@ -146,7 +146,7 @@ public class PDFParser extends COSParser {
         }
     }
 
-    public void getXRefInfo(List<COSXRefInfo> infos) throws Exception {
+    public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         this.getXRefInfo(infos, 0);
     }
 
@@ -175,7 +175,7 @@ public class PDFParser extends COSParser {
         }
         long number = token.integer;
 
-        if ((source.read() != 32) || CharTable.isSpace(source.peek())) {
+        if ((source.readByte() != 32) || CharTable.isSpace(source.peek())) {
             //check correct spacing (6.1.8 clause)
             headerFormatComplyPDFA = false;
         }
@@ -287,7 +287,7 @@ public class PDFParser extends COSParser {
         return postEOFDataSize;
     }
 
-    private void getXRefSectionAndTrailer(final COSXRefInfo section) throws Exception {
+    private void getXRefSectionAndTrailer(final COSXRefInfo section) throws IOException {
         nextToken();
         if ((getToken().type != Token.Type.TT_KEYWORD ||
                 getToken().keyword != Token.Keyword.KW_XREF) &&
@@ -307,10 +307,10 @@ public class PDFParser extends COSParser {
     private void parseXrefTable(final COSXRefSection xrefs) throws IOException {
         //check spacings after "xref" keyword
         //pdf/a-1b specification, clause 6.1.4
-        byte space = this.source.read();
+        byte space = this.source.readByte();
         if (isCR(space)) {
             if (isLF(this.source.peek())) {
-                this.source.read();
+                this.source.readByte();
             }
             if (!isDigit()) {
                 document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
@@ -323,7 +323,7 @@ public class PDFParser extends COSParser {
 
         //check spacings between header elements
         //pdf/a-1b specification, clause 6.1.4
-        space = this.source.read();
+        space = this.source.readByte();
         if (!CharTable.isSpace(space) || !isDigit()) {
             document.setSubsectionHeaderSpaceSeparated(Boolean.FALSE);
         }
@@ -368,7 +368,7 @@ public class PDFParser extends COSParser {
         xrefStreamParser.parseStreamAndTrailer();
     }
 
-	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws Exception {
+	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws IOException {
 		if (offset == 0) {
 			offset = findLastXRef();
 			if (offset == 0) {
@@ -394,7 +394,7 @@ public class PDFParser extends COSParser {
 		getXRefInfo(info, offset);
 	}
 
-	private void getTrailer(final COSTrailer trailer) throws Exception {
+	private void getTrailer(final COSTrailer trailer) throws IOException {
 		if (findKeyword(Token.Keyword.KW_TRAILER)) {
 			COSObject obj = nextObject();
 			trailer.setObject(obj);
@@ -402,12 +402,12 @@ public class PDFParser extends COSParser {
 
 		if (trailer.knownKey(ASAtom.ENCRYPT)) {
 			closeInputStream();
-			throw new Exception("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+			throw new IOException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 		}
 
         if (trailer.knownKey(ASAtom.XREF_STM)) {
             closeInputStream();
-            throw new Exception("PDFParser::GetTrailer(...)" + StringExceptions.XREF_STM_NOT_SUPPORTED);
+            throw new IOException("PDFParser::GetTrailer(...)" + StringExceptions.XREF_STM_NOT_SUPPORTED);
         }
 	}
 
