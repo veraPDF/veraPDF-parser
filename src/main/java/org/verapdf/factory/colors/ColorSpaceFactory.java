@@ -111,13 +111,14 @@ public class ColorSpaceFactory {
         Long patternType = base.getIntegerKey(ASAtom.PATTERN_TYPE);
         if (patternType != null) {
             int simplePatternType = patternType.intValue();
-            if (simplePatternType == 1) {
-                return new PDTilingPattern(base);
-            } else if (simplePatternType == 2) {
-                return new PDShadingPattern(base);
-            } else {
-                LOGGER.debug("PatternType value is not correct");
-                return null;
+            switch (simplePatternType) {
+                case PDPattern.TYPE_TILING_PATTERN:
+                    return new PDTilingPattern(base);
+                case PDPattern.TYPE_SHADING_PATTERN:
+                    return new PDShadingPattern(base);
+                default:
+                    LOGGER.debug("PatternType value is not correct");
+                    return null;
             }
         } else {
             LOGGER.debug("COSObject doesn't contain PatternType key");

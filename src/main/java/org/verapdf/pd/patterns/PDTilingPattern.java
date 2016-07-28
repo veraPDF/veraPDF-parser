@@ -16,7 +16,7 @@ public class PDTilingPattern extends PDPattern implements PDContentStream {
 
     @Override
     public int getPatternType() {
-        return 1;
+        return PDPattern.TYPE_TILING_PATTERN;
     }
 
     @Override

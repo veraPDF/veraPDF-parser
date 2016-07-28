@@ -9,6 +9,9 @@ import org.verapdf.pd.colors.PDColorSpace;
  */
 public abstract class PDPattern extends PDColorSpace {
 
+    public static final int TYPE_TILING_PATTERN = 1;
+    public static final int TYPE_SHADING_PATTERN = 2;
+
     protected PDPattern(COSObject obj) {
         super(obj);
     }

@@ -16,7 +16,7 @@ public class PDShadingPattern extends PDPattern {
 
     @Override
     public int getPatternType() {
-        return 1;
+        return PDPattern.TYPE_SHADING_PATTERN;
     }
 
     public PDShading getShading() {
