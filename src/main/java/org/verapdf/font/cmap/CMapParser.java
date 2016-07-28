@@ -233,12 +233,4 @@ public class CMapParser extends BaseParser {
                     ". Expected " + type + " but got " + getToken().type);
         }
     }
-
-    private byte[] getRawBytes(String string) {
-        byte[] res = new byte[string.length()];
-        for (int i = 0; i < string.length(); ++i) {
-            res[i] = (byte) string.charAt(i);
-        }
-        return res;
-    }
 }

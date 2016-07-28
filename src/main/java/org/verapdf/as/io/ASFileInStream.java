@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
 /**
  * @author Timur Kamalov
  */
-public class ASFileInStream implements ASInputStream {
+public class ASFileInStream extends ASInputStream {
 
 	private RandomAccessFile stream;
 	private long offset;

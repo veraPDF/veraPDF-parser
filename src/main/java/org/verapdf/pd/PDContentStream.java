@@ -5,14 +5,10 @@ import org.verapdf.cos.COSObject;
 /**
  * @author Timur Kamalov
  */
-public abstract class PDContentStream extends PDObject {
+public interface PDContentStream {
 
-	protected PDContentStream(COSObject contents) {
-		super(contents);
-	}
+	COSObject getContents();
 
-	public abstract COSObject getContents();
-
-	public abstract void setContents(final COSObject contents);
+	void setContents(final COSObject contents);
 
 }

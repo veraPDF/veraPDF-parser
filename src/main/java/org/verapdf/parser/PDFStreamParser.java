@@ -99,7 +99,7 @@ public class PDFStreamParser extends COSParser {
 		switch (c) {
 			case '<': {
 				//check brackets
-				source.read();
+				source.readByte();
 				c = source.peek();
 				source.unread();
 
@@ -191,12 +191,12 @@ public class PDFStreamParser extends COSParser {
 				nextByte != '[' && nextByte != '<' &&
 				nextByte != '(' && nextByte != '/' &&
 				(nextByte < '0' || nextByte > '9'))	{
-			byte currentByte = source.read();
+			byte currentByte = source.readByte();
 			nextByte = source.peek();
 			buffer.append(currentByte);
 			// d0 and d1 operators
 			if (currentByte == 'd' && (nextByte == '0' || nextByte == '1') ) {
-				buffer.append(source.read());
+				buffer.append(source.readByte());
 				nextByte = source.peek();
 			}
 		}
