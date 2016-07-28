@@ -1,6 +1,5 @@
 package org.verapdf.pd.patterns;
 
-import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
@@ -11,10 +10,13 @@ import org.verapdf.tools.TypeConverter;
  */
 public class PDShadingPattern extends PDPattern {
 
-    private static final Logger LOGGER = Logger.getLogger(PDShadingPattern.class);
-
     public PDShadingPattern(COSObject obj) {
         super(obj);
+    }
+
+    @Override
+    public int getPatternType() {
+        return 1;
     }
 
     public PDShading getShading() {

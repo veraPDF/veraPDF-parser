@@ -8,6 +8,9 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.pd.colors.*;
+import org.verapdf.pd.patterns.PDPattern;
+import org.verapdf.pd.patterns.PDShadingPattern;
+import org.verapdf.pd.patterns.PDTilingPattern;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +34,8 @@ public class ColorSpaceFactory {
             return getColorSpaceFromName(base);
         } else if (type == COSObjType.COS_ARRAY) {
             return getColorSpaceFromArray(base);
+        } else if (type == COSObjType.COS_DICT || type == COSObjType.COS_STREAM) {
+            return getPattern(base);
         } else {
             LOGGER.debug("COSObject has to be a name or array, but it is not");
             return null;
@@ -100,6 +105,24 @@ public class ColorSpaceFactory {
             }
         }
         return null;
+    }
+
+    private static PDPattern getPattern(COSObject base) {
+        Long patternType = base.getIntegerKey(ASAtom.PATTERN_TYPE);
+        if (patternType != null) {
+            int simplePatternType = patternType.intValue();
+            if (simplePatternType == 1) {
+                return new PDTilingPattern(base);
+            } else if (simplePatternType == 2) {
+                return new PDShadingPattern(base);
+            } else {
+                LOGGER.debug("PatternType value is not correct");
+                return null;
+            }
+        } else {
+            LOGGER.debug("COSObject doesn't contain PatternType key");
+            return null;
+        }
     }
 
 }

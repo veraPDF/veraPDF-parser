@@ -15,6 +15,11 @@ public class PDTilingPattern extends PDPattern implements PDContentStream {
     }
 
     @Override
+    public int getPatternType() {
+        return 1;
+    }
+
+    @Override
     public COSObject getContents() {
         return super.getObject();
     }
