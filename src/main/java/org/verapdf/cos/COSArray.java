@@ -136,4 +136,14 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         return this.entries.get(i);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSArray)) return false;
+
+        COSArray that = (COSArray) o;
+
+        return entries != null ? entries.equals(that.entries) : that.entries == null;
+
+    }
 }

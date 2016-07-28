@@ -60,4 +60,14 @@ public class COSInteger extends COSNumber {
         return String.valueOf(this.value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSInteger)) return false;
+
+        COSInteger that = (COSInteger) o;
+
+        return value == that.value;
+
+    }
 }
