@@ -14,7 +14,6 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
 
     protected static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
 
-
     protected double[] fontMatrix = DEFAULT_FONT_MATRIX;
     protected int charSetOffset;
     protected int charStringsOffset;
@@ -22,11 +21,17 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
     protected int privateDictSize;
     protected int defaultWidthX;
     protected int nominalWidthX;
-    ArrayList<CFFNumber> stack;
+    protected int nGlyphs;
+    protected CFFIndex charStrings;
+    protected int charStringType;
+    protected int[] widths;
+    private ArrayList<CFFNumber> stack;
 
     protected CFFInnerFontParser(ASInputStream stream) throws IOException {
         super(stream);
         stack = new ArrayList<>(48);
+        this.charSetOffset = 0; // default
+        this.charStringType = 2;
     }
 
     protected void parseTopDict() throws IOException {
@@ -58,6 +63,10 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
                                     for (int i = 0; i < 6; ++i) {
                                         fontMatrix[i] = this.stack.get(i).getReal();
                                     }
+                                    this.stack.clear();
+                                    break;
+                                case 6:     // Charstring Type
+                                    this.charStringType = this.stack.get(0).getInteger();
                                     this.stack.clear();
                                     break;
                                 default:
@@ -122,5 +131,12 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
             }
         }
     }
+
+    protected void readCharStrings() throws IOException {
+        this.charStrings = this.readIndex();
+        this.nGlyphs = this.charStrings.size();
+        widths = new int[nGlyphs];
+    }
+
 
 }

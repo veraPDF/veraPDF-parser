@@ -1,4 +1,4 @@
-package org.verapdf.font.cff;
+package org.verapdf.font.cff.predefined;
 
 /**
  * Class contains all predefined standard strings in CFF files.

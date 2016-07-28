@@ -1,6 +1,7 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.font.cff.predefined.CFFStandardStrings;
 import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
@@ -12,8 +13,8 @@ import java.io.IOException;
  */
 public class CFFFileBaseParser {
 
-    protected byte offSize;
-    protected byte hdrSize;
+    private byte offSize;
+    private byte hdrSize;
     protected InternalInputStream source;
     protected CFFIndex definedNames;
 
@@ -65,6 +66,7 @@ public class CFFFileBaseParser {
         readCard8();
         hdrSize = readCard8();
         this.offSize = readCard8();
+        this.source.seek(hdrSize);
     }
 
     protected double readReal() throws IOException {
