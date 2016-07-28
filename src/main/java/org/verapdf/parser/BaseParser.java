@@ -48,13 +48,13 @@ public class BaseParser {
 	protected String getLine() throws IOException {
 		initializeToken();
 		this.token.token = "";
-		byte ch = this.source.read();
+		byte ch = this.source.readByte();
 		while (!this.source.isEof()) {
 			if (ch == ASCII_LF || ch == ASCII_CR) {
 				break;
 			}
 			appendToToken(ch);
-			ch = this.source.read();
+			ch = this.source.readByte();
 		}
 		return this.token.token;
 	}
@@ -63,13 +63,13 @@ public class BaseParser {
 		initializeToken();
 		this.source.seek(offset);
 		this.token.token = "";
-		byte ch = this.source.read();
+		byte ch = this.source.readByte();
 		while (!this.source.isEof()) {
 			if (ch == ASCII_LF || ch == ASCII_CR) {
 				break;
 			}
 			appendToToken(ch);
-			ch = this.source.read();
+			ch = this.source.readByte();
 		}
 		return this.token.token;
 	}
@@ -77,10 +77,10 @@ public class BaseParser {
 	protected String readUntilWhitespace() throws IOException {
 		initializeToken();
 		this.token.token = "";
-		byte ch = this.source.read();
+		byte ch = this.source.readByte();
 		while (!this.source.isEof() || !isSpace(ch)) {
 			appendToToken(ch);
-			ch = this.source.read();
+			ch = this.source.readByte();
 		}
 		this.source.unread();
 		return this.token.token;
@@ -103,7 +103,7 @@ public class BaseParser {
 
 		this.token.type = Token.Type.TT_NONE;
 
-		byte ch = this.source.read();
+		byte ch = this.source.readByte();
 
 		switch (ch) {
 			case '(':
@@ -114,7 +114,7 @@ public class BaseParser {
 				//error
 				break;
 			case '<':
-				ch = source.read();
+				ch = source.readByte();
 				if (ch == '<') {
 					this.token.type = Token.Type.TT_OPENDICT;
 				} else {
@@ -124,7 +124,7 @@ public class BaseParser {
 				}
 				break;
 			case '>':
-				ch = this.source.read();
+				ch = this.source.readByte();
 				if (ch == '>') {
 					this.token.type = Token.Type.TT_CLOSEDICT;
 				} else {
@@ -189,9 +189,9 @@ public class BaseParser {
 	}
 
 	protected void skipSingleEol() throws IOException {
-		byte c = this.source.read();
+		byte c = this.source.readByte();
 		if (isCR(c)) {
-			c = this.source.read();
+			c = this.source.readByte();
 			if (!isLF(c)) {
 				this.source.unread();
 			}
@@ -207,7 +207,7 @@ public class BaseParser {
 	protected void skipSpaces(boolean skipComment) throws IOException {
 		byte ch;
 		while (!this.source.isEof()) {
-			ch = this.source.read();
+			ch = this.source.readByte();
 			if (CharTable.isSpace(ch)) {
 				continue;
 			}
@@ -247,13 +247,13 @@ public class BaseParser {
 
 	private void skipEOL() throws IOException {
 		// skips EOL == { CR, LF, CRLF } only if it is the first symbol(s)
-		byte ch = this.source.read();
+		byte ch = this.source.readByte();
 		if (isLF(ch)) {
 			return; // EOL == LF
 		}
 
 		if (isCR(ch)) {
-			ch = this.source.read();
+			ch = this.source.readByte();
 			if (isLF(ch)) {
 				return; // EOL == CRLF
 				// else EOL == CR and ch == next character
@@ -267,13 +267,13 @@ public class BaseParser {
 		// skips all characters till EOL == { CR, LF, CRLF }
 		byte ch;
 		while (!this.source.isEof()) {
-			ch = this.source.read();
+			ch = this.source.readByte();
 			if (isLF(ch)) {
 				return; // EOL == LF
 			}
 
 			if (isCR(ch)) {
-				ch = this.source.read();
+				ch = this.source.readByte();
 				if (isLF(ch)) { // EOL == CR
 					this.source.unread();
 				} // else EOL == CRLF
@@ -288,7 +288,7 @@ public class BaseParser {
 
 		int parenthesesDepth = 0;
 
-		byte ch = this.source.read();
+		byte ch = this.source.readByte();
 		while (!this.source.isEof()) {
 			switch (ch) {
 				default:
@@ -307,7 +307,7 @@ public class BaseParser {
 					appendToToken(ch);
 					break;
 				case '\\': {
-					ch = this.source.read();
+					ch = this.source.readByte();
 					switch (ch) {
 						case '(':
 							appendToToken(CharTable.ASCII_LEFT_PAR);
@@ -341,7 +341,7 @@ public class BaseParser {
 							// look for 1, 2, or 3 octal characters
 							char ch1 = (char) (ch - '0');
 							for (int i = 1; i < 3; i++) {
-								ch = this.source.read();
+								ch = this.source.readByte();
 								if (ch < '0' || ch > '7') {
 									this.source.unread();
 									break;
@@ -355,7 +355,7 @@ public class BaseParser {
 						case ASCII_LF:
 							break;
 						case ASCII_CR:
-							ch = this.source.read();
+							ch = this.source.readByte();
 							if (ch != ASCII_LF) {
 								this.source.unread();
 							}
@@ -368,7 +368,7 @@ public class BaseParser {
 				}
 			}
 
-			ch = source.read();
+			ch = source.readByte();
 		}
 	}
 
@@ -384,7 +384,7 @@ public class BaseParser {
 
 		boolean odd = false;
 		while (!this.source.isEof()) {
-			ch = this.source.read();
+			ch = this.source.readByte();
 			if (CharTable.isSpace(ch)) {
 				continue;
 			} else if (ch == '>') {
@@ -419,7 +419,7 @@ public class BaseParser {
 		this.token.token = "";
 		byte ch;
 		while (!this.source.isEof()) {
-			ch = this.source.read();
+			ch = this.source.readByte();
 			if (CharTable.isTokenDelimiter(ch)) {
 				this.source.unread();
 				break;
@@ -428,10 +428,10 @@ public class BaseParser {
 			if (ch == '#') {
 				byte ch1, ch2;
 				int dc;
-				ch1 = this.source.read();
+				ch1 = this.source.readByte();
 				if (!source.isEof() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.er) {
 					dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
-					ch2 = this.source.read();
+					ch2 = this.source.readByte();
 					if (!this.source.isEof() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.er) {
 						dc = ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
 						appendToToken(dc);
@@ -454,7 +454,7 @@ public class BaseParser {
 		this.token.token = "";
 		byte ch;
 		while (!this.source.isEof()) {
-			ch = this.source.read();
+			ch = this.source.readByte();
 			if (CharTable.isTokenDelimiter(ch)) {
 				this.source.unread();
 				break;
@@ -470,7 +470,7 @@ public class BaseParser {
 		this.token.type = Token.Type.TT_INTEGER;
 		byte ch;
 		while (!this.source.isEof()) {
-			ch = this.source.read();
+			ch = this.source.readByte();
 			if (CharTable.isTokenDelimiter(ch)) {
 				this.source.unread();
 				break;
