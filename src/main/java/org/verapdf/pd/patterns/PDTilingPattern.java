@@ -1,14 +1,19 @@
 package org.verapdf.pd.patterns;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDContentStream;
+import org.verapdf.pd.PDResources;
 import org.verapdf.tools.TypeConverter;
 
 /**
  * @author Maksim Bezrukov
  */
 public class PDTilingPattern extends PDPattern implements PDContentStream {
+
+    private static final Logger LOGGER = Logger.getLogger(PDTilingPattern.class);
 
     public PDTilingPattern(COSObject obj) {
         super(obj);
@@ -53,8 +58,11 @@ public class PDTilingPattern extends PDPattern implements PDContentStream {
         return TypeConverter.getRealArray(getKey(ASAtom.MATRIX), 6, "Matrix");
     }
 
-//    TODO: implement me
-//    public PDResources getResources() {
-//
-//    }
+    public PDResources getResources() {
+        COSObject resources = getKey(ASAtom.RESOURCES);
+        if (resources != null && resources.getType() == COSObjType.COS_DICT) {
+            return new PDResources(resources);
+        }
+        return null;
+    }
 }
