@@ -1,6 +1,8 @@
 package org.verapdf.pd;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 
 import java.io.IOException;
@@ -9,6 +11,8 @@ import java.io.IOException;
  * @author Timur Kamalov
  */
 public class PDCatalog extends PDObject {
+
+	private static final Logger LOGGER = Logger.getLogger(PDCatalog.class);
 
 	private PDPageTree pages;
 
@@ -28,6 +32,14 @@ public class PDCatalog extends PDObject {
 			this.pages.setObject(pages);
 		}
 		return pages;
+	}
+
+	public PDMetadata getMetadata() {
+		COSObject metadata = getKey(ASAtom.METADATA);
+		if (metadata != null && metadata.getType() == COSObjType.COS_STREAM) {
+			return new PDMetadata(metadata);
+		}
+		return null;
 	}
 
 }

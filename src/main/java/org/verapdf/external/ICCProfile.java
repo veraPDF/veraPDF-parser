@@ -7,6 +7,7 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.factory.colors.ColorSpaceFactory;
+import org.verapdf.pd.PDMetadata;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.colors.PDColorSpace;
 
@@ -429,8 +430,11 @@ public class ICCProfile extends PDObject {
 		return ColorSpaceFactory.getColorSpace(getKey(ASAtom.ALTERNATE));
 	}
 
-//	TODO: implement me
-//	public PDMetadata getMetadata() {
-//
-//	}
+	public PDMetadata getMetadata() {
+		COSObject metadata = getKey(ASAtom.METADATA);
+		if (metadata != null && metadata.getType() == COSObjType.COS_STREAM) {
+			return new PDMetadata(metadata);
+		}
+		return null;
+	}
 }
