@@ -341,6 +341,7 @@ public class ASAtom {
     public static final ASAtom OP_NS = new ASAtom("op");
     public static final ASAtom OPEN_ACTION = new ASAtom("OpenAction");
     public static final ASAtom OPEN_TYPE = new ASAtom("OpenType");
+    public static final ASAtom OPI = new ASAtom("OPI");
     public static final ASAtom OPM = new ASAtom("OPM");
     public static final ASAtom OPT = new ASAtom("Opt");
     public static final ASAtom ORDER = new ASAtom("Order");
