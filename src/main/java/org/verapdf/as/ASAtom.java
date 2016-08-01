@@ -23,6 +23,7 @@ public class ASAtom {
     public static final ASAtom ADBE_X509_RSA_SHA1 = new ASAtom("adbe.x509.rsa_sha1");
     public static final ASAtom ADOBE_PPKLITE = new ASAtom("Adobe.PPKLite");
     public static final ASAtom AESV3 = new ASAtom("AESV3");
+    public static final ASAtom AF_RELATIONSHIP = new ASAtom("AFRelationship");
     public static final ASAtom AFTER = new ASAtom("After");
     public static final ASAtom AIS = new ASAtom("AIS");
     public static final ASAtom ALT = new ASAtom("Alt");
@@ -297,6 +298,7 @@ public class ASAtom {
     public static final ASAtom MAC = new ASAtom("Mac");
     public static final ASAtom MAC_ROMAN_ENCODING = new ASAtom("MacRomanEncoding");
     public static final ASAtom MARK_INFO = new ASAtom("MarkInfo");
+    public static final ASAtom MARKED = new ASAtom("Marked");
     public static final ASAtom MASK = new ASAtom("Mask");
     public static final ASAtom MATRIX = new ASAtom("Matrix");
     public static final ASAtom MAX_LEN = new ASAtom("MaxLen");
@@ -316,6 +318,7 @@ public class ASAtom {
     public static final ASAtom NAME = new ASAtom("Name");
     public static final ASAtom NAMES = new ASAtom("Names");
     public static final ASAtom NEED_APPEARANCES = new ASAtom("NeedAppearances");
+    public static final ASAtom NEEDS_RENDERING = new ASAtom("NeedsRendering");
     public static final ASAtom NEXT = new ASAtom("Next");
     public static final ASAtom NM = new ASAtom("NM");
     public static final ASAtom NON_EFONT_NO_WARN = new ASAtom("NonEFontNoWarn");
@@ -397,6 +400,7 @@ public class ASAtom {
     public static final ASAtom REGISTRY_NAME = new ASAtom("RegistryName");
     public static final ASAtom RENAME = new ASAtom("Rename");
     public static final ASAtom RESOURCES = new ASAtom("Resources");
+    public static final ASAtom REQUIREMENTS = new ASAtom("Requirements");
     public static final ASAtom RGB = new ASAtom("RGB");
     public static final ASAtom RI = new ASAtom("RI");
     public static final ASAtom ROLE_MAP = new ASAtom("RoleMap");
