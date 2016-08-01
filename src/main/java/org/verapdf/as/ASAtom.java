@@ -29,6 +29,7 @@ public class ASAtom {
     public static final ASAtom ALT = new ASAtom("Alt");
     public static final ASAtom ALPHA = new ASAtom("Alpha");
     public static final ASAtom ALTERNATE = new ASAtom("Alternate");
+    public static final ASAtom ALTERNATES = new ASAtom("Alternates");
     public static final ASAtom ANNOT = new ASAtom("Annot");
     public static final ASAtom ANNOTS = new ASAtom("Annots");
     public static final ASAtom ANTI_ALIAS = new ASAtom("AntiAlias");
@@ -255,6 +256,7 @@ public class ASAtom {
     public static final ASAtom INDEXED = new ASAtom("Indexed");
     public static final ASAtom INFO = new ASAtom("Info");
     public static final ASAtom INKLIST = new ASAtom("InkList");
+    public static final ASAtom INTENT = new ASAtom("Intent");
     public static final ASAtom INTERPOLATE = new ASAtom("Interpolate");
     public static final ASAtom IT = new ASAtom("IT");
     public static final ASAtom ITALIC_ANGLE = new ASAtom("ItalicAngle");
