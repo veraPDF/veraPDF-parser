@@ -235,4 +235,14 @@ public class COSDictionary extends COSDirect {
         return this.entries.values();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSDictionary)) return false;
+
+        COSDictionary that = (COSDictionary) o;
+
+        return entries != null ? entries.equals(that.entries) : that.entries == null;
+
+    }
 }

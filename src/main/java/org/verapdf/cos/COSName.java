@@ -92,4 +92,14 @@ public class COSName extends COSDirect {
         return value.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSName)) return false;
+
+        COSName cosName = (COSName) o;
+
+        return value != null ? value.equals(cosName.value) : cosName.value == null;
+
+    }
 }

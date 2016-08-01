@@ -54,4 +54,14 @@ public class COSBoolean extends COSDirect {
         this.value = value;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSBoolean)) return false;
+
+        COSBoolean that = (COSBoolean) o;
+
+        return value == that.value;
+
+    }
 }

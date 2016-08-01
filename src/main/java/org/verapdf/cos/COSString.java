@@ -182,4 +182,26 @@ public class COSString extends COSDirect {
         this.hexCount = hexCount;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSString)) return false;
+
+        COSString cosString = (COSString) o;
+
+        if (isHex != cosString.isHex) return false;
+        if (containsOnlyHex != cosString.containsOnlyHex) return false;
+        if (hexCount != cosString.hexCount) return false;
+        return value != null ? value.equals(cosString.value) : cosString.value == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = value != null ? value.hashCode() : 0;
+        result = 31 * result + (isHex ? 1 : 0);
+        result = 31 * result + (containsOnlyHex ? 1 : 0);
+        result = 31 * result + (int) (hexCount ^ (hexCount >>> 32));
+        return result;
+    }
 }
