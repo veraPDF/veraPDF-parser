@@ -1,7 +1,11 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.font.GeneralNumber;
 import org.verapdf.font.cff.predefined.*;
+import org.verapdf.font.type1.Type1CharStringParser;
+import org.verapdf.io.ASMemoryInStream;
+import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,18 +18,25 @@ import java.util.ArrayList;
  */
 public class CFFType1SubfontParser extends CFFInnerFontParser {
 
-    private int encodingOffset;
+    private long encodingOffset;
     private int[] encoding;     // array with mapping code -> gid
     private String[] charSet;   // array with mappings gid -> glyphName
 
-    public CFFType1SubfontParser(ASInputStream stream) throws IOException {
+    public CFFType1SubfontParser(InternalInputStream stream, CFFIndex definedNames,
+                                 long topDictBeginOffset, long topDictEndOffset)
+            throws IOException {
         super(stream);
         encodingOffset = 0; // default
         encoding = new int[256];
+        this.definedNames = definedNames;
+        this.source.seek(topDictBeginOffset);
+        while (this.source.getOffset() < topDictEndOffset) {
+            readTopDictUnit();
+        }
     }
 
     @Override
-    protected void parseTopDictOneByteOps(int lastRead, ArrayList<CFFNumber> stack) {
+    protected void readTopDictOneByteOps(int lastRead, ArrayList<GeneralNumber> stack) {
         switch (lastRead) {
             case 16:    // encoding
                 this.encodingOffset = stack.get(0).getInteger();
@@ -36,8 +47,27 @@ public class CFFType1SubfontParser extends CFFInnerFontParser {
         }
     }
 
+    @Override
+    public void parseFont() throws IOException {
+        this.source.seek(this.privateDictOffset);
+        while (this.source.getOffset() < this.privateDictOffset + this.privateDictSize) {
+            this.readPrivateDictUnit();
+        }
+
+        this.source.seek(charStringsOffset);
+        this.readCharStrings();
+
+        this.source.seek(encodingOffset);
+        this.readEncoding();
+
+        this.source.seek(charSetOffset);
+        this.readCharSet();
+
+        this.readWidths();
+    }
+
     protected void readEncoding() throws IOException {  // TODO: when we will have array of read fonts probably add logic of checking previously processed encodings and reducing
-        if (encodingOffset == 0) {                       // problem to copying arrays.
+        if (encodingOffset == 0) {                      // problem to copying arrays.
             this.encoding = CFFStandardEncoding.STANDARD_ENCODING;  // TODO: do we need to do deep copy?
         } else if (encodingOffset == 1) {
             this.encoding = CFFExpertEncoding.EXPERT_ENCODING;
@@ -72,6 +102,8 @@ public class CFFType1SubfontParser extends CFFInnerFontParser {
                     }
                     this.readSupplements();
                     break;
+                default:
+                    break;
             }
         }
     }
@@ -88,54 +120,72 @@ public class CFFType1SubfontParser extends CFFInnerFontParser {
     private void readCharSet() throws IOException {
         this.charSet = new String[this.nGlyphs];
         this.charSet[0] = this.getStringBySID(0);
-        switch (this.charSetOffset) {
-            case 0:
-                this.charSet = CFFISOAdobeCharset.ISO_ADOBE;    // TODO: do we need to do deep copy?
-                break;
-            case 1:
-                this.charSet = CFFExpertCharset.EXPERT;
-                break;
-            case 2:
-                this.charSet = CFFExpertSubsetCharset.EXPERT_SUBSET;
-                break;
-            default:    // user-defined charset
-                byte format = this.readCard8();
-                switch (format) {
-                    case 0:
-                        for (int i = 1; i < nGlyphs; ++i) {
-                            this.charSet[i] = this.getStringBySID(this.readCard16());
-                        }
-                        break;
-                    case 1:
-                    case 2:
-                        try {
-                            int charSetPointer = 0;
-                            while (charSetPointer < nGlyphs) {
-                                int first = this.readCard16();
-                                int nLeft;
-                                if (format == 1) {
-                                    nLeft = this.readCard8() & 0xFF;
-                                } else {
-                                    nLeft = this.readCard16();
-                                }
-                                for (int i = 0; i <= nLeft; ++i) {
-                                    this.charSet[charSetPointer++] =
-                                            this.getStringBySID(first + i);
-                                }
+        if (this.charSetOffset == 0) {
+            this.charSet = CFFISOAdobeCharset.ISO_ADOBE;    // TODO: do we need to do deep copy?
+        } else if (this.charSetOffset == 1) {
+            this.charSet = CFFExpertCharset.EXPERT;
+        } else if (this.charSetOffset == 2) {
+            this.charSet = CFFExpertSubsetCharset.EXPERT_SUBSET;
+        } else {
+            byte format = this.readCard8();
+            switch (format) {
+                case 0:
+                    for (int i = 1; i < nGlyphs; ++i) {
+                        this.charSet[i] = this.getStringBySID(this.readCard16());
+                    }
+                    break;
+                case 1:
+                case 2:
+                    try {
+                        int charSetPointer = 0;
+                        while (charSetPointer < nGlyphs) {
+                            int first = this.readCard16();
+                            int nLeft;
+                            if (format == 1) {
+                                nLeft = this.readCard8() & 0xFF;
+                            } else {
+                                nLeft = this.readCard16();
                             }
-                        } catch (ArrayIndexOutOfBoundsException e) {
-                            throw new IOException("Error in parsing ranges of CharString in CFF file", e);
+                            for (int i = 0; i <= nLeft; ++i) {
+                                this.charSet[charSetPointer++] =
+                                        this.getStringBySID(first + i);
+                            }
                         }
-                        break;
-                    default:
-                        throw new IOException("Can't process format of CharSet in CFF file");
-                }
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        throw new IOException("Error in parsing ranges of CharString in CFF file", e);
+                    }
+                    break;
+                default:
+                    throw new IOException("Can't process format of CharSet in CFF file");
+            }
         }
     }
 
-    private void readWidths() {
-        for(int i = 0; i < nGlyphs; ++i) {
+    private void readWidths() throws IOException {
+        for (int i = 0; i < nGlyphs; ++i) {
+            GeneralNumber width = getWidthFromCharString(this.charStrings.get(i));
+            float res = width.isInteger() ? width.getInteger() :
+                    width.getReal();
+            if(res == -1.) {
+                res = this.defaultWidthX;
+            } else {
+                res += this.nominalWidthX;
+            }
+            this.widths[i] = res;
+        }
+    }
 
+    private GeneralNumber getWidthFromCharString(byte[] charString) throws IOException {
+        if (this.charStringType == 1) {
+            Type1CharStringParser parser = new Type1CharStringParser(
+                    new ASMemoryInStream(charString));
+            return parser.getWidth();
+        } else if (this.charStringType == 2) {
+            Type2CharStringParser parser = new Type2CharStringParser(
+                    new ASMemoryInStream(charString));
+            return parser.getWidth();
+        } else {
+            throw new IOException("Can't process CharString of type " + this.charStringType);
         }
     }
 }

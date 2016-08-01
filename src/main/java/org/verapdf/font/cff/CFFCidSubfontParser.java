@@ -7,5 +7,4 @@ package org.verapdf.font.cff;
  */
 public class CFFCidSubfontParser {
 
-
 }

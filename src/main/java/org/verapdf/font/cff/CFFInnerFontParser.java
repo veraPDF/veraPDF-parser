@@ -1,6 +1,8 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.font.GeneralNumber;
+import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,20 +14,26 @@ import java.util.ArrayList;
  */
 public abstract class CFFInnerFontParser extends CFFFileBaseParser {
 
-    protected static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
+    private static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
+    private ArrayList<GeneralNumber> stack;
 
+    //Top DICT
     protected double[] fontMatrix = DEFAULT_FONT_MATRIX;
-    protected int charSetOffset;
-    protected int charStringsOffset;
-    protected int privateDictOffset;
-    protected int privateDictSize;
+    protected long charSetOffset;
+    protected long charStringsOffset;
+    protected long privateDictOffset;
+    protected long privateDictSize;
+    protected int charStringType;
+
+    //Private DICT
     protected int defaultWidthX;
     protected int nominalWidthX;
+
+    //CharStrings
     protected int nGlyphs;
     protected CFFIndex charStrings;
-    protected int charStringType;
-    protected int[] widths;
-    private ArrayList<CFFNumber> stack;
+    protected float[] widths;
+
 
     protected CFFInnerFontParser(ASInputStream stream) throws IOException {
         super(stream);
@@ -34,13 +42,20 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
         this.charStringType = 2;
     }
 
-    protected void parseTopDict() throws IOException {
+    protected CFFInnerFontParser(InternalInputStream stream) {
+        super(stream);
+        stack = new ArrayList<>(48);
+        this.charSetOffset = 0; // default
+        this.charStringType = 2;
+    }
+
+    protected void readTopDictUnit() throws IOException {
         try {
             int next = this.source.peek() & 0xFF;
             if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
                 this.stack.add(readNumber());
             } else {
-                this.source.read();
+                this.source.readByte();
                 if (next > -1 && next < 22) {
                     switch (next) {
                         case 15:    // charset
@@ -57,7 +72,7 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
                             this.stack.clear();
                             break;
                         case 12:
-                            next = this.source.read() & 0xFF;
+                            next = this.source.readByte() & 0xFF;
                             switch (next) {
                                 case 7:     // FontMatrix
                                     for (int i = 0; i < 6; ++i) {
@@ -66,15 +81,15 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
                                     this.stack.clear();
                                     break;
                                 case 6:     // Charstring Type
-                                    this.charStringType = this.stack.get(0).getInteger();
+                                    this.charStringType = (int) this.stack.get(0).getInteger();
                                     this.stack.clear();
                                     break;
                                 default:
-                                    parseTopDictTwoByteOps(next, this.stack);
+                                    readTopDictTwoByteOps(next, this.stack);
                             }
                             break;
                         default:
-                            parseTopDictOneByteOps(next, this.stack);
+                            readTopDictOneByteOps(next, this.stack);
                     }
                 }
             }
@@ -92,7 +107,7 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
      *                 is used in switch.
      * @param stack    is ArrayList representing stack.
      */
-    protected void parseTopDictOneByteOps(int lastRead, ArrayList<CFFNumber> stack) {
+    protected void readTopDictOneByteOps(int lastRead, ArrayList<GeneralNumber> stack) {
         stack.clear();
     }
 
@@ -105,24 +120,24 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
      *                 used in switch.
      * @param stack    is ArrayList representing stack.
      */
-    protected void parseTopDictTwoByteOps(int lastRead, ArrayList<CFFNumber> stack) {
+    protected void readTopDictTwoByteOps(int lastRead, ArrayList<GeneralNumber> stack) {
         stack.clear();
     }
 
-    protected void parsePrivateDict() throws IOException {
+    protected void readPrivateDictUnit() throws IOException {
         int next = this.source.peek() & 0xFF;
         if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
             this.stack.add(readNumber());
         } else {
-            this.source.read();
+            this.source.readByte();
             if (next > -1 && next < 22) {
                 switch (next) {
                     case 20:    // defaultWidthX
-                        this.defaultWidthX = this.stack.get(0).getInteger();
+                        this.defaultWidthX = (int) this.stack.get(0).getInteger();
                         this.stack.clear();
                         break;
                     case 21:    // nominalWidthX
-                        this.nominalWidthX = this.stack.get(0).getInteger();
+                        this.nominalWidthX = (int) this.stack.get(0).getInteger();
                         this.stack.clear();
                         break;
                     default:
@@ -135,8 +150,13 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
     protected void readCharStrings() throws IOException {
         this.charStrings = this.readIndex();
         this.nGlyphs = this.charStrings.size();
-        widths = new int[nGlyphs];
+        widths = new float[nGlyphs];
     }
 
+    /**
+     * This method does parsing of subfont extracting encoding info and width
+     * info. Note that Header and Name INDEX should be read at this moment.
+     */
+    public abstract void parseFont() throws IOException;
 
 }

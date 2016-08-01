@@ -11,12 +11,14 @@ import java.util.Arrays;
 class CFFIndex {
 
     private int count;
-    private int[] offset;
+    private int offsetShift;
+    private int[] offsets;
     private byte[] data;
 
-    CFFIndex(int count, int[] offset, byte[] data) {
+    CFFIndex(int count, int offsetShift, int[] offsets, byte[] data) {
         this.count = count;
-        this.offset = offset;
+        this.offsetShift = offsetShift;
+        this.offsets = offsets;
         this.data = data;
     }
 
@@ -29,7 +31,14 @@ class CFFIndex {
             throw new ArrayIndexOutOfBoundsException("Can't get object with number "
                     + n + " from INDEX with " + count + " elements.");
         }
-        return Arrays.copyOfRange(data, offset[n], offset[n + 1]);
+        return Arrays.copyOfRange(data, offsets[n] - 1, offsets[n + 1]);
     }
 
+    int getOffset(int i) {
+        return offsets[i];
+    }
+
+    int getOffsetShift() {
+        return offsetShift;
+    }
 }
