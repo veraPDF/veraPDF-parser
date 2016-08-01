@@ -1,6 +1,5 @@
 package org.verapdf.pd.patterns;
 
-import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
@@ -12,8 +11,6 @@ import org.verapdf.tools.TypeConverter;
  * @author Maksim Bezrukov
  */
 public class PDTilingPattern extends PDPattern implements PDContentStream {
-
-    private static final Logger LOGGER = Logger.getLogger(PDTilingPattern.class);
 
     public PDTilingPattern(COSObject obj) {
         super(obj);
