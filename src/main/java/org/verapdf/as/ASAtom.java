@@ -399,6 +399,7 @@ public class ASAtom {
     public static final ASAtom REASONS = new ASAtom("Reasons");
     public static final ASAtom RECIPIENTS = new ASAtom("Recipients");
     public static final ASAtom RECT = new ASAtom("Rect");
+    public static final ASAtom REF = new ASAtom("Ref");
     public static final ASAtom REGISTRY = new ASAtom("Registry");
     public static final ASAtom REGISTRY_NAME = new ASAtom("RegistryName");
     public static final ASAtom RENAME = new ASAtom("Rename");
@@ -448,6 +449,7 @@ public class ASAtom {
     public static final ASAtom SUBJ = new ASAtom("Subj");
     public static final ASAtom SUBJECT = new ASAtom("Subject");
     public static final ASAtom SUBTYPE = new ASAtom("Subtype");
+    public static final ASAtom SUBTYPE_2 = new ASAtom("Subtype2");
     public static final ASAtom SUPPLEMENT = new ASAtom("Supplement");
     public static final ASAtom SV = new ASAtom("SV");
     public static final ASAtom SW = new ASAtom("SW");
