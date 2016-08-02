@@ -429,6 +429,7 @@ public class ASAtom {
     public static final ASAtom SIZE = new ASAtom("Size");
     public static final ASAtom SM = new ASAtom("SM");
     public static final ASAtom SMASK = new ASAtom("SMask");
+    public static final ASAtom SMASK_IN_DATA = new ASAtom("SMaskInData");
     public static final ASAtom SOFT_LIGHT = new ASAtom("SoftLight");
     public static final ASAtom SS = new ASAtom("SS");
     public static final ASAtom ST = new ASAtom("St");

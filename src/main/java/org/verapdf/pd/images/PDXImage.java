@@ -143,4 +143,9 @@ public class PDXImage extends PDXObject {
 		return null;
 	}
 
+	public int getSMaskInData() {
+		Long value = getObject().getIntegerKey(ASAtom.SMASK_IN_DATA);
+		return value != null ? value.intValue() : 0;
+	}
+
 }
