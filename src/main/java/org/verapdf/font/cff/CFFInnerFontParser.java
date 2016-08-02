@@ -19,7 +19,7 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
     private ArrayList<GeneralNumber> stack;
 
     //Top DICT
-    protected float[] fontMatrix;
+    protected float[] fontMatrix = new float[6];
     protected long charSetOffset;
     protected long charStringsOffset;
     protected long privateDictOffset;
@@ -159,7 +159,7 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
     }
 
     public float[] getWidths() {
-            return widths;
+        return widths;
     }
 
     /**

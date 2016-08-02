@@ -55,6 +55,9 @@ class Type2CharStringParser extends BaseCharStringParser {
                     this.setWidth(this.stack.get(0));
                 }
                 break;
+            case 28:    // actually not an operator but 2-byte number
+                this.stack.push(readNextNumber(nextByte));
+                return false;
             default:
                 break;
         }
@@ -66,7 +69,7 @@ class Type2CharStringParser extends BaseCharStringParser {
         byte[] buf = new byte[4];
         if (firstByte == 28) {
             this.stream.read(buf, 2);
-            return new GeneralNumber((char) ((buf[0] << 8) | buf[1]));
+            return new GeneralNumber((char) (((buf[0] & 0xFF) << 8) | (buf[1] & 0xFF)));
         } else {
             this.stream.read(buf, 4);
             int integer = 0;
