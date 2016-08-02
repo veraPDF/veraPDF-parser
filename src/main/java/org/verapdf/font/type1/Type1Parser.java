@@ -148,10 +148,4 @@ public class Type1Parser extends COSParser {
         this.source.seek(startingOffset);
         return res - 512;
     }
-
-    public static void main(String[] args) throws IOException {     // TODO: remove
-        Type1Parser parser = new Type1Parser("/home/shemyakovsergey/freeeuro.pfa");
-        parser.parse();
-    }
-
 }

@@ -1,6 +1,5 @@
 package org.verapdf.font.cff;
 
-import org.verapdf.as.io.ASInputStream;
 import org.verapdf.font.GeneralNumber;
 import org.verapdf.font.cff.predefined.*;
 import org.verapdf.font.type1.Type1CharStringParser;
@@ -9,6 +8,7 @@ import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Instance of this class represent a parser of Type1-like font from FontSet of
@@ -127,7 +127,7 @@ public class CFFType1SubfontParser extends CFFInnerFontParser {
         } else if (this.charSetOffset == 2) {
             this.charSet = CFFExpertSubsetCharset.EXPERT_SUBSET;
         } else {
-            byte format = this.readCard8();
+            int format = this.readCard8();
             switch (format) {
                 case 0:
                     for (int i = 1; i < nGlyphs; ++i) {
@@ -137,7 +137,7 @@ public class CFFType1SubfontParser extends CFFInnerFontParser {
                 case 1:
                 case 2:
                     try {
-                        int charSetPointer = 0;
+                        int charSetPointer = 1;
                         while (charSetPointer < nGlyphs) {
                             int first = this.readCard16();
                             int nLeft;
@@ -166,12 +166,17 @@ public class CFFType1SubfontParser extends CFFInnerFontParser {
             GeneralNumber width = getWidthFromCharString(this.charStrings.get(i));
             float res = width.isInteger() ? width.getInteger() :
                     width.getReal();
-            if(res == -1.) {
+            if (res == -1.) {
                 res = this.defaultWidthX;
             } else {
                 res += this.nominalWidthX;
             }
             this.widths[i] = res;
+        }
+        if(!Arrays.equals(this.fontMatrix, this.DEFAULT_FONT_MATRIX)) {
+            for (int i = 0; i < widths.length; ++i) {
+                widths[i] = widths[i] * fontMatrix[0] * 1000;
+            }
         }
     }
 

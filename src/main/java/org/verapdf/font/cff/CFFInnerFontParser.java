@@ -14,11 +14,12 @@ import java.util.ArrayList;
  */
 public abstract class CFFInnerFontParser extends CFFFileBaseParser {
 
-    private static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
+    protected static final float[] DEFAULT_FONT_MATRIX =
+            {(float) 0.001, 0, 0, (float) 0.001, 0, 0};
     private ArrayList<GeneralNumber> stack;
 
     //Top DICT
-    protected double[] fontMatrix = DEFAULT_FONT_MATRIX;
+    protected float[] fontMatrix;
     protected long charSetOffset;
     protected long charStringsOffset;
     protected long privateDictOffset;
@@ -40,6 +41,8 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
         stack = new ArrayList<>(48);
         this.charSetOffset = 0; // default
         this.charStringType = 2;
+        System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,
+                DEFAULT_FONT_MATRIX.length);
     }
 
     protected CFFInnerFontParser(InternalInputStream stream) {
@@ -47,6 +50,8 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
         stack = new ArrayList<>(48);
         this.charSetOffset = 0; // default
         this.charStringType = 2;
+        System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,
+                DEFAULT_FONT_MATRIX.length);
     }
 
     protected void readTopDictUnit() throws IOException {
@@ -151,6 +156,10 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
         this.charStrings = this.readIndex();
         this.nGlyphs = this.charStrings.size();
         widths = new float[nGlyphs];
+    }
+
+    public float[] getWidths() {
+            return widths;
     }
 
     /**

@@ -52,7 +52,7 @@ public abstract class BaseCharStringParser {
      */
     private GeneralNumber getNextInteger(int firstByte) throws IOException {
         byte[] buf = new byte[1];
-        if (firstByte > 31 && firstByte < 247) {    // TODO: decide what to do with 28 in Type2 and 4-byte numbers.
+        if (firstByte > 31 && firstByte < 247) {
             return new GeneralNumber(firstByte - 139);
         } else if (firstByte > 246 && firstByte < 251) {
             this.stream.read(buf, 1);

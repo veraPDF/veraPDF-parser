@@ -17,6 +17,5 @@ public class CFFParserTest {
         CFFSubfontParserStarter parser =
                 new CFFSubfontParserStarter(new InternalInputStream(cMapPath));
         parser.parse();
-        System.out.println(""); //TODO: remove
     }
 }

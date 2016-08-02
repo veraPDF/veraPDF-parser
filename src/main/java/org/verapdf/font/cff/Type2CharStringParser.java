@@ -12,14 +12,14 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class Type2CharStringParser extends BaseCharStringParser {
+class Type2CharStringParser extends BaseCharStringParser {
 
     private static final int TWO_POWER_16 = 65536;
 
     /**
      * {@inheritDoc}
      */
-    public Type2CharStringParser(ASInputStream stream) throws IOException {
+    Type2CharStringParser(ASInputStream stream) throws IOException {
         super(stream);
     }
 

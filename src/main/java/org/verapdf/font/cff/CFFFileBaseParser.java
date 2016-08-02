@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public class CFFFileBaseParser {
 
-    private byte offSize;
+    private int offSize;
     protected InternalInputStream source;
     protected CFFIndex definedNames;
 
@@ -26,8 +26,8 @@ public class CFFFileBaseParser {
         this.source = source;
     }
 
-    protected byte readCard8() throws IOException {
-        return this.source.readByte();
+    protected int readCard8() throws IOException {
+        return this.source.readByte() & 0xFF;
     }
 
     protected int readCard16() throws IOException {
@@ -54,7 +54,7 @@ public class CFFFileBaseParser {
         if (count == 0) {
             return new CFFIndex(0, 0, new int[0], new byte[0]);
         }
-        byte offSize = readCard8();
+        int offSize = readCard8();
         int[] offset = new int[count + 1];
         for (int i = 0; i < count + 1; ++i) {
             offset[i] = (int) readOffset(offSize);
@@ -70,14 +70,14 @@ public class CFFFileBaseParser {
     protected void readHeader() throws IOException {
         readCard8();
         readCard8();
-        byte hdrSize = readCard8();
+        int hdrSize = readCard8();
         this.offSize = readCard8();
         this.source.seek(hdrSize);
     }
 
     private float readReal() throws IOException {
         StringBuilder builder = new StringBuilder();
-        byte buf;
+        int buf;
         parsing:
         while (true) {
             buf = readCard8();
@@ -137,7 +137,7 @@ public class CFFFileBaseParser {
 
     protected GeneralNumber readNumber() throws IOException {
         byte first = this.source.readByte();
-        if(first == 0x1E) {
+        if (first == 0x1E) {
             return new GeneralNumber(this.readReal());
         } else {
             return new GeneralNumber(this.readInteger(first));
