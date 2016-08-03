@@ -29,6 +29,7 @@ public class ASAtom {
     public static final ASAtom ALT = new ASAtom("Alt");
     public static final ASAtom ALPHA = new ASAtom("Alpha");
     public static final ASAtom ALTERNATE = new ASAtom("Alternate");
+    public static final ASAtom ALTERNATES = new ASAtom("Alternates");
     public static final ASAtom ANNOT = new ASAtom("Annot");
     public static final ASAtom ANNOTS = new ASAtom("Annots");
     public static final ASAtom ANTI_ALIAS = new ASAtom("AntiAlias");
@@ -255,6 +256,7 @@ public class ASAtom {
     public static final ASAtom INDEXED = new ASAtom("Indexed");
     public static final ASAtom INFO = new ASAtom("Info");
     public static final ASAtom INKLIST = new ASAtom("InkList");
+    public static final ASAtom INTENT = new ASAtom("Intent");
     public static final ASAtom INTERPOLATE = new ASAtom("Interpolate");
     public static final ASAtom IT = new ASAtom("IT");
     public static final ASAtom ITALIC_ANGLE = new ASAtom("ItalicAngle");
@@ -341,6 +343,7 @@ public class ASAtom {
     public static final ASAtom OP_NS = new ASAtom("op");
     public static final ASAtom OPEN_ACTION = new ASAtom("OpenAction");
     public static final ASAtom OPEN_TYPE = new ASAtom("OpenType");
+    public static final ASAtom OPI = new ASAtom("OPI");
     public static final ASAtom OPM = new ASAtom("OPM");
     public static final ASAtom OPT = new ASAtom("Opt");
     public static final ASAtom ORDER = new ASAtom("Order");
@@ -396,6 +399,7 @@ public class ASAtom {
     public static final ASAtom REASONS = new ASAtom("Reasons");
     public static final ASAtom RECIPIENTS = new ASAtom("Recipients");
     public static final ASAtom RECT = new ASAtom("Rect");
+    public static final ASAtom REF = new ASAtom("Ref");
     public static final ASAtom REGISTRY = new ASAtom("Registry");
     public static final ASAtom REGISTRY_NAME = new ASAtom("RegistryName");
     public static final ASAtom RENAME = new ASAtom("Rename");
@@ -425,6 +429,7 @@ public class ASAtom {
     public static final ASAtom SIZE = new ASAtom("Size");
     public static final ASAtom SM = new ASAtom("SM");
     public static final ASAtom SMASK = new ASAtom("SMask");
+    public static final ASAtom SMASK_IN_DATA = new ASAtom("SMaskInData");
     public static final ASAtom SOFT_LIGHT = new ASAtom("SoftLight");
     public static final ASAtom SS = new ASAtom("SS");
     public static final ASAtom ST = new ASAtom("St");
@@ -445,6 +450,7 @@ public class ASAtom {
     public static final ASAtom SUBJ = new ASAtom("Subj");
     public static final ASAtom SUBJECT = new ASAtom("Subject");
     public static final ASAtom SUBTYPE = new ASAtom("Subtype");
+    public static final ASAtom SUBTYPE_2 = new ASAtom("Subtype2");
     public static final ASAtom SUPPLEMENT = new ASAtom("Supplement");
     public static final ASAtom SV = new ASAtom("SV");
     public static final ASAtom SW = new ASAtom("SW");

@@ -1,6 +1,5 @@
 package org.verapdf.pd.colors;
 
-import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObject;
@@ -10,8 +9,6 @@ import org.verapdf.tools.TypeConverter;
  * @author Maksim Bezrukov
  */
 public abstract class PDCIEDictionaryBased extends PDColorSpace {
-
-    private static final Logger LOGGER = Logger.getLogger(PDCIEDictionaryBased.class);
 
     protected PDCIEDictionaryBased() {
         this(COSDictionary.construct());
