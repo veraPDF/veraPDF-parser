@@ -4,6 +4,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSString;
 import org.verapdf.tools.TaggedPDFHelper;
 
 import java.util.List;
@@ -33,8 +34,12 @@ public class PDStructElem extends PDObject {
 		return null;
 	}
 
-	public String getLang() {
-		return getObject().getStringKey(ASAtom.LANG);
+	public COSString getLang() {
+		COSObject object = getKey(ASAtom.LANG);
+		if (object != null && object.getType() == COSObjType.COS_STRING) {
+			return (COSString) object.get();
+		}
+		return null;
 	}
 
 	public List<PDStructElem> getChildren() {
