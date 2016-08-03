@@ -442,6 +442,7 @@ public class ASAtom {
     public static final ASAtom STEM_V = new ASAtom("StemV");
     public static final ASAtom STM_F = new ASAtom("StmF");
     public static final ASAtom STR_F = new ASAtom("StrF");
+    public static final ASAtom STRUCT_ELEM = new ASAtom("StructElem");
     public static final ASAtom STRUCT_PARENT = new ASAtom("StructParent");
     public static final ASAtom STRUCT_PARENTS = new ASAtom("StructParents");
     public static final ASAtom STRUCT_TREE_ROOT = new ASAtom("StructTreeRoot");
