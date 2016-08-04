@@ -159,4 +159,8 @@ public class PDDocument {
 		return getCatalog().getStructTreeRoot();
 	}
 
+	public PDMetadata getMetadata() throws IOException {
+		return getCatalog().getMetadata();
+	}
+
 }
