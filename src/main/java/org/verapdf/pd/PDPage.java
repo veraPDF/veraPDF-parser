@@ -172,7 +172,7 @@ public class PDPage extends PDPageTreeNode {
         return null;
     }
 
-    private COSObject getCOSPresSteps() {
+    public COSObject getCOSPresSteps() {
         COSObject pres = getKey(ASAtom.PRES_STEPS);
         return (pres == null || pres.empty() || pres.getType() == COSObjType.COS_NULL) ? null : pres;
     }
