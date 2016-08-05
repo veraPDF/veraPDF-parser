@@ -32,7 +32,11 @@ public class CFFSubfontParserStarter extends CFFFileBaseParser {
         for (int i = 0; i < name.size(); ++i) {
             fontNames.add(new String(name.get(i)));
             if (isCIDFont(top.get(i))) {
-                //TODO: CID fonts
+                CFFCidSubfontParser parser = new CFFCidSubfontParser(this.source,
+                        topOffset + top.getOffset(i) - 1 + top.getOffsetShift(),
+                        topOffset + top.getOffset(i + 1) - 1 + top.getOffsetShift());
+                parser.parseFont();
+                this.fontParsers.add(parser);
             } else {
                 CFFType1SubfontParser parser = new CFFType1SubfontParser(this.source,
                         this.definedNames,
