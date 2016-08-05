@@ -1,10 +1,8 @@
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSDocument;
-import org.verapdf.cos.COSIndirect;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
+import org.verapdf.pd.colors.PDColorSpace;
 
 /**
  * @author Timur Kamalov
@@ -128,6 +126,55 @@ public class PDPage extends PDPageTreeNode {
 
     public void setContent(PDContentStream content) {
         this.content = content;
+    }
+
+    public PDGroup getGroup() {
+        COSObject group = getKey(ASAtom.GROUP);
+        if (group != null && group.getType() == COSObjType.COS_DICT) {
+            return new PDGroup(group);
+        }
+        return null;
+    }
+
+    public PDColorSpace getGroupCS() {
+        PDGroup group = getGroup();
+        if (group != null) {
+            return group.getColorSpace();
+        }
+        return null;
+    }
+
+    public COSArray getCOSMediaBox() {
+        return getCOSBBox(ASAtom.MEDIA_BOX);
+    }
+
+    public COSArray getCOSCropBox() {
+        return getCOSBBox(ASAtom.CROP_BOX);
+    }
+
+    public COSArray getCOSBleedBox() {
+        return getCOSBBox(ASAtom.BLEED_BOX);
+    }
+
+    public COSArray getCOSTrimBox() {
+        return getCOSBBox(ASAtom.TRIM_BOX);
+    }
+
+    public COSArray getCOSArtBox() {
+        return getCOSBBox(ASAtom.ART_BOX);
+    }
+
+    private COSArray getCOSBBox(ASAtom type) {
+        COSObject object = getKey(type);
+        if (object != null && object.getType() == COSObjType.COS_ARRAY) {
+            return (COSArray) object.get();
+        }
+        return null;
+    }
+
+    private COSObject getCOSPresSteps() {
+        COSObject pres = getKey(ASAtom.PRES_STEPS);
+        return (pres == null || pres.empty() || pres.getType() == COSObjType.COS_NULL) ? null : pres;
     }
 
     //TODO : implement this
