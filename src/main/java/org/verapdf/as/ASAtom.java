@@ -235,11 +235,15 @@ public class ASAtom {
     public static final ASAtom GTS_PDFA1 = new ASAtom("GTS_PDFA1");
     // H
     public static final ASAtom H = new ASAtom("H");
+    public static final ASAtom HALFTONE_NAME = new ASAtom("HalftoneName");
+    public static final ASAtom HALFTONE_TYPE = new ASAtom("HalftoneType");
     public static final ASAtom HARD_LIGHT = new ASAtom("HardLight");
     public static final ASAtom HEIGHT = new ASAtom("Height");
     public static final ASAtom HIDE_MENUBAR = new ASAtom("HideMenubar");
     public static final ASAtom HIDE_TOOLBAR = new ASAtom("HideToolbar");
     public static final ASAtom HIDE_WINDOWUI = new ASAtom("HideWindowUI");
+    public static final ASAtom HT = new ASAtom("HT");
+    public static final ASAtom HTP = new ASAtom("HTP");
     // I
     public static final ASAtom I = new ASAtom("I");
     public static final ASAtom IC = new ASAtom("IC");
@@ -442,6 +446,7 @@ public class ASAtom {
     public static final ASAtom STEM_V = new ASAtom("StemV");
     public static final ASAtom STM_F = new ASAtom("StmF");
     public static final ASAtom STR_F = new ASAtom("StrF");
+    public static final ASAtom STRUCT_ELEM = new ASAtom("StructElem");
     public static final ASAtom STRUCT_PARENT = new ASAtom("StructParent");
     public static final ASAtom STRUCT_PARENTS = new ASAtom("StructParents");
     public static final ASAtom STRUCT_TREE_ROOT = new ASAtom("StructTreeRoot");
@@ -468,6 +473,7 @@ public class ASAtom {
     public static final ASAtom TM = new ASAtom("TM");
     public static final ASAtom TO_UNICODE = new ASAtom("ToUnicode");
     public static final ASAtom TR = new ASAtom("TR");
+    public static final ASAtom TR2 = new ASAtom("TR2");
     public static final ASAtom TRAPPED = new ASAtom("Trapped");
     public static final ASAtom TRANS = new ASAtom("Trans");
     public static final ASAtom TRANSPARENCY = new ASAtom("Transparency");
