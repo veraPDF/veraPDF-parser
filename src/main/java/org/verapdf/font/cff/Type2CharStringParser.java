@@ -1,7 +1,7 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.font.GeneralNumber;
+import org.verapdf.font.CFFNumber;
 import org.verapdf.font.type1.BaseCharStringParser;
 
 import java.io.IOException;
@@ -65,11 +65,11 @@ class Type2CharStringParser extends BaseCharStringParser {
     }
 
     @Override
-    protected GeneralNumber readNextNumber(int firstByte) throws IOException {
+    protected CFFNumber readNextNumber(int firstByte) throws IOException {
         byte[] buf = new byte[4];
         if (firstByte == 28) {
             this.stream.read(buf, 2);
-            return new GeneralNumber((char) (((buf[0] & 0xFF) << 8) | (buf[1] & 0xFF)));
+            return new CFFNumber((char) (((buf[0] & 0xFF) << 8) | (buf[1] & 0xFF)));
         } else {
             this.stream.read(buf, 4);
             int integer = 0;
@@ -79,7 +79,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             }
             integer |= buf[3] & 0xFF;
             float res = integer;
-            return new GeneralNumber(res / TWO_POWER_16);
+            return new CFFNumber(res / TWO_POWER_16);
         }
     }
 }

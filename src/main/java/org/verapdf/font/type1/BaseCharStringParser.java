@@ -1,7 +1,7 @@
 package org.verapdf.font.type1;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.font.GeneralNumber;
+import org.verapdf.font.CFFNumber;
 
 import java.io.IOException;
 import java.util.Stack;
@@ -14,8 +14,8 @@ import java.util.Stack;
 public abstract class BaseCharStringParser {
 
     protected ASInputStream stream;
-    protected Stack<GeneralNumber> stack;
-    private GeneralNumber width;
+    protected Stack<CFFNumber> stack;
+    private CFFNumber width;
 
     /**
      * Constructor that calls method parse(), so width is extracted right after
@@ -27,18 +27,18 @@ public abstract class BaseCharStringParser {
     protected BaseCharStringParser(ASInputStream stream) throws IOException {
         this.stream = stream;
         this.stack = new Stack<>();
-        this.width = new GeneralNumber(-1);
+        this.width = new CFFNumber(-1);
         parse();
     }
 
     /**
      * @return width of glyph or -1 if it can't be found in given CharString.
      */
-    public GeneralNumber getWidth() {
+    public CFFNumber getWidth() {
         return this.width;
     }
 
-    protected void setWidth(GeneralNumber width) {
+    protected void setWidth(CFFNumber width) {
         this.width = width;
     }
 
@@ -50,17 +50,17 @@ public abstract class BaseCharStringParser {
      * @return number that was read.
      * @throws IOException if stream reading error occurs.
      */
-    private GeneralNumber getNextInteger(int firstByte) throws IOException {
+    private CFFNumber getNextInteger(int firstByte) throws IOException {
         byte[] buf = new byte[1];
         if (firstByte > 31 && firstByte < 247) {
-            return new GeneralNumber(firstByte - 139);
+            return new CFFNumber(firstByte - 139);
         } else if (firstByte > 246 && firstByte < 251) {
             this.stream.read(buf, 1);
-            return new GeneralNumber(((firstByte - 247) << 8)
+            return new CFFNumber(((firstByte - 247) << 8)
                     + (buf[0] & 0xFF) + 108);
         } else if (firstByte > 250 && firstByte < 255) {
             this.stream.read(buf, 1);
-            return new GeneralNumber(-((firstByte - 251) << 8) -
+            return new CFFNumber(-((firstByte - 251) << 8) -
                     (buf[0] & 0xFF) - 108);
         } else {
             return readNextNumber(firstByte);
@@ -119,5 +119,5 @@ public abstract class BaseCharStringParser {
      * @return number that was read.
      * @throws IOException if stream reading error occurs.
      */
-    protected abstract GeneralNumber readNextNumber(int firstByte) throws IOException;
+    protected abstract CFFNumber readNextNumber(int firstByte) throws IOException;
 }

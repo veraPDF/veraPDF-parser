@@ -1,46 +1,38 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.font.PDFlibFont;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Instance of this class parses data common for all inner CFF fonts and
- * initializes parsers for each of them.
+ * This class starts parsing for all inner CFF fonts and contains fonts parsed.
  *
  * @author Sergey Shemyakov
  */
-public class CFFSubfontParserStarter extends CFFFileBaseParser {
+public class CFFFont extends CFFFileBaseParser implements PDFlibFont {
 
-    private List<String> fontNames;
-    private List<CFFInnerFontParser> fontParsers;
+    private PDFlibFont font;
 
-    CFFSubfontParserStarter(ASInputStream stream) throws IOException {
+    CFFFont(ASInputStream stream) throws IOException {
         super(stream);
-        this.fontNames = new ArrayList<>();
-        this.fontParsers = new ArrayList<>();
     }
 
-    public void parse() throws IOException {
+    @Override
+    public void parseFont() throws IOException {
         this.readHeader();
-        CFFIndex name = this.readIndex();
+        this.readIndex();   // name
         long topOffset = this.source.getOffset();
         CFFIndex top = this.readIndex();
         this.definedNames = this.readIndex();
-        for (int i = 0; i < name.size(); ++i) {
-            fontNames.add(new String(name.get(i)));
-            if (isCIDFont(top.get(i))) {
-                //TODO: CID fonts
-            } else {
-                CFFType1SubfontParser parser = new CFFType1SubfontParser(this.source,
-                        this.definedNames,
-                        topOffset + top.getOffset(i) - 1 + top.getOffsetShift(),
-                        topOffset + top.getOffset(i + 1) - 1 + top.getOffsetShift());
-                parser.parseFont();
-                this.fontParsers.add(parser);
-            }
+        if (isCIDFont(top.get(0))) {
+            //TODO: CID fonts
+        } else {
+            font = new CFFType1Font(this.source,
+                    this.definedNames,
+                    topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
+                    topOffset + top.getOffset(1) - 1 + top.getOffsetShift());
+            font.parseFont();
         }
     }
 
@@ -63,5 +55,15 @@ public class CFFSubfontParserStarter extends CFFFileBaseParser {
         } catch (ArrayIndexOutOfBoundsException ex) {
             return false;
         }
+    }
+
+    @Override
+    public float getWidth(int code) {
+        return this.font.getWidth(code);
+    }
+
+    @Override
+    public float getWidth(String glyphName) {
+        return this.font.getWidth(glyphName);
     }
 }

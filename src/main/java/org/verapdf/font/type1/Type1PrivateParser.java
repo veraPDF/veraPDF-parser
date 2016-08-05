@@ -32,7 +32,7 @@ class Type1PrivateParser extends BaseParser {
         glyphWidths = new HashMap<>();
         this.fontMatrix = fontMatrix;
         isDefaultFontMatrix = Arrays.equals(this.fontMatrix,
-                Type1Parser.DEFAULT_FONT_MATRIX);
+                Type1Font.DEFAULT_FONT_MATRIX);
         this.lenIV = 4;
     }
 
@@ -72,7 +72,7 @@ class Type1PrivateParser extends BaseParser {
                         nextToken();
                         int amountOfSubrs = (int) this.getToken().integer;
                         nextToken();    // reading "array"
-                        for(int i = 0; i < amountOfSubrs; ++i) {
+                        for (int i = 0; i < amountOfSubrs; ++i) {
                             nextToken();    // reading "dup"
                             nextToken();    // reading number
                             nextToken();
@@ -113,7 +113,7 @@ class Type1PrivateParser extends BaseParser {
         ASInputStream decodedCharString = new EexecFilterDecode(
                 charString, true, this.getLenIV());
         Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
-        if(!isDefaultFontMatrix) {
+        if (!isDefaultFontMatrix) {
             glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getInteger()));
         } else {
             glyphWidths.put(glyphName, (int) parser.getWidth().getInteger());

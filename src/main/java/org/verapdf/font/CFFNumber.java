@@ -5,19 +5,21 @@ package org.verapdf.font;
  *
  * @author Sergey Shemyakov
  */
-public class GeneralNumber {
+public class CFFNumber {
 
     private long integer;
     private float real;
-    boolean isInteger;
+    private boolean isInteger;
 
-    public GeneralNumber(int integer) {
+    public CFFNumber(int integer) {
         this.integer = integer;
+        this.real = integer;
         this.isInteger = true;
     }
 
-    public GeneralNumber(float real) {
+    public CFFNumber(float real) {
         this.real = real;
+        this.integer = (long) real;
         this.isInteger = false;
     }
 

@@ -4,6 +4,7 @@ import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
+import org.verapdf.font.PDFlibFont;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
 
@@ -17,7 +18,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-public class Type1Parser extends COSParser {
+public class Type1Font extends COSParser implements PDFlibFont {
 
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
 
@@ -30,7 +31,7 @@ public class Type1Parser extends COSParser {
     /**
      * {@inheritDoc}
      */
-    public Type1Parser(String fileName) throws IOException {
+    public Type1Font(String fileName) throws IOException {
         super(fileName);
         encoding = new String[256];
     }
@@ -38,7 +39,7 @@ public class Type1Parser extends COSParser {
     /**
      * {@inheritDoc}
      */
-    public Type1Parser(InputStream fileStream) throws IOException {
+    public Type1Font(InputStream fileStream) throws IOException {
         super(fileStream);
         encoding = new String[256];
     }
@@ -46,7 +47,7 @@ public class Type1Parser extends COSParser {
     /**
      * {@inheritDoc}
      */
-    public Type1Parser(ASInputStream asInputStream) throws IOException {
+    public Type1Font(ASInputStream asInputStream) throws IOException {
         super(asInputStream);
         encoding = new String[256];
     }
@@ -56,7 +57,8 @@ public class Type1Parser extends COSParser {
      *
      * @throws IOException if stream reading error occurs.
      */
-    public void parse() throws IOException {
+    @Override
+    public void parseFont() throws IOException {
         initializeToken();
 
         skipSpaces(true);
@@ -147,5 +149,21 @@ public class Type1Parser extends COSParser {
         long res = this.source.getOffset() - length;
         this.source.seek(startingOffset);
         return res - 512;
+    }
+
+    @Override
+    public float getWidth(int charCode) {
+        try {
+            Integer res = this.glyphWidths.get(encoding[charCode]);
+            return res == null ? -1 : res;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public float getWidth(String glyphName) {
+        Integer res = this.glyphWidths.get(glyphName);
+        return res == null ? -1 : res;
     }
 }
