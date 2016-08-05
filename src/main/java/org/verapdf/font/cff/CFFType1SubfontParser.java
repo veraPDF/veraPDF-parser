@@ -2,8 +2,6 @@ package org.verapdf.font.cff;
 
 import org.verapdf.font.GeneralNumber;
 import org.verapdf.font.cff.predefined.*;
-import org.verapdf.font.type1.Type1CharStringParser;
-import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
@@ -33,13 +31,14 @@ public class CFFType1SubfontParser extends CFFInnerFontParser {
         while (this.source.getOffset() < topDictEndOffset) {
             readTopDictUnit();
         }
+        this.clearStack();
     }
 
     @Override
     protected void readTopDictOneByteOps(int lastRead, ArrayList<GeneralNumber> stack) {
         switch (lastRead) {
             case 16:    // encoding
-                this.encodingOffset = stack.get(0).getInteger();
+                this.encodingOffset = stack.get(stack.size() - 1).getInteger();
                 stack.clear();
                 break;
             default:
@@ -177,20 +176,6 @@ public class CFFType1SubfontParser extends CFFInnerFontParser {
             for (int i = 0; i < widths.length; ++i) {
                 widths[i] = widths[i] * fontMatrix[0] * 1000;
             }
-        }
-    }
-
-    private GeneralNumber getWidthFromCharString(byte[] charString) throws IOException {
-        if (this.charStringType == 1) {
-            Type1CharStringParser parser = new Type1CharStringParser(
-                    new ASMemoryInStream(charString));
-            return parser.getWidth();
-        } else if (this.charStringType == 2) {
-            Type2CharStringParser parser = new Type2CharStringParser(
-                    new ASMemoryInStream(charString));
-            return parser.getWidth();
-        } else {
-            throw new IOException("Can't process CharString of type " + this.charStringType);
         }
     }
 }

@@ -2,6 +2,8 @@ package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.font.GeneralNumber;
+import org.verapdf.font.type1.Type1CharStringParser;
+import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
@@ -64,16 +66,20 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
                 if (next > -1 && next < 22) {
                     switch (next) {
                         case 15:    // charset
-                            this.charSetOffset = this.stack.get(0).getInteger();
+                            this.charSetOffset =
+                                    this.stack.get(stack.size() - 1).getInteger();
                             this.stack.clear();
                             break;
                         case 17:    // CharStrings
-                            this.charStringsOffset = this.stack.get(0).getInteger();
+                            this.charStringsOffset =
+                                    this.stack.get(stack.size() - 1).getInteger();
                             this.stack.clear();
                             break;
                         case 18:    // Private
-                            this.privateDictSize = this.stack.get(0).getInteger();
-                            this.privateDictOffset = this.stack.get(1).getInteger();
+                            this.privateDictSize =
+                                    this.stack.get(stack.size() - 2).getInteger();
+                            this.privateDictOffset =
+                                    this.stack.get(stack.size() - 1).getInteger();
                             this.stack.clear();
                             break;
                         case 12:
@@ -86,7 +92,8 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
                                     this.stack.clear();
                                     break;
                                 case 6:     // Charstring Type
-                                    this.charStringType = (int) this.stack.get(0).getInteger();
+                                    this.charStringType = (int)
+                                            this.stack.get(stack.size() - 1).getInteger();
                                     this.stack.clear();
                                     break;
                                 default:
@@ -138,11 +145,13 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
             if (next > -1 && next < 22) {
                 switch (next) {
                     case 20:    // defaultWidthX
-                        this.defaultWidthX = (int) this.stack.get(0).getInteger();
+                        this.defaultWidthX = (int)
+                                this.stack.get(stack.size() - 1).getInteger();
                         this.stack.clear();
                         break;
                     case 21:    // nominalWidthX
-                        this.nominalWidthX = (int) this.stack.get(0).getInteger();
+                        this.nominalWidthX = (int)
+                                this.stack.get(stack.size() - 1).getInteger();
                         this.stack.clear();
                         break;
                     default:
@@ -160,6 +169,24 @@ public abstract class CFFInnerFontParser extends CFFFileBaseParser {
 
     public float[] getWidths() {
         return widths;
+    }
+
+    void clearStack() {
+        this.stack.clear();
+    }
+
+    protected GeneralNumber getWidthFromCharString(byte[] charString) throws IOException {
+        if (this.charStringType == 1) {
+            Type1CharStringParser parser = new Type1CharStringParser(
+                    new ASMemoryInStream(charString));
+            return parser.getWidth();
+        } else if (this.charStringType == 2) {
+            Type2CharStringParser parser = new Type2CharStringParser(
+                    new ASMemoryInStream(charString));
+            return parser.getWidth();
+        } else {
+            throw new IOException("Can't process CharString of type " + this.charStringType);
+        }
     }
 
     /**
