@@ -49,4 +49,9 @@ public class PDAnnotation extends PDObject {
 		}
 		return null;
 	}
+
+	public PDAppearanceEntry getNormalAppearance() {
+		// TODO: implement me
+		return null;
+	}
 }
