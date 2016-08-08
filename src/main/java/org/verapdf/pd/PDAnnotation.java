@@ -8,9 +8,9 @@ import org.verapdf.tools.TypeConverter;
 /**
  * @author Maksim Bezrukov
  */
-public class PDAnnot extends PDObject {
+public class PDAnnotation extends PDObject {
 
-	public PDAnnot(COSObject obj) {
+	public PDAnnotation(COSObject obj) {
 		super(obj);
 	}
 

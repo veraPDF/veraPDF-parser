@@ -4,6 +4,10 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.colors.PDColorSpace;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Timur Kamalov
  */
@@ -175,6 +179,20 @@ public class PDPage extends PDPageTreeNode {
     public COSObject getCOSPresSteps() {
         COSObject pres = getKey(ASAtom.PRES_STEPS);
         return (pres == null || pres.empty() || pres.getType() == COSObjType.COS_NULL) ? null : pres;
+    }
+
+    public List<PDAnnotation> getAnnotations() {
+        COSObject annots = getKey(ASAtom.ANNOTS);
+        if (annots != null && annots.getType() == COSObjType.COS_ARRAY) {
+            List<PDAnnotation> res = new ArrayList<>();
+            for (COSObject annot : (COSArray) annots.get()) {
+                if (annot != null && annot.getType() == COSObjType.COS_DICT) {
+                    res.add(new PDAnnotation(annot));
+                }
+            }
+            return Collections.unmodifiableList(res);
+        }
+        return Collections.emptyList();
     }
 
     //TODO : implement this
