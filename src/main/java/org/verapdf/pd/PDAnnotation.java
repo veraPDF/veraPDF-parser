@@ -50,8 +50,35 @@ public class PDAnnotation extends PDObject {
 		return null;
 	}
 
+	public COSObject getCOSAP() {
+		COSObject appearanceDictionary = getKey(ASAtom.AP);
+		if (appearanceDictionary != null && appearanceDictionary.getType() == COSObjType.COS_DICT) {
+			return appearanceDictionary;
+		}
+		return null;
+	}
+
 	public PDAppearanceEntry getNormalAppearance() {
-		// TODO: implement me
+		return getAppearanceEntry(ASAtom.N);
+	}
+
+	public PDAppearanceEntry getRolloverAppearance() {
+		return getAppearanceEntry(ASAtom.R);
+	}
+
+	public PDAppearanceEntry getDownAppearance() {
+		return getAppearanceEntry(ASAtom.D);
+	}
+
+	private PDAppearanceEntry getAppearanceEntry(ASAtom key) {
+		COSObject appearanceDictionary = getCOSAP();
+		if (appearanceDictionary != null) {
+			COSObject appearance = appearanceDictionary.getKey(key);
+			if (appearance != null &&
+					(appearance.getType() == COSObjType.COS_DICT || appearance.getType() == COSObjType.COS_STREAM)) {
+				return new PDAppearanceEntry(appearance);
+			}
+		}
 		return null;
 	}
 }
