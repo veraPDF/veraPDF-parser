@@ -30,6 +30,11 @@ public class PDXImage extends PDXObject {
 		parseJPXAndColorSpace();
 	}
 
+	@Override
+	public ASAtom getType() {
+		return ASAtom.IMAGE;
+	}
+
 	private void parseJPXAndColorSpace() {
 		PDColorSpace colorSpace = ColorSpaceFactory.getColorSpace(getKey(ASAtom.COLORSPACE));
 		if (colorSpace != null) {
