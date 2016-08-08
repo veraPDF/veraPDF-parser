@@ -21,6 +21,11 @@ public class PDResources extends PDObject {
 		return ColorSpaceFactory.getColorSpace(rawColorSpace);
 	}
 
+	public PDColorSpace getPattern(ASAtom name) {
+		COSObject rawPattern = getResource(ASAtom.PATTERN, name);
+		return ColorSpaceFactory.getColorSpace(rawPattern);
+	}
+
 	public PDShading getShading(ASAtom name) {
 		COSObject rawShading = getResource(ASAtom.SHADING, name);
 		return new PDShading(rawShading);
