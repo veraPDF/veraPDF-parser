@@ -42,6 +42,14 @@ public abstract class XRefReader implements IReader {
 		return this.xref.getTrailer();
 	}
 
+	public COSTrailer getFirstTrailer() {
+		return this.xref.getFirstTrailer();
+	}
+
+	public COSTrailer getLastTrailer() {
+		return this.xref.getLastTrailer();
+	}
+
 	//PROTECTED METHODS
 	protected void setXRefInfo(final List<COSXRefInfo> infos) {
 		this.xref.set(infos);

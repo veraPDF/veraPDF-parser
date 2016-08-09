@@ -18,7 +18,7 @@ public class COSDictionary extends COSDirect {
 
     protected COSDictionary() {
         super();
-        this.entries = new HashMap<ASAtom, COSObject>();
+        this.entries = new HashMap<>();
     }
 
     protected COSDictionary(final ASAtom key, final COSObject value) {

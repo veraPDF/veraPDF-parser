@@ -285,6 +285,7 @@ public class ASAtom {
     public static final ASAtom LE = new ASAtom("LE");
     public static final ASAtom LEADING = new ASAtom("Leading");
     public static final ASAtom LEGAL_ATTESTATION = new ASAtom("LegalAttestation");
+    public static final ASAtom LINEARIZED = new ASAtom("Linearized");
     public static final ASAtom LENGTH = new ASAtom("Length");
     public static final ASAtom LENGTH1 = new ASAtom("Length1");
     public static final ASAtom LENGTH2 = new ASAtom("Length2");

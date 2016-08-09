@@ -24,4 +24,8 @@ public interface IReader {
 
 	COSTrailer getTrailer();
 
+	COSTrailer getFirstTrailer();
+
+	COSTrailer getLastTrailer();
+
 }
