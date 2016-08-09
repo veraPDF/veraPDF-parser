@@ -3,6 +3,7 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.pd.actions.PDAction;
 import org.verapdf.tools.TypeConverter;
 
 /**
@@ -74,10 +75,17 @@ public class PDAnnotation extends PDObject {
 		COSObject appearanceDictionary = getCOSAP();
 		if (appearanceDictionary != null) {
 			COSObject appearance = appearanceDictionary.getKey(key);
-			if (appearance != null &&
-					(appearance.getType() == COSObjType.COS_DICT || appearance.getType() == COSObjType.COS_STREAM)) {
+			if (appearance != null && appearance.getType().isDictionaryBased()) {
 				return new PDAppearanceEntry(appearance);
 			}
+		}
+		return null;
+	}
+
+	public PDAction getA() {
+		COSObject action = getKey(ASAtom.A);
+		if (action != null && action.getType() == COSObjType.COS_DICT) {
+			return new PDAction(action);
 		}
 		return null;
 	}

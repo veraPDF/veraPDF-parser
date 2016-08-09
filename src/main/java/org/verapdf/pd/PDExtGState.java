@@ -70,7 +70,7 @@ public class PDExtGState extends PDResource {
         COSObject fontArray = getKey(ASAtom.FONT);
         if (fontArray != null && fontArray.getType() == COSObjType.COS_ARRAY) {
             COSObject res = fontArray.at(1);
-            if (res != null && (res.getType() == COSObjType.COS_INTEGER || res.getType() == COSObjType.COS_REAL)) {
+            if (res != null && res.getType().isNumber()) {
                 return (COSNumber) res.get();
             }
         }
