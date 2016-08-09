@@ -22,6 +22,8 @@ public class COSDocument {
 	private COSBody body;
 	private COSXRefTable xref;
 	private COSTrailer trailer;
+	private COSTrailer firstTrailer;
+	private COSTrailer lastTrailer;
 	private boolean isNew;
 
 	private byte postEOFDataSize;
@@ -35,6 +37,8 @@ public class COSDocument {
 		this.body = new COSBody();
 		this.xref = new COSXRefTable();
 		this.trailer = new COSTrailer();
+		this.firstTrailer = new COSTrailer();
+		this.lastTrailer = new COSTrailer();
 		this.isNew = true;
 
 		this.xrefEOLMarkersComplyPDFA = true;
@@ -61,6 +65,8 @@ public class COSDocument {
 		this.xref = new COSXRefTable();
 		this.xref.set(this.reader.getKeys());
 		this.trailer = reader.getTrailer();
+		this.firstTrailer = reader.getFirstTrailer();
+		this.lastTrailer = reader.getLastTrailer();
 
 		this.xrefEOLMarkersComplyPDFA = true;
 		this.subsectionHeaderSpaceSeparated = true;
@@ -144,6 +150,14 @@ public class COSDocument {
 
 	public COSTrailer getTrailer() {
 		return this.trailer;
+	}
+
+	public COSTrailer getFirstTrailer() {
+		return firstTrailer;
+	}
+
+	public COSTrailer getLastTrailer() {
+		return lastTrailer;
 	}
 
 	public PDDocument getPDDocument() {

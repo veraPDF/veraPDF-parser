@@ -119,6 +119,40 @@ public class PDFParser extends COSParser {
         return result;
     }
 
+    public boolean isLinearized() throws IOException {
+        COSObject linDict = findFirstDictionary();
+
+        if (!linDict.empty() && linDict.getType() == COSObjType.COS_DICT) {
+            if (linDict.knownKey(ASAtom.LINEARIZED)) {
+                long length = linDict.getIntegerKey(ASAtom.L);
+                if (length != 0) {
+                    return length == this.source.getStreamLength() && this.source.getOffset() < LINEARIZATION_DICTIONARY_LOOKUP_SIZE;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private COSObject findFirstDictionary() throws IOException {
+        source.seek(0L);
+        if (findKeyword(Token.Keyword.KW_OBJ, LINEARIZATION_DICTIONARY_LOOKUP_SIZE)) {
+            source.unread(7);
+
+            //this will handle situations when linearization dictionary's
+            //object number contains more than one digit
+            source.unread();
+            while (!CharTable.isSpace(this.source.read())) {
+                source.unread(2);
+            }
+
+            COSObject linDict = getObject(source.getOffset());
+            return linDict;
+        } else {
+            return null;
+        }
+    }
+
     /**
      * check second line of pdf header
      */
@@ -295,10 +329,9 @@ public class PDFParser extends COSParser {
             closeInputStream();
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
-        if(this.getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
+        if (this.getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
             parseXrefTable(section.getXRefSection());
             getTrailer(section.getTrailer());
-
         } else {
             parseXrefStream(section);
         }

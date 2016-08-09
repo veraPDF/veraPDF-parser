@@ -18,6 +18,11 @@ public class COSParser extends BaseParser {
 
 	private static final Logger LOG = Logger.getLogger(COSParser.class);
 
+	/**
+	 * Linearization dictionary must be in first 1024 bytes of document
+	 */
+	protected final int LINEARIZATION_DICTIONARY_LOOKUP_SIZE = 1024;
+
 	protected COSDocument document;
 	protected Queue<COSObject> objects = new LinkedList<>();
 	protected Queue<Integer> integers = new LinkedList<>();
