@@ -24,6 +24,7 @@ public class COSDocument {
 	private COSTrailer trailer;
 	private COSTrailer firstTrailer;
 	private COSTrailer lastTrailer;
+	private boolean linearized;
 	private boolean isNew;
 
 	private byte postEOFDataSize;
@@ -39,6 +40,7 @@ public class COSDocument {
 		this.trailer = new COSTrailer();
 		this.firstTrailer = new COSTrailer();
 		this.lastTrailer = new COSTrailer();
+		this.linearized = false;
 		this.isNew = true;
 
 		this.xrefEOLMarkersComplyPDFA = true;
@@ -67,6 +69,7 @@ public class COSDocument {
 		this.trailer = reader.getTrailer();
 		this.firstTrailer = reader.getFirstTrailer();
 		this.lastTrailer = reader.getLastTrailer();
+		this.linearized = reader.isLinearized();
 
 		this.xrefEOLMarkersComplyPDFA = true;
 		this.subsectionHeaderSpaceSeparated = true;
