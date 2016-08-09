@@ -122,7 +122,7 @@ public class PDFParser extends COSParser {
     public boolean isLinearized() throws IOException {
         COSObject linDict = findFirstDictionary();
 
-        if (!linDict.empty() && linDict.getType() == COSObjType.COS_DICT) {
+        if (linDict != null && !linDict.empty() && linDict.getType() == COSObjType.COS_DICT) {
             if (linDict.knownKey(ASAtom.LINEARIZED)) {
                 long length = linDict.getIntegerKey(ASAtom.L);
                 if (length != 0) {
