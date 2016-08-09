@@ -380,6 +380,7 @@ public class ASAtom {
     public static final ASAtom PG = new ASAtom("Pg");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");
     public static final ASAtom PREDICTOR = new ASAtom("Predictor");
+    public static final ASAtom PRES_STEPS = new ASAtom("PresSteps");
     public static final ASAtom PREV = new ASAtom("Prev");
     public static final ASAtom PRINT_AREA = new ASAtom("PrintArea");
     public static final ASAtom PRINT_CLIP = new ASAtom("PrintClip");
