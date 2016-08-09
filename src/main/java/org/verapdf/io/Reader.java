@@ -74,6 +74,9 @@ public class Reader extends XRefReader {
 		return this.parser.getObject(offset);
 	}
 
+	public boolean isLinearized() {
+		return this.linearized;
+	}
 
 	// PRIVATE METHODS
 	private void init() throws IOException {
