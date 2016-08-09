@@ -163,6 +163,10 @@ public class COSDocument {
 		return lastTrailer;
 	}
 
+	public boolean isLinearized() {
+		return linearized;
+	}
+
 	public PDDocument getPDDocument() {
 		return this.doc;
 	}
