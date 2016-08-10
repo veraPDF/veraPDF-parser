@@ -9,11 +9,13 @@ import org.verapdf.pd.PDResource;
 /**
  * @author Maksim Bezrukov
  */
-public class PDXObject extends PDResource {
+public abstract class PDXObject extends PDResource {
 
 	protected PDXObject(COSObject obj) {
 		super(obj);
 	}
+
+	public abstract ASAtom getType();
 
 	public ASAtom getSubtype() {
 		return getObject().getNameKey(ASAtom.SUBTYPE);
@@ -33,5 +35,22 @@ public class PDXObject extends PDResource {
 			return new PDXImage(smask);
 		}
 		return null;
+	}
+
+	public static PDXObject getTypedPDXObject(COSObject object) {
+		ASAtom type = object.getNameKey(ASAtom.SUBTYPE);
+		if (ASAtom.IMAGE.equals(type)) {
+			return new PDXImage(object);
+		} else if (ASAtom.FORM.equals(type)) {
+			if (ASAtom.PS.equals(object.getNameKey(ASAtom.SUBTYPE_2))) {
+				return new PDXPostScript(object);
+			} else {
+				return new PDXForm(object);
+			}
+		} else if (ASAtom.PS.equals(type)) {
+			return new PDXPostScript(object);
+		} else {
+			return null;
+		}
 	}
 }
