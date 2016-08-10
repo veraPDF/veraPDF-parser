@@ -94,6 +94,21 @@ public class BaseParser {
 		return this.token.type == Token.Type.TT_KEYWORD && this.token.keyword == keyword;
 	}
 
+	// lookUpSize starts from current offset
+	protected boolean findKeyword(final Token.Keyword keyword, final int lookUpSize) throws IOException {
+		long endOffset = this.source.getOffset() + lookUpSize > this.source.getStreamLength()
+				? this.source.getOffset() + lookUpSize : this.source.getStreamLength();
+
+		nextToken();
+		while (this.token.type != Token.Type.TT_EOF && (this.token.type != Token.Type.TT_KEYWORD || this.token.keyword != keyword)) {
+			if (endOffset >= this.source.getOffset()) {
+				break;
+			}
+			nextToken();
+		}
+		return this.token.type == Token.Type.TT_KEYWORD && this.token.keyword == keyword;
+	}
+
 	protected void nextToken() throws IOException {
 		skipSpaces(true);
 		if (this.source.isEof()) {

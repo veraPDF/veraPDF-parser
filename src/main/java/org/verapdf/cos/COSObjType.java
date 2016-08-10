@@ -14,6 +14,13 @@ public enum COSObjType {
 	COS_STRING,
 	COS_DICT,
 	COS_ARRAY,
-	COS_STREAM
+	COS_STREAM;
 
+	public boolean isNumber() {
+		return this == COS_INTEGER || this == COS_REAL;
+	}
+
+	public boolean isDictionaryBased() {
+		return this == COS_DICT || this == COS_STREAM;
+	}
 }

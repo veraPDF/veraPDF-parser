@@ -77,4 +77,14 @@ public class COSReal extends COSNumber {
         return stringValue;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSReal)) return false;
+
+        COSReal cosReal = (COSReal) o;
+
+        return Double.compare(cosReal.value, value) == 0;
+
+    }
 }

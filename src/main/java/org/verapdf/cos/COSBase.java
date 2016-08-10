@@ -104,5 +104,4 @@ public abstract class COSBase {
 	public abstract boolean setDirect(final COSObject value);
 
 	public abstract void mark();
-
 }

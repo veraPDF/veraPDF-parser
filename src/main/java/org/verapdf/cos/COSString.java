@@ -108,58 +108,57 @@ public class COSString extends COSDirect {
     }
 
     protected String toHexString() {
-        String result = "";
+        StringBuilder result = new StringBuilder();
 
-        result += '<';
+        result.append('<');
         for (int i = 0; i < this.value.length(); i++) {
             final char c = this.value.charAt(i);
-            result += COSFilterASCIIHexEncode.asciiHexBig[c];
-            result += COSFilterASCIIHexEncode.asciiHexLittle[c];
+            result.append(COSFilterASCIIHexEncode.asciiHexBig[c]);
+            result.append(COSFilterASCIIHexEncode.asciiHexLittle[c]);
         }
-        result += '>';
+        result.append('>');
 
-        return result;
+        return result.toString();
     }
 
     protected String toLitString() {
-        String result = new String();
-
-        result += '(';
+        StringBuilder result = new StringBuilder();
+        result.append('(');
         for (int i = 0; i < this.value.length(); i++) {
             final char ch = this.value.charAt(i);
             switch (ch) {
                 case '(':
-                    result += "\\(";
+                    result.append("\\(");
                     break;
                 case ')':
-                    result += "\\)";
+                    result.append("\\)");
                     break;
                 case '\n':
-                    result += '\n';
+                    result.append('\n');
                     break;
                 case '\r':
-                    result += '\r';
+                    result.append('\r');
                     break;
                 case '\t':
-                    result += '\t';
+                    result.append('\t');
                     break;
                 case '\b':
-                    result += '\b';
+                    result.append('\b');
                     break;
                 case '\f':
-                    result += '\f';
+                    result.append('\f');
                     break;
                 case '\\':
-                    result += '\\';
+                    result.append('\\');
                     break;
                 default:
-                    result += ch;
+                    result.append(ch);
                     break;
             }
         }
-        result += ')';
+        result.append(')');
 
-        return result;
+        return result.toString();
     }
 
     public String getLitString() {
@@ -182,4 +181,26 @@ public class COSString extends COSDirect {
         this.hexCount = hexCount;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSString)) return false;
+
+        COSString cosString = (COSString) o;
+
+        if (isHex != cosString.isHex) return false;
+        if (containsOnlyHex != cosString.containsOnlyHex) return false;
+        if (hexCount != cosString.hexCount) return false;
+        return value != null ? value.equals(cosString.value) : cosString.value == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = value != null ? value.hashCode() : 0;
+        result = 31 * result + (isHex ? 1 : 0);
+        result = 31 * result + (containsOnlyHex ? 1 : 0);
+        result = 31 * result + (int) (hexCount ^ (hexCount >>> 32));
+        return result;
+    }
 }

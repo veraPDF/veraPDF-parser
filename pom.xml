@@ -4,9 +4,46 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+      <artifactId>verapdf-parent</artifactId>
+      <groupId>org.verapdf</groupId>
+      <version>1.0.16</version>
+      <relativePath>parent/pom.xml</relativePath>
+    </parent>
+
     <groupId>org.verapdf</groupId>
-    <artifactId>pdflib</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>parser</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+
+    <name>veraPDF Parser</name>
+    <description>veraPDF tools for parsing, modifying and creating PDF documents.</description>
+
+    <scm>
+      <url>https://github.com/veraPDF/veraPDF-parser/</url>
+      <connection>scm:git:https://github.com/veraPDF/veraPDF-parser.git</connection>
+      <developerConnection>scm:git:git@github.com:veraPDF/veraPDF-parser.git</developerConnection>
+    </scm>
+
+    <repositories>
+      <repository>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>
+        <id>vera-dev</id>
+        <name>Vera development</name>
+        <url>http://artifactory.opf-labs.org/artifactory/vera-dev</url>
+      </repository>
+    </repositories>
+    <pluginRepositories>
+      <pluginRepository>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+        <id>vera-dev</id>
+        <name>Vera development</name>
+        <url>http://artifactory.opf-labs.org/artifactory/vera-dev</url>
+      </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
         <dependency>
@@ -27,12 +64,68 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
+            </plugin>
+
+            <plugin>
+              <groupId>org.jacoco</groupId>
+              <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>versions-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
+
+    <reporting>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.4</version>
+          <configuration>
+            <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+            <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+          </configuration>
+          <reportSets>
+            <reportSet>
+              <reports>
+                <report>index</report>
+                <report>dependencies</report>
+                <report>project-team</report>
+                <report>mailing-list</report>
+                <report>cim</report>
+                <report>issue-tracking</report>
+                <report>license</report>
+                <report>scm</report>
+              </reports>
+            </reportSet>
+          </reportSets>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <failOnError>false</failOnError>
+            <dependencySourceExcludes>
+              <!-- exclude ONLY commons-cli artifacts -->
+              <dependencySourceExclude>junit:*</dependencySourceExclude>
+              <dependencySourceExclude>org.apache:*</dependencySourceExclude>
+              <dependencySourceExclude>org.junit:*</dependencySourceExclude>
+              <dependencySourceExclude>org.hamcrest.*</dependencySourceExclude>
+              <dependencySourceExclude>org.log4j.*</dependencySourceExclude>
+            </dependencySourceExcludes>
+            <includeDependencySources>true</includeDependencySources>
+            <show>public</show>
+          </configuration>
+        </plugin>
+      </plugins>
+    </reporting>
 
 </project>

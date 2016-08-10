@@ -7,6 +7,7 @@ import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author Timur Kamalov
@@ -198,4 +199,39 @@ public class COSStream extends COSDictionary {
 		DECRYPT_AND_DECODE
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof COSStream)) return false;
+		if (!super.equals(o)) return false;
+
+		COSStream cosStream = (COSStream) o;
+
+		if (streamKeywordCRLFCompliant != cosStream.streamKeywordCRLFCompliant) return false;
+		if (endstreamKeywordCRLFCompliant != cosStream.endstreamKeywordCRLFCompliant) return false;
+		if (realStreamSize != cosStream.realStreamSize) return false;
+		try {
+			if (stream != null ? !equalsStreams(stream, cosStream.stream) : cosStream.stream != null) return false;
+		} catch (IOException e) {
+			LOGGER.debug("Exception during comparing streams");
+			return false;
+		}
+		return flags == cosStream.flags;
+	}
+
+	private boolean equalsStreams(ASInputStream first, ASInputStream second) throws IOException {
+		byte[] tempOne = new byte[1024];
+		byte[] tempTwo = new byte[1024];
+		int readFromOne;
+		int readFromTwo;
+		do {
+			readFromOne = first.read(tempOne, tempOne.length);
+			readFromTwo = second.read(tempTwo, tempTwo.length);
+			if (readFromOne != readFromTwo || !Arrays.equals(tempOne, tempTwo)) {
+				return false;
+			}
+		} while (readFromOne != 0);
+
+		return true;
+	}
 }

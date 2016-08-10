@@ -29,6 +29,7 @@ public class ASAtom {
     public static final ASAtom ALT = new ASAtom("Alt");
     public static final ASAtom ALPHA = new ASAtom("Alpha");
     public static final ASAtom ALTERNATE = new ASAtom("Alternate");
+    public static final ASAtom ALTERNATES = new ASAtom("Alternates");
     public static final ASAtom ANNOT = new ASAtom("Annot");
     public static final ASAtom ANNOTS = new ASAtom("Annots");
     public static final ASAtom ANTI_ALIAS = new ASAtom("AntiAlias");
@@ -234,11 +235,15 @@ public class ASAtom {
     public static final ASAtom GTS_PDFA1 = new ASAtom("GTS_PDFA1");
     // H
     public static final ASAtom H = new ASAtom("H");
+    public static final ASAtom HALFTONE_NAME = new ASAtom("HalftoneName");
+    public static final ASAtom HALFTONE_TYPE = new ASAtom("HalftoneType");
     public static final ASAtom HARD_LIGHT = new ASAtom("HardLight");
     public static final ASAtom HEIGHT = new ASAtom("Height");
     public static final ASAtom HIDE_MENUBAR = new ASAtom("HideMenubar");
     public static final ASAtom HIDE_TOOLBAR = new ASAtom("HideToolbar");
     public static final ASAtom HIDE_WINDOWUI = new ASAtom("HideWindowUI");
+    public static final ASAtom HT = new ASAtom("HT");
+    public static final ASAtom HTP = new ASAtom("HTP");
     // I
     public static final ASAtom I = new ASAtom("I");
     public static final ASAtom IC = new ASAtom("IC");
@@ -255,6 +260,7 @@ public class ASAtom {
     public static final ASAtom INDEXED = new ASAtom("Indexed");
     public static final ASAtom INFO = new ASAtom("Info");
     public static final ASAtom INKLIST = new ASAtom("InkList");
+    public static final ASAtom INTENT = new ASAtom("Intent");
     public static final ASAtom INTERPOLATE = new ASAtom("Interpolate");
     public static final ASAtom IT = new ASAtom("IT");
     public static final ASAtom ITALIC_ANGLE = new ASAtom("ItalicAngle");
@@ -279,6 +285,7 @@ public class ASAtom {
     public static final ASAtom LE = new ASAtom("LE");
     public static final ASAtom LEADING = new ASAtom("Leading");
     public static final ASAtom LEGAL_ATTESTATION = new ASAtom("LegalAttestation");
+    public static final ASAtom LINEARIZED = new ASAtom("Linearized");
     public static final ASAtom LENGTH = new ASAtom("Length");
     public static final ASAtom LENGTH1 = new ASAtom("Length1");
     public static final ASAtom LENGTH2 = new ASAtom("Length2");
@@ -341,6 +348,7 @@ public class ASAtom {
     public static final ASAtom OP_NS = new ASAtom("op");
     public static final ASAtom OPEN_ACTION = new ASAtom("OpenAction");
     public static final ASAtom OPEN_TYPE = new ASAtom("OpenType");
+    public static final ASAtom OPI = new ASAtom("OPI");
     public static final ASAtom OPM = new ASAtom("OPM");
     public static final ASAtom OPT = new ASAtom("Opt");
     public static final ASAtom ORDER = new ASAtom("Order");
@@ -373,6 +381,7 @@ public class ASAtom {
     public static final ASAtom PG = new ASAtom("Pg");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");
     public static final ASAtom PREDICTOR = new ASAtom("Predictor");
+    public static final ASAtom PRES_STEPS = new ASAtom("PresSteps");
     public static final ASAtom PREV = new ASAtom("Prev");
     public static final ASAtom PRINT_AREA = new ASAtom("PrintArea");
     public static final ASAtom PRINT_CLIP = new ASAtom("PrintClip");
@@ -396,6 +405,7 @@ public class ASAtom {
     public static final ASAtom REASONS = new ASAtom("Reasons");
     public static final ASAtom RECIPIENTS = new ASAtom("Recipients");
     public static final ASAtom RECT = new ASAtom("Rect");
+    public static final ASAtom REF = new ASAtom("Ref");
     public static final ASAtom REGISTRY = new ASAtom("Registry");
     public static final ASAtom REGISTRY_NAME = new ASAtom("RegistryName");
     public static final ASAtom RENAME = new ASAtom("Rename");
@@ -425,6 +435,7 @@ public class ASAtom {
     public static final ASAtom SIZE = new ASAtom("Size");
     public static final ASAtom SM = new ASAtom("SM");
     public static final ASAtom SMASK = new ASAtom("SMask");
+    public static final ASAtom SMASK_IN_DATA = new ASAtom("SMaskInData");
     public static final ASAtom SOFT_LIGHT = new ASAtom("SoftLight");
     public static final ASAtom SS = new ASAtom("SS");
     public static final ASAtom ST = new ASAtom("St");
@@ -437,6 +448,7 @@ public class ASAtom {
     public static final ASAtom STEM_V = new ASAtom("StemV");
     public static final ASAtom STM_F = new ASAtom("StmF");
     public static final ASAtom STR_F = new ASAtom("StrF");
+    public static final ASAtom STRUCT_ELEM = new ASAtom("StructElem");
     public static final ASAtom STRUCT_PARENT = new ASAtom("StructParent");
     public static final ASAtom STRUCT_PARENTS = new ASAtom("StructParents");
     public static final ASAtom STRUCT_TREE_ROOT = new ASAtom("StructTreeRoot");
@@ -445,6 +457,7 @@ public class ASAtom {
     public static final ASAtom SUBJ = new ASAtom("Subj");
     public static final ASAtom SUBJECT = new ASAtom("Subject");
     public static final ASAtom SUBTYPE = new ASAtom("Subtype");
+    public static final ASAtom SUBTYPE_2 = new ASAtom("Subtype2");
     public static final ASAtom SUPPLEMENT = new ASAtom("Supplement");
     public static final ASAtom SV = new ASAtom("SV");
     public static final ASAtom SW = new ASAtom("SW");
@@ -462,6 +475,7 @@ public class ASAtom {
     public static final ASAtom TM = new ASAtom("TM");
     public static final ASAtom TO_UNICODE = new ASAtom("ToUnicode");
     public static final ASAtom TR = new ASAtom("TR");
+    public static final ASAtom TR2 = new ASAtom("TR2");
     public static final ASAtom TRAPPED = new ASAtom("Trapped");
     public static final ASAtom TRANS = new ASAtom("Trans");
     public static final ASAtom TRANSPARENCY = new ASAtom("Transparency");
@@ -519,6 +533,7 @@ public class ASAtom {
     }
 
     private ASAtom(String value, boolean predefinedValue) {
+        this.value = value;
         if (predefinedValue) {
             predefinedPDFNames.put(value, this);
         } else {
@@ -539,6 +554,7 @@ public class ASAtom {
             return cachedPDFNames.get(value);
         } else {
             ASAtom result = new ASAtom(value, false);
+            result.setValue(value);
             cachedPDFNames.put(value, result);
             return result;
         }
@@ -546,6 +562,10 @@ public class ASAtom {
 
     public String getValue() {
         return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override

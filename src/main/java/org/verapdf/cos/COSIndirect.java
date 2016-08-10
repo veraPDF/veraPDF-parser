@@ -349,4 +349,15 @@ public class COSIndirect extends COSBase {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSIndirect)) return false;
+
+        COSIndirect that = (COSIndirect) o;
+
+        if (key != null ? !key.equals(that.key) : that.key != null) return false;
+        return document == that.document;
+
+    }
 }

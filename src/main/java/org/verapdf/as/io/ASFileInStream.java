@@ -1,6 +1,7 @@
 package org.verapdf.as.io;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -33,13 +34,24 @@ public class ASFileInStream extends ASInputStream {
 		long prev = this.stream.getFilePointer();
 
 		this.stream.seek(this.offset + this.curPos);
-		int count = this.stream.read(buffer, 0, sizeToRead);
 
-		this.stream.seek(prev);
+		try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+			byte[] temp = new byte[1024];
+			int n;
 
-		this.curPos += count;
+			while (sizeToRead > 0 && (n = this.stream.read(temp, 0, Math.min(temp.length, sizeToRead))) != -1) {
+				output.write(temp, 0, n);
+				sizeToRead -= n;
+			}
 
-		return count;
+			byte[] byteArray = output.toByteArray();
+			int count = byteArray.length;
+			System.arraycopy(byteArray, 0, buffer, 0, count);
+
+			this.stream.seek(prev);
+			this.curPos += count;
+			return count;
+		}
 	}
 
 	public int skip(int size) throws IOException {
