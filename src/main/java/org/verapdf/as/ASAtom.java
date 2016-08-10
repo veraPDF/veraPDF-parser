@@ -533,6 +533,7 @@ public class ASAtom {
     }
 
     private ASAtom(String value, boolean predefinedValue) {
+        this.value = value;
         if (predefinedValue) {
             predefinedPDFNames.put(value, this);
         } else {
@@ -553,6 +554,7 @@ public class ASAtom {
             return cachedPDFNames.get(value);
         } else {
             ASAtom result = new ASAtom(value, false);
+            result.setValue(value);
             cachedPDFNames.put(value, result);
             return result;
         }
@@ -560,6 +562,10 @@ public class ASAtom {
 
     public String getValue() {
         return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override
