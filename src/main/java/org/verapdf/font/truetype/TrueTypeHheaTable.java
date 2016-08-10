@@ -10,11 +10,11 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-class TrueTypeHheaTableParser extends TrueTypeTableParser {
+class TrueTypeHheaTable extends TrueTypeTable {
 
     private int numberOfHMetrics;
 
-    TrueTypeHheaTableParser(InternalInputStream source, long offset) {
+    TrueTypeHheaTable(InternalInputStream source, long offset) {
         super(source, offset);
     }
 

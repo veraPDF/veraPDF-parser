@@ -9,11 +9,11 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-abstract class TrueTypeTableParser extends TrueTypeBaseParser {
+abstract class TrueTypeTable extends TrueTypeBaseParser {
 
     protected long offset;
 
-    protected TrueTypeTableParser(InternalInputStream source, long offset) {
+    protected TrueTypeTable(InternalInputStream source, long offset) {
         super(source);
         this.offset = offset;
     }

@@ -1,6 +1,12 @@
 package org.verapdf.font.truetype;
 
+import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSDictionary;
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
+import org.verapdf.font.PDFlibFont;
 
 import java.io.IOException;
 
@@ -9,11 +15,14 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class TrueTypeFont {
+public class TrueTypeFont implements PDFlibFont {
 
     private float[] widths;
 
     private TrueTypeFontParser parser;
+    private boolean isSymbolic;
+    private COSObject encoding;
+    private String[] encodingMappingArray;
 
     /**
      * Constructor from stream, containing font data.
@@ -21,8 +30,15 @@ public class TrueTypeFont {
      * @param stream is stream containing font data.
      * @throws IOException if creation of @{link InternalInputStream} fails.
      */
-    public TrueTypeFont(ASInputStream stream) throws IOException {
+    public TrueTypeFont(ASInputStream stream, boolean isSymbolic,
+                        COSObject encoding) throws IOException {
         this.parser = new TrueTypeFontParser(stream);
+        this.isSymbolic = isSymbolic;
+        if (encoding != null) {
+            this.encoding = encoding;
+        } else {
+            this.isSymbolic = true;
+        }
     }
 
     /**
@@ -30,7 +46,8 @@ public class TrueTypeFont {
      *
      * @throws IOException if stream-reading error occurs.
      */
-    public void parse() throws IOException {
+    @Override
+    public void parseFont() throws IOException {
         this.parser.readHeader();
         this.parser.readTableDirectory();
         this.parser.readTables();
@@ -41,28 +58,138 @@ public class TrueTypeFont {
         for (int i = 0; i < unconvertedWidths.length; ++i) {
             widths[i] = unconvertedWidths[i] * quotient;
         }
+
+        if (!isSymbolic) {
+            this.createChToNameTable();
+        }
     }
 
     /**
-     * @return array, containing platform ID for each cmap in this True Type
-     * font.
+     * @return array, containing platform ID and encoding ID for each cmap in
+     * this True Type font.
      */
-    public int[] getCmapPlatformIDs() {
-        return this.parser.getCmapParser().getPlatformIDs();
+    public TrueTypeCmapSubtable[] getCmapEncodingPlatform() {
+        return this.parser.getCmapParser().getCmapInfos();
     }
 
-    /**
-     * @return array, containing encoding ID for each cmap in this True Type
-     * font.
-     */
-    public int[] getCmapEncodingIDs() {
-        return this.parser.getCmapParser().getEncodingIDs();
+    @Override
+    public float getWidth(int code) {
+        if (isSymbolic) {
+            return getWidthSymbolic(code);
+        } else {
+            String glyphName = encodingMappingArray[code];
+            return getWidth(glyphName);
+        }
     }
 
-    /**
-     * @return array, containing width for each glyph in this True Type font.
-     */
-    public float[] getWidths() {
-        return widths;
+    @Override
+    public float getWidth(String glyphName) {
+        if (isSymbolic) {
+            return -1;
+        }
+        if (glyphName.equals(TrueTypePredefined.NOTDEF_STRING)) {
+            int gid = this.parser.getPostParser().getGID(glyphName);
+            return widths[gid];
+        }
+        TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
+        if (cmap31 != null) {
+            AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
+            int gid = cmap31.getGlyph(unicode.getSymbolCode());
+            return widths[gid];
+        } else {
+            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+            if (cmap10 != null) {
+                int charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyphName);
+                int gid = cmap10.getGlyph(charCode);
+                return widths[gid];
+            } else {
+                return -1;  //case when no cmap (3,1) and no (1,0) is found
+            }
+        }
+    }
+
+    private float getWidthSymbolic(int code) {
+        TrueTypeCmapSubtable cmap30 = this.parser.getCmapTable(3, 0);
+        if (cmap30 != null) {
+            int sampleCode = cmap30.getSampleCharCode();
+            int highByteMask = sampleCode & 0x0000FF00;
+            if (highByteMask != 0x00000000 && highByteMask != 0x0000F000 &&
+                    highByteMask != 0x0000F100 && highByteMask != 0x0000F200) { // should we check this at all?
+                return -1;
+            }
+            int gid = cmap30.getGlyph(highByteMask & code);     // we suppose that code is in fact 1-byte value
+            return widths[gid];
+        } else {
+            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+            if (cmap10 != null) {
+                int gid = cmap10.getGlyph(code);
+                return widths[gid];
+            } else {
+                return -1;
+            }
+        }
+    }
+
+    private void createChToNameTable() throws IOException {
+        this.encodingMappingArray = new String[256];
+        if (this.encoding.getType() == COSObjType.COS_NAME) {
+            if (this.encoding.getString().equals(ASAtom.MAC_ROMAN_ENCODING)) {
+                System.arraycopy(TrueTypePredefined.MAC_ROMAN_ENCODING, 0,
+                        encodingMappingArray, 0, 256);
+            } else if (this.encoding.getString().equals(ASAtom.WIN_ANSI_ENCODING)) {
+                System.arraycopy(TrueTypePredefined.WIN_ANSI_ENCODING, 0,
+                        encodingMappingArray, 0, 256);
+            } else {
+                throw new IOException("Error in reading /Encoding entry in font dictionary");
+            }
+        } else if (this.encoding.getType() == COSObjType.COS_DICT) {
+            createChToNameTableFromDict((COSDictionary) this.encoding.get());
+        } else {
+            throw new IOException("Error in reading /Encoding entry in font dictionary");
+        }
+    }
+
+    private void createChToNameTableFromDict(COSDictionary encoding) throws IOException {
+        if (encoding.knownKey(ASAtom.BASE_ENCODING)) {
+            ASAtom baseEncoding = encoding.getNameKey(ASAtom.BASE_ENCODING);
+            if (ASAtom.WIN_ANSI_ENCODING.equals(baseEncoding)) {
+                System.arraycopy(TrueTypePredefined.WIN_ANSI_ENCODING, 0,
+                        encodingMappingArray, 0, 256);
+            } else if (ASAtom.MAC_ROMAN_ENCODING.equals(baseEncoding)) {
+                System.arraycopy(TrueTypePredefined.MAC_ROMAN_ENCODING, 0,
+                        encodingMappingArray, 0, 256);
+            } else if (ASAtom.getASAtom(
+                    TrueTypePredefined.MAC_EXPERT_ENCODING_STRING).equals(baseEncoding)) {
+                System.arraycopy(TrueTypePredefined.MAC_EXPERT_ENCODING, 0,
+                        encodingMappingArray, 0, 256);
+            } else {
+                throw new IOException("Error in reading /Encoding entry in font dictionary");
+            }
+        } else {
+            System.arraycopy(TrueTypePredefined.STANDARD_ENCODING, 0,
+                    encodingMappingArray, 0, 256);
+        }
+        COSArray differences = (COSArray) encoding.getKey(ASAtom.DIFFERENCES).get();
+        if (differences != null) {
+            applyDiffsToEncoding(differences);
+        }
+        for (int i = 0; i < 256; ++i) {
+            if (TrueTypePredefined.NOTDEF_STRING.equals(encodingMappingArray[i])) {
+                encodingMappingArray[i] = TrueTypePredefined.STANDARD_ENCODING[i];
+            }
+        }
+    }
+
+    private void applyDiffsToEncoding(COSArray differences) throws IOException {
+        int diffIndex = -1;
+        for (COSObject obj : differences) {
+            if (obj.getType() == COSObjType.COS_INTEGER) {
+                diffIndex = obj.getInteger().intValue();
+            } else if (obj.getType() == COSObjType.COS_NAME && diffIndex != -1) {
+                encodingMappingArray[diffIndex++] = obj.getString();
+            } else {
+                throw new IOException("Error in reading /Encoding entry in font dictionary");
+            }
+        }
     }
 }

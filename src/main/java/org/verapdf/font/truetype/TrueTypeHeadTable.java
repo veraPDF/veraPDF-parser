@@ -10,11 +10,11 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-class TrueTypeHeadTableParser extends TrueTypeTableParser {
+class TrueTypeHeadTable extends TrueTypeTable {
 
     private int unitsPerEm;
 
-    TrueTypeHeadTableParser(InternalInputStream source, long offset) {
+    TrueTypeHeadTable(InternalInputStream source, long offset) {
         super(source, offset);
     }
 

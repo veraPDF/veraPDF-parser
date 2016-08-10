@@ -15,12 +15,16 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
     private static final long HMTX = 1752003704;    // "hmtx" read as 4-byte unsigned number
     private static final long CMAP = 1668112752;    // "cmap" read as 4-byte unsigned number
     private static final long HEAD = 1751474532;    // "head" read as 4-byte unsigned number
+    private static final long POST = 1886352244;    // "post" read as 4-byte unsigned number
+    private static final long MAXP = 1835104368;    // "maxp" read as 4-byte unsigned number
 
     private int numTables;
-    private TrueTypeHeadTableParser headParser;
-    private TrueTypeHheaTableParser hheaParser;
-    private TrueTypeHmtxTableParser hmtxParser;
-    private TrueTypeCmapTableParser cmapParser;
+    private TrueTypeHeadTable headParser;
+    private TrueTypeHheaTable hheaParser;
+    private TrueTypeHmtxTable hmtxParser;
+    private TrueTypeCmapTable cmapParser;
+    private TrueTypePostTable postParser;
+    private TrueTypeMaxpTable maxpParser;
 
     TrueTypeFontParser(ASInputStream source) throws IOException {
         super(source);
@@ -37,15 +41,19 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
             long tabName = this.readULong();
             this.readULong();   // checksum
             long offset = this.readULong();
-            this.readULong();   // length
+            long length = this.readULong();   // length
             if (tabName == TrueTypeFontParser.CMAP) {
-                this.cmapParser = new TrueTypeCmapTableParser(this.source, offset);
+                this.cmapParser = new TrueTypeCmapTable(this.source, offset);
             } else if (tabName == TrueTypeFontParser.HHEA) {
-                this.hheaParser = new TrueTypeHheaTableParser(this.source, offset);
+                this.hheaParser = new TrueTypeHheaTable(this.source, offset);
             } else if (tabName == TrueTypeFontParser.HMTX) {
-                this.hmtxParser = new TrueTypeHmtxTableParser(this.source, offset);
+                this.hmtxParser = new TrueTypeHmtxTable(this.source, offset);
             } else if (tabName == TrueTypeFontParser.HEAD) {
-                this.headParser = new TrueTypeHeadTableParser(this.source, offset);
+                this.headParser = new TrueTypeHeadTable(this.source, offset);
+            } else if (tabName == TrueTypeFontParser.POST) {
+                this.postParser = new TrueTypePostTable(this.source, offset, length);
+            } else if (tabName == TrueTypeFontParser.MAXP) {
+                this.maxpParser = new TrueTypeMaxpTable(source, offset);
             }
         }
     }
@@ -56,21 +64,33 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         this.hmtxParser.setNumberOfHMetrics(hheaParser.getNumberOfHMetrics());
         this.hmtxParser.readTable();
         this.cmapParser.readTable();
+        this.maxpParser.readTable();
+        this.postParser.setNumGlyphs(maxpParser.getNumGlyphs());
     }
 
-    TrueTypeHeadTableParser getHeadParser() {
+    TrueTypeHeadTable getHeadParser() {
         return headParser;
     }
 
-    TrueTypeHheaTableParser getHheaParser() {
-        return hheaParser;
-    }
-
-    TrueTypeHmtxTableParser getHmtxParser() {
+    TrueTypeHmtxTable getHmtxParser() {
         return hmtxParser;
     }
 
-    TrueTypeCmapTableParser getCmapParser() {
+    TrueTypeCmapTable getCmapParser() {
         return cmapParser;
+    }
+
+    public TrueTypePostTable getPostParser() {
+        return postParser;
+    }
+
+    public TrueTypeCmapSubtable getCmapTable(int platformID, int encodingID) {
+        for (TrueTypeCmapSubtable ttci : cmapParser.getCmapInfos()) {
+            if (ttci.getPlatformID() == platformID &&
+                    ttci.getEncodingID() == encodingID) {
+                return ttci;
+            }
+        }
+        return null;
     }
 }

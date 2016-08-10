@@ -10,12 +10,12 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-class TrueTypeHmtxTableParser extends TrueTypeTableParser {
+class TrueTypeHmtxTable extends TrueTypeTable {
 
     private int[] longHorMetrics;
     private int numberOfHMetrics;
 
-    TrueTypeHmtxTableParser(InternalInputStream source, long offset) {
+    TrueTypeHmtxTable(InternalInputStream source, long offset) {
         super(source, offset);
     }
 
