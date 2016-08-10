@@ -13,13 +13,13 @@ public class COSTrailer extends PDObject {
 		setObject(COSDictionary.construct(), false);
 	}
 
-	public long getSize() {
+	public Long getSize() {
 		return getObject().getIntegerKey(ASAtom.SIZE);
 	}
 
-	public void setSize(final long size) {
+	public void setSize(final Long size) {
 		if (getPrev() != 0) {
-			final long prevSize = getObject().getIntegerKey(ASAtom.SIZE);
+			final Long prevSize = getObject().getIntegerKey(ASAtom.SIZE);
 			if (prevSize > size) {
 				return;
 			}
@@ -27,11 +27,11 @@ public class COSTrailer extends PDObject {
 		getObject().setIntegerKey(ASAtom.SIZE, size);
 	}
 
-	public long getPrev() {
+	public Long getPrev() {
 		return getObject().getIntegerKey(ASAtom.PREV);
 	}
 
-	public void setPrev(final long prev) {
+	public void setPrev(final Long prev) {
 		if (prev != 0) {
 			getObject().setIntegerKey(ASAtom.PREV, prev);
 		} else {
