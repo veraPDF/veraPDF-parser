@@ -181,7 +181,7 @@ public class PDFParser extends COSParser {
     }
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
-        this.getXRefInfo(infos, 0);
+        this.getXRefInfo(infos, 0L);
     }
 
     public COSObject getObject(final long offset) throws IOException {
@@ -262,7 +262,7 @@ public class PDFParser extends COSParser {
         this.flag = true;
     }
 
-    private long findLastXRef() throws IOException {
+    private Long findLastXRef() throws IOException {
         source.seekFromEnd(64);
         if (findKeyword(Token.Keyword.KW_STARTXREF)) {
             nextToken();
@@ -270,7 +270,7 @@ public class PDFParser extends COSParser {
                 return getToken().integer;
             }
         }
-        return 0;
+        return 0L;
     }
 
     private byte calculatePostEOFDataSize() throws IOException {
@@ -401,7 +401,7 @@ public class PDFParser extends COSParser {
         xrefStreamParser.parseStreamAndTrailer();
     }
 
-	private void getXRefInfo(final List<COSXRefInfo> info, long offset) throws IOException {
+	private void getXRefInfo(final List<COSXRefInfo> info, Long offset) throws IOException {
 		if (offset == 0) {
 			offset = findLastXRef();
 			if (offset == 0) {
@@ -420,7 +420,7 @@ public class PDFParser extends COSParser {
         getXRefSectionAndTrailer(section);
 
         offset = section.getTrailer().getPrev();
-		if (offset == 0) {
+		if (offset == null || offset == 0) {
 			return;
 		}
 
