@@ -24,11 +24,11 @@ public class TrueTypeCmapSubtable {
         this.sampleCode = -1;
     }
 
-    public int getPlatformID() {
+    int getPlatformID() {
         return platformID;
     }
 
-    public int getEncodingID() {
+    int getEncodingID() {
         return encodingID;
     }
 
@@ -51,7 +51,11 @@ public class TrueTypeCmapSubtable {
         }
     }
 
-    public int getSampleCharCode() {
+    int getSampleCharCode() {
         return this.sampleCode;
+    }
+
+    public boolean containsGlyph(int glyphCode) {
+        return this.mapping.containsValue(glyphCode);
     }
 }

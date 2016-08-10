@@ -133,10 +133,10 @@ public class TrueTypeFont implements PDFlibFont {
     private void createChToNameTable() throws IOException {
         this.encodingMappingArray = new String[256];
         if (this.encoding.getType() == COSObjType.COS_NAME) {
-            if (this.encoding.getString().equals(ASAtom.MAC_ROMAN_ENCODING)) {
+            if (ASAtom.MAC_ROMAN_ENCODING.getValue().equals(this.encoding.get().getString())) {
                 System.arraycopy(TrueTypePredefined.MAC_ROMAN_ENCODING, 0,
                         encodingMappingArray, 0, 256);
-            } else if (this.encoding.getString().equals(ASAtom.WIN_ANSI_ENCODING)) {
+            } else if (ASAtom.WIN_ANSI_ENCODING.getValue().equals(this.encoding.get().getString())) {
                 System.arraycopy(TrueTypePredefined.WIN_ANSI_ENCODING, 0,
                         encodingMappingArray, 0, 256);
             } else {

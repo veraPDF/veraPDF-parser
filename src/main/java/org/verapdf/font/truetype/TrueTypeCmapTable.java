@@ -35,7 +35,7 @@ class TrueTypeCmapTable extends TrueTypeTable {
                             this.readULong());
         }
         for (TrueTypeCmapSubtable cmap : cmapInfos) {
-            this.source.seek(cmap.getOffset());
+            this.source.seek(cmap.getOffset() + this.offset);
             int format = this.readUShort();
             switch (format) {
                 case 0:
@@ -80,18 +80,23 @@ class TrueTypeCmapTable extends TrueTypeTable {
                 startCode, idDelta, idRangeOffset, segCount);
         for (int i = 0; i < segCount; ++i) {
             if (idRangeOffset[i] == 0) {
-                for (int j = startCode[i]; j <= endCode[j]; ++j) {
-                    cmap.put(j, idDelta[i] + j);
+                for (int j = startCode[i]; j <= endCode[i]; ++j) {
+                    cmap.put(j, (idDelta[i] + j) % 65536);
                 }
             } else {
-                for (int j = 0; j < endCode[i] - startCode[i]; ++j) {    // In the next line according to spec we need to write idRangeOffset[i]/2. Why?
-                    long glyphOffset = j + idRangeOffset[i] + idRangeOffsetBegin + 2 * i;   // adding offset of i-th element in idRangeOffset
-                    this.source.seek(glyphOffset);
-                    int glyphCode = this.readUShort();
-                    if (glyphCode != 0) {
-                        glyphCode = (glyphCode + idDelta[i]) % 65536;
+                if (startCode[i] != 65535 && endCode[i] != 65535) {
+                    for (int j = 0; j <= endCode[i] - startCode[i]; ++j) {    // In the next line according to spec we need to write idRangeOffset[i]/2. Why?
+                        long glyphOffset = idRangeOffsetBegin +
+                                ((idRangeOffset[i] / 2) + j + (i - segCount)) * 2;
+                        this.source.seek(glyphOffset);
+                        int glyphCode = this.readUShort();
+                        if (glyphCode != 0) {
+                            glyphCode = (glyphCode + idDelta[i]) % 65536;
+                        }
+                        if (!cmap.containsGlyph(glyphCode)) {
+                            cmap.put(j + startCode[i], glyphCode);
+                        }
                     }
-                    cmap.put(j, glyphCode);
                 }
             }
         }
@@ -109,11 +114,10 @@ class TrueTypeCmapTable extends TrueTypeTable {
         for (int i = 0; i < segCount; ++i) {
             idDelta[i] = this.readUShort();
         }
-        long idRangeBegin = this.source.getOffset();
         for (int i = 0; i < segCount; ++i) {
             idRangeOffset[i] = this.readUShort();
         }
-        return idRangeBegin;
+        return this.source.getOffset();
     }
 
     private void readTrimmedTableMapping(TrueTypeCmapSubtable cmap) throws IOException {

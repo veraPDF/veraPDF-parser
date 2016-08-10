@@ -7,11 +7,11 @@ import java.io.IOException;
 /**
  * @author Sergey Shemyakov
  */
-public class TrueTypeMaxpTable extends TrueTypeTable {
+class TrueTypeMaxpTable extends TrueTypeTable {
 
     private int numGlyphs;
 
-    public TrueTypeMaxpTable(InternalInputStream source, long offset) {
+    TrueTypeMaxpTable(InternalInputStream source, long offset) {
         super(source, offset);
     }
 
@@ -24,7 +24,7 @@ public class TrueTypeMaxpTable extends TrueTypeTable {
         this.source.seek(startingOffset);
     }
 
-    public int getNumGlyphs() {
+    int getNumGlyphs() {
         return numGlyphs;
     }
 }

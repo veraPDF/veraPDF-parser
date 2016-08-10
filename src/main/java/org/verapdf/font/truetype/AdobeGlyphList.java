@@ -20,8 +20,9 @@ public class AdobeGlyphList {
     private static final Logger LOGGER = Logger.getLogger(AdobeGlyphList.class);
 
     private static final Map<String, AGLUnicode> MAPPING =
-            new HashMap<String, AGLUnicode>();
+            new HashMap<>();
     private static final String AGL_FILE = "/font/AdobeGlyphList.txt";
+    private static final AGLUnicode EMPTY = new AGLUnicode(-1);
 
 
     private static String getSystemIndependentPath(String path)
@@ -60,7 +61,12 @@ public class AdobeGlyphList {
     }
 
     public static AGLUnicode get(String glyphName) {
-        return MAPPING.get(glyphName);
+        AGLUnicode res = MAPPING.get(glyphName);
+        if (res == null) {
+            LOGGER.debug("Cannot find glyph " + glyphName + " in Adobe Glyph List");
+            return EMPTY;
+        }
+        return res;
     }
 
     /**

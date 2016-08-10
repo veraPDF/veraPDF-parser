@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-public class TrueTypePostTable extends TrueTypeTable {
+class TrueTypePostTable extends TrueTypeTable {
 
     private long length;
     private int numGlyphs;
@@ -55,10 +55,11 @@ public class TrueTypePostTable extends TrueTypeTable {
                 strings.add(this.readPascalString());
             }
             for (int i = 0; i < this.numGlyphs; ++i) {
-                if (glyphNameIndexInt[i] < 256) {
-                    stringToGid.put(TrueTypePredefined.MAC_ROMAN_ENCODING[glyphNameIndexInt[i]], i);
+                if (glyphNameIndexInt[i] < TrueTypePredefined.MAC_INDEX_TO_GLYPH_NAME.length) {
+                    stringToGid.put(TrueTypePredefined.MAC_INDEX_TO_GLYPH_NAME[glyphNameIndexInt[i]], i);
                 } else {
-                    stringToGid.put(strings.get(glyphNameIndexInt[i] - 256), i);
+                    stringToGid.put(strings.get(glyphNameIndexInt[i] -
+                            TrueTypePredefined.MAC_INDEX_TO_GLYPH_NAME.length), i);
                 }
             }
         } else if (format == 2.5f) {

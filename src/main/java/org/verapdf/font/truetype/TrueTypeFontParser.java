@@ -66,6 +66,7 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         this.cmapParser.readTable();
         this.maxpParser.readTable();
         this.postParser.setNumGlyphs(maxpParser.getNumGlyphs());
+        this.postParser.readTable();
     }
 
     TrueTypeHeadTable getHeadParser() {
@@ -80,11 +81,11 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         return cmapParser;
     }
 
-    public TrueTypePostTable getPostParser() {
+    TrueTypePostTable getPostParser() {
         return postParser;
     }
 
-    public TrueTypeCmapSubtable getCmapTable(int platformID, int encodingID) {
+    TrueTypeCmapSubtable getCmapTable(int platformID, int encodingID) {
         for (TrueTypeCmapSubtable ttci : cmapParser.getCmapInfos()) {
             if (ttci.getPlatformID() == platformID &&
                     ttci.getEncodingID() == encodingID) {
