@@ -22,6 +22,16 @@ public class ASFileInStream extends ASInputStream {
 		this.curPos = 0;
 	}
 
+	@Override
+	public int read() throws IOException {
+		if (this.offset < this.size) {
+			return this.stream.readByte();
+		} else {
+			return -1;
+		}
+	}
+
+	@Override
 	public int read(byte[] buffer, int sizeToRead) throws IOException {
 		if (sizeToRead == 0 || this.size != nPos && this.size <= this.curPos) {
 			return -1;
@@ -54,6 +64,7 @@ public class ASFileInStream extends ASInputStream {
 		}
 	}
 
+	@Override
 	public int skip(int size) throws IOException {
 		if (size == 0 || this.size != nPos && this.size <= this.curPos) {
 			return 0;
@@ -68,15 +79,13 @@ public class ASFileInStream extends ASInputStream {
 		return size;
 	}
 
+	@Override
 	public void close() {
 	}
 
+	@Override
 	public void reset() {
 		this.curPos = 0;
-	}
-
-	public boolean isCloneable() {
-		return false;
 	}
 
 }

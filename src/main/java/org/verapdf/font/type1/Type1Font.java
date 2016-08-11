@@ -72,7 +72,7 @@ public class Type1Font extends COSParser implements PDFlibFont {
     private void processToken() throws IOException {
         switch (getToken().type) {
             case TT_NAME:
-                switch (getToken().token) {
+                switch (getToken().getValue()) {
                     //Do processing of all necessary names like /FontName, /FamilyName, etc.
                     case Type1StringConstants.FONT_MATRIX_STRING:
                         this.skipSpaces();
@@ -90,13 +90,13 @@ public class Type1Font extends COSParser implements PDFlibFont {
                     case Type1StringConstants.ENCODING_STRING:
                         do {
                             nextToken();
-                        } while (!this.getToken().token.equals(
+                        } while (!this.getToken().getValue().equals(
                                 Type1StringConstants.DUP_STRING));
                         this.source.unread(3);
 
                         while (true) {
                             nextToken();
-                            if (this.getToken().token.equals(
+                            if (this.getToken().getValue().equals(
                                     Type1StringConstants.READONLY_STRING)) {
                                 break;
                             }
@@ -104,7 +104,7 @@ public class Type1Font extends COSParser implements PDFlibFont {
                             this.readNumber();
                             long key = this.getToken().integer;
                             this.nextToken();
-                            encoding[(int) key] = this.getToken().token;
+                            encoding[(int) key] = this.getToken().getValue();
                             this.nextToken();
                         }
                         break;
@@ -113,7 +113,7 @@ public class Type1Font extends COSParser implements PDFlibFont {
                 }
                 break;
             case TT_NONE:
-                switch (getToken().token) {
+                switch (getToken().getValue()) {
                     //Do processing of keywords like eexec
                     case Type1StringConstants.EEXEC_STRING:
                         this.skipSpaces();
