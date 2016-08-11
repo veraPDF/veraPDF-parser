@@ -15,12 +15,11 @@ import java.util.NoSuchElementException;
  */
 public class PDFStreamParser extends COSParser {
 
-	private final List<Object> tokens;
+	private final List<Object> tokens = new ArrayList<>();
 
 	public PDFStreamParser(COSStream stream) throws IOException {
 		super(stream.getData());
-
-		this.tokens = new ArrayList<>();
+		initializeToken();
 	}
 
 	public void parseTokens() throws IOException {
@@ -107,7 +106,7 @@ public class PDFStreamParser extends COSParser {
 					result = getDictionary();
 				} else {
 					nextToken();
-					result = COSString.construct(getToken().token);
+					result = COSString.construct(getToken().getValue());
 				}
 				break;
 			}
@@ -117,7 +116,7 @@ public class PDFStreamParser extends COSParser {
 			}
 			case '(':
 				nextToken();
-				result = COSString.construct(getToken().token);
+				result = COSString.construct(getToken().getValue());
 				break;
 			case '/':
 				// name
@@ -193,10 +192,10 @@ public class PDFStreamParser extends COSParser {
 				(nextByte < '0' || nextByte > '9'))	{
 			byte currentByte = source.readByte();
 			nextByte = source.peek();
-			buffer.append(currentByte);
+			buffer.append((char) currentByte);
 			// d0 and d1 operators
 			if (currentByte == 'd' && (nextByte == '0' || nextByte == '1') ) {
-				buffer.append(source.readByte());
+				buffer.append((char) source.readByte());
 				nextByte = source.peek();
 			}
 		}

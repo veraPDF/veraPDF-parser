@@ -276,6 +276,10 @@ public abstract class COSDirect extends COSBase {
         return null;
     }
 
+    public COSBase getDirectBase() {
+        return this;
+    }
+
     public boolean setDirect(final COSObject value) {
         return false;
     }
