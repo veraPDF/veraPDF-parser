@@ -1,7 +1,6 @@
 package org.verapdf.pd.patterns;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.tools.TypeConverter;
 
@@ -21,8 +20,7 @@ public class PDShadingPattern extends PDPattern {
 
     public PDShading getShading() {
         COSObject obj = getKey(ASAtom.SHADING);
-        if (obj != null &&
-                (obj.getType() == COSObjType.COS_DICT || obj.getType() == COSObjType.COS_STREAM)) {
+        if (obj != null && obj.getType().isDictionaryBased()) {
             return new PDShading(obj);
         } else {
             return null;

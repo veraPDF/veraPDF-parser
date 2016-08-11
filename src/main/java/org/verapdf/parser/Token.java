@@ -14,7 +14,7 @@ public class Token {
 	public long integer;
 	public double real;
 
-	public String token;
+	private StringBuilder token = new StringBuilder();
 
 	//fields specific for pdf/a validation of strings
 	private boolean containsOnlyHex = true;
@@ -22,7 +22,19 @@ public class Token {
 
 	public void toKeyword() {
 		this.type = Type.TT_KEYWORD;
-		this.keyword = getKeyword(token);
+		this.keyword = getKeyword(token.toString());
+	}
+
+	public void append(char c) {
+		this.token.append(c);
+	}
+
+	public String getValue() {
+		return this.token.toString();
+	}
+
+	public void clearValue() {
+		this.token.setLength(0);
 	}
 
 	public enum Type {
@@ -57,33 +69,27 @@ public class Token {
 		KW_TRAILER
 	}
 
-	private static final Map<Keyword, String> keywords = new HashMap<Keyword, String>();
+	private static final Map<String, Keyword> keywords = new HashMap<>();
 
 	static {
-		keywords.put(Keyword.KW_NULL, "null");
-		keywords.put(Keyword.KW_TRUE, "true");
-		keywords.put(Keyword.KW_FALSE, "false");
-		keywords.put(Keyword.KW_STREAM, "stream");
-		keywords.put(Keyword.KW_ENDSTREAM, "endstream");
-		keywords.put(Keyword.KW_OBJ, "obj");
-		keywords.put(Keyword.KW_ENDOBJ, "endobj");
-		keywords.put(Keyword.KW_R, "R");
-		keywords.put(Keyword.KW_N, "n");
-		keywords.put(Keyword.KW_F, "f");
-		keywords.put(Keyword.KW_XREF, "xref");
-		keywords.put(Keyword.KW_STARTXREF, "startxref");
-		keywords.put(Keyword.KW_TRAILER, "trailer");
-		keywords.put(Keyword.KW_NONE, null);
+		keywords.put("null", Keyword.KW_NULL);
+		keywords.put("true", Keyword.KW_TRUE);
+		keywords.put("false", Keyword.KW_FALSE);
+		keywords.put("stream", Keyword.KW_STREAM);
+		keywords.put("endstream", Keyword.KW_ENDSTREAM);
+		keywords.put("obj", Keyword.KW_OBJ );
+		keywords.put("endobj", Keyword.KW_ENDOBJ);
+		keywords.put("R", Keyword.KW_R );
+		keywords.put("n", Keyword.KW_N);
+		keywords.put("f", Keyword.KW_F);
+		keywords.put("xref", Keyword.KW_XREF);
+		keywords.put("startxref", Keyword.KW_STARTXREF);
+		keywords.put("trailer", Keyword.KW_TRAILER);
+		keywords.put(null, Keyword.KW_NONE);
 	}
 
 	public static Keyword getKeyword(final String keyword) {
-		for (Map.Entry<Keyword, String> entry : keywords.entrySet()) {
-			if (keyword.equals(entry.getValue())) {
-				return entry.getKey();
-			}
-		}
-		//TODO : not sure it's correct
-		return Keyword.KW_NONE;
+		return keywords.get(keyword);
 	}
 
 	//GETTERS & SETTERS

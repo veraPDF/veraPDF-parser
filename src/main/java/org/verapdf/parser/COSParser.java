@@ -18,6 +18,11 @@ public class COSParser extends BaseParser {
 
 	private static final Logger LOG = Logger.getLogger(COSParser.class);
 
+	/**
+	 * Linearization dictionary must be in first 1024 bytes of document
+	 */
+	protected final int LINEARIZATION_DICTIONARY_LOOKUP_SIZE = 1024;
+
 	protected COSDocument document;
 	protected Queue<COSObject> objects = new LinkedList<>();
 	protected Queue<Integer> integers = new LinkedList<>();
@@ -123,11 +128,11 @@ public class COSParser extends BaseParser {
 			case TT_REAL:
 				return COSReal.construct(token.real);
 			case TT_LITSTRING:
-				return COSString.construct(token.token);
+				return COSString.construct(token.getValue());
 			case TT_HEXSTRING:
-				return COSString.construct(token.token, true, token.getHexCount(), token.isContainsOnlyHex());
+				return COSString.construct(token.getValue(), true, token.getHexCount(), token.isContainsOnlyHex());
 			case TT_NAME:
-				return COSName.construct(token.token);
+				return COSName.construct(token.getValue());
 			case TT_OPENARRAY:
 				this.flag = false;
 				return getArray();
@@ -182,7 +187,7 @@ public class COSParser extends BaseParser {
 		if (token.type != Token.Type.TT_NAME) {
 			return new COSObject();
 		}
-		return COSName.construct(token.token);
+		return COSName.construct(token.getValue());
 	}
 
 	protected COSObject getDictionary() throws IOException {

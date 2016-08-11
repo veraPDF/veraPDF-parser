@@ -32,7 +32,7 @@ class Type1PrivateParser extends BaseParser {
         glyphWidths = new HashMap<>();
         this.fontMatrix = fontMatrix;
         isDefaultFontMatrix = Arrays.equals(this.fontMatrix,
-                Type1Parser.DEFAULT_FONT_MATRIX);
+                Type1Font.DEFAULT_FONT_MATRIX);
         this.lenIV = 4;
     }
 
@@ -41,7 +41,8 @@ class Type1PrivateParser extends BaseParser {
 
         skipSpaces(true);
 
-        while (getToken().type != Token.Type.TT_EOF) {
+        while (getToken().type != Token.Type.TT_EOF &&
+                !Type1StringConstants.CLOSEFILE.equals(getToken().getValue())) {
             nextToken();
             processToken();
         }
@@ -50,7 +51,7 @@ class Type1PrivateParser extends BaseParser {
     private void processToken() throws IOException {
         switch (this.getToken().type) {
             case TT_NAME:
-                switch (this.getToken().token) {
+                switch (this.getToken().getValue()) {
                     case Type1StringConstants.CHAR_STRINGS_STRING:
                         nextToken();
                         int amountOfGlyphs = (int) this.getToken().integer;
@@ -67,6 +68,23 @@ class Type1PrivateParser extends BaseParser {
                             this.lenIV = (int) this.getToken().integer;
                         }
                         break;
+                    case Type1StringConstants.SUBRS:    // skipping binary data that can be bad for parser
+                        nextToken();
+                        int amountOfSubrs = (int) this.getToken().integer;
+                        nextToken();    // reading "array"
+                        for (int i = 0; i < amountOfSubrs; ++i) {
+                            nextToken();    // reading "dup"
+                            nextToken();    // reading number
+                            nextToken();
+                            long toSkip = this.getToken().integer;
+                            nextToken();    // reading "RD"
+                            this.skipSpaces();
+                            this.source.skip(toSkip);
+                            this.nextToken();   // reading "NP"
+                        }
+                        break;
+                    default:
+                        break;
                 }
         }
     }
@@ -82,7 +100,7 @@ class Type1PrivateParser extends BaseParser {
     private void decodeCharString() throws IOException {
         this.nextToken();
         checkTokenType(Token.Type.TT_NAME);
-        String glyphName = this.getToken().token;
+        String glyphName = this.getToken().getValue();
         this.nextToken();
         checkTokenType(Token.Type.TT_INTEGER);
         long charstringLength = this.getToken().integer;
@@ -94,11 +112,11 @@ class Type1PrivateParser extends BaseParser {
                 new ASFileInStream(this.source.getStream(), beginOffset, charstringLength));
         ASInputStream decodedCharString = new EexecFilterDecode(
                 charString, true, this.getLenIV());
-        CharStringParser parser = new CharStringParser(decodedCharString);
-        if(!isDefaultFontMatrix) {
-            glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth()));
+        Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
+        if (!isDefaultFontMatrix) {
+            glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getInteger()));
         } else {
-            glyphWidths.put(glyphName, parser.getWidth());
+            glyphWidths.put(glyphName, (int) parser.getWidth().getInteger());
         }
         this.nextToken();
     }
@@ -110,7 +128,7 @@ class Type1PrivateParser extends BaseParser {
         }
     }
 
-    private int applyFontMatrix(int width) {
+    private int applyFontMatrix(long width) {
         return (int) (width * fontMatrix[0]) * 1000;
     }
 

@@ -21,6 +21,11 @@ public class PDXForm extends PDXObject implements PDContentStream {
 	}
 
 	@Override
+	public ASAtom getType() {
+		return ASAtom.FORM;
+	}
+
+	@Override
 	public COSObject getContents() {
 		return super.getObject();
 	}

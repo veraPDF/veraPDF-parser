@@ -285,6 +285,7 @@ public class ASAtom {
     public static final ASAtom LE = new ASAtom("LE");
     public static final ASAtom LEADING = new ASAtom("Leading");
     public static final ASAtom LEGAL_ATTESTATION = new ASAtom("LegalAttestation");
+    public static final ASAtom LINEARIZED = new ASAtom("Linearized");
     public static final ASAtom LENGTH = new ASAtom("Length");
     public static final ASAtom LENGTH1 = new ASAtom("Length1");
     public static final ASAtom LENGTH2 = new ASAtom("Length2");
@@ -380,6 +381,7 @@ public class ASAtom {
     public static final ASAtom PG = new ASAtom("Pg");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");
     public static final ASAtom PREDICTOR = new ASAtom("Predictor");
+    public static final ASAtom PRES_STEPS = new ASAtom("PresSteps");
     public static final ASAtom PREV = new ASAtom("Prev");
     public static final ASAtom PRINT_AREA = new ASAtom("PrintArea");
     public static final ASAtom PRINT_CLIP = new ASAtom("PrintClip");
@@ -531,6 +533,7 @@ public class ASAtom {
     }
 
     private ASAtom(String value, boolean predefinedValue) {
+        this.value = value;
         if (predefinedValue) {
             predefinedPDFNames.put(value, this);
         } else {
@@ -551,6 +554,7 @@ public class ASAtom {
             return cachedPDFNames.get(value);
         } else {
             ASAtom result = new ASAtom(value, false);
+            result.setValue(value);
             cachedPDFNames.put(value, result);
             return result;
         }
@@ -558,6 +562,10 @@ public class ASAtom {
 
     public String getValue() {
         return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override
