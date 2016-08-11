@@ -305,14 +305,14 @@ class CFFType1Font extends CFFFileBaseParser implements PDFlibFont {
         try {
             return this.widths[this.encoding[charCode]];
         } catch (ArrayIndexOutOfBoundsException e) {
-            return -1;
+            return this.widths[0];
         }
     }
 
     public float getWidth(String charName) {
         Integer index = this.charSet.get(charName);
         if (index == null || index >= this.widths.length || index < 0) {
-            return -1;
+            return this.widths[0];
         }
         return this.widths[index];
     }
