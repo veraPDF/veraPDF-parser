@@ -373,7 +373,7 @@ public class PDFParser extends COSParser {
                 nextToken();
                 xref.generation = (int) getToken().integer;
                 nextToken();
-                xref.free = getToken().token.charAt(0);
+                xref.free = getToken().getValue().charAt(0);
                 xrefs.addEntry(number + i, xref);
             }
             nextToken();

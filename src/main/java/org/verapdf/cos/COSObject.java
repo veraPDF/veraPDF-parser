@@ -396,6 +396,10 @@ public class COSObject {
 		return this.base != null ? this.base.getDirect() : null;
 	}
 
+	public COSBase getDirectBase() {
+		return this.base != null ? this.base.getDirectBase() : null;
+	}
+
 	public void setDirect(final COSObject value) {
 		if (this.base == null || !this.base.setDirect(value)) {
 			set(value.base);

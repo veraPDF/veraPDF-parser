@@ -67,7 +67,7 @@ public class CMapParser extends BaseParser {
     private void processToken() throws IOException {
         switch (getToken().type) {
             case TT_NAME:
-                switch (getToken().token) {
+                switch (getToken().getValue()) {
                     case "WMode":
                         skipSpaces();
                         readNumber();
@@ -76,25 +76,25 @@ public class CMapParser extends BaseParser {
                     case "Registry":
                         nextToken();
                         if (getToken().type.equals(Token.Type.TT_LITSTRING)) {
-                            this.cMap.setRegistry(getToken().token);
+                            this.cMap.setRegistry(getToken().getValue());
                         } else {
-                            throw new IOException("CMap contains invalid /" + getToken().token + " value");
+                            throw new IOException("CMap contains invalid /" + getToken().getValue() + " value");
                         }
                         break;
                     case "Ordering":
                         nextToken();
                         if (getToken().type.equals(Token.Type.TT_LITSTRING)) {
-                            this.cMap.setOrdering(getToken().token);
+                            this.cMap.setOrdering(getToken().getValue());
                         } else {
-                            throw new IOException("CMap contains invalid /" + getToken().token + " value");
+                            throw new IOException("CMap contains invalid /" + getToken().getValue() + " value");
                         }
                         break;
                     case "CMapName":
                         nextToken();
                         if (getToken().type.equals(Token.Type.TT_NAME)) {
-                            this.cMap.setName(getToken().token);
+                            this.cMap.setName(getToken().getValue());
                         } else {
-                            throw new IOException("CMap contains invalid /" + getToken().token + " value");
+                            throw new IOException("CMap contains invalid /" + getToken().getValue() + " value");
                         }
                         break;
                 }
@@ -102,10 +102,10 @@ public class CMapParser extends BaseParser {
             case TT_INTEGER:
                 int listLength = (int) getToken().integer;
                 nextToken();
-                if (!getToken().type.equals(Token.Type.TT_NONE)) {
+                if (getToken().type != Token.Type.TT_KEYWORD) {
                     break;
                 }
-                processList(listLength, getToken().token);
+                processList(listLength, getToken().getValue());
         }
     }
 
@@ -134,7 +134,7 @@ public class CMapParser extends BaseParser {
             }
         }
         nextToken();
-        if (!getToken().token.equals("end" + type)) {
+        if (!getToken().getValue().equals("end" + type)) {
             LOGGER.warn("Unexpected end of " + type + " in CMap");
         }
     }
@@ -142,11 +142,11 @@ public class CMapParser extends BaseParser {
     private void readLineCodeSpaceRange() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "codespacerange list");
-        byte[] begin = getRawBytes(getToken().token);
+        byte[] begin = getRawBytes(getToken().getValue());
 
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "codespacerange list");
-        byte[] end = getRawBytes(getToken().token);
+        byte[] end = getRawBytes(getToken().getValue());
 
         CodeSpace codeSpace = new CodeSpace(begin, end);
 
@@ -170,11 +170,11 @@ public class CMapParser extends BaseParser {
     private void readLineCIDRange() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "cidrange list");
-        long cidRangeStart = numberFromBytes(getRawBytes(getToken().token));
+        long cidRangeStart = numberFromBytes(getRawBytes(getToken().getValue()));
 
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "cidrange list");
-        long cidRangeEnd = numberFromBytes(getRawBytes(getToken().token));
+        long cidRangeEnd = numberFromBytes(getRawBytes(getToken().getValue()));
 
         nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "cidrange list");
@@ -185,11 +185,11 @@ public class CMapParser extends BaseParser {
     private void readLineNotDefRange() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "notdef list");
-        long notDefRangeStart = numberFromBytes(getRawBytes(getToken().token));
+        long notDefRangeStart = numberFromBytes(getRawBytes(getToken().getValue()));
 
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "notdef list");
-        long notDefRangeEnd = numberFromBytes(getRawBytes(getToken().token));
+        long notDefRangeEnd = numberFromBytes(getRawBytes(getToken().getValue()));
 
         nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "notdef list");
@@ -200,7 +200,7 @@ public class CMapParser extends BaseParser {
     private void readSingleCharMapping() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "cidchar");
-        long charCode = numberFromBytes(getRawBytes(getToken().token));
+        long charCode = numberFromBytes(getRawBytes(getToken().getValue()));
 
         nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "cidchar");
@@ -211,7 +211,7 @@ public class CMapParser extends BaseParser {
     private void readSingleNotDefMapping() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "notdefchar");
-        long notDefCharCode = numberFromBytes(getRawBytes(getToken().token));
+        long notDefCharCode = numberFromBytes(getRawBytes(getToken().getValue()));
 
         nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "notdefchar");

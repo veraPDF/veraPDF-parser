@@ -50,7 +50,7 @@ class Type1PrivateParser extends BaseParser {
     private void processToken() throws IOException {
         switch (this.getToken().type) {
             case TT_NAME:
-                switch (this.getToken().token) {
+                switch (this.getToken().getValue()) {
                     case Type1StringConstants.CHAR_STRINGS_STRING:
                         nextToken();
                         int amountOfGlyphs = (int) this.getToken().integer;
@@ -82,7 +82,7 @@ class Type1PrivateParser extends BaseParser {
     private void decodeCharString() throws IOException {
         this.nextToken();
         checkTokenType(Token.Type.TT_NAME);
-        String glyphName = this.getToken().token;
+        String glyphName = this.getToken().getValue();
         this.nextToken();
         checkTokenType(Token.Type.TT_INTEGER);
         long charstringLength = this.getToken().integer;

@@ -48,7 +48,7 @@ public class PDMetadata extends PDObject {
     }
 
     public COSStream getCOSStream() {
-        COSBase currentObject = getObject().get();
+        COSBase currentObject = getObject().getDirectBase();
         if (currentObject.getType() == COSObjType.COS_STREAM) {
             return (COSStream) currentObject;
         } else {
