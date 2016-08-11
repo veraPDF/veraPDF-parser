@@ -4,6 +4,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.colors.PDColorSpace;
+import org.verapdf.pd.images.PDXObject;
 import org.verapdf.pd.patterns.PDShading;
 
 /**
@@ -21,9 +22,19 @@ public class PDResources extends PDObject {
 		return ColorSpaceFactory.getColorSpace(rawColorSpace);
 	}
 
+	public PDColorSpace getPattern(ASAtom name) {
+		COSObject rawPattern = getResource(ASAtom.PATTERN, name);
+		return ColorSpaceFactory.getColorSpace(rawPattern);
+	}
+
 	public PDShading getShading(ASAtom name) {
 		COSObject rawShading = getResource(ASAtom.SHADING, name);
 		return new PDShading(rawShading);
+	}
+
+	public PDXObject getXObject(ASAtom name) {
+		COSObject rawXObject = getResource(ASAtom.XOBJECT, name);
+		return PDXObject.getTypedPDXObject(rawXObject);
 	}
 
 	public PDExtGState getExtGState(ASAtom name) {

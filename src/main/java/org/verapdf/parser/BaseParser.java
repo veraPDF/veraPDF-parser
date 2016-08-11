@@ -47,7 +47,7 @@ public class BaseParser {
 
 	protected String getLine() throws IOException {
 		initializeToken();
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch = this.source.readByte();
 		while (!this.source.isEof()) {
 			if (ch == ASCII_LF || ch == ASCII_CR) {
@@ -56,13 +56,13 @@ public class BaseParser {
 			appendToToken(ch);
 			ch = this.source.readByte();
 		}
-		return this.token.token;
+		return this.token.getValue();
 	}
 
 	protected String getLine(final int offset) throws IOException {
 		initializeToken();
+		this.token.clearValue();
 		this.source.seek(offset);
-		this.token.token = "";
 		byte ch = this.source.readByte();
 		while (!this.source.isEof()) {
 			if (ch == ASCII_LF || ch == ASCII_CR) {
@@ -71,24 +71,39 @@ public class BaseParser {
 			appendToToken(ch);
 			ch = this.source.readByte();
 		}
-		return this.token.token;
+		return this.token.getValue();
 	}
 
 	protected String readUntilWhitespace() throws IOException {
 		initializeToken();
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch = this.source.readByte();
 		while (!this.source.isEof() || !isSpace(ch)) {
 			appendToToken(ch);
 			ch = this.source.readByte();
 		}
 		this.source.unread();
-		return this.token.token;
+		return this.token.getValue();
 	}
 
 	protected boolean findKeyword(final Token.Keyword keyword) throws IOException {
 		nextToken();
 		while (this.token.type != Token.Type.TT_EOF && (this.token.type != Token.Type.TT_KEYWORD || this.token.keyword != keyword)) {
+			nextToken();
+		}
+		return this.token.type == Token.Type.TT_KEYWORD && this.token.keyword == keyword;
+	}
+
+	// lookUpSize starts from current offset
+	protected boolean findKeyword(final Token.Keyword keyword, final int lookUpSize) throws IOException {
+		long endOffset = this.source.getOffset() + lookUpSize > this.source.getStreamLength()
+				? this.source.getOffset() + lookUpSize : this.source.getStreamLength();
+
+		nextToken();
+		while (this.token.type != Token.Type.TT_EOF && (this.token.type != Token.Type.TT_KEYWORD || this.token.keyword != keyword)) {
+			if (endOffset >= this.source.getOffset()) {
+				break;
+			}
 			nextToken();
 		}
 		return this.token.type == Token.Type.TT_KEYWORD && this.token.keyword == keyword;
@@ -284,7 +299,7 @@ public class BaseParser {
 	}
 
 	private void readLitString() throws IOException {
-		this.token.token = "";
+		this.token.clearValue();
 
 		int parenthesesDepth = 0;
 
@@ -373,7 +388,7 @@ public class BaseParser {
 	}
 
 	private void readHexString() throws IOException {
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch;
 		int uc = 0;
 		int hex;
@@ -416,7 +431,7 @@ public class BaseParser {
 	}
 
 	private void readName() throws IOException {
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch;
 		while (!this.source.isEof()) {
 			ch = this.source.readByte();
@@ -451,7 +466,7 @@ public class BaseParser {
 	}
 
 	private void readToken() throws IOException {
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch;
 		while (!this.source.isEof()) {
 			ch = this.source.readByte();
@@ -466,7 +481,7 @@ public class BaseParser {
 
 	protected void readNumber() throws IOException {
 		initializeToken();
-		this.token.token = "";
+		this.token.clearValue();
 		this.token.type = Token.Type.TT_INTEGER;
 		byte ch;
 		while (!this.source.isEof()) {
@@ -486,11 +501,11 @@ public class BaseParser {
 			}
 		}
 		if (this.token.type == Token.Type.TT_INTEGER) {
-			int value = Integer.valueOf(this.token.token);
+			int value = Integer.valueOf(this.token.getValue());
 			this.token.integer = value;
 			this.token.real = (double) value;
 		} else {
-			double value = Double.valueOf(this.token.token);
+			double value = Double.valueOf(this.token.getValue());
 			this.token.integer = Math.round(value);
 			this.token.real = value;
 		}
@@ -503,11 +518,11 @@ public class BaseParser {
 	}
 
 	private void appendToToken(final byte ch) {
-		this.token.token += (char) ch;
+		this.token.append((char) ch);
 	}
 
 	private void appendToToken(final int ch) {
-		this.token.token += (char) ch;
+		this.token.append((char) ch);
 	}
 
 	protected byte[] getRawBytes(String string) {

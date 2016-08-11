@@ -1,6 +1,7 @@
 package org.verapdf.as.io;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -21,6 +22,16 @@ public class ASFileInStream extends ASInputStream {
 		this.curPos = 0;
 	}
 
+	@Override
+	public int read() throws IOException {
+		if (this.offset < this.size) {
+			return this.stream.readByte();
+		} else {
+			return -1;
+		}
+	}
+
+	@Override
 	public int read(byte[] buffer, int sizeToRead) throws IOException {
 		if (sizeToRead == 0 || this.size != nPos && this.size <= this.curPos) {
 			return -1;
@@ -33,15 +44,27 @@ public class ASFileInStream extends ASInputStream {
 		long prev = this.stream.getFilePointer();
 
 		this.stream.seek(this.offset + this.curPos);
-		int count = this.stream.read(buffer, 0, sizeToRead);
 
-		this.stream.seek(prev);
+		try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+			byte[] temp = new byte[1024];
+			int n;
 
-		this.curPos += count;
+			while (sizeToRead > 0 && (n = this.stream.read(temp, 0, Math.min(temp.length, sizeToRead))) != -1) {
+				output.write(temp, 0, n);
+				sizeToRead -= n;
+			}
 
-		return count;
+			byte[] byteArray = output.toByteArray();
+			int count = byteArray.length;
+			System.arraycopy(byteArray, 0, buffer, 0, count);
+
+			this.stream.seek(prev);
+			this.curPos += count;
+			return count;
+		}
 	}
 
+	@Override
 	public int skip(int size) throws IOException {
 		if (size == 0 || this.size != nPos && this.size <= this.curPos) {
 			return 0;
@@ -56,15 +79,13 @@ public class ASFileInStream extends ASInputStream {
 		return size;
 	}
 
+	@Override
 	public void close() {
 	}
 
+	@Override
 	public void reset() {
 		this.curPos = 0;
-	}
-
-	public boolean isCloneable() {
-		return false;
 	}
 
 }

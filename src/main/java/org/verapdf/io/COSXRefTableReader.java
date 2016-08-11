@@ -4,10 +4,7 @@ import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSTrailer;
 import org.verapdf.cos.xref.COSXRefInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Timur Kamalov
@@ -18,6 +15,8 @@ public class COSXRefTableReader {
 	private Map<COSKey, Long> offsets;
 	private COSTrailer trailer;
 
+	private COSTrailer firstTrailer;
+	private COSTrailer lastTrailer;
 
 	public COSXRefTableReader() {
 		this.startXRef = 0;
@@ -40,7 +39,7 @@ public class COSXRefTableReader {
 		this.offsets.clear();
 		this.trailer.clear();
 
-		if (infos == null && infos.isEmpty()) {
+		if (infos == null || infos.isEmpty()) {
 			return;
 		}
 
@@ -48,11 +47,25 @@ public class COSXRefTableReader {
 		this.startXRef = lastInfo.getStartXRef();
 		this.trailer = lastInfo.getTrailer();
 
+		Map<Long, COSTrailer> trailers = new HashMap<>();
 		for (COSXRefInfo info : infos) {
+			trailers.put(info.getStartXRef(), info.getTrailer());
 			info.getXRefSection().addTo(this.offsets);
 		}
 
+		setFirstAndLastTrailers(trailers);
+
 		infos.clear();
+	}
+
+	public void setFirstAndLastTrailers(Map<Long, COSTrailer> trailers) {
+		if (trailers.isEmpty()) {
+			return;
+		}
+		Set<Long> offsets = trailers.keySet();
+		SortedSet<Long> sortedOffset = new TreeSet<>(offsets);
+		this.firstTrailer = trailers.get(sortedOffset.first());
+		this.lastTrailer = trailers.get(sortedOffset.last());
 	}
 
 	public void set(final COSXRefInfo info) {
@@ -83,6 +96,14 @@ public class COSXRefTableReader {
 
 	public COSTrailer getTrailer() {
 		return this.trailer;
+	}
+
+	public COSTrailer getFirstTrailer() {
+		return this.firstTrailer;
+	}
+
+	public COSTrailer getLastTrailer() {
+		return this.lastTrailer;
 	}
 
 }
