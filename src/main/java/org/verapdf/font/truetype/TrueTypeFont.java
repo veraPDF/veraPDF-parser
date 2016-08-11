@@ -95,19 +95,19 @@ public class TrueTypeFont implements PDFlibFont {
         }
         if (glyphName.equals(TrueTypePredefined.NOTDEF_STRING)) {
             int gid = this.parser.getPostParser().getGID(glyphName);
-            return widths[gid];
+            return getWidthWithCheck(gid);
         }
         TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
         if (cmap31 != null) {
             AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
             int gid = cmap31.getGlyph(unicode.getSymbolCode());
-            return widths[gid];
+            return getWidthWithCheck(gid);
         } else {
             TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
             if (cmap10 != null) {
                 int charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyphName);
                 int gid = cmap10.getGlyph(charCode);
-                return widths[gid];
+                return getWidthWithCheck(gid);
             } else {
                 return -1;  //case when no cmap (3,1) and no (1,0) is found
             }
@@ -143,15 +143,23 @@ public class TrueTypeFont implements PDFlibFont {
                 return -1;
             }
             int gid = cmap30.getGlyph(highByteMask & code);     // we suppose that code is in fact 1-byte value
-            return widths[gid];
+            return getWidthWithCheck(gid);
         } else {
             TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
             if (cmap10 != null) {
                 int gid = cmap10.getGlyph(code);
-                return widths[gid];
+                return getWidthWithCheck(gid);
             } else {
                 return -1;
             }
+        }
+    }
+
+    private float getWidthWithCheck(int gid) {
+        if(gid < widths.length) {
+            return widths[gid];
+        } else {
+            return widths[widths.length - 1];   // case of monospaced fonts
         }
     }
 
