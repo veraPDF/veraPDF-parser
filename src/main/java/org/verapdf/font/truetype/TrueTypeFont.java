@@ -72,6 +72,9 @@ public class TrueTypeFont implements PDFlibFont {
         return this.parser.getCmapParser().getCmapInfos();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public float getWidth(int code) {
         if (isSymbolic) {
@@ -82,6 +85,9 @@ public class TrueTypeFont implements PDFlibFont {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public float getWidth(String glyphName) {
         if (isSymbolic) {
@@ -106,6 +112,25 @@ public class TrueTypeFont implements PDFlibFont {
                 return -1;  //case when no cmap (3,1) and no (1,0) is found
             }
         }
+    }
+
+    /**
+     * @return true if font is symbolic.
+     */
+    public boolean isSymbolic() {
+        return isSymbolic;
+    }
+
+    /**
+     * Returns true if cmap table with given platform ID and encoding ID is
+     * present in the font.
+     *
+     * @param platformID is platform ID of requested cmap.
+     * @param encodingID is encoding ID of requested cmap.
+     * @return true if requested cmap is present.
+     */
+    public boolean isCmapPresent(int platformID, int encodingID) {
+        return this.parser.getCmapTable(platformID, encodingID) != null;
     }
 
     private float getWidthSymbolic(int code) {
