@@ -101,6 +101,7 @@ public abstract class COSBase {
 	public abstract COSDocument getDocument();
 	public abstract boolean setKey(final COSKey key, final COSDocument document);
 	public abstract COSObject getDirect();
+	public abstract COSBase getDirectBase();
 	public abstract boolean setDirect(final COSObject value);
 
 	public abstract void mark();
