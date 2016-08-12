@@ -3,6 +3,7 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObject;
+import org.verapdf.font.PDFlibFont;
 
 /**
  * This is PD representation of font.
