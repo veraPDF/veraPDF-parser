@@ -2,6 +2,7 @@ package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.font.PDFlibFont;
 
@@ -23,8 +24,11 @@ public abstract class PDFont {
     public PDFont(COSDictionary dictionary) {
         this.dictionary = dictionary;
         COSObject fd = dictionary.getKey(ASAtom.FONT_DESC);
-        fontDescriptor =
-                fd == COSObject.getEmpty() ? null : (COSDictionary) fd.get();
+        if(fd.getType() == COSObjType.COS_DICT) {
+            fontDescriptor = (COSDictionary) fd.getDirectBase();
+        } else {
+            fontDescriptor = null;
+        }
     }
 
     /**
