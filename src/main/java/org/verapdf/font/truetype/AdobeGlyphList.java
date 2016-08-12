@@ -79,6 +79,15 @@ public class AdobeGlyphList {
     }
 
     /**
+     * Checks if Adobe Glyph List contains given glyph.
+     * @param glyphName is name of glyph to check.
+     * @return true if this glyph is contained in Adobe Glyph List.
+     */
+    public static boolean contains(String glyphName) {
+        return MAPPING.containsKey(glyphName);
+    }
+
+    /**
      * This class represents entity into which Adobe Glyph List maps glyph names,
      * i. a. it contains either Unicode of symbol or Unicode of symbol and
      * Unicode of diacritic symbol.
