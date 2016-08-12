@@ -28,6 +28,7 @@ public interface PDFlibFont {
     /**
      * This method does parsing of font, after it all the data needed should be
      * extracted.
+     * @throws IOException if error in font parsing occurs.
      */
     void parseFont() throws IOException;
 }
