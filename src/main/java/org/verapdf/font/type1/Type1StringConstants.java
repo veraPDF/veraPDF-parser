@@ -14,4 +14,6 @@ public class Type1StringConstants {
     static final String CHAR_STRINGS_STRING = "CharStrings";
     static final String LEN_IV_STRING = "LenIV";
     static final String CLEARTOMARK_STRING = "cleartomark";
+    static final String CLOSEFILE = "closefile";
+    static final String SUBRS = "Subrs";
 }
