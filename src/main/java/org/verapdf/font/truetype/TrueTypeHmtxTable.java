@@ -24,7 +24,7 @@ class TrueTypeHmtxTable extends TrueTypeTable {
     }
 
     @Override
-    public void readTable() throws IOException {
+    void readTable() throws IOException {
         long startingOffset = this.source.getOffset();
         this.source.seek(this.offset);
         longHorMetrics = new int[numberOfHMetrics];

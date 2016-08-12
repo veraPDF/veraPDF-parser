@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This structure contains Platform ID and Encoding ID of Type 1 font.
+ * Instance of this class represents CMap subtable of Type 1 font.
  *
  * @author Sergey Shemyakov
  */
@@ -16,6 +16,13 @@ public class TrueTypeCmapSubtable {
     private Map<Integer, Integer> mapping;
     private int sampleCode;
 
+    /**
+     * Constructor.
+     *
+     * @param platformID is platform ID of CMap.
+     * @param encodingID is encoding ID of CMap.
+     * @param offset     is byte offset at which CMap data can be found.
+     */
     public TrueTypeCmapSubtable(int platformID, int encodingID, long offset) {
         this.platformID = platformID;
         this.encodingID = encodingID;
@@ -32,10 +39,19 @@ public class TrueTypeCmapSubtable {
         return encodingID;
     }
 
+    /**
+     * @return byte offset at which CMap data can be found.
+     */
     public long getOffset() {
         return offset;
     }
 
+    /**
+     * Method adds mapping CID -> GID to CMap.
+     *
+     * @param key   is CID.
+     * @param value is GID.
+     */
     public void put(Integer key, Integer value) {
         if (sampleCode != -1) {
             sampleCode = key;
@@ -43,6 +59,12 @@ public class TrueTypeCmapSubtable {
         this.mapping.put(key, value);
     }
 
+    /**
+     * Gets GID for specified CID.
+     *
+     * @param code is character code.
+     * @return glyph ID for this character code.
+     */
     public int getGlyph(int code) {
         if (!mapping.containsKey(code)) {
             return 0;
@@ -55,6 +77,12 @@ public class TrueTypeCmapSubtable {
         return this.sampleCode;
     }
 
+    /**
+     * Checks if particular glyph ID is present in this CMap.
+     *
+     * @param glyphCode is glyph ID.
+     * @return true if glyph is present in this CMap.
+     */
     public boolean containsGlyph(int glyphCode) {
         return this.mapping.containsValue(glyphCode);
     }

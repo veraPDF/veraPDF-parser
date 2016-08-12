@@ -19,7 +19,7 @@ class TrueTypeHheaTable extends TrueTypeTable {
     }
 
     @Override
-    public void readTable() throws IOException {
+    void readTable() throws IOException {
         long startingOffset = this.source.getOffset();
         this.source.seek(this.offset);
         this.source.skip(4 +   // version

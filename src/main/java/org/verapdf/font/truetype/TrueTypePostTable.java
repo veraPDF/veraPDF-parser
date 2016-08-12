@@ -31,7 +31,7 @@ class TrueTypePostTable extends TrueTypeTable {
     }
 
     @Override
-    public void readTable() throws IOException {
+    void readTable() throws IOException {
         long startingOffset = this.source.getOffset();
         this.source.seek(this.offset);
         float format = this.readFixed();
@@ -77,7 +77,7 @@ class TrueTypePostTable extends TrueTypeTable {
         this.source.seek(startingOffset);
     }
 
-    public int getGID(String s) {
+    int getGID(String s) {
         return this.stringToGid.get(s);
     }
 

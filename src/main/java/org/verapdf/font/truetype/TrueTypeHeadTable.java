@@ -19,7 +19,7 @@ class TrueTypeHeadTable extends TrueTypeTable {
     }
 
     @Override
-    public void readTable() throws IOException {
+    void readTable() throws IOException {
         long startingOffset = this.source.getOffset();
         this.source.seek(this.offset);
         this.source.skip(18);   //  4 table version, 4 fontRevision, 4 checkSumAdjustment, 4 magicNumber, 2 flags

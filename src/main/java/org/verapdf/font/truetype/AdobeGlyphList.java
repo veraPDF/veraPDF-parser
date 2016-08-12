@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Class provides methods to work with Adobe Glyph List.
+ *
  * @author Sergey Shemyakov
  */
 public class AdobeGlyphList {
@@ -60,6 +62,13 @@ public class AdobeGlyphList {
 
     }
 
+    /**
+     * Returns AGLUnicode for glyph with specified name according to Adobe Glyph
+     * List.
+     *
+     * @param glyphName is name of required glyph.
+     * @return code for requested glyph.
+     */
     public static AGLUnicode get(String glyphName) {
         AGLUnicode res = MAPPING.get(glyphName);
         if (res == null) {
@@ -88,14 +97,23 @@ public class AdobeGlyphList {
             this.diacriticCodes = new int[0];
         }
 
+        /**
+         * @return Unicode of symbol that is not diacritic.
+         */
         public int getSymbolCode() {
             return symbolCode;
         }
 
+        /**
+         * @return array of Unicode for all diacritic glyphs.
+         */
         public int[] getDiacriticCodes() {
             return diacriticCodes;
         }
 
+        /**
+         * @return true if this character has diacritic symbols.
+         */
         public boolean hasDiacritic() {
             return this.diacriticCodes.length != 0;
         }

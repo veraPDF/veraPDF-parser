@@ -23,5 +23,5 @@ abstract class TrueTypeTable extends TrueTypeBaseParser {
      *
      * @throws IOException if stream-reading error occurs.
      */
-    public abstract void readTable() throws IOException;
+    abstract void readTable() throws IOException;
 }

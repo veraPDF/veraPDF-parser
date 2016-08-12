@@ -60,7 +60,7 @@ public class TrueTypeFont implements PDFlibFont {
         }
 
         if (!isSymbolic) {
-            this.createChToNameTable();
+            this.createCIDToNameTable();
         }
     }
 
@@ -163,7 +163,7 @@ public class TrueTypeFont implements PDFlibFont {
         }
     }
 
-    private void createChToNameTable() throws IOException {
+    private void createCIDToNameTable() throws IOException {
         this.encodingMappingArray = new String[256];
         if (this.encoding.getType() == COSObjType.COS_NAME) {
             if (ASAtom.MAC_ROMAN_ENCODING.getValue().equals(this.encoding.get().getString())) {
@@ -176,13 +176,13 @@ public class TrueTypeFont implements PDFlibFont {
                 throw new IOException("Error in reading /Encoding entry in font dictionary");
             }
         } else if (this.encoding.getType() == COSObjType.COS_DICT) {
-            createChToNameTableFromDict((COSDictionary) this.encoding.get());
+            createCIDToNameTableFromDict((COSDictionary) this.encoding.get());
         } else {
             throw new IOException("Error in reading /Encoding entry in font dictionary");
         }
     }
 
-    private void createChToNameTableFromDict(COSDictionary encoding) throws IOException {
+    private void createCIDToNameTableFromDict(COSDictionary encoding) throws IOException {
         if (encoding.knownKey(ASAtom.BASE_ENCODING)) {
             ASAtom baseEncoding = encoding.getNameKey(ASAtom.BASE_ENCODING);
             if (ASAtom.WIN_ANSI_ENCODING.equals(baseEncoding)) {
