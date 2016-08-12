@@ -85,7 +85,7 @@ class TrueTypeCmapTable extends TrueTypeTable {
                 }
             } else {
                 if (startCode[i] != 65535 && endCode[i] != 65535) {
-                    for (int j = 0; j <= endCode[i] - startCode[i]; ++j) {    // In the next line according to spec we need to write idRangeOffset[i]/2. Why?
+                    for (int j = 0; j <= endCode[i] - startCode[i]; ++j) {
                         long glyphOffset = idRangeOffsetBegin +
                                 ((idRangeOffset[i] / 2) + j + (i - segCount)) * 2;
                         this.source.seek(glyphOffset);
