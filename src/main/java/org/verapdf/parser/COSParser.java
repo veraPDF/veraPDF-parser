@@ -336,6 +336,7 @@ public class COSParser extends BaseParser {
 
 		long diff = stream.getRealStreamSize() - expectedLength;
 
+		skipSpaces();
 		source.unread(2);
 		int firstSymbol = source.readByte();
 		int secondSymbol = source.readByte();
