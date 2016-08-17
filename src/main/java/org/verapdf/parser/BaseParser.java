@@ -96,12 +96,12 @@ public class BaseParser {
 
 	// lookUpSize starts from current offset
 	protected boolean findKeyword(final Token.Keyword keyword, final int lookUpSize) throws IOException {
-		long endOffset = this.source.getOffset() + lookUpSize > this.source.getStreamLength()
+		long endOffset = this.source.getOffset() + lookUpSize < this.source.getStreamLength()
 				? this.source.getOffset() + lookUpSize : this.source.getStreamLength();
 
 		nextToken();
 		while (this.token.type != Token.Type.TT_EOF && (this.token.type != Token.Type.TT_KEYWORD || this.token.keyword != keyword)) {
-			if (endOffset >= this.source.getOffset()) {
+			if (this.source.getOffset() >= endOffset) {
 				break;
 			}
 			nextToken();
