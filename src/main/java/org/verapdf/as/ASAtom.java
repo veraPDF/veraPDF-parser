@@ -500,6 +500,7 @@ public class ASAtom {
     public static final ASAtom UNIX = new ASAtom("Unix");
     public static final ASAtom URI = new ASAtom("URI");
     public static final ASAtom URL = new ASAtom("URL");
+    public static final ASAtom USE_CMAP = new ASAtom("UseCMap");
     // V
     public static final ASAtom V = new ASAtom("V");
     public static final ASAtom VERISIGN_PPKVS = new ASAtom("VeriSign.PPKVS");
