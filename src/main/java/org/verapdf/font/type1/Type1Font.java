@@ -166,4 +166,8 @@ public class Type1Font extends COSParser implements PDFlibFont {
         Integer res = this.glyphWidths.get(glyphName);
         return res == null ? -1 : res;
     }
+
+    public String[] getEncoding() {
+        return encoding;
+    }
 }

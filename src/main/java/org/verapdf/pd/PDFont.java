@@ -1,10 +1,14 @@
 package org.verapdf.pd;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
 import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.cff.CFFFont;
+import org.verapdf.font.truetype.TrueTypeFont;
+import org.verapdf.font.type1.Type1Font;
+
+import java.io.IOException;
 
 /**
  * This is PD representation of font.
@@ -12,6 +16,8 @@ import org.verapdf.font.PDFlibFont;
  * @author Sergey Shemyakov
  */
 public abstract class PDFont {
+
+    private static final Logger LOGGER = Logger.getLogger(PDFont.class);
 
     private COSDictionary dictionary;
     private COSDictionary fontDescriptor;
@@ -24,7 +30,7 @@ public abstract class PDFont {
     public PDFont(COSDictionary dictionary) {
         this.dictionary = dictionary;
         COSObject fd = dictionary.getKey(ASAtom.FONT_DESC);
-        if(fd.getType() == COSObjType.COS_DICT) {
+        if (fd.getType() == COSObjType.COS_DICT) {
             fontDescriptor = (COSDictionary) fd.getDirectBase();
         } else {
             fontDescriptor = null;
@@ -69,7 +75,7 @@ public abstract class PDFont {
      */
     public String getFontName() throws IllegalStateException {
         String type = this.dictionary.getStringKey(ASAtom.BASE_FONT);
-        if (this.getFontDescriptor() != null) {
+        if (this.fontDescriptor != null) {
             String typeFromDescriptor =
                     this.fontDescriptor.getStringKey(ASAtom.FONT_NAME);
             if (!type.equals(typeFromDescriptor)) {
@@ -92,7 +98,7 @@ public abstract class PDFont {
             throw new IllegalStateException("Font descriptor is null");
         }
         Long flagsLong = this.fontDescriptor.getIntegerKey(ASAtom.FLAGS);
-        if(flagsLong == null) {
+        if (flagsLong == null) {
             throw new IllegalStateException("Font descriptor doesn't contain /Flags entry");
         }
         int flags = flagsLong.intValue();
@@ -101,7 +107,40 @@ public abstract class PDFont {
 
     public abstract String getName();
 
-    public PDFlibFont getFontFile() {   // TODO: fix A LOT of details of this method.
-        return null;    // the idea on moment of creation is as follows: we need some method in GFPDTrueType that can
-    }   // give us information about TrueType cmap (3,1)
+    public PDFlibFont getFontFile() {
+        if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
+            COSStream type1FontFile =
+                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();
+            try {
+                return new Type1Font(
+                        type1FontFile.getData(COSStream.FilterFlags.DECODE));
+            } catch (IOException e) {
+                LOGGER.error("Can't read Type 1 font program.");
+            }
+        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE2)) {
+            COSStream trueTypeFontFile =
+                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE2).get();
+            try {
+                return new TrueTypeFont(trueTypeFontFile.getData(COSStream.FilterFlags.DECODE),
+                        this.isSymbolic(), this.dictionary.getKey(ASAtom.ENCODING));
+            } catch (IOException e) {
+                LOGGER.error("Can't read TrueType font program.");
+            }
+        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+            COSStream fontFile =
+                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE3).get();
+            COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).get();
+            if (ASAtom.TYPE1C.equals(subtype.get()) ||
+                    ASAtom.CID_FONT_TYPE0C.equals(subtype.get())) {     // TODO: check if cases of CFF type 1 and CFF CID are fine
+                try {
+                    return new CFFFont(fontFile.getData(COSStream.FilterFlags.DECODE));
+                } catch (IOException e) {
+                    LOGGER.error("Can't read CFF font program.");
+                }
+            } else if (ASAtom.OPEN_TYPE.equals(subtype.get())) {
+                return null;    // TODO: add OpenType
+            }
+        }
+        return null;
+    }
 }

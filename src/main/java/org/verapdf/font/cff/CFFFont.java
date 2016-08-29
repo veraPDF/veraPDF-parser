@@ -14,7 +14,7 @@ public class CFFFont extends CFFFileBaseParser implements PDFlibFont {
 
     private PDFlibFont font;
 
-    CFFFont(ASInputStream stream) throws IOException {
+    public CFFFont(ASInputStream stream) throws IOException {
         super(stream);
     }
 

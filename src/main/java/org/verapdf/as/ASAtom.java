@@ -94,6 +94,7 @@ public class ASAtom {
     public static final ASAtom CHAR_SET = new ASAtom("CharSet");
     public static final ASAtom CICI_SIGNIT = new ASAtom("CICI.SignIt");
     public static final ASAtom CID_FONT_TYPE0 = new ASAtom("CIDFontType0");
+    public static final ASAtom CID_FONT_TYPE0C = new ASAtom("CIDFontType0C");
     public static final ASAtom CID_FONT_TYPE2 = new ASAtom("CIDFontType2");
     public static final ASAtom CID_TO_GID_MAP = new ASAtom("CIDToGIDMap");
     public static final ASAtom CID_SET = new ASAtom("CIDSet");
@@ -489,6 +490,7 @@ public class ASAtom {
     public static final ASAtom TYPE = new ASAtom("Type");
     public static final ASAtom TYPE0 = new ASAtom("Type0");
     public static final ASAtom TYPE1 = new ASAtom("Type1");
+    public static final ASAtom TYPE1C = new ASAtom("Type1C");
     public static final ASAtom TYPE3 = new ASAtom("Type3");
     // U
     public static final ASAtom U = new ASAtom("U");
