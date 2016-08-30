@@ -86,4 +86,14 @@ public class TrueTypeCmapSubtable {
     public boolean containsGlyph(int glyphCode) {
         return this.mapping.containsValue(glyphCode);
     }
+
+    /**
+     * Checks if particular character ID is present in this CMap.
+     *
+     * @param cid is character ID.
+     * @return true if this CID is present.
+     */
+    public boolean containsCID(int cid) {
+        return this.mapping.containsKey(cid);
+    }
 }

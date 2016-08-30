@@ -2,12 +2,9 @@ package org.verapdf.font.cff;
 
 import org.verapdf.font.CFFNumber;
 import org.verapdf.font.PDFlibFont;
-import org.verapdf.font.type1.Type1CharStringParser;
-import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,43 +15,21 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-class CFFType1Font extends CFFFileBaseParser implements PDFlibFont {
-
-    private static final float[] DEFAULT_FONT_MATRIX =
-            {(float) 0.001, 0, 0, (float) 0.001, 0, 0};
-    private ArrayList<CFFNumber> stack;
+class CFFType1Font extends CFFFontBaseParser implements PDFlibFont {
 
     //Top DICT
-    private float[] fontMatrix = new float[6];
-    private long charSetOffset;
-    private long charStringsOffset;
     private long privateDictOffset;
     private long privateDictSize;
-    private int charStringType;
-
-    //Private DICT
-    private int defaultWidthX;
-    private int nominalWidthX;
-
-    //CharStrings
-    private int nGlyphs;
-    private CFFIndex charStrings;
-    private float[] widths;
 
     private long encodingOffset;
     private int[] encoding;     // array with mapping code -> gid
     private Map<String, Integer> charSet;   // mappings glyphName -> gid
 
     CFFType1Font(InternalInputStream stream, CFFIndex definedNames,
-                        long topDictBeginOffset, long topDictEndOffset)
+                 long topDictBeginOffset, long topDictEndOffset)
             throws IOException {
         super(stream);
-        stack = new ArrayList<>(48);
-        this.charSetOffset = 0; // default
-        this.charStringType = 2;
         encodingOffset = 0;
-        System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,
-                DEFAULT_FONT_MATRIX.length);
         encoding = new int[256];
         this.definedNames = definedNames;
         this.source.seek(topDictBeginOffset);
@@ -64,6 +39,9 @@ class CFFType1Font extends CFFFileBaseParser implements PDFlibFont {
         this.stack.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void parseFont() throws IOException {
         this.source.seek(this.privateDictOffset);
@@ -83,106 +61,22 @@ class CFFType1Font extends CFFFileBaseParser implements PDFlibFont {
         this.readWidths();
     }
 
-    private void readTopDictUnit() throws IOException {
-        try {
-            int next = this.source.peek() & 0xFF;
-            if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
-                this.stack.add(readNumber());
-            } else {
-                this.source.readByte();
-                if (next > -1 && next < 22) {
-                    switch (next) {
-                        case 15:    // charset
-                            this.charSetOffset =
-                                    this.stack.get(stack.size() - 1).getInteger();
-                            this.stack.clear();
-                            break;
-                        case 16:    // encoding
-                            this.encodingOffset = stack.get(stack.size() - 1).getInteger();
-                            stack.clear();
-                            break;
-                        case 17:    // CharStrings
-                            this.charStringsOffset =
-                                    this.stack.get(stack.size() - 1).getInteger();
-                            this.stack.clear();
-                            break;
-                        case 18:    // Private
-                            this.privateDictSize =
-                                    this.stack.get(stack.size() - 2).getInteger();
-                            this.privateDictOffset =
-                                    this.stack.get(stack.size() - 1).getInteger();
-                            this.stack.clear();
-                            break;
-                        case 12:
-                            next = this.source.readByte() & 0xFF;
-                            switch (next) {
-                                case 7:     // FontMatrix
-                                    for (int i = 0; i < 6; ++i) {
-                                        fontMatrix[i] = this.stack.get(i).getReal();
-                                    }
-                                    this.stack.clear();
-                                    break;
-                                case 6:     // Charstring Type
-                                    this.charStringType = (int)
-                                            this.stack.get(stack.size() - 1).getInteger();
-                                    this.stack.clear();
-                                    break;
-                                default:
-                                    this.stack.clear();
-                            }
-                            break;
-                        default:
-                            this.stack.clear();
-                    }
-                }
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new IOException("Error with stack in processing Top DICT in CFF file", e);
-        }
-    }
-
-    private void readPrivateDictUnit() throws IOException {
-        int next = this.source.peek() & 0xFF;
-        if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
-            this.stack.add(readNumber());
-        } else {
-            this.source.readByte();
-            if (next > -1 && next < 22) {
-                switch (next) {
-                    case 20:    // defaultWidthX
-                        this.defaultWidthX = (int)
-                                this.stack.get(stack.size() - 1).getInteger();
-                        this.stack.clear();
-                        break;
-                    case 21:    // nominalWidthX
-                        this.nominalWidthX = (int)
-                                this.stack.get(stack.size() - 1).getInteger();
-                        this.stack.clear();
-                        break;
-                    default:
-                        this.stack.clear();
-                }
-            }
-        }
-    }
-
-    private void readCharStrings() throws IOException {
-        this.charStrings = this.readIndex();
-        this.nGlyphs = this.charStrings.size();
-        widths = new float[nGlyphs];
-    }
-
-    private CFFNumber getWidthFromCharString(byte[] charString) throws IOException {
-        if (this.charStringType == 1) {
-            Type1CharStringParser parser = new Type1CharStringParser(
-                    new ASMemoryInStream(charString));
-            return parser.getWidth();
-        } else if (this.charStringType == 2) {
-            Type2CharStringParser parser = new Type2CharStringParser(
-                    new ASMemoryInStream(charString));
-            return parser.getWidth();
-        } else {
-            throw new IOException("Can't process CharString of type " + this.charStringType);
+    @Override
+    protected void readTopDictOneByteOps(int lastRead) {
+        switch (lastRead) {
+            case 16:    // encoding
+                this.encodingOffset = stack.get(stack.size() - 1).getInteger();
+                this.stack.clear();
+                break;
+            case 18:    // Private
+                this.privateDictSize =
+                        this.stack.get(stack.size() - 2).getInteger();
+                this.privateDictOffset =
+                        this.stack.get(stack.size() - 1).getInteger();
+                this.stack.clear();
+                break;
+            default:
+                this.stack.clear();
         }
     }
 
@@ -300,6 +194,9 @@ class CFFType1Font extends CFFFileBaseParser implements PDFlibFont {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public float getWidth(int charCode) {
         try {
@@ -309,12 +206,24 @@ class CFFType1Font extends CFFFileBaseParser implements PDFlibFont {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public float getWidth(String charName) {
         Integer index = this.charSet.get(charName);
         if (index == null || index >= this.widths.length || index < 0) {
             return this.widths[0];
         }
         return this.widths[index];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsCID(int cid) {
+        return cid < nGlyphs;
     }
 
     private void initializeCharSet(String[] charSetArray) {

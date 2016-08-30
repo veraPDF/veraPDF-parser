@@ -31,4 +31,12 @@ public interface PDFlibFont {
      * @throws IOException if error in font parsing occurs.
      */
     void parseFont() throws IOException;
+
+    /**
+     * Checks if font contains character with given ID.
+     *
+     * @param cid is character code.
+     * @return true if font contains character with given ID.
+     */
+    boolean containsCID(int cid);
 }
