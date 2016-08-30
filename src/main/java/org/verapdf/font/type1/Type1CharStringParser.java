@@ -1,7 +1,7 @@
 package org.verapdf.font.type1;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.font.GeneralNumber;
+import org.verapdf.font.CFFNumber;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class Type1CharStringParser extends BaseCharStringParser{
+public class Type1CharStringParser extends BaseCharStringParser {
 
     /**
      * {@inheritDoc}
@@ -88,7 +88,7 @@ public class Type1CharStringParser extends BaseCharStringParser{
                 case 12:    // div
                     int num2 = (int) this.stack.pop().getInteger();
                     int num1 = (int) this.stack.pop().getInteger();
-                    this.stack.push(new GeneralNumber(num1 / num2));  // That is not exactly what we should do, pushed number should be real. But we know that
+                    this.stack.push(new CFFNumber(num1 / num2));  // That is not exactly what we should do, pushed number should be real. But we know that
                     break;  // width is integer, so the result of division is not needed.
                 default:
                     break;
@@ -98,7 +98,7 @@ public class Type1CharStringParser extends BaseCharStringParser{
     }
 
     @Override
-    protected GeneralNumber readNextNumber(int firstByte) throws IOException {
+    protected CFFNumber readNextNumber(int firstByte) throws IOException {
         byte[] buf = new byte[4];
         this.stream.read(buf, 4);
         int res = 0;
@@ -107,6 +107,6 @@ public class Type1CharStringParser extends BaseCharStringParser{
             res <<= 8;
         }
         res |= buf[3] & 0xFF;
-        return new GeneralNumber(res);
+        return new CFFNumber(res);
     }
 }

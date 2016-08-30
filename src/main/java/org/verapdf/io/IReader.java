@@ -22,6 +22,12 @@ public interface IReader {
 
 	long getStartXRef();
 
+	boolean isLinearized();
+
 	COSTrailer getTrailer();
+
+	COSTrailer getFirstTrailer();
+
+	COSTrailer getLastTrailer();
 
 }

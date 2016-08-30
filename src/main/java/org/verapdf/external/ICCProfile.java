@@ -3,9 +3,13 @@ package org.verapdf.external;
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
+import org.verapdf.factory.colors.ColorSpaceFactory;
+import org.verapdf.pd.PDMetadata;
 import org.verapdf.pd.PDObject;
+import org.verapdf.pd.colors.PDColorSpace;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -68,7 +72,7 @@ public class ICCProfile extends PDObject {
 	private String description = null;
 	private String copyright = null;
 
-	private ICCProfile(COSObject profileStream) {
+	public ICCProfile(COSObject profileStream) {
 		super(profileStream);
 		initializeProfileHeader();
 	}
@@ -106,15 +110,6 @@ public class ICCProfile extends PDObject {
 	 */
 	public String getDeviceClass() {
 		return getSubArrayFromHeader(DEVICE_CLASS_OFFSET, REQUIRED_LENGTH);
-	}
-
-	/**
-	 * @return number of colorants for ICC profile, described in profile
-	 *         dictionary
-	 */
-	public Long getNumberOfColorants() {
-		COSObject key = this.getKey(ASAtom.N);
-		return key == null ? null : key.getInteger();
 	}
 
 	/**
@@ -393,5 +388,53 @@ public class ICCProfile extends PDObject {
 			value += (b[i] & 0xFF) << shift;
 		}
 		return value;
+	}
+
+	/**
+	 * @return number of colorants for ICC profile, described in profile
+	 *         dictionary
+	 */
+	public Long getNumberOfColorants() {
+		return getObject().getIntegerKey(ASAtom.N);
+	}
+
+	/**
+	 * @return range array value for ICC profile, described in profile
+	 *         dictionary
+	 */
+	public double[] getRange() {
+		COSObject rangeObject = getObject().getKey(ASAtom.RANGE);
+		if (rangeObject != null && rangeObject.getType() == COSObjType.COS_ARRAY) {
+			int size = rangeObject.size();
+			Long estimatedSize = getNumberOfColorants();
+			if (estimatedSize != null && size != estimatedSize.intValue()*2) {
+				LOGGER.debug("Range array doesn't consist of " + estimatedSize.intValue()*2 + " elements");
+			}
+
+			double[] res = new double[size];
+			for (int i = 0; i < size; ++i) {
+				COSObject number = rangeObject.at(i);
+				if (number == null || number.getReal() == null) {
+					LOGGER.debug("Range array contains non number value");
+					return null;
+				} else {
+					res[i] = number.getReal();
+				}
+			}
+			return res;
+		}
+		return null;
+	}
+
+	public PDColorSpace getAlternate() {
+		return ColorSpaceFactory.getColorSpace(getKey(ASAtom.ALTERNATE));
+	}
+
+	public PDMetadata getMetadata() {
+		COSObject metadata = getKey(ASAtom.METADATA);
+		if (metadata != null && metadata.getType() == COSObjType.COS_STREAM) {
+			return new PDMetadata(metadata);
+		}
+		return null;
 	}
 }

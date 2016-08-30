@@ -155,4 +155,12 @@ public class PDDocument {
 		out.close();
 	}
 
+	public PDStructTreeRoot getStructTreeRoot() throws IOException {
+		return getCatalog().getStructTreeRoot();
+	}
+
+	public PDMetadata getMetadata() throws IOException {
+		return getCatalog().getMetadata();
+	}
+
 }

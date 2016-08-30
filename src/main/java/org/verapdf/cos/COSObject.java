@@ -207,7 +207,7 @@ public class COSObject {
 	}
 
 	public Boolean getBooleanKey(final ASAtom key) {
-		return this.base != null ? this.base.getBoolean() : true;
+		return this.base != null ? this.base.getBooleanKey(key) : true;
 	}
 
 	public void setBooleanKey(final ASAtom key, final boolean value) {
@@ -396,6 +396,10 @@ public class COSObject {
 		return this.base != null ? this.base.getDirect() : null;
 	}
 
+	public COSBase getDirectBase() {
+		return this.base != null ? this.base.getDirectBase() : null;
+	}
+
 	public void setDirect(final COSObject value) {
 		if (this.base == null || !this.base.setDirect(value)) {
 			set(value.base);
@@ -439,4 +443,17 @@ public class COSObject {
 		this.isHeaderFormatComplyPDFA = isHeaderFormatComplyPDFA;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof COSObject)) return false;
+
+		COSObject cosObject = (COSObject) o;
+
+		if (isHeaderOfObjectComplyPDFA != cosObject.isHeaderOfObjectComplyPDFA) return false;
+		if (isEndOfObjectComplyPDFA != cosObject.isEndOfObjectComplyPDFA) return false;
+		if (isHeaderFormatComplyPDFA != cosObject.isHeaderFormatComplyPDFA) return false;
+		return base != null ? base.equals(cosObject.base) : cosObject.base == null;
+
+	}
 }

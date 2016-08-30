@@ -253,8 +253,7 @@ public abstract class COSDirect extends COSBase {
 
     // INDIRECT OBJECT
     public Boolean isIndirect() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_INDIRECT_TYPE, getClass().toString()));
-        return null;
+        return Boolean.FALSE;
     }
 
     public COSKey getKey() {
@@ -274,6 +273,10 @@ public abstract class COSDirect extends COSBase {
     public COSObject getDirect() {
         LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_INDIRECT_TYPE, getClass().toString()));
         return null;
+    }
+
+    public COSBase getDirectBase() {
+        return this;
     }
 
     public boolean setDirect(final COSObject value) {

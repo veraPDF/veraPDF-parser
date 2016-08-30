@@ -1,8 +1,7 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.font.GeneralNumber;
-import org.verapdf.font.cff.predefined.CFFStandardStrings;
+import org.verapdf.font.CFFNumber;
 import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
@@ -12,7 +11,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class CFFFileBaseParser {
+class CFFFileBaseParser {
 
     private int offSize;
     protected InternalInputStream source;
@@ -33,10 +32,6 @@ public class CFFFileBaseParser {
     protected int readCard16() throws IOException {
         int highOrder = (this.source.readByte() & 0xFF) << 8;
         return highOrder | (this.source.readByte() & 0xFF);
-    }
-
-    protected long readOffset() throws IOException {
-        return this.readOffset(this.offSize);
     }
 
     private long readOffset(int offSize) throws IOException {
@@ -112,8 +107,8 @@ public class CFFFileBaseParser {
         return Float.parseFloat(builder.toString());
     }
 
-    private int readInteger(byte firstByte) throws IOException {
-        int firstByteValue = firstByte & 0xFF;
+    private int readInteger(byte b) throws IOException {
+        int firstByteValue = b & 0xFF;
         if (firstByteValue > 31 && firstByteValue < 247) {
             return firstByteValue - 139;
         }
@@ -135,22 +130,22 @@ public class CFFFileBaseParser {
         }
     }
 
-    protected GeneralNumber readNumber() throws IOException {
+    protected CFFNumber readNumber() throws IOException {
         byte first = this.source.readByte();
         if (first == 0x1E) {
-            return new GeneralNumber(this.readReal());
+            return new CFFNumber(this.readReal());
         } else {
-            return new GeneralNumber(this.readInteger(first));
+            return new CFFNumber(this.readInteger(first));
         }
     }
 
     protected String getStringBySID(int sid) throws IOException {
         try {
-            if (sid < CFFStandardStrings.N_STD_STRINGS) {
-                return CFFStandardStrings.STANDARD_STRINGS[sid];
+            if (sid < CFFPredefined.N_STD_STRINGS) {
+                return CFFPredefined.STANDARD_STRINGS[sid];
             } else {
                 return new String(this.definedNames.get(sid -
-                        CFFStandardStrings.N_STD_STRINGS));
+                        CFFPredefined.N_STD_STRINGS));
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new IOException("Can't get string with given SID", e);

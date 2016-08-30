@@ -44,6 +44,11 @@ public class COSIndirect extends COSBase {
         }
     }
 
+    // Access to base underlying object
+    public COSBase get() {
+        return this.child.get();
+    }
+
     // OBJECT TYPE
     public COSObjType getType() {
         return getDirect().getType();
@@ -331,6 +336,10 @@ public class COSIndirect extends COSBase {
         return this.document != null ? this.document.getObject(key) : this.child;
     }
 
+    public COSBase getDirectBase() {
+        return this.document != null ? this.document.getObject(key).get() : this.child.get();
+    }
+
     public boolean setDirect(final COSObject value) {
         if (this.document != null) {
             this.document.setObject(this.key, value);
@@ -349,4 +358,15 @@ public class COSIndirect extends COSBase {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSIndirect)) return false;
+
+        COSIndirect that = (COSIndirect) o;
+
+        if (key != null ? !key.equals(that.key) : that.key != null) return false;
+        return document == that.document;
+
+    }
 }

@@ -1,5 +1,6 @@
 package org.verapdf.cos;
 
+import org.apache.log4j.Logger;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.io.IReader;
@@ -9,12 +10,16 @@ import org.verapdf.pd.PDDocument;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Timur Kamalov
  */
 public class COSDocument {
+
+	private static final Logger LOGGER = Logger.getLogger(COSDocument.class);
 
 	private PDDocument doc;
 	private IReader reader;
@@ -22,6 +27,9 @@ public class COSDocument {
 	private COSBody body;
 	private COSXRefTable xref;
 	private COSTrailer trailer;
+	private COSTrailer firstTrailer;
+	private COSTrailer lastTrailer;
+	private boolean linearized;
 	private boolean isNew;
 
 	private byte postEOFDataSize;
@@ -35,6 +43,9 @@ public class COSDocument {
 		this.body = new COSBody();
 		this.xref = new COSXRefTable();
 		this.trailer = new COSTrailer();
+		this.firstTrailer = new COSTrailer();
+		this.lastTrailer = new COSTrailer();
+		this.linearized = false;
 		this.isNew = true;
 
 		this.xrefEOLMarkersComplyPDFA = true;
@@ -61,6 +72,9 @@ public class COSDocument {
 		this.xref = new COSXRefTable();
 		this.xref.set(this.reader.getKeys());
 		this.trailer = reader.getTrailer();
+		this.firstTrailer = reader.getFirstTrailer();
+		this.lastTrailer = reader.getLastTrailer();
+		this.linearized = reader.isLinearized();
 
 		this.xrefEOLMarkersComplyPDFA = true;
 		this.subsectionHeaderSpaceSeparated = true;
@@ -84,24 +98,42 @@ public class COSDocument {
 
 	public List<COSObject> getObjects() {
 		List<COSObject> result = new ArrayList<>();
-		COSKey key = new COSKey();
-		try {
-			List<COSObject> objects = this.body.getAll();
-			for (COSObject object : objects) {
-				if (!object.empty()) {
-					result.add(object);
-					continue;
-				}
+		for (COSKey key : this.xref.getAllKeys()) {
+			COSObject obj = this.body.get(key);
+			if (!obj.empty()) {
+				result.add(obj);
+			} else {
+				try {
+					COSObject newObj = this.reader.getObject(key);
 
-				key = object.getKey();
-				COSObject newObj = this.reader.getObject(key);
-				this.body.set(key, newObj);
-				result.add(newObj);
+					this.body.set(key, newObj);
+					result.add(newObj);
+				} catch (IOException e) {
+					LOGGER.warn("Error while parsing object : " + key.getNumber() +
+							" " + key.getGeneration());
+				}
 			}
-		} catch (IOException e) {
-			//TODO :
-			throw new RuntimeException("Error while parsing object : " + key.getNumber() +
-					" " + key.getGeneration());
+		}
+		return result;
+	}
+
+	public Map<COSKey, COSObject> getObjectsMap() {
+		Map<COSKey, COSObject> result = new HashMap();
+		for (COSKey key : this.xref.getAllKeys()) {
+			COSObject obj = this.body.get(key);
+			if (!obj.empty()) {
+				result.put(key, obj);
+			} else {
+				try {
+					COSObject newObj = this.reader.getObject(key);
+
+					this.body.set(key, newObj);
+					result.put(key, newObj);
+				} catch (IOException e) {
+					LOGGER.warn("Error while parsing object : " + key.getNumber() +
+							" " + key.getGeneration());
+				}
+			}
 		}
 		return result;
 	}
@@ -132,7 +164,8 @@ public class COSDocument {
 	public COSKey setObject(COSObject obj) {
 		COSKey key = obj.getKey();
 
-		if (key.equals(new COSKey())) {
+		//TODO : fix this method for document save
+		if (key.getNumber() == 0 && key.getGeneration() == 0) {
 			key = this.xref.next();
 			this.body.set(key, obj.getDirect());
 			obj = COSIndirect.construct(key, this);
@@ -144,6 +177,18 @@ public class COSDocument {
 
 	public COSTrailer getTrailer() {
 		return this.trailer;
+	}
+
+	public COSTrailer getFirstTrailer() {
+		return firstTrailer;
+	}
+
+	public COSTrailer getLastTrailer() {
+		return lastTrailer;
+	}
+
+	public boolean isLinearized() {
+		return linearized;
 	}
 
 	public PDDocument getPDDocument() {
