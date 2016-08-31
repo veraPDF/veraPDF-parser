@@ -305,6 +305,7 @@ public class ASAtom {
     public static final ASAtom M = new ASAtom("M");
     public static final ASAtom MAC = new ASAtom("Mac");
     public static final ASAtom MAC_ROMAN_ENCODING = new ASAtom("MacRomanEncoding");
+    public static final ASAtom MAC_EXPERT_ENCODING = new ASAtom("MacExpertEncoding");
     public static final ASAtom MARK_INFO = new ASAtom("MarkInfo");
     public static final ASAtom MARKED = new ASAtom("Marked");
     public static final ASAtom MASK = new ASAtom("Mask");
