@@ -117,6 +117,10 @@ public class ASAtom {
     public static final ASAtom CONTENTS = new ASAtom("Contents");
     public static final ASAtom COORDS = new ASAtom("Coords");
     public static final ASAtom COUNT = new ASAtom("Count");
+    public static final ASAtom COURIER = new ASAtom("Courier");
+    public static final ASAtom COURIER_BOLD = new ASAtom("Courier-Bold");
+    public static final ASAtom COURIER_BOLD_OBLIQUE = new ASAtom("Courier-BoldOblique");
+    public static final ASAtom COURIER_OBLIQUE = new ASAtom("Courier-Oblique");
     public static final ASAtom CP = new ASAtom("CP");
     public static final ASAtom CREATION_DATE = new ASAtom("CreationDate");
     public static final ASAtom CREATOR = new ASAtom("Creator");
@@ -240,6 +244,10 @@ public class ASAtom {
     public static final ASAtom HALFTONE_TYPE = new ASAtom("HalftoneType");
     public static final ASAtom HARD_LIGHT = new ASAtom("HardLight");
     public static final ASAtom HEIGHT = new ASAtom("Height");
+    public static final ASAtom HELVETICA = new ASAtom("Helvetica");
+    public static final ASAtom HELVETICA_BOLD = new ASAtom("Helvetica-Bold");
+    public static final ASAtom HELVETICA_BOLD_OBLIQUE = new ASAtom("Helvetica-BoldOblique");
+    public static final ASAtom HELVETICA_OBLIQUE = new ASAtom("Helvetica-Oblique");
     public static final ASAtom HIDE_MENUBAR = new ASAtom("HideMenubar");
     public static final ASAtom HIDE_TOOLBAR = new ASAtom("HideToolbar");
     public static final ASAtom HIDE_WINDOWUI = new ASAtom("HideWindowUI");
@@ -464,6 +472,7 @@ public class ASAtom {
     public static final ASAtom SV = new ASAtom("SV");
     public static final ASAtom SW = new ASAtom("SW");
     public static final ASAtom SY = new ASAtom("Sy");
+    public static final ASAtom SYMBOL = new ASAtom("Symbol");
     // T
     public static final ASAtom T = new ASAtom("T");
     public static final ASAtom TARGET = new ASAtom("Target");
@@ -471,6 +480,10 @@ public class ASAtom {
     public static final ASAtom THREADS = new ASAtom("Threads");
     public static final ASAtom TI = new ASAtom("TI");
     public static final ASAtom TILING_TYPE = new ASAtom("TilingType");
+    public static final ASAtom TIMES_BOLD = new ASAtom("Times-Bold");
+    public static final ASAtom TIMES_BOLD_ITALIC = new ASAtom("Times-BoldItalic");
+    public static final ASAtom TIMES_ITALIC = new ASAtom("Times-Italic");
+    public static final ASAtom TIMES_ROMAN = new ASAtom("Times-Roman");
     public static final ASAtom TIME_STAMP = new ASAtom("TimeStamp");
     public static final ASAtom TITLE = new ASAtom("Title");
     public static final ASAtom TK = new ASAtom("TK");
@@ -529,6 +542,9 @@ public class ASAtom {
     // Y
     public static final ASAtom Y_STEP = new ASAtom("YStep");
     public static final ASAtom YES = new ASAtom("Yes");
+
+    // Z
+    public static final ASAtom ZAPF_DINGBATS = new ASAtom("ZapfDingbats");
 
     private String value;
 
