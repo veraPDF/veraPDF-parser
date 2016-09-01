@@ -83,6 +83,20 @@ public class ASMemoryInStream extends ASInputStream {
     }
 
     /**
+     * Reads single byte.
+     *
+     * @return byte read or -1 if end is reached.
+     * @throws IOException
+     */
+    @Override
+    public int read() throws IOException {
+        if (currentPosition == bufferSize) {
+            return -1;
+        }
+        return this.buffer[currentPosition++];
+    }
+
+    /**
      * Skips up to size bytes of data.
      *
      * @param size is amount of bytes to skip.

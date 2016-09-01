@@ -3,7 +3,7 @@ package org.verapdf.pd;
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
-import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.PDFLibFont;
 import org.verapdf.font.cff.CFFFont;
 import org.verapdf.font.truetype.TrueTypeFont;
 import org.verapdf.font.type1.Type1Font;
@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public abstract class PDFont {
+public class PDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDFont.class);
 
@@ -105,9 +105,11 @@ public abstract class PDFont {
         return (flags & 0b00100100) == 4;
     }
 
-    public abstract String getName();
+    public String getName() {
+        return this.dictionary.getStringKey(ASAtom.BASE_FONT);
+    }
 
-    public PDFlibFont getFontFile() {
+    public PDFLibFont getFontFile() {
         if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
             COSStream type1FontFile =
                     (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();

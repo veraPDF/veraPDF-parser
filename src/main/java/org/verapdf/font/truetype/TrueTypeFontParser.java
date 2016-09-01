@@ -85,6 +85,10 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         return postParser;
     }
 
+    public TrueTypeMaxpTable getMaxpParser() {
+        return maxpParser;
+    }
+
     TrueTypeCmapSubtable getCmapTable(int platformID, int encodingID) {
         for (TrueTypeCmapSubtable ttci : cmapParser.getCmapInfos()) {
             if (ttci.getPlatformID() == platformID &&
