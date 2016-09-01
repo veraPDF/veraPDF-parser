@@ -90,11 +90,11 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
         }
     }
 
-    protected void readTopDictTwoByteOps(int lastRead) {
+    protected void readTopDictTwoByteOps(int lastRead) throws IOException {
         this.stack.clear();
     }
 
-    protected void readTopDictOneByteOps(int lastRead) {
+    protected void readTopDictOneByteOps(int lastRead) throws IOException {
         this.stack.clear();
     }
 

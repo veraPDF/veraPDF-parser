@@ -79,6 +79,13 @@ public class OpenTypeFont implements PDFlibFont {
         }
     }
 
+    /**
+     * @return CFF font or TrueType font, represented by this OpenType font.
+     */
+    public PDFlibFont getFont() {
+        return font;
+    }
+
     private ASInputStream getCFFTable() throws IOException {
         this.source = new InternalInputStream(this.source);
         this.readHeader();

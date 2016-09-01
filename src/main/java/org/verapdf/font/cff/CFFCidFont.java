@@ -23,6 +23,9 @@ public class CFFCidFont extends CFFFontBaseParser implements PDFlibFont {
     private int[] fdSelect;     // array with mapping gid -> font dict
     private int[] nominalWidths;
     private int[] defaultWidths;
+    private int supplement;
+    private String registry;
+    private String ordering;
 
     CFFCidFont(InternalInputStream stream, long topDictBeginOffset,
                long topDictEndOffset) throws IOException {
@@ -54,8 +57,15 @@ public class CFFCidFont extends CFFFontBaseParser implements PDFlibFont {
     }
 
     @Override
-    protected void readTopDictTwoByteOps(int lastRead) {
+    protected void readTopDictTwoByteOps(int lastRead) throws IOException {
         switch (lastRead) {
+            case 30:
+                this.supplement = (int) this.stack.get(this.stack.size() - 1).getInteger();
+                this.ordering = getStringBySID((int)
+                        this.stack.get(this.stack.size() - 2).getInteger());
+                this.registry = getStringBySID((int)
+                        this.stack.get(this.stack.size() - 3).getInteger());
+                this.stack.clear();
             case 36:
                 this.fdArrayOffset = this.stack.get(this.stack.size() - 1).getInteger();
                 this.stack.clear();
@@ -209,5 +219,17 @@ public class CFFCidFont extends CFFFontBaseParser implements PDFlibFont {
     @Override
     public boolean containsCID(int cid) {
         return this.charSet.containsKey(cid);
+    }
+
+    public int getSupplement() {
+        return supplement;
+    }
+
+    public String getRegistry() {
+        return registry;
+    }
+
+    public String getOrdering() {
+        return ordering;
     }
 }
