@@ -1,7 +1,7 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.PDFLibFont;
 
 import java.io.IOException;
 
@@ -10,9 +10,9 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class CFFFont extends CFFFileBaseParser implements PDFlibFont {
+public class CFFFont extends CFFFileBaseParser implements PDFLibFont {
 
-    private PDFlibFont font;
+    private PDFLibFont font;
     private boolean isCIDFont = false;
 
     /**
@@ -36,7 +36,7 @@ public class CFFFont extends CFFFileBaseParser implements PDFlibFont {
         CFFIndex top = this.readIndex();
         this.definedNames = this.readIndex();
         if (isCIDFont(top.get(0))) {
-            font = new CFFCidFont(this.source,
+            font = new CFFCIDFont(this.source,
                     topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                     topOffset + top.getOffset(1) - 1 + top.getOffsetShift());
             font.parseFont();
@@ -109,7 +109,7 @@ public class CFFFont extends CFFFileBaseParser implements PDFlibFont {
     /**
      * @return CID font or Type1 font that is presented by CFF program.
      */
-    public PDFlibFont getFont() {
+    public PDFLibFont getFont() {
         return this.font;
     }
 }

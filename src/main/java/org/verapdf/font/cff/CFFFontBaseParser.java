@@ -20,6 +20,8 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected ArrayList<CFFNumber> stack;
 
     //Top DICT
+    protected long topDictBeginOffset;
+    protected long topDictEndOffset;
     protected float[] fontMatrix = new float[6];
     protected long charStringsOffset;
     protected long charSetOffset;
@@ -34,7 +36,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected int defaultWidthX;
     protected int nominalWidthX;
 
-    public CFFFontBaseParser(InternalInputStream source) throws IOException {
+    public CFFFontBaseParser(InternalInputStream source) {
         super(source);
         stack = new ArrayList<>(48);
         System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,

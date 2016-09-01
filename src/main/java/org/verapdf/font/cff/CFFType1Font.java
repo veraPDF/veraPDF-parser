@@ -1,7 +1,7 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.font.CFFNumber;
-import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.PDFLibFont;
 import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-class CFFType1Font extends CFFFontBaseParser implements PDFlibFont {
+class CFFType1Font extends CFFFontBaseParser implements PDFLibFont {
 
     //Top DICT
     private long privateDictOffset;
@@ -26,17 +26,13 @@ class CFFType1Font extends CFFFontBaseParser implements PDFlibFont {
     private Map<String, Integer> charSet;   // mappings glyphName -> gid
 
     CFFType1Font(InternalInputStream stream, CFFIndex definedNames,
-                 long topDictBeginOffset, long topDictEndOffset)
-            throws IOException {
+                 long topDictBeginOffset, long topDictEndOffset) {
         super(stream);
         encodingOffset = 0;
         encoding = new int[256];
         this.definedNames = definedNames;
-        this.source.seek(topDictBeginOffset);
-        while (this.source.getOffset() < topDictEndOffset) {
-            readTopDictUnit();
-        }
-        this.stack.clear();
+        this.topDictBeginOffset = topDictBeginOffset;
+        this.topDictEndOffset = topDictEndOffset;
     }
 
     /**
@@ -44,6 +40,12 @@ class CFFType1Font extends CFFFontBaseParser implements PDFlibFont {
      */
     @Override
     public void parseFont() throws IOException {
+        this.source.seek(topDictBeginOffset);
+        while (this.source.getOffset() < topDictEndOffset) {
+            readTopDictUnit();
+        }
+        this.stack.clear();
+
         this.source.seek(this.privateDictOffset);
         while (this.source.getOffset() < this.privateDictOffset + this.privateDictSize) {
             this.readPrivateDictUnit();

@@ -6,7 +6,7 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.PDFLibFont;
 
 import java.io.IOException;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class TrueTypeFont implements PDFlibFont {
+public class TrueTypeFont implements PDFLibFont {
 
     private float[] widths;
 

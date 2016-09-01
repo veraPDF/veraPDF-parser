@@ -1,7 +1,7 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.font.CFFNumber;
-import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.PDFLibFont;
 import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-public class CFFCidFont extends CFFFontBaseParser implements PDFlibFont {
+public class CFFCIDFont extends CFFFontBaseParser implements PDFLibFont {
 
     private long fdArrayOffset;
     private long fdSelectOffset;
@@ -27,13 +27,11 @@ public class CFFCidFont extends CFFFontBaseParser implements PDFlibFont {
     private String registry;
     private String ordering;
 
-    CFFCidFont(InternalInputStream stream, long topDictBeginOffset,
-               long topDictEndOffset) throws IOException {
+    CFFCIDFont(InternalInputStream stream, long topDictBeginOffset,
+               long topDictEndOffset) {
         super(stream);
-        this.source.seek(topDictBeginOffset);
-        while (this.source.getOffset() < topDictEndOffset) {
-            readTopDictUnit();
-        }
+        this.topDictBeginOffset = topDictBeginOffset;
+        this.topDictEndOffset = topDictEndOffset;
     }
 
     /**
@@ -41,6 +39,12 @@ public class CFFCidFont extends CFFFontBaseParser implements PDFlibFont {
      */
     @Override
     public void parseFont() throws IOException {
+        this.source.seek(topDictBeginOffset);
+        while (this.source.getOffset() < topDictEndOffset) {
+            readTopDictUnit();
+        }
+        this.stack.clear();
+
         this.source.seek(charStringsOffset);
         this.readCharStrings();
 

@@ -3,7 +3,7 @@ package org.verapdf.font.openType;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
-import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.PDFLibFont;
 import org.verapdf.font.cff.CFFFont;
 import org.verapdf.font.truetype.TrueTypeFont;
 import org.verapdf.io.InternalInputStream;
@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class OpenTypeFont implements PDFlibFont {
+public class OpenTypeFont implements PDFLibFont {
 
     private static final long CFF = 1128678944;     // "CFF " read as 4-byte unsigned number
 
@@ -23,7 +23,7 @@ public class OpenTypeFont implements PDFlibFont {
     private boolean isSymbolic;
     private COSObject encoding;
     private ASInputStream source;
-    private PDFlibFont font;
+    private PDFLibFont font;
     private int numTables;
 
     /**
@@ -82,7 +82,7 @@ public class OpenTypeFont implements PDFlibFont {
     /**
      * @return CFF font or TrueType font, represented by this OpenType font.
      */
-    public PDFlibFont getFont() {
+    public PDFLibFont getFont() {
         return font;
     }
 
