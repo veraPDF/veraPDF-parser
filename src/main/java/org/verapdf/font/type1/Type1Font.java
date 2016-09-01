@@ -171,4 +171,8 @@ public class Type1Font extends COSParser implements PDFlibFont {
     public boolean containsCID(int cid) {
         return cid < 256;
     }
+
+    public String[] getEncoding() {
+        return encoding;
+    }
 }
