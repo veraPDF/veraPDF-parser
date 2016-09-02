@@ -1,7 +1,7 @@
 package org.verapdf.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.PDFLibFont;
 
 import java.io.IOException;
 
@@ -10,14 +10,24 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class CFFFont extends CFFFileBaseParser implements PDFlibFont {
+public class CFFFont extends CFFFileBaseParser implements PDFLibFont {
 
-    private PDFlibFont font;
+    private PDFLibFont font;
+    private boolean isCIDFont = false;
 
+    /**
+     * Constructor from stream.
+     *
+     * @param stream is stream with CFF program.
+     * @throws IOException if creation of @{link InternalInputStream} fails.
+     */
     public CFFFont(ASInputStream stream) throws IOException {
         super(stream);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void parseFont() throws IOException {
         this.readHeader();
@@ -26,7 +36,10 @@ public class CFFFont extends CFFFileBaseParser implements PDFlibFont {
         CFFIndex top = this.readIndex();
         this.definedNames = this.readIndex();
         if (isCIDFont(top.get(0))) {
-            //TODO: CID fonts
+            font = new CFFCIDFont(this.source,
+                    topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
+                    topOffset + top.getOffset(1) - 1 + top.getOffsetShift());
+            font.parseFont();
         } else {
             font = new CFFType1Font(this.source,
                     this.definedNames,
@@ -51,19 +64,52 @@ public class CFFFont extends CFFFileBaseParser implements PDFlibFont {
             } else {
                 return false;
             }
-            return topDict[rosOffset] == 12 && topDict[rosOffset + 1] == 30;
+            if (topDict[rosOffset] == 12 && topDict[rosOffset + 1] == 30) {
+                isCIDFont = true;
+                return true;
+            }
+            return false;
         } catch (ArrayIndexOutOfBoundsException ex) {
             return false;
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public float getWidth(int code) {
         return this.font.getWidth(code);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public float getWidth(String glyphName) {
         return this.font.getWidth(glyphName);
+    }
+
+    /**
+     * @return true if this font is CFF CID font.
+     */
+    public boolean isCIDFont() {
+        return isCIDFont;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsCID(int cid) {
+        return font.containsCID(cid);
+    }
+
+    /**
+     * @return CID font or Type1 font that is presented by CFF program.
+     */
+    public PDFLibFont getFont() {
+        return this.font;
     }
 }

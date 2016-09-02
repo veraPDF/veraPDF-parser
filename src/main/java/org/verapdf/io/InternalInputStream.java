@@ -26,6 +26,11 @@ public class InternalInputStream extends ASInputStream {
 		this.source = new RandomAccessFile(createTempFile(asInputStream), READ_ONLY_MODE);
 	}
 
+	@Override
+	public int read() throws IOException {
+		return this.source.read();
+	}
+
 	public int read(byte[] buffer, int size) throws IOException {
 		return this.source.read(buffer, 0, size);
 	}
