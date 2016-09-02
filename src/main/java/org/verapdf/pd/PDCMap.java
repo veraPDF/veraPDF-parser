@@ -92,21 +92,33 @@ public class PDCMap {
      * @return Registry value from CMap CIDSystemInfo dictionary.
      */
     public String getRegistry() {
-        return this.getCIDSystemInfo().getStringKey(ASAtom.REGISTRY);
+        if(this.getCIDSystemInfo() == null) {
+            return null;
+        } else {
+            return this.getCIDSystemInfo().getStringKey(ASAtom.REGISTRY);
+        }
     }
 
     /**
      * @return Ordering value from CMap CIDSystemInfo dictionary.
      */
     public String getOrdering() {
-        return this.getCIDSystemInfo().getStringKey(ASAtom.ORDERING);
+        if(this.getCIDSystemInfo() == null) {
+            return null;
+        } else {
+            return this.getCIDSystemInfo().getStringKey(ASAtom.ORDERING);
+        }
     }
 
     /**
      * @return Supplement value from CMap CIDSystemInfo dictionary.
      */
     public Long getSupplement() {
-        return this.getCIDSystemInfo().getIntegerKey(ASAtom.SUPPLEMENT);
+        if(this.getCIDSystemInfo() == null) {
+            return null;
+        } else {
+            return this.getCIDSystemInfo().getIntegerKey(ASAtom.SUPPLEMENT);
+        }
     }
 
     private COSDictionary getCIDSystemInfo() {
