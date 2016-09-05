@@ -6,7 +6,7 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.pd.font.PDFLibFontProgram;
+import org.verapdf.pd.font.FontProgram;
 
 import java.io.IOException;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class TrueTypeFontProgram implements PDFLibFontProgram {
+public class TrueTypeFontProgram implements FontProgram {
 
     private float[] widths;
 

@@ -4,7 +4,7 @@ import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.io.InternalInputStream;
-import org.verapdf.pd.font.PDFLibFontProgram;
+import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class OpenTypeFontProgram implements PDFLibFontProgram {
+public class OpenTypeFontProgram implements FontProgram {
 
     private static final long CFF = 1128678944;     // "CFF " read as 4-byte unsigned number
 
@@ -23,7 +23,7 @@ public class OpenTypeFontProgram implements PDFLibFontProgram {
     private boolean isSymbolic;
     private COSObject encoding;
     private ASInputStream source;
-    private PDFLibFontProgram font;
+    private FontProgram font;
     private int numTables;
 
     /**
@@ -82,7 +82,7 @@ public class OpenTypeFontProgram implements PDFLibFontProgram {
     /**
      * @return CFF font or TrueType font, represented by this OpenType font.
      */
-    public PDFLibFontProgram getFont() {
+    public FontProgram getFont() {
         return font;
     }
 

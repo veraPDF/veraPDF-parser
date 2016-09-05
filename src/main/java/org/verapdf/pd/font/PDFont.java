@@ -65,8 +65,7 @@ public class PDFont {
      * @return font subtype (Subtype entry).
      */
     public ASAtom getSubtype() {
-        COSName type = (COSName) this.dictionary.getKey(ASAtom.SUBTYPE).get();
-        return type == null ? null : type.get();
+        return this.dictionary.getNameKey(ASAtom.SUBTYPE);
     }
 
     /**
@@ -76,15 +75,15 @@ public class PDFont {
      *                               and font descriptor are different.
      */
     public ASAtom getFontName() throws IllegalStateException {
-        COSName type = (COSName) this.dictionary.getKey(ASAtom.BASE_FONT).get();
+        ASAtom type = this.dictionary.getNameKey(ASAtom.BASE_FONT);
         if (this.fontDescriptor != null && type != null) {
-            COSName typeFromDescriptor =
-                    (COSName) this.fontDescriptor.getKey(ASAtom.FONT_NAME).get();
-            if (type.get() != typeFromDescriptor.get()) {
+            ASAtom typeFromDescriptor =
+                    this.fontDescriptor.getNameKey(ASAtom.FONT_NAME);
+            if (type!= typeFromDescriptor) {
                 throw new IllegalStateException("Font names specified in font dictionary and font descriptor are different");
             }
         }
-        return type == null ? null : type.get();
+        return type;
     }
 
     /**
@@ -111,7 +110,7 @@ public class PDFont {
         return this.dictionary.getStringKey(ASAtom.BASE_FONT);
     }
 
-    public PDFLibFontProgram getFontFile() {
+    public FontProgram getFontFile() {
         if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
             COSStream type1FontFile =
                     (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();

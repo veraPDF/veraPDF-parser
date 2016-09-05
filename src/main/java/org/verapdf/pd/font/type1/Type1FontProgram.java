@@ -6,7 +6,7 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
-import org.verapdf.pd.font.PDFLibFontProgram;
+import org.verapdf.pd.font.FontProgram;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-public class Type1FontProgram extends COSParser implements PDFLibFontProgram {
+public class Type1FontProgram extends COSParser implements FontProgram {
 
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
 

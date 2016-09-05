@@ -2,7 +2,7 @@ package org.verapdf.pd.font.cff;
 
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.pd.font.CFFNumber;
-import org.verapdf.pd.font.PDFLibFontProgram;
+import org.verapdf.pd.font.FontProgram;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,7 +15,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-class CFFType1FontProgram extends CFFFontBaseParser implements PDFLibFontProgram {
+class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
 
     //Top DICT
     private long privateDictOffset;
