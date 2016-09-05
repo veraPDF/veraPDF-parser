@@ -145,6 +145,7 @@ public class ASAtom {
     public static final ASAtom DESCENT = new ASAtom("Descent");
     public static final ASAtom DEST = new ASAtom("Dest");
     public static final ASAtom DEST_OUTPUT_PROFILE = new ASAtom("DestOutputProfile");
+    public static final ASAtom DEST_OUTPUT_PROFILE_REF = new ASAtom("DestOutputProfileRef");
     public static final ASAtom DESTS = new ASAtom("Dests");
     public static final ASAtom DEVICECMYK = new ASAtom("DeviceCMYK");
     public static final ASAtom DEVICEGRAY = new ASAtom("DeviceGray");
