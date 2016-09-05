@@ -7,7 +7,7 @@ import org.verapdf.cos.COSObject;
 /**
  * @author Sergey Shemyakov
  */
-public class PDType0Font extends PDFont {
+public class PDType0Font extends PDCIDFont {
 
     private org.verapdf.pd.font.cmap.PDCMap pdcMap;
     private COSDictionary cidSystemInfo;
