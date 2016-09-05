@@ -163,4 +163,8 @@ public class PDDocument {
 		return getCatalog().getMetadata();
 	}
 
+	public List<PDOutputIntent> getOutputIntents() throws IOException {
+		return getCatalog().getOutputIntents();
+	}
+
 }

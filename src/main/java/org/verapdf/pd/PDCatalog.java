@@ -1,10 +1,14 @@
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Timur Kamalov
@@ -45,6 +49,20 @@ public class PDCatalog extends PDObject {
 			return new PDStructTreeRoot(base);
 		}
 		return null;
+	}
+
+	public List<PDOutputIntent> getOutputIntents() {
+		COSObject base = getKey(ASAtom.OUTPUT_INTENTS);
+		if (base != null && base.getType() == COSObjType.COS_ARRAY) {
+			List<PDOutputIntent> result = new ArrayList<>(base.size());
+			for (COSObject obj : (COSArray) base.get()) {
+				if (obj != null && obj.getType().isDictionaryBased()) {
+					result.add(new PDOutputIntent(obj));
+				}
+			}
+			return Collections.unmodifiableList(result);
+		}
+		return Collections.emptyList();
 	}
 
 }
