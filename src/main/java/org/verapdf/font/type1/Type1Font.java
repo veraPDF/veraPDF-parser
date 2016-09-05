@@ -4,7 +4,7 @@ import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
-import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.PDFLibFont;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
 
@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-public class Type1Font extends COSParser implements PDFlibFont {
+public class Type1Font extends COSParser implements PDFLibFont {
 
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
 
@@ -165,5 +165,14 @@ public class Type1Font extends COSParser implements PDFlibFont {
     public float getWidth(String glyphName) {
         Integer res = this.glyphWidths.get(glyphName);
         return res == null ? -1 : res;
+    }
+
+    @Override
+    public boolean containsCID(int cid) {
+        return cid < 256;
+    }
+
+    public String[] getEncoding() {
+        return encoding;
     }
 }

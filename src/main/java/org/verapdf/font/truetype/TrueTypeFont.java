@@ -6,7 +6,7 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.font.PDFlibFont;
+import org.verapdf.font.PDFLibFont;
 
 import java.io.IOException;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class TrueTypeFont implements PDFlibFont {
+public class TrueTypeFont implements PDFLibFont {
 
     private float[] widths;
 
@@ -25,9 +25,11 @@ public class TrueTypeFont implements PDFlibFont {
     private String[] encodingMappingArray;
 
     /**
-     * Constructor from stream, containing font data.
+     * Constructor from stream, containing font data, and encoding details.
      *
      * @param stream is stream containing font data.
+     * @param isSymbolic is true if font is marked as symbolic.
+     * @param encoding is value of /Encoding in font dictionary.
      * @throws IOException if creation of @{link InternalInputStream} fails.
      */
     public TrueTypeFont(ASInputStream stream, boolean isSymbolic,
@@ -70,6 +72,19 @@ public class TrueTypeFont implements PDFlibFont {
      */
     public TrueTypeCmapSubtable[] getCmapEncodingPlatform() {
         return this.parser.getCmapParser().getCmapInfos();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsCID(int cid) {
+        for (TrueTypeCmapSubtable cMap : getCmapEncodingPlatform()) {
+            if (cMap.containsCID(cid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -122,6 +137,13 @@ public class TrueTypeFont implements PDFlibFont {
     }
 
     /**
+     * @return number of glyphs in this font.
+     */
+    public int getNGlyphs() {
+        return this.parser.getMaxpParser().getNumGlyphs();
+    }
+
+    /**
      * Returns true if cmap table with given platform ID and encoding ID is
      * present in the font.
      *
@@ -156,7 +178,7 @@ public class TrueTypeFont implements PDFlibFont {
     }
 
     private float getWidthWithCheck(int gid) {
-        if(gid < widths.length) {
+        if (gid < widths.length) {
             return widths[gid];
         } else {
             return widths[widths.length - 1];   // case of monospaced fonts
