@@ -1,4 +1,4 @@
-package org.verapdf.pd.font.truetype;
+package org.verapdf.pd.font.cff;
 
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.pd.font.PDFont;
@@ -6,9 +6,9 @@ import org.verapdf.pd.font.PDFont;
 /**
  * @author Sergey Shemyakov
  */
-public class PDTrueTypeFont extends PDFont {
+public class PDCFFCIDFont extends PDFont {
 
-    public PDTrueTypeFont(COSDictionary dictionary) {
+    public PDCFFCIDFont(COSDictionary dictionary) {
         super(dictionary);
     }
 }

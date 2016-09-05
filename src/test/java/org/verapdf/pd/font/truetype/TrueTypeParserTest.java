@@ -15,8 +15,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class TrueTypeParserTest {
 
-    private static final String MONO_FONT_PATH = "src/test/resources/org/verapdf/font/truetype/SourceCodePro-Bold.ttf";
-    private static final String REGULAR_FONT_PATH = "src/test/resources/org/verapdf/font/truetype/LiberationSans-Regular.ttf";
+    private static final String MONO_FONT_PATH = "src/test/resources/org/verapdf/pd/font/truetype/SourceCodePro-Bold.ttf";
+    private static final String REGULAR_FONT_PATH = "src/test/resources/org/verapdf/pd/font/truetype/LiberationSans-Regular.ttf";
     private static final boolean IS_SYMBOLIC = false;
     private static final COSObject ENCODING = COSName.construct(ASAtom.MAC_ROMAN_ENCODING);
 
