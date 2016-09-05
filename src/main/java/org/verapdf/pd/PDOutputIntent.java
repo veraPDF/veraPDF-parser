@@ -30,6 +30,14 @@ public class PDOutputIntent extends PDObject {
 		return getStringValue(ASAtom.INFO);
 	}
 
+	public String getSubtype() {
+		COSObject base = getKey(ASAtom.S);
+		if (base != null && base.getType() == COSObjType.COS_NAME) {
+			return base.getName().getValue();
+		}
+		return null;
+	}
+
 	public ICCProfile getDestOutputProfile() {
 		COSObject profile = getKey(ASAtom.DEST_OUTPUT_PROFILE);
 		if (profile != null && profile.getType() == COSObjType.COS_STREAM) {
