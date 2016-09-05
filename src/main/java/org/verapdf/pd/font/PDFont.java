@@ -194,7 +194,8 @@ public class PDFont {
     }
 
     public COSStream getCIDSet() {
-        return (COSStream) this.fontDescriptor.getKey(ASAtom.CID_SET).get();
+        COSObject cidSet = this.fontDescriptor.getKey(ASAtom.CID_SET);
+        return cidSet == null ? null : (COSStream) cidSet.get();
     }
 
     public COSObject getCIDToGIDMap() {
