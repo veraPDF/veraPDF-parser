@@ -7,7 +7,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public interface PDFLibFontProgram {
+public interface FontProgram {
 
     /**
      * Returns width of glyph for given character code.

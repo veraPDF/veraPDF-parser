@@ -3,11 +3,7 @@ package org.verapdf.pd.font;
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
-import org.verapdf.pd.font.cff.CFFFontProgram;
-import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
-import org.verapdf.pd.font.type1.Type1FontProgram;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +12,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-public class PDFont {
+public abstract class PDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDFont.class);
 
@@ -63,9 +59,8 @@ public class PDFont {
     /**
      * @return font subtype (Subtype entry).
      */
-    public String getSubtype() {
-        String type = this.dictionary.getStringKey(ASAtom.SUBTYPE);
-        return type == null ? "" : type;
+    public ASAtom getSubtype() {
+        return this.dictionary.getNameKey(ASAtom.SUBTYPE);
     }
 
     /**
@@ -74,16 +69,16 @@ public class PDFont {
      * @throws IllegalStateException if font names specified in font dictionary
      *                               and font descriptor are different.
      */
-    public String getFontName() throws IllegalStateException {
-        String type = this.dictionary.getStringKey(ASAtom.BASE_FONT);
-        if (this.fontDescriptor != null) {
-            String typeFromDescriptor =
-                    this.fontDescriptor.getStringKey(ASAtom.FONT_NAME);
-            if (!type.equals(typeFromDescriptor)) {
+    public ASAtom getFontName() throws IllegalStateException {
+        ASAtom type = this.dictionary.getNameKey(ASAtom.BASE_FONT);
+        if (this.fontDescriptor != null && type != null) {
+            ASAtom typeFromDescriptor =
+                    this.fontDescriptor.getNameKey(ASAtom.FONT_NAME);
+            if (type != typeFromDescriptor) {
                 throw new IllegalStateException("Font names specified in font dictionary and font descriptor are different");
             }
         }
-        return type == null ? "" : type;
+        return type;
     }
 
     /**
@@ -110,45 +105,14 @@ public class PDFont {
         return this.dictionary.getStringKey(ASAtom.BASE_FONT);
     }
 
-    public PDFLibFontProgram getFontFile() {
-        if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
-            COSStream type1FontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();
-            try {
-                return new Type1FontProgram(
-                        type1FontFile.getData(COSStream.FilterFlags.DECODE));
-            } catch (IOException e) {
-                LOGGER.error("Can't read Type 1 font program.");
-            }
-        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE2)) {
-            COSStream trueTypeFontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE2).get();
-            try {
-                return new TrueTypeFontProgram(trueTypeFontFile.getData(COSStream.FilterFlags.DECODE),
-                        this.isSymbolic(), this.dictionary.getKey(ASAtom.ENCODING));
-            } catch (IOException e) {
-                LOGGER.error("Can't read TrueType font program.");
-            }
-        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
-            COSStream fontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE3).get();
-            COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).get();
-            if (ASAtom.TYPE1C.equals(subtype.get()) ||
-                    ASAtom.CID_FONT_TYPE0C.equals(subtype.get())) {     // TODO: check if cases of CFF type 1 and CFF CID are fine
-                try {
-                    return new CFFFontProgram(fontFile.getData(COSStream.FilterFlags.DECODE));
-                } catch (IOException e) {
-                    LOGGER.error("Can't read CFF font program.");
-                }
-            } else if (ASAtom.OPEN_TYPE.equals(subtype.get())) {
-                return null;    // TODO: add OpenType
-            }
-        }
-        return null;
-    }
+    public abstract FontProgram getFontProgram();
 
     public COSObject getEncoding() {
         return this.dictionary.getKey(ASAtom.ENCODING);
+    }
+
+    public COSStream getFontFile2() {
+        return (COSStream) this.fontDescriptor.getKey(ASAtom.FONT_FILE2).get();
     }
 
     public Map<Integer, String> getDifferences() {
@@ -167,5 +131,17 @@ public class PDFont {
             }
         }
         return res;
+    }
+
+    public COSObject getWidths() {
+        return this.dictionary.getKey(ASAtom.WIDTHS);
+    }
+
+    public Long getFirstChar() {
+        return this.dictionary.getIntegerKey(ASAtom.FIRST_CHAR);
+    }
+
+    public Long getLastChar() {
+        return this.dictionary.getIntegerKey(ASAtom.LAST_CHAR);
     }
 }

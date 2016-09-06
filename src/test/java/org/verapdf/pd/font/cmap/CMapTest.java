@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
  * @author Sergey Shemyakov
  */
 public class CMapTest {
-    private String cMapPath = "src/test/resources/org/verapdf/font/cmap/83pv-RKSJ-H";
+    private String cMapPath = "src/test/resources/org/verapdf/pd/font/cmap/83pv-RKSJ-H";
 
     @Test
     public void testParser() {

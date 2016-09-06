@@ -5,9 +5,13 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
 import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.parser.COSParser;
+import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDFont;
+import org.verapdf.pd.font.cff.CFFFontProgram;
+import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -50,4 +54,34 @@ public class PDType1Font extends PDFont {
         return Collections.emptySet();
     }
 
+    @Override
+    public FontProgram getFontProgram() {
+        if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
+            COSStream type1FontFile =
+                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();
+            try {
+                return new Type1FontProgram(
+                        type1FontFile.getData(COSStream.FilterFlags.DECODE));
+            } catch (IOException e) {
+                LOGGER.error("Can't read Type 1 font program.");
+            }
+        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+            COSStream type1FontFile =
+                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();
+            ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
+            if (subtype == ASAtom.TYPE1C) {
+                try {
+                    return new CFFFontProgram(type1FontFile.getData(
+                            COSStream.FilterFlags.DECODE));
+                } catch (IOException e) {
+                    LOGGER.error("Can't read Type 1 font program.");
+                }
+            } else if (subtype == ASAtom.OPEN_TYPE) {
+                return new OpenTypeFontProgram(type1FontFile.getData(
+                        COSStream.FilterFlags.DECODE), true, this.isSymbolic(),
+                        this.getEncoding());
+            }
+        }
+        return null;
+    }
 }

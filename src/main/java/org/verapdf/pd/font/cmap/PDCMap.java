@@ -119,6 +119,10 @@ public class PDCMap {
         }
     }
 
+    public COSObject getUseCMap() {
+        return this.cMap.getKey(ASAtom.USE_CMAP);
+    }
+
     private COSDictionary getCIDSystemInfo() {
         if (cidSystemInfo == null) {
             this.cidSystemInfo = (COSDictionary)
