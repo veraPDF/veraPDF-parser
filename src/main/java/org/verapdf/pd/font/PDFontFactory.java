@@ -15,12 +15,6 @@ public class PDFontFactory {
 
     private static final Logger LOGGER = Logger.getLogger(PDFontFactory.class);
 
-    private static PDFontFactory ourInstance = new PDFontFactory();
-
-    public static PDFontFactory getInstance() {
-        return ourInstance;
-    }
-
     private PDFontFactory() {
     }
 
@@ -28,7 +22,7 @@ public class PDFontFactory {
      * @param fontDictionary is COSDictionary that is font dictionary.
      * @return PDFont that corresponds to this dictionary.
      */
-    public PDFont getPDFont(COSDictionary fontDictionary) {
+    public static PDFont getPDFont(COSDictionary fontDictionary) {
         ASAtom subtype = fontDictionary.getNameKey(ASAtom.SUBTYPE);
         if (subtype == ASAtom.TYPE1) {
             return new PDType1Font(fontDictionary);
