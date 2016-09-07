@@ -7,6 +7,7 @@ import org.verapdf.as.filters.ASFilterFactory;
 import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.filters.ASOutFilter;
 import org.verapdf.as.filters.IASFilterFactory;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.COSDictionary;
@@ -57,7 +58,7 @@ public class COSFilterRegistry {
 		if (filterFactory != null) {
 			return filterFactory.getInFilter(inputStream, decodeParams);
 		} else {
-			return null;
+			return new ASBufferingInFilter(inputStream);
 		}
 	}
 
