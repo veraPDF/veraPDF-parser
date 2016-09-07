@@ -94,6 +94,10 @@ public class COSXRefTableReader {
 		return value != null ? value : 0;
 	}
 
+	public boolean containsKey(final COSKey key) {
+		return this.offsets.containsKey(key);
+	}
+
 	public COSTrailer getTrailer() {
 		return this.trailer;
 	}

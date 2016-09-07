@@ -146,11 +146,13 @@ public class COSDocument {
 			}
 
 			COSObject newObj = this.reader.getObject(key);
-
+			if (newObj == null) {
+				return null;
+			}
 			this.body.set(key, newObj);
 			return this.body.get(key);
 		} catch (IOException e) {
-			//TODO :
+			//TODO : maybe not runtime, maybe no exception at all
 			throw new RuntimeException("Error while parsing object : " + key.getNumber() +
 									   " " + key.getGeneration());
 		}
