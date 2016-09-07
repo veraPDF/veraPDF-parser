@@ -119,16 +119,20 @@ public class PDFParser extends COSParser {
         return result;
     }
 
-    public boolean isLinearized() throws IOException {
-        COSObject linDict = findFirstDictionary();
+    public boolean isLinearized() {
+        try {
+            COSObject linDict = findFirstDictionary();
 
-        if (linDict != null && !linDict.empty() && linDict.getType() == COSObjType.COS_DICT) {
-            if (linDict.knownKey(ASAtom.LINEARIZED)) {
-                long length = linDict.getIntegerKey(ASAtom.L);
-                if (length != 0) {
-                    return length == this.source.getStreamLength() && this.source.getOffset() < LINEARIZATION_DICTIONARY_LOOKUP_SIZE;
+            if (linDict != null && !linDict.empty() && linDict.getType() == COSObjType.COS_DICT) {
+                if (linDict.knownKey(ASAtom.LINEARIZED)) {
+                    long length = linDict.getIntegerKey(ASAtom.L);
+                    if (length != 0) {
+                        return length == this.source.getStreamLength() && this.source.getOffset() < LINEARIZATION_DICTIONARY_LOOKUP_SIZE;
+                    }
                 }
             }
+        } catch (IOException e) {
+            LOG.warn("IO error while trying to find first document dictionary");
         }
 
         return false;

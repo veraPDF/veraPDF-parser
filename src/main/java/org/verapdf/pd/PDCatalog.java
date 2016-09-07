@@ -54,6 +54,9 @@ public class PDCatalog extends PDObject {
 	public List<PDOutputIntent> getOutputIntents() {
 		COSObject base = getKey(ASAtom.OUTPUT_INTENTS);
 		if (base != null && base.getType() == COSObjType.COS_ARRAY) {
+			if (base.isIndirect()) {
+				base = base.getDirect();
+			}
 			List<PDOutputIntent> result = new ArrayList<>(base.size());
 			for (COSObject obj : (COSArray) base.get()) {
 				if (obj != null && obj.getType().isDictionaryBased()) {
