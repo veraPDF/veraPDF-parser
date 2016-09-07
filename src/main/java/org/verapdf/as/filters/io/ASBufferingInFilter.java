@@ -72,6 +72,22 @@ public class ASBufferingInFilter extends ASInFilter {
     }
 
     /**
+     * Reads next portion of data from the underlying stream and appends it to
+     * the end of data, contained in internal buffer.
+     *
+     * @param bytesToAdd amount of bytes to read.
+     * @return amount of bytes actually appended to buffer.
+     */
+    public long addToBuffer(int bytesToAdd) throws IOException {
+        bytesToAdd = Math.min(bytesToAdd, bufferCapacity - bufferEnd);
+        byte[] toAdd = new byte[bytesToAdd];
+        long actuallyRead = this.getInputStream().read(toAdd, bytesToAdd);
+        System.arraycopy(toAdd, 0, this.internalBuffer, bufferEnd, bytesToAdd);
+        bufferEnd += bytesToAdd;
+        return actuallyRead;
+    }
+
+    /**
      * @return beginning index of unread data in buffer.
      */
     public int getBufferBegin() {
@@ -106,6 +122,9 @@ public class ASBufferingInFilter extends ASInFilter {
      */
     public int bufferPopArray(byte[] buffer, int read) throws IOException {
         int actualRead = Math.min(read, bufferSize());
+        if(actualRead == -1) {
+            return -1;
+        }
         if (buffer.length < actualRead) {
             throw new IOException("Passed buffer is too small");
         }
@@ -147,10 +166,10 @@ public class ASBufferingInFilter extends ASInFilter {
     }
 
     public static byte[] concatenate(byte[] one, int lengthOne, byte[] two, int lengthTwo) {
-        if(lengthTwo == -1) {
+        if (lengthTwo == -1) {
             lengthTwo = 0;
         }
-        if(lengthOne == -1) {
+        if (lengthOne == -1) {
             lengthOne = 0;
         }
         if (lengthOne == 0) {
