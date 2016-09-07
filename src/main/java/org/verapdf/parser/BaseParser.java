@@ -236,6 +236,24 @@ public class BaseParser {
 		}
 	}
 
+	protected void skipStreamSpaces() throws IOException {
+		byte space = this.source.readByte();
+
+		//check for whitespace
+		while (space == ASCII_SPACE) {
+			space = this.source.readByte();
+		}
+
+		if (space == ASCII_CR) {
+			space = this.source.readByte();
+			if (space != ASCII_LF) {
+				this.source.unread();
+			}
+		} else if (space != ASCII_LF) {
+			this.source.unread();
+		}
+	}
+
 	protected boolean isDigit() throws IOException {
 		return isDigit(this.source.peek());
 	}
@@ -501,7 +519,7 @@ public class BaseParser {
 			}
 		}
 		if (this.token.type == Token.Type.TT_INTEGER) {
-			int value = Integer.valueOf(this.token.getValue());
+			long value = Long.valueOf(this.token.getValue());
 			this.token.integer = value;
 			this.token.real = (double) value;
 		} else {

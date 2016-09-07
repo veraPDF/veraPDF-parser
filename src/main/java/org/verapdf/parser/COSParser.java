@@ -246,6 +246,8 @@ public class COSParser extends BaseParser {
 		checkStreamSpacings(dict);
 		long streamStartOffset = source.getOffset();
 
+		skipStreamSpaces();
+
 		long size = dict.getKey(ASAtom.LENGTH).getInteger();
 		source.seek(streamStartOffset);
 
@@ -272,6 +274,8 @@ public class COSParser extends BaseParser {
 								token.keyword == Token.Keyword.KW_ENDSTREAM) {
 							realStreamSize = possibleEndstreamOffset - streamStartOffset;
 							dict.setRealStreamSize(realStreamSize);
+							ASInputStream stm = super.getStream(realStreamSize);
+							dict.setData(stm);
 							source.seek(possibleEndstreamOffset);
 							break;
 						}
@@ -287,7 +291,7 @@ public class COSParser extends BaseParser {
 			}
 		}
 
-		checkEndstreamSpacings(dict, size);
+		checkEndstreamSpacings(dict, streamStartOffset, size);
 
 		return dict;
 	}
@@ -331,12 +335,13 @@ public class COSParser extends BaseParser {
 		return validLength;
 	}
 
-	private void checkEndstreamSpacings(COSObject stream, long expectedLength) throws IOException {
-		byte eolCount = 0;
-
-		long diff = stream.getRealStreamSize() - expectedLength;
-
+	private void checkEndstreamSpacings(COSObject stream, long streamStartOffset, long expectedLength) throws IOException {
 		skipSpaces();
+
+		byte eolCount = 0;
+		long approximateLength = source.getOffset() - streamStartOffset;
+		long diff = approximateLength - expectedLength;
+
 		source.unread(2);
 		int firstSymbol = source.readByte();
 		int secondSymbol = source.readByte();
@@ -353,7 +358,7 @@ public class COSParser extends BaseParser {
 			stream.setEndstreamKeywordCRLFCompliant(false);
 		}
 
-		stream.setRealStreamSize(stream.getRealStreamSize() - eolCount);
+		stream.setRealStreamSize(approximateLength - eolCount);
 	}
 
 }
