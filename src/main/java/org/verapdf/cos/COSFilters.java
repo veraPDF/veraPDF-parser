@@ -3,7 +3,7 @@ package org.verapdf.cos;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
-import org.verapdf.cos.xref.COSFilterRegistry;
+import org.verapdf.cos.filters.COSFilterRegistry;
 import org.verapdf.pd.PDObject;
 
 import java.io.IOException;

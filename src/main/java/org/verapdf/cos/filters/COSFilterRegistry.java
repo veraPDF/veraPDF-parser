@@ -1,4 +1,4 @@
-package org.verapdf.cos.xref;
+package org.verapdf.cos.filters;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
@@ -7,6 +7,7 @@ import org.verapdf.as.filters.ASFilterFactory;
 import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.filters.ASOutFilter;
 import org.verapdf.as.filters.IASFilterFactory;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.COSDictionary;
@@ -57,7 +58,8 @@ public class COSFilterRegistry {
 		if (filterFactory != null) {
 			return filterFactory.getInFilter(inputStream, decodeParams);
 		} else {
-			return null;
+			LOGGER.warn("Trying to use unimplemented decoding filter.");
+			return new ASBufferingInFilter(inputStream);
 		}
 	}
 
