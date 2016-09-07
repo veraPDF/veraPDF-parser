@@ -98,7 +98,7 @@ public class ASAtom {
     public static final ASAtom CID_FONT_TYPE2 = new ASAtom("CIDFontType2");
     public static final ASAtom CID_TO_GID_MAP = new ASAtom("CIDToGIDMap");
     public static final ASAtom CID_SET = new ASAtom("CIDSet");
-    public static final ASAtom CIDSYSTEMINFO = new ASAtom("CIDSystemInfo");
+    public static final ASAtom CID_SYSTEM_INFO = new ASAtom("CIDSystemInfo");
     public static final ASAtom CLR_F = new ASAtom("ClrF");
     public static final ASAtom CLR_FF = new ASAtom("ClrFf");
     public static final ASAtom CMAP = new ASAtom("CMap");
