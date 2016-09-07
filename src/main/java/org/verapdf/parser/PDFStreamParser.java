@@ -1,7 +1,9 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
+import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.cos.*;
+import org.verapdf.operator.InlineImageOperator;
 import org.verapdf.operator.Operator;
 
 import java.io.IOException;
@@ -18,7 +20,7 @@ public class PDFStreamParser extends COSParser {
 	private final List<Object> tokens = new ArrayList<>();
 
 	public PDFStreamParser(COSStream stream) throws IOException {
-		super(stream.getData());
+		super(stream.getData(COSStream.FilterFlags.DECODE));
 		initializeToken();
 	}
 
@@ -165,7 +167,53 @@ public class PDFStreamParser extends COSParser {
 				}
 				break;
 			}
-			//TODO : Support inline image operators
+			// BI operator
+			case 'B': {
+				Token token = getToken();
+				nextToken();
+				result = Operator.getOperator(token.getValue());
+				if (result instanceof InlineImageOperator) {
+					InlineImageOperator imageOperator = (InlineImageOperator) result;
+					COSObject imageParameters = COSDictionary.construct();
+					Object nextToken = parseNextToken();
+					while (nextToken instanceof COSObject &&
+							((COSObject) nextToken).getType() == COSObjType.COS_NAME) {
+						Object value = parseNextToken();
+						if (value instanceof COSObject) {
+							imageParameters.setKey(((COSObject) nextToken).getName(), (COSObject) value);
+						} else {
+							//TODO : log some warning?
+						}
+					}
+
+					//TODO : check for errors
+					imageOperator.setImageData(((InlineImageOperator) nextToken).getImageData());
+				}
+				break;
+			}
+			// ID operator
+			case 'I': {
+				//looking for an ID operator
+				if (source.readByte() != 73 && source.readByte() != 68) {
+					//TODO : change
+					throw new IOException("Corrupted inline image operator");
+				}
+				if (CharTable.isSpace(source.peek())) {
+					source.readByte();
+				}
+				long startOffset = source.getOffset();
+				int imageStreamLength = 2;
+				byte previousByte = source.readByte();
+				byte currentByte = source.readByte();
+				while (!(previousByte == 'E' && currentByte == 'I') && !source.isEof()) {
+					previousByte = currentByte;
+					currentByte = source.readByte();
+					imageStreamLength++;
+				}
+				result = Operator.getOperator("ID");
+				((InlineImageOperator) result).setImageData(new ASFileInStream(source.getStream(), startOffset, imageStreamLength));
+				break;
+			}
 			default: {
 				String operator = nextOperator();
 				if (operator.length() == 0) {

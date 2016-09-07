@@ -41,8 +41,8 @@ public class Reader extends XRefReader {
 	}
 
 	//PUBLIC METHODS
-	public String getHeader() {
-		return this.header.getHeader();
+	public COSHeader getHeader() {
+		return this.header;
 	}
 
 	public COSObject getObject(final COSKey key) throws IOException {
