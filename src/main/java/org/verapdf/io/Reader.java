@@ -25,13 +25,10 @@ public class Reader extends XRefReader {
 	private COSHeader header;
 	private Map<Long, DecodedObjectStreamParser> objectStreams;
 
-	private boolean linearized;
-
 	public Reader(final COSDocument document, final String fileName) throws IOException {
 		super();
 		this.parser = new PDFParser(document, fileName);
 		this.objectStreams = new HashMap<>();
-		this.linearized = false;
 		init();
 	}
 
@@ -39,7 +36,6 @@ public class Reader extends XRefReader {
 		super();
 		this.parser = new PDFParser(document, fileStream);
 		this.objectStreams = new HashMap<>();
-		this.linearized = false;
 		init();
 	}
 
@@ -83,13 +79,12 @@ public class Reader extends XRefReader {
 	}
 
 	public boolean isLinearized() {
-		return this.linearized;
+		return this.parser.isLinearized();
 	}
 
 	// PRIVATE METHODS
 	private void init() throws IOException {
 		this.header = this.parser.getHeader();
-		this.linearized = this.parser.isLinearized();
 
 		List<COSXRefInfo> infos = new ArrayList<COSXRefInfo>();
 		this.parser.getXRefInfo(infos);
