@@ -29,7 +29,10 @@ public class PDAppearanceEntry extends PDObject {
 		Map<ASAtom, PDAppearanceStream> res = new HashMap<>();
 		for (ASAtom key : getObject().getKeySet()) {
 			COSObject obj = getKey(key);
-			if (obj.getType() == COSObjType.COS_STREAM) {
+			if (obj.isIndirect()) {
+				obj = obj.getDirect();
+			}
+			if (obj != null && obj.getType() == COSObjType.COS_STREAM) {
 				res.put(key, new PDAppearanceStream(obj));
 			}
 		}

@@ -1,5 +1,6 @@
 package org.verapdf.io;
 
+import org.apache.log4j.Logger;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.parser.DecodedObjectStreamParser;
@@ -17,6 +18,8 @@ import java.util.Map;
  * @author Timur Kamalov
  */
 public class Reader extends XRefReader {
+
+	private static final Logger LOGGER = Logger.getLogger(Reader.class);
 
 	private PDFParser parser;
 	private COSHeader header;
@@ -46,6 +49,11 @@ public class Reader extends XRefReader {
 	}
 
 	public COSObject getObject(final COSKey key) throws IOException {
+		if (!super.containsKey(key)) {
+			LOGGER.warn("Trying to get object " + key.getNumber() + " " +
+					key.getGeneration() + " that is not present in the document");
+			return null;
+		}
 		final long offset = getOffset(key);
 		if(offset > 0) {
 			return getObject(offset);

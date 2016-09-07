@@ -63,4 +63,8 @@ public abstract class XRefReader implements IReader {
 		return this.xref.getOffset(key);
 	}
 
+	protected boolean containsKey(final COSKey key) {
+		return this.xref.containsKey(key);
+	}
+
 }
