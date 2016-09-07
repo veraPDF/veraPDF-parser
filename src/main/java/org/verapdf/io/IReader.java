@@ -1,5 +1,6 @@
 package org.verapdf.io;
 
+import org.verapdf.cos.COSHeader;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSTrailer;
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public interface IReader {
 
-	String getHeader();
+	COSHeader getHeader();
 
 	List<COSKey> getKeys();
 

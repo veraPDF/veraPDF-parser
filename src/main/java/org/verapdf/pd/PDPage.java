@@ -185,6 +185,9 @@ public class PDPage extends PDPageTreeNode {
         COSObject annots = getKey(ASAtom.ANNOTS);
         if (annots != null && annots.getType() == COSObjType.COS_ARRAY) {
             List<PDAnnotation> res = new ArrayList<>();
+            if (annots.isIndirect()) {
+                annots = annots.getDirect();
+            }
             for (COSObject annot : (COSArray) annots.get()) {
                 if (annot != null && annot.getType() == COSObjType.COS_DICT) {
                     res.add(new PDAnnotation(annot));
@@ -194,23 +197,6 @@ public class PDPage extends PDPageTreeNode {
         }
         return Collections.emptyList();
     }
-
-    //TODO : implement this
-    /*
-    public PDResources getResources() {
-        COSObject resDict = getKey(ASAtom.RESOURCES);
-        COSDocument doc = getObject().getDocument();
-        if (resDict.Empty())
-        {
-            resDict = COSDictionary.construct();
-            COSObject ind = COSIndirect.construct(resDict, doc);
-            setKey(ASAtom.RESOURCES, ind);
-            return PDResources(ind, doc);
-        }
-        else
-            return PDResources(resDict, doc);
-    }
-    */
 
     public int getPageNumber() {
         return pagesTotal;

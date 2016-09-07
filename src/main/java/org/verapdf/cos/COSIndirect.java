@@ -75,7 +75,7 @@ public class COSIndirect extends COSBase {
     }
 
     public Object accept(final ICOSVisitor visitor) {
-        return null;
+        return get() != null ? get().accept(visitor) : COSNull.NULL.accept(visitor);
     }
 
     //! Boolean values

@@ -12,14 +12,14 @@ public class Operator {
 
 	private String operator;
 
-	private Operator(final String operator) {
+	protected Operator(final String operator) {
 		this.operator = operator;
 	}
 
 	public static Operator getOperator(final String operator) {
 		//don't cache image operators due to unique parameters and data
 		if (operator.equals("BI") || operator.equals("ID")) {
-			return new Operator(operator);
+			return new InlineImageOperator(operator);
 		} else {
 			if (cachedOperators.containsKey(operator)) {
 				return cachedOperators.get(operator);
@@ -33,6 +33,11 @@ public class Operator {
 
 	public String getOperator() {
 		return operator;
+	}
+
+	@Override
+	public String toString() {
+		return "PDFOperator{" + operator + '}';
 	}
 
 }

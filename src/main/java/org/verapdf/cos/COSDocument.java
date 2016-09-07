@@ -68,7 +68,7 @@ public class COSDocument {
 		this.doc = document;
 		this.body = new COSBody();
 
-		this.header = new COSHeader(this.reader.getHeader());
+		this.header = this.reader.getHeader();
 		this.xref = new COSXRefTable();
 		this.xref.set(this.reader.getKeys());
 		this.trailer = reader.getTrailer();
