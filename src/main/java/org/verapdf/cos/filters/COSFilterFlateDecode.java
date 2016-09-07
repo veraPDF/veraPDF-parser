@@ -38,15 +38,27 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
      */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
+        int bytesFed = 0;
         if (inflater.getRemaining() == 0) {
-            int bytesFed = (int) this.feedBuffer(getBufferCapacity());
+            bytesFed = (int) this.feedBuffer(getBufferCapacity());
             if (bytesFed == -1) {
                 return -1;
             }
             inflater.setInput(this.internalBuffer, 0, bytesFed);
         }
         try {
-            return inflater.inflate(buffer, 0, size);
+            int res = inflater.inflate(buffer, 0, size);
+            if(res == 0) {
+                long added = this.addToBuffer(BF_BUFFER_SIZE);
+                if(added == -1) {
+                    return -1;
+                } else {
+                    inflater.setInput(this.internalBuffer, 0, (int) (bytesFed + added));
+                    return inflater.inflate(buffer, 0, size);
+                }
+            } else {
+                return res;
+            }
         } catch (DataFormatException e) {
             throw new IOException("Can't decode Flate encoded data", e);
         }
