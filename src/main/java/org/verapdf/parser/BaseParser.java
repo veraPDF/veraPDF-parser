@@ -1,5 +1,6 @@
 package org.verapdf.parser;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
@@ -16,6 +17,8 @@ import static org.verapdf.as.CharTable.*;
  * @author Timur Kamalov
  */
 public class BaseParser {
+
+	private static final Logger LOGGER = Logger.getLogger(BaseParser.class);
 
 	private static final byte ASCII_ZERO = 48;
 	private static final byte ASCII_NINE = 57;
@@ -498,34 +501,38 @@ public class BaseParser {
 	}
 
 	protected void readNumber() throws IOException {
-		initializeToken();
-		this.token.clearValue();
-		this.token.type = Token.Type.TT_INTEGER;
-		byte ch;
-		while (!this.source.isEof()) {
-			ch = this.source.readByte();
-			if (CharTable.isTokenDelimiter(ch)) {
-				this.source.unread();
-				break;
+		try {
+			initializeToken();
+			this.token.clearValue();
+			this.token.type = Token.Type.TT_INTEGER;
+			byte ch;
+			while (!this.source.isEof()) {
+				ch = this.source.readByte();
+				if (CharTable.isTokenDelimiter(ch)) {
+					this.source.unread();
+					break;
+				}
+				if (ch >= '0' && ch <= '9') {
+					appendToToken(ch);
+				} else if (ch == '.') {
+					this.token.type = Token.Type.TT_REAL;
+					appendToToken(ch);
+				} else {
+					this.source.unread();
+					break;
+				}
 			}
-			if (ch >= '0' && ch <= '9') {
-				appendToToken(ch);
-			} else if (ch == '.') {
-				this.token.type = Token.Type.TT_REAL;
-				appendToToken(ch);
+			if (this.token.type == Token.Type.TT_INTEGER) {
+				long value = Long.valueOf(this.token.getValue());
+				this.token.integer = value;
+				this.token.real = (double) value;
 			} else {
-				this.source.unread();
-				break;
+				double value = Double.valueOf(this.token.getValue());
+				this.token.integer = Math.round(value);
+				this.token.real = value;
 			}
-		}
-		if (this.token.type == Token.Type.TT_INTEGER) {
-			long value = Long.valueOf(this.token.getValue());
-			this.token.integer = value;
-			this.token.real = (double) value;
-		} else {
-			double value = Double.valueOf(this.token.getValue());
-			this.token.integer = Math.round(value);
-			this.token.real = value;
+		} catch (NumberFormatException e) {
+			LOGGER.debug(e);
 		}
 	}
 
