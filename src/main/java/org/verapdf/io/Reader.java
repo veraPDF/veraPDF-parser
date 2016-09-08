@@ -50,8 +50,11 @@ public class Reader extends XRefReader {
 					key.getGeneration() + " that is not present in the document");
 			return null;
 		}
-		final long offset = getOffset(key);
+		long offset = getOffset(key);
 		if(offset > 0) {
+			if (getHeader().getHeaderOffset() > 0) {
+				offset += getHeader().getHeaderOffset();
+			}
 			return getObject(offset);
 		} else {
 			DecodedObjectStreamParser parser = objectStreams.get(-offset);
