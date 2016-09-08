@@ -300,9 +300,12 @@ public class ICCProfile extends PDObject {
 				return;
 			}
 		}
-
-		this.description = getTagValue(data, descOffset, descLength, false);
-		this.copyright = getTagValue(data, cprtOffset, cprtLength, true);
+		if (descLength != 0) {
+			this.description = getTagValue(data, descOffset, descLength, false);
+		}
+		if (cprtLength != 0) {
+			this.copyright = getTagValue(data, cprtOffset, cprtLength, true);
+		}
 	}
 
 	private String getTagValue(ASInputStream data, int tagOffset, int tagLength, boolean isCprt) throws IOException {
