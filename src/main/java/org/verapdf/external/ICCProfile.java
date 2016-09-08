@@ -80,7 +80,7 @@ public class ICCProfile extends PDObject {
 	private void initializeProfileHeader() {
 		try (ASInputStream data = this.getObject().getData(COSStream.FilterFlags.DECODE)) {
 			byte[] temp = new byte[HEADER_LENGTH];
-			int count = data.read(temp, HEADER_LENGTH);
+			int count = Math.max(data.read(temp, HEADER_LENGTH), 0);
 			if (count == HEADER_LENGTH) {
 				this.profileHeader = temp;
 			} else {
@@ -273,24 +273,24 @@ public class ICCProfile extends PDObject {
 		int cprtLength = 0;
 
 		byte[] temp = new byte[REQUIRED_LENGTH];
-		currentOffset += data.read(temp, REQUIRED_LENGTH);
+		currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 		if (currentOffset != HEADER_LENGTH + REQUIRED_LENGTH) {
 				return;
 		}
 		int tagsNumberRemained = byteArrayToInt(temp);
 		while (tagsNumberRemained-- > 0) {
 			int prevOffset = currentOffset;
-			currentOffset += data.read(temp, REQUIRED_LENGTH);
+			currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 			String tag = new String(temp);
 			if (tag.equals("desc")) {
-				currentOffset += data.read(temp, REQUIRED_LENGTH);
+				currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 				descOffset = byteArrayToInt(temp);
-				currentOffset += data.read(temp, REQUIRED_LENGTH);
+				currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 				descLength = byteArrayToInt(temp);
 			} else if (tag.equals("cprt")) {
-				currentOffset += data.read(temp, REQUIRED_LENGTH);
+				currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 				cprtOffset = byteArrayToInt(temp);
-				currentOffset += data.read(temp, REQUIRED_LENGTH);
+				currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 				cprtLength = byteArrayToInt(temp);
 			} else {
 				currentOffset += data.skip(TAGINFO_LENGTH - REQUIRED_LENGTH);
@@ -316,7 +316,7 @@ public class ICCProfile extends PDObject {
 		}
 
 		byte[] temp = new byte[REQUIRED_LENGTH];
-		currOffset += data.read(temp, REQUIRED_LENGTH);
+		currOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 		if (currOffset != tagOffset + REQUIRED_LENGTH) {
 			return null;
 		}
@@ -325,7 +325,7 @@ public class ICCProfile extends PDObject {
 			int prevOffset = currOffset;
 
 			currOffset += data.skip(REQUIRED_LENGTH);
-			currOffset += data.read(temp, REQUIRED_LENGTH);
+			currOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 			currOffset += data.skip(REQUIRED_LENGTH);
 			if (currOffset != prevOffset + REQUIRED_LENGTH*3) {
 				return null;
@@ -334,12 +334,12 @@ public class ICCProfile extends PDObject {
 			for (int i = 0; i < number; ++i) {
 				prevOffset = currOffset;
 
-				currOffset += data.read(temp, REQUIRED_LENGTH);
+				currOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 				String local = getSubArray(temp, 0, REQUIRED_LENGTH);
 				if ("enUS".equals(local)) {
-					currOffset += data.read(temp, REQUIRED_LENGTH);
+					currOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 					int length = byteArrayToInt(temp);
-					currOffset += data.read(temp, REQUIRED_LENGTH);
+					currOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 					int offset = byteArrayToInt(temp);
 					if (currOffset != prevOffset + REQUIRED_LENGTH*3) {
 						return null;
@@ -347,7 +347,7 @@ public class ICCProfile extends PDObject {
 					data.reset();
 					currOffset = data.skip(offset);
 					byte[] temporary = new byte[length];
-					currOffset += data.read(temporary, length);
+					currOffset += Math.max(data.read(temporary, length), 0);
 					if (currOffset == offset + length) {
 						return new String(temporary, StandardCharsets.UTF_16BE).trim();
 					} else {
@@ -362,13 +362,13 @@ public class ICCProfile extends PDObject {
 		} else if ("desc".equals(type)) {
 			int prevOffset = currOffset;
 			currOffset += data.skip(REQUIRED_LENGTH);
-			currOffset += data.read(temp, REQUIRED_LENGTH);
+			currOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 			if (currOffset != prevOffset + REQUIRED_LENGTH*2) {
 				return null;
 			}
 			int length = byteArrayToInt(temp);
 			byte[] temporary = new byte[length];
-			currOffset += data.read(temporary, length);
+			currOffset += Math.max(data.read(temporary, length), 0);
 			if (currOffset == prevOffset + REQUIRED_LENGTH*2 + length) {
 				return new String(temporary, StandardCharsets.US_ASCII).trim();
 			}
@@ -376,7 +376,7 @@ public class ICCProfile extends PDObject {
 			int prevOffset = currOffset;
 			int length = tagLength - REQUIRED_LENGTH;
 			byte[] temporary = new byte[length];
-			currOffset += data.read(temporary, length);
+			currOffset += Math.max(data.read(temporary, length), 0);
 			if (currOffset == prevOffset + length) {
 				return new String(temporary, StandardCharsets.US_ASCII).trim();
 			}
