@@ -3,7 +3,9 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 import org.verapdf.factory.colors.ColorSpaceFactory;
+import org.verapdf.factory.fonts.PDFontFactory;
 import org.verapdf.pd.colors.PDColorSpace;
+import org.verapdf.pd.font.PDFont;
 import org.verapdf.pd.images.PDXObject;
 import org.verapdf.pd.patterns.PDShading;
 
@@ -40,6 +42,11 @@ public class PDResources extends PDObject {
 	public PDExtGState getExtGState(ASAtom name) {
 		COSObject rawExtGState = getResource(ASAtom.SHADING, name);
 		return new PDExtGState(rawExtGState);
+	}
+
+	public PDFont getFont(ASAtom name) {
+		COSObject rawFont = getResource(ASAtom.FONT, name);
+		return PDFontFactory.getPDFont(rawFont);
 	}
 
 	private COSObject getResource(ASAtom type, ASAtom name) {
