@@ -3,6 +3,7 @@ package org.verapdf.pd.font;
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
+import org.verapdf.pd.PDResource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-public abstract class PDFont {
+public abstract class PDFont extends PDResource {
 
     private static final Logger LOGGER = Logger.getLogger(PDFont.class);
 
