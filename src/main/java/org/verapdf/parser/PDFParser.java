@@ -185,6 +185,7 @@ public class PDFParser extends COSParser {
     }
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
+        calculatePostEOFDataSize();
         this.getXRefInfo(infos, 0L);
     }
 
@@ -277,7 +278,7 @@ public class PDFParser extends COSParser {
         return 0L;
     }
 
-    private byte calculatePostEOFDataSize() throws IOException {
+    private void calculatePostEOFDataSize() throws IOException {
         final byte lookupSize = 64;
 
         source.seekFromEnd(lookupSize);
@@ -300,16 +301,24 @@ public class PDFParser extends COSParser {
                     if (postEOFDataSize > 0) {
                         if (buffer[currentBufferOffset + EOF_MARKER.length] == 0x0D) {
                             currentBufferOffset++;
-                            if (currentBufferOffset < buffer.length && buffer[currentBufferOffset] == 0x0A) {
+                            if (currentBufferOffset + EOF_MARKER.length < buffer.length && buffer[currentBufferOffset  + EOF_MARKER.length] == 0x0A) {
                                 postEOFDataSize -= 2;
+                                document.setPostEOFDataSize(postEOFDataSize);
+                                return;
                             } else {
                                 postEOFDataSize -= 1;
+                                document.setPostEOFDataSize(postEOFDataSize);
+                                return;
                             }
                         } else if (buffer[currentBufferOffset + EOF_MARKER.length] == 0x0A) {
                             postEOFDataSize -= 1;
+                            document.setPostEOFDataSize(postEOFDataSize);
+                            return;
                         }
+                    } else {
+                        document.setPostEOFDataSize(postEOFDataSize);
+                        return;
                     }
-                    return postEOFDataSize;
                 }
                 currentMarkerOffset--;
                 // found current char
@@ -322,7 +331,7 @@ public class PDFParser extends COSParser {
             currentBufferOffset--;
         }
 
-        return postEOFDataSize;
+        document.setPostEOFDataSize(postEOFDataSize);
     }
 
     private void getXRefSectionAndTrailer(final COSXRefInfo section) throws IOException {
@@ -413,9 +422,16 @@ public class PDFParser extends COSParser {
 				throw new IOException("PDFParser::GetXRefInfo(...)" + StringExceptions.START_XREF_VALIDATION);
 			}
 		}
-        document.setPostEOFDataSize(calculatePostEOFDataSize());
+
 		clear();
-        source.seek(offset);
+
+        //for files with junk before header
+        if (getHeader().getHeaderOffset() > 0) {
+            offset += getHeader().getHeaderOffset();
+        }
+
+        //we will skip eol marker in any case
+        source.seek(offset - 1);
 
 		COSXRefInfo section = new COSXRefInfo();
 		info.add(0, section);
