@@ -108,13 +108,15 @@ public class COSStream extends COSDictionary {
 		return getData(FilterFlags.RAW_DATA);
 	}
 
-	public ASInputStream getData(final FilterFlags flags)  {
-		if (flags == FilterFlags.RAW_DATA || this.flags != FilterFlags.RAW_DATA) {
-			return this.stream;
-		}
-
+	public ASInputStream getData(final FilterFlags flags) {
 		try {
-			return getFilters().getInputStream(stream, this.getKey(ASAtom.DECODE_PARMS));
+			if (flags == FilterFlags.RAW_DATA || this.flags != FilterFlags.RAW_DATA) {
+				this.stream.reset();
+				return this.stream;
+			}
+			ASInputStream result = getFilters().getInputStream(stream, this.getKey(ASAtom.DECODE_PARMS));
+			result.reset();
+			return result;
 		} catch (IOException e) {
 			LOGGER.error("Can't get stream data", e);
 			return null;

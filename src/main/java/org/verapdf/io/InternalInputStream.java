@@ -76,9 +76,12 @@ public class InternalInputStream extends ASInputStream {
 	}
 
 	public byte peek() throws IOException {
-		byte result = this.source.readByte();
-		unread();
-		return result;
+		if (!isEof()) {
+			byte result = this.source.readByte();
+			unread();
+			return result;
+		}
+		return -1;
 	}
 
 	public InternalInputStream unread() throws IOException{
