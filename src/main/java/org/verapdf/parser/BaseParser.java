@@ -81,7 +81,7 @@ public class BaseParser {
 		initializeToken();
 		this.token.clearValue();
 		byte ch = this.source.readByte();
-		while (!this.source.isEof() || !isSpace(ch)) {
+		while (!this.source.isEof() && !isSpace(ch)) {
 			appendToToken(ch);
 			ch = this.source.readByte();
 		}

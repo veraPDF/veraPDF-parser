@@ -112,7 +112,7 @@ public class PDPage extends PDPageTreeNode {
     }
 
     public Boolean isInheritedResources() {
-        return getObject().knownKey(ASAtom.RESOURCES);
+        return !getObject().knownKey(ASAtom.RESOURCES);
     }
 
     public void setResources(PDResources resources) {

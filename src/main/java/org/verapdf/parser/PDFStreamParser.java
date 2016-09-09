@@ -27,6 +27,9 @@ public class PDFStreamParser extends COSParser {
 	public void parseTokens() throws IOException {
 		Object token = parseNextToken();
 		while (token != null) {
+			if (token instanceof COSObject) {
+				token = ((COSObject) token).get();
+			}
 			tokens.add(token);
 			token = parseNextToken();
 		}
@@ -233,18 +236,21 @@ public class PDFStreamParser extends COSParser {
 		//maximum possible length of an operator is 3 and we'll leave some space for invalid cases
 		StringBuffer buffer = new StringBuffer(5);
 		byte nextByte = source.peek();
-		while (nextByte != -1 && // EOF
+		while (source.getOffset() < source.getStreamLength() && // EOF
 				!CharTable.isSpace(nextByte) && nextByte != ']' &&
 				nextByte != '[' && nextByte != '<' &&
 				nextByte != '(' && nextByte != '/' &&
 				(nextByte < '0' || nextByte > '9'))	{
 			byte currentByte = source.readByte();
-			nextByte = source.peek();
 			buffer.append((char) currentByte);
-			// d0 and d1 operators
-			if (currentByte == 'd' && (nextByte == '0' || nextByte == '1') ) {
-				buffer.append((char) source.readByte());
+
+			if (source.getOffset() < source.getStreamLength()) {
+				// d0 and d1 operators
 				nextByte = source.peek();
+				if (currentByte == 'd' && (nextByte == '0' || nextByte == '1')) {
+					buffer.append((char) source.readByte());
+					nextByte = source.peek();
+				}
 			}
 		}
 

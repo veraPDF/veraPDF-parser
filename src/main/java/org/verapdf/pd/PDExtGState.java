@@ -30,8 +30,8 @@ public class PDExtGState extends PDResource {
         return getObject().getBooleanKey(ASAtom.OP_NS);
     }
 
-    public Integer getOverprintMode() {
-        return getObject().getIntegerKey(ASAtom.OPM).intValue();
+    public Long getOverprintMode() {
+         return getObject().getIntegerKey(ASAtom.OPM);
     }
 
     public COSObject getCOSTR() {
