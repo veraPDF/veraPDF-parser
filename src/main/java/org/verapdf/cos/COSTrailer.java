@@ -18,7 +18,7 @@ public class COSTrailer extends PDObject {
 	}
 
 	public void setSize(final Long size) {
-		if (getPrev() != 0) {
+		if (getPrev() != null && getPrev() != 0) {
 			final Long prevSize = getObject().getIntegerKey(ASAtom.SIZE);
 			if (prevSize > size) {
 				return;
