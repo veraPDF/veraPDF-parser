@@ -40,7 +40,7 @@ public class PDResources extends PDObject {
 	}
 
 	public PDExtGState getExtGState(ASAtom name) {
-		COSObject rawExtGState = getResource(ASAtom.SHADING, name);
+		COSObject rawExtGState = getResource(ASAtom.EXT_G_STATE, name);
 		return new PDExtGState(rawExtGState);
 	}
 

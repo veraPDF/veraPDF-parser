@@ -207,7 +207,7 @@ public class COSObject {
 	}
 
 	public Boolean getBooleanKey(final ASAtom key) {
-		return this.base != null ? this.base.getBooleanKey(key) : true;
+		return this.base != null ? this.base.getBooleanKey(key) : null;
 	}
 
 	public void setBooleanKey(final ASAtom key, final boolean value) {

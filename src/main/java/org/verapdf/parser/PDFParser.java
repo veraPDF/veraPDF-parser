@@ -457,11 +457,6 @@ public class PDFParser extends COSParser {
 			closeInputStream();
 			throw new IOException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 		}
-
-        if (trailer.knownKey(ASAtom.XREF_STM)) {
-            closeInputStream();
-            throw new IOException("PDFParser::GetTrailer(...)" + StringExceptions.XREF_STM_NOT_SUPPORTED);
-        }
 	}
 
 }
