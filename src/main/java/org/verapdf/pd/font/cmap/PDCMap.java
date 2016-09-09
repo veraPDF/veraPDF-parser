@@ -24,6 +24,8 @@ public class PDCMap {
 
     private COSObject cMap;
     private COSDictionary cidSystemInfo;
+    private CMap cMapFile = null;
+    private boolean parsedCMap = false;
 
     /**
      * Constructor from COSObject.
@@ -60,29 +62,35 @@ public class PDCMap {
 
     /**
      * @return CMap file object read from stream or loaded from predefined CMap
-     * file.
-     * @throws IOException if CMap cannot be read.
+     * file or null if load failed.
      */
-    public CMap getCMapFile() throws IOException {
-        if (this.cMap.getType() == COSObjType.COS_STREAM) {
-            CMapParser parser =
-                    new CMapParser(this.cMap.getData(COSStream.FilterFlags.DECODE));
-            parser.parse();
-            return parser.getCMap();
-        } else if (this.cMap.getType() == COSObjType.COS_NAME) {
-            String name = this.cMap.getString();
-            String cMapPath = "/font/cmap/" + name;
+    public CMap getCMapFile() {
+        if(!parsedCMap) {
+            parsedCMap = true;
             try {
-                File cMap = new File(getSystemIndependentPath(cMapPath));
-                InputStream cMapStream = new FileInputStream(cMap);
-                CMapParser parser = new CMapParser(cMapStream);
-                parser.parse();
-                return parser.getCMap();
-            } catch (URISyntaxException e) {
+                if (this.cMap.getType() == COSObjType.COS_STREAM) {
+                    CMapParser parser =
+                            new CMapParser(this.cMap.getData(COSStream.FilterFlags.DECODE));
+                    parser.parse();
+                    this.cMapFile = parser.getCMap();
+                    return this.cMapFile;
+                } else if (this.cMap.getType() == COSObjType.COS_NAME) {
+                    String name = this.cMap.getString();
+                    String cMapPath = "/font/cmap/" + name;
+                        File cMap = new File(getSystemIndependentPath(cMapPath));
+                        InputStream cMapStream = new FileInputStream(cMap);
+                        CMapParser parser = new CMapParser(cMapStream);
+                        parser.parse();
+                        this.cMapFile = parser.getCMap();
+                        return this.cMapFile;
+                } else {
+                    return null;
+                }
+            } catch (IOException | URISyntaxException e) {
                 return null;
             }
         } else {
-            return null;
+            return this.cMapFile;
         }
     }
 
@@ -90,7 +98,7 @@ public class PDCMap {
      * @return Registry value from CMap CIDSystemInfo dictionary.
      */
     public String getRegistry() {
-        if(this.getCIDSystemInfo() == null) {
+        if (this.getCIDSystemInfo() == null) {
             return null;
         } else {
             return this.getCIDSystemInfo().getStringKey(ASAtom.REGISTRY);
@@ -101,7 +109,7 @@ public class PDCMap {
      * @return Ordering value from CMap CIDSystemInfo dictionary.
      */
     public String getOrdering() {
-        if(this.getCIDSystemInfo() == null) {
+        if (this.getCIDSystemInfo() == null) {
             return null;
         } else {
             return this.getCIDSystemInfo().getStringKey(ASAtom.ORDERING);
@@ -112,7 +120,7 @@ public class PDCMap {
      * @return Supplement value from CMap CIDSystemInfo dictionary.
      */
     public Long getSupplement() {
-        if(this.getCIDSystemInfo() == null) {
+        if (this.getCIDSystemInfo() == null) {
             return null;
         } else {
             return this.getCIDSystemInfo().getIntegerKey(ASAtom.SUPPLEMENT);
@@ -138,5 +146,9 @@ public class PDCMap {
         URL resourceUrl = ClassLoader.class.getResource(path);
         Path resourcePath = Paths.get(resourceUrl.toURI());
         return resourcePath.toString();
+    }
+
+    public String toUnicode(int code) {
+        return this.getCMapFile() == null ? null : this.getCMapFile().getUnicode(code);
     }
 }

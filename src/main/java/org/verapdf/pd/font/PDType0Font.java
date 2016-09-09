@@ -1,8 +1,11 @@
 package org.verapdf.pd.font;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObject;
+
+import java.io.IOException;
 
 /**
  * @author Sergey Shemyakov
@@ -45,5 +48,10 @@ public class PDType0Font extends PDCIDFont {
         } else {
             return this.pdcMap;
         }
+    }
+
+    @Override
+    public int readCode(ASInputStream stream) throws IOException {
+        return this.pdcMap.getCMapFile().getCIDFromStream(stream);
     }
 }

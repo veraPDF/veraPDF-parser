@@ -2,9 +2,12 @@ package org.verapdf.pd.font;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDResource;
+import org.verapdf.pd.font.cmap.PDCMap;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +22,7 @@ public abstract class PDFont extends PDResource {
 
     protected COSDictionary dictionary;
     protected COSDictionary fontDescriptor;
+    protected PDCMap toUnicodeCMap;
 
     /**
      * Constructor from COSDictionary.
@@ -102,11 +106,21 @@ public abstract class PDFont extends PDResource {
         return (flags & 0b00100100) == 4;
     }
 
+    public Encoding getEncodingMapping() {
+        COSBase encoding = this.getEncoding().getDirectBase();
+        if(encoding.getType() == COSObjType.COS_NAME) {
+            return new Encoding(encoding.getName());
+        } else if (encoding.getType() == COSObjType.COS_DICT) {
+            return new Encoding(encoding.getNameKey(ASAtom.BASE_ENCODING),
+                    this.getDifferences());
+        } else {
+            return null;
+        }
+    }
+
     public String getName() {
         return this.dictionary.getStringKey(ASAtom.BASE_FONT);
     }
-
-    public abstract FontProgram getFontProgram();
 
     public COSObject getEncoding() {
         return this.dictionary.getKey(ASAtom.ENCODING);
@@ -144,5 +158,31 @@ public abstract class PDFont extends PDResource {
 
     public Long getLastChar() {
         return this.dictionary.getIntegerKey(ASAtom.LAST_CHAR);
+    }
+
+    public abstract int readCode(ASInputStream stream) throws IOException;
+
+    public abstract FontProgram getFontProgram();
+
+    /**
+     * Gets Unicode string for given character code. This method returns null in
+     * case when no toUnicode mapping for this character was found, so some
+     * inherited classes need to call this method, check return value on null
+     * and then implement their special logic.
+     *
+     * @param code is code for character.
+     * @return Unicode string
+     */
+    public String toUnicode(int code) {
+
+        if(toUnicodeCMap == null) {
+            this.toUnicodeCMap = new PDCMap(this.dictionary.getKey(ASAtom.TO_UNICODE));
+        }
+
+        if (toUnicodeCMap.getCMapName() != null &&
+                toUnicodeCMap.getCMapName().startsWith("Identity-")) {
+            return new String(new char[] { (char) code });
+        }
+        return this.toUnicodeCMap.toUnicode(code);
     }
 }

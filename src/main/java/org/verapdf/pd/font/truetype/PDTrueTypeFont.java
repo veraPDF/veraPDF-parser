@@ -2,6 +2,7 @@ package org.verapdf.pd.font.truetype;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSStream;
 import org.verapdf.pd.font.FontProgram;
@@ -44,5 +45,10 @@ public class PDTrueTypeFont extends PDFont {
             }
         }
         return null;
+    }
+
+    @Override
+    public int readCode(ASInputStream stream) throws IOException {
+        return stream.read();
     }
 }
