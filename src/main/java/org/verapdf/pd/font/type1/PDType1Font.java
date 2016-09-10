@@ -10,7 +10,7 @@ import org.verapdf.cos.COSStream;
 import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.parser.COSParser;
 import org.verapdf.pd.font.FontProgram;
-import org.verapdf.pd.font.PDFont;
+import org.verapdf.pd.font.PDSimpleFont;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 
@@ -22,7 +22,7 @@ import java.util.TreeSet;
 /**
  * @author Sergey Shemyakov
  */
-public class PDType1Font extends PDFont {
+public class PDType1Font extends PDSimpleFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDType1Font.class);
 

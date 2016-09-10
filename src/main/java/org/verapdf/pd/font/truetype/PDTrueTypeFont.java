@@ -6,7 +6,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSStream;
 import org.verapdf.pd.font.FontProgram;
-import org.verapdf.pd.font.PDFont;
+import org.verapdf.pd.font.PDSimpleFont;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * @author Sergey Shemyakov
  */
-public class PDTrueTypeFont extends PDFont {
+public class PDTrueTypeFont extends PDSimpleFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDTrueTypeFont.class);
 
