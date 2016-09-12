@@ -1,6 +1,5 @@
 package org.verapdf.pd.font;
 
-import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDResource;
@@ -15,10 +14,10 @@ import java.util.Map;
  */
 public abstract class PDFont extends PDResource {
 
-    private static final Logger LOGGER = Logger.getLogger(PDFont.class);
-
     protected COSDictionary dictionary;
     protected COSDictionary fontDescriptor;
+    protected boolean isFontParsed = false;
+    protected FontProgram fontProgram;
 
     /**
      * Constructor from COSDictionary.

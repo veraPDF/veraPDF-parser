@@ -23,13 +23,19 @@ public class PDTrueTypeFont extends PDFont {
 
     @Override
     public FontProgram getFontProgram() {
+        if (this.isFontParsed) {
+            return this.fontProgram;
+        }
+        this.isFontParsed = true;
+
         if (fontDescriptor.knownKey(ASAtom.FONT_FILE2)) {
             COSStream trueTypeFontFile =
                     (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE2).getDirectBase();
             try {
-                return new TrueTypeFontProgram(trueTypeFontFile.getData(
+                this.fontProgram = new TrueTypeFontProgram(trueTypeFontFile.getData(
                         COSStream.FilterFlags.DECODE), this.isSymbolic(),
                         this.getEncoding());
+                return this.fontProgram;
             } catch (IOException e) {
                 LOGGER.error("Can't read TrueType font program.");
             }
@@ -38,11 +44,13 @@ public class PDTrueTypeFont extends PDFont {
                     (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE3).get();
             ASAtom subtype = trueTypeFontFile.getNameKey(ASAtom.SUBTYPE);
             if (subtype == ASAtom.OPEN_TYPE) {
-                return new OpenTypeFontProgram(trueTypeFontFile.getData(
+                this.fontProgram = new OpenTypeFontProgram(trueTypeFontFile.getData(
                         COSStream.FilterFlags.DECODE), false, this.isSymbolic(),
                         this.getEncoding());
+                return this.fontProgram;
             }
         }
+        this.fontProgram = null;
         return null;
     }
 }

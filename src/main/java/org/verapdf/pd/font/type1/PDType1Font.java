@@ -56,12 +56,18 @@ public class PDType1Font extends PDFont {
 
     @Override
     public FontProgram getFontProgram() {
+        if(this.isFontParsed) {
+            return this.fontProgram;
+        }
+        this.isFontParsed = true;
+
         if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
             COSStream type1FontFile =
                     (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();
             try {
-                return new Type1FontProgram(
+                this.fontProgram = new Type1FontProgram(
                         type1FontFile.getData(COSStream.FilterFlags.DECODE));
+                return this.fontProgram;
             } catch (IOException e) {
                 LOGGER.error("Can't read Type 1 font program.");
             }
@@ -71,17 +77,20 @@ public class PDType1Font extends PDFont {
             ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
             if (subtype == ASAtom.TYPE1C) {
                 try {
-                    return new CFFFontProgram(type1FontFile.getData(
+                    this.fontProgram = new CFFFontProgram(type1FontFile.getData(
                             COSStream.FilterFlags.DECODE));
+                    return this.fontProgram;
                 } catch (IOException e) {
                     LOGGER.error("Can't read Type 1 font program.");
                 }
             } else if (subtype == ASAtom.OPEN_TYPE) {
-                return new OpenTypeFontProgram(type1FontFile.getData(
+                this.fontProgram = new OpenTypeFontProgram(type1FontFile.getData(
                         COSStream.FilterFlags.DECODE), true, this.isSymbolic(),
                         this.getEncoding());
+                return this.fontProgram;
             }
         }
+        this.fontProgram = null;
         return null;
     }
 }
