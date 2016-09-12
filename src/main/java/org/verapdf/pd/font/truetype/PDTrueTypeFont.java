@@ -25,7 +25,7 @@ public class PDTrueTypeFont extends PDFont {
     public FontProgram getFontProgram() {
         if (fontDescriptor.knownKey(ASAtom.FONT_FILE2)) {
             COSStream trueTypeFontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE2).get();
+                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE2).getDirectBase();
             try {
                 return new TrueTypeFontProgram(trueTypeFontFile.getData(
                         COSStream.FilterFlags.DECODE), this.isSymbolic(),

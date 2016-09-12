@@ -187,6 +187,7 @@ public class PDFStreamParser extends COSParser {
 						} else {
 							//TODO : log some warning?
 						}
+						nextToken = parseNextToken();
 					}
 
 					//TODO : check for errors
