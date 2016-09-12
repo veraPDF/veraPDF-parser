@@ -18,6 +18,14 @@ class TrueTypeHeadTable extends TrueTypeTable {
         super(source, offset);
     }
 
+    /**
+     * Sets units per em to default. Should be used if table is not present in
+     * font program.
+     */
+    TrueTypeHeadTable() {
+        this.unitsPerEm = 2048;
+    }
+
     @Override
     void readTable() throws IOException {
         long startingOffset = this.source.getOffset();

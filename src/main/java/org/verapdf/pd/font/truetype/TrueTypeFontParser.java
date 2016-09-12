@@ -1,5 +1,6 @@
 package org.verapdf.pd.font.truetype;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.io.ASInputStream;
 
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.io.IOException;
  * @author Sergey Shemyakov
  */
 class TrueTypeFontParser extends TrueTypeBaseParser {
+
+    private static final Logger LOGGER = Logger.getLogger(TrueTypeFontParser.class);
 
     private static final long HHEA = 1751672161;    // "hhea" read as 4-byte unsigned number
     private static final long HMTX = 1752003704;    // "hmtx" read as 4-byte unsigned number
@@ -59,14 +62,46 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
     }
 
     void readTables() throws IOException {
-        this.headParser.readTable();
-        this.hheaParser.readTable();
-        this.hmtxParser.setNumberOfHMetrics(hheaParser.getNumberOfHMetrics());
-        this.hmtxParser.readTable();
-        this.cmapParser.readTable();
-        this.maxpParser.readTable();
-        this.postParser.setNumGlyphs(maxpParser.getNumGlyphs());
-        this.postParser.readTable();
+        if (headParser != null) {
+            this.headParser.readTable();
+        } else {
+            LOGGER.warn("True type font doesn't contain head table. Default value for unitsPerEm used.");
+            this.headParser = new TrueTypeHeadTable();
+        }
+
+        if (hheaParser != null) {
+            this.hheaParser.readTable();
+        } else {
+            throw new IOException("True type font doesn't contain hhea table.");
+        }
+
+        if (hmtxParser != null) {
+            this.hmtxParser.setNumberOfHMetrics(hheaParser.getNumberOfHMetrics());
+            this.hmtxParser.readTable();
+        } else {
+            throw new IOException("True type font doesn't contain hmtx table.");
+        }
+
+        if (cmapParser != null) {
+            this.cmapParser.readTable();
+        } else {
+            throw new IOException("True type font doesn't contain cmap table.");
+        }
+
+        if (this.maxpParser != null) {
+            this.maxpParser.readTable();
+        } else {
+            this.maxpParser = new TrueTypeMaxpTable(
+                    this.hmtxParser.getLongHorMetrics().length);
+            LOGGER.warn("True type font doesn't contain maxp table. Default value for numGlyphs used.");
+        }
+
+        if (this.postParser != null) {
+            this.postParser.setNumGlyphs(maxpParser.getNumGlyphs());
+            this.postParser.readTable();
+        } else {
+            LOGGER.warn("True type font doesn't contain post table.");
+        }
     }
 
     TrueTypeHeadTable getHeadParser() {

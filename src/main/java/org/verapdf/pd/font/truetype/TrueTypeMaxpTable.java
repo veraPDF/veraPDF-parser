@@ -15,6 +15,10 @@ class TrueTypeMaxpTable extends TrueTypeTable {
         super(source, offset);
     }
 
+    public TrueTypeMaxpTable(int numGlyphs) {
+        this.numGlyphs = numGlyphs;
+    }
+
     @Override
     void readTable() throws IOException {
         long startingOffset = this.source.getOffset();

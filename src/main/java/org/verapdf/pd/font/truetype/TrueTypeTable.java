@@ -19,6 +19,12 @@ abstract class TrueTypeTable extends TrueTypeBaseParser {
     }
 
     /**
+     * Empty constructor for inherited classes. Should be used to set Table
+     * values to default if table is not present in font program.
+     */
+    protected TrueTypeTable() {}
+
+    /**
      * This method extracts all the data needed from table.
      *
      * @throws IOException if stream-reading error occurs.

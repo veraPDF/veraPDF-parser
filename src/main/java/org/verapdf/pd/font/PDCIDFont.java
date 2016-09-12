@@ -34,13 +34,20 @@ public class PDCIDFont extends PDFont {
 
     @Override
     public FontProgram getFontProgram() {
+        if(this.isFontParsed) {
+            return this.fontProgram;
+        }
+        this.isFontParsed = true;
+
         if (fontDescriptor.knownKey(ASAtom.FONT_FILE2) &&
                 this.getSubtype() == ASAtom.CID_FONT_TYPE2) {
             COSStream trueTypeFontFile =
                     (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE2).get();
             try {
-                return new TrueTypeFontProgram(trueTypeFontFile.getData(COSStream.FilterFlags.DECODE),
+                this.fontProgram = new TrueTypeFontProgram(
+                        trueTypeFontFile.getData(COSStream.FilterFlags.DECODE),
                         this.isSymbolic(), this.getEncoding());
+                return this.fontProgram;
             } catch (IOException e) {
                 LOGGER.error("Can't read TrueType font program.");
             }
@@ -50,21 +57,28 @@ public class PDCIDFont extends PDFont {
             COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).get();
             if (ASAtom.CID_FONT_TYPE0C == subtype.get()) {
                 try {
-                    return new CFFFontProgram(fontFile.getData(COSStream.FilterFlags.DECODE));
+                    this.fontProgram = new CFFFontProgram(
+                            fontFile.getData(COSStream.FilterFlags.DECODE));
+                    return this.fontProgram;
                 } catch (IOException e) {
                     LOGGER.error("Can't read CFF font program.");
                 }
             } else if (ASAtom.OPEN_TYPE == subtype.get()) {
                 ASAtom fontName = this.getFontName();
                 if (fontName == ASAtom.TRUE_TYPE || fontName == ASAtom.CID_FONT_TYPE2) {
-                    return new OpenTypeFontProgram(fontFile.getData(COSStream.FilterFlags.DECODE),
+                    this.fontProgram = new OpenTypeFontProgram(
+                            fontFile.getData(COSStream.FilterFlags.DECODE),
                             false, this.isSymbolic(), this.getEncoding());
+                    return this.fontProgram;
                 } else {
-                    return new OpenTypeFontProgram(fontFile.getData(COSStream.FilterFlags.DECODE),
+                    this.fontProgram = new OpenTypeFontProgram(
+                            fontFile.getData(COSStream.FilterFlags.DECODE),
                             true, this.isSymbolic(), this.getEncoding());
+                    return this.fontProgram;
                 }
             }
         }
+        this.fontProgram = null;
         return null;
     }
 }
