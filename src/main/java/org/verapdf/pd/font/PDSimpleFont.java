@@ -4,9 +4,6 @@ import org.apache.log4j.Logger;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.pd.font.truetype.AdobeGlyphList;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * Represents simple font on pd level (Type1, TrueType, Type3).
  *
@@ -48,10 +45,5 @@ public abstract class PDSimpleFont extends PDFont {
         }
         LOGGER.warn("Cannot find encoding for glyph with code" + code + " in font " + this.getName());
         return null;
-    }
-
-    @Override
-    public int readCode(InputStream stream) throws IOException {
-        return stream.read();
     }
 }

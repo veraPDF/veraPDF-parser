@@ -2,7 +2,6 @@ package org.verapdf.pd.font;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDResource;
 import org.verapdf.pd.font.cmap.PDCMap;
@@ -161,7 +160,17 @@ public abstract class PDFont extends PDResource {
         return this.dictionary.getIntegerKey(ASAtom.LAST_CHAR);
     }
 
-    public abstract int readCode(InputStream stream) throws IOException;
+    /**
+     * Method reads next character code from stream according to font data. It
+     * can contain from 1 to 4 bytes.
+     *
+     * @param stream is stream with raw data.
+     * @return next character code read.
+     * @throws IOException if reading fails.
+     */
+    public int readCode(InputStream stream) throws IOException {
+        return stream.read();
+    }
 
     public abstract FontProgram getFontProgram();
 

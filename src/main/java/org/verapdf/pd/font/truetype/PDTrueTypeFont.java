@@ -2,7 +2,6 @@ package org.verapdf.pd.font.truetype;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSStream;
 import org.verapdf.pd.font.FontProgram;
@@ -10,7 +9,6 @@ import org.verapdf.pd.font.PDSimpleFont;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author Sergey Shemyakov

@@ -100,4 +100,8 @@ public class PDType0Font extends PDCIDFont {
             return null;
         }
     }
+
+    public int toCID(int code) {
+        return this.pdcMap.getCMapFile().toCID(code);
+    }
 }

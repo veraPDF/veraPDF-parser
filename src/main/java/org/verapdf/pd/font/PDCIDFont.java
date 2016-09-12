@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * @author Sergey Shemyakov
  */
-public abstract class PDCIDFont extends PDFont {
+public class PDCIDFont extends PDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDCIDFont.class);
 
