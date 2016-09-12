@@ -18,11 +18,14 @@ public class PDType0Font extends PDCIDFont {
 
     public COSDictionary getCIDSystemInfo() {
         if (this.cidSystemInfo == null) {
-            COSDictionary cidFontDict = (COSDictionary)
-                    dictionary.getKey(ASAtom.DESCENDANT_FONTS).get();
+            COSObject cidFontDictObj = dictionary.getKey(ASAtom.DESCENDANT_FONTS).at(0);
+            if (cidFontDictObj == null) {
+                return null;
+            }
+            COSDictionary cidFontDict = (COSDictionary) cidFontDictObj.getDirectBase();
             if (cidFontDict != null) {
                 COSDictionary cidSystemInfo = (COSDictionary)
-                        cidFontDict.getKey(ASAtom.CID_SYSTEM_INFO).get();
+                        cidFontDict.getKey(ASAtom.CID_SYSTEM_INFO).getDirectBase();
                 this.cidSystemInfo = cidSystemInfo;
                 return cidSystemInfo;
             }
