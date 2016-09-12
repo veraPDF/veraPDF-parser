@@ -224,8 +224,8 @@ class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
      * {@inheritDoc}
      */
     @Override
-    public boolean containsCID(int cid) {
-        return cid < nGlyphs;
+    public boolean containsCode(int code) {
+        return code < nGlyphs;
     }
 
     private void initializeCharSet(String[] charSetArray) {

@@ -4,6 +4,9 @@ import org.apache.log4j.Logger;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.pd.font.truetype.AdobeGlyphList;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * Represents simple font on pd level (Type1, TrueType, Type3).
  *
@@ -20,7 +23,7 @@ public abstract class PDSimpleFont extends PDFont {
     /**
      * This method maps character code to a Unicode value. Firstly it checks
      * toUnicode CMap, then it behaves like described in PDF32000_2008 9.10.2
-     * "Mapping Character Codes to Unicode Values".
+     * "Mapping Character Codes to Unicode Values" for simple font.
      *
      * @param code is code for character.
      * @return Unicode value.
@@ -45,5 +48,10 @@ public abstract class PDSimpleFont extends PDFont {
         }
         LOGGER.warn("Cannot find encoding for glyph with code" + code + " in font " + this.getName());
         return null;
+    }
+
+    @Override
+    public int readCode(InputStream stream) throws IOException {
+        return stream.read();
     }
 }

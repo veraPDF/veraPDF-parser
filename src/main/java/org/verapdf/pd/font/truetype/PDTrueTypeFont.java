@@ -10,6 +10,7 @@ import org.verapdf.pd.font.PDSimpleFont;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Sergey Shemyakov
@@ -45,10 +46,5 @@ public class PDTrueTypeFont extends PDSimpleFont {
             }
         }
         return null;
-    }
-
-    @Override
-    public int readCode(ASInputStream stream) throws IOException {
-        return stream.read();
     }
 }

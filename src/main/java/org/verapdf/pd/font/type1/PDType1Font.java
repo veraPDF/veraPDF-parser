@@ -85,9 +85,4 @@ public class PDType1Font extends PDSimpleFont {
         }
         return null;
     }
-
-    @Override
-    public int readCode(ASInputStream stream) throws IOException {
-        return stream.read();
-    }
 }

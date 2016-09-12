@@ -102,8 +102,8 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
      * {@inheritDoc}
      */
     @Override
-    public boolean containsCID(int cid) {
-        return font.containsCID(cid);
+    public boolean containsCode(int code) {
+        return font.containsCode(code);
     }
 
     /**

@@ -6,10 +6,12 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
+import org.verapdf.io.InternalInputStream;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.cmap.PDCMap;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Represents Type0 font on pd level.
@@ -60,10 +62,19 @@ public class PDType0Font extends PDCIDFont {
     }
 
     @Override
-    public int readCode(ASInputStream stream) throws IOException {
-        return this.pdcMap.getCMapFile().getCIDFromStream(stream);
+    public int readCode(InputStream stream) throws IOException {
+        ASInputStream asInputStream = new InternalInputStream(stream);
+        return this.pdcMap.getCMapFile().getCIDFromStream(asInputStream);
     }
 
+    /**
+     * This method maps character code to a Unicode value. Firstly it checks
+     * toUnicode CMap, then it behaves like described in PDF32000_2008 9.10.2
+     * "Mapping Character Codes to Unicode Values" for Type0 font.
+     *
+     * @param code is code for character.
+     * @return unicode value.
+     */
     @Override
     public String toUnicode(int code) {
         String unicode = super.toUnicode(code);

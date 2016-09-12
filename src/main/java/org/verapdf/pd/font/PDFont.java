@@ -8,6 +8,7 @@ import org.verapdf.pd.PDResource;
 import org.verapdf.pd.font.cmap.PDCMap;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,7 +109,7 @@ public abstract class PDFont extends PDResource {
 
     public Encoding getEncodingMapping() {
         COSBase encoding = this.getEncoding().getDirectBase();
-        if(encoding.getType() == COSObjType.COS_NAME) {
+        if (encoding.getType() == COSObjType.COS_NAME) {
             return new Encoding(encoding.getName());
         } else if (encoding.getType() == COSObjType.COS_DICT) {
             return new Encoding(encoding.getNameKey(ASAtom.BASE_ENCODING),
@@ -160,7 +161,7 @@ public abstract class PDFont extends PDResource {
         return this.dictionary.getIntegerKey(ASAtom.LAST_CHAR);
     }
 
-    public abstract int readCode(ASInputStream stream) throws IOException;
+    public abstract int readCode(InputStream stream) throws IOException;
 
     public abstract FontProgram getFontProgram();
 
@@ -175,14 +176,38 @@ public abstract class PDFont extends PDResource {
      */
     public String toUnicode(int code) {
 
-        if(toUnicodeCMap == null) {
+        if (toUnicodeCMap == null) {
             this.toUnicodeCMap = new PDCMap(this.dictionary.getKey(ASAtom.TO_UNICODE));
         }
 
         if (toUnicodeCMap.getCMapName() != null &&
                 toUnicodeCMap.getCMapName().startsWith("Identity-")) {
-            return new String(new char[] { (char) code });
+            return new String(new char[]{(char) code});
         }
         return this.toUnicodeCMap.toUnicode(code);
+    }
+
+    public double getWidth(int code) {
+        if (dictionary.knownKey(ASAtom.WIDTHS) ||
+                dictionary.knownKey(ASAtom.MISSING_WIDTH)) {
+            int firstChar = dictionary.getIntegerKey(ASAtom.FIRST_CHAR).intValue();
+            int lastChar = dictionary.getIntegerKey(ASAtom.LAST_CHAR).intValue();
+            if (getWidths().size() > 0 && code >= firstChar && code <= lastChar) {
+                return getWidths().at(code - firstChar).getReal();
+            }
+
+            if (this.fontDescriptor != null) {
+                return fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
+            }
+        }
+        // TODO: process case of standard fonts
+
+        try {
+            this.getFontProgram().parseFont();
+            return this.getFontProgram().getWidth(code);
+        } catch (IOException e) {
+            LOGGER.warn("Can't parse font program of font " + this.getName());
+            return 0;
+        }
     }
 }

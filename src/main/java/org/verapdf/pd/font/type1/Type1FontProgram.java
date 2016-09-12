@@ -168,8 +168,8 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     @Override
-    public boolean containsCID(int cid) {
-        return cid < 256;
+    public boolean containsCode(int code) {
+        return code < 256;
     }
 
     public String[] getEncoding() {

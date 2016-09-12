@@ -78,9 +78,9 @@ public class TrueTypeFontProgram implements FontProgram {
      * {@inheritDoc}
      */
     @Override
-    public boolean containsCID(int cid) {
+    public boolean containsCode(int code) {
         for (TrueTypeCmapSubtable cMap : getCmapEncodingPlatform()) {
-            if (cMap.containsCID(cid)) {
+            if (cMap.containsCID(code)) {
                 return true;
             }
         }
