@@ -49,6 +49,11 @@ public class COSIndirect extends COSBase {
         return this.child.get();
     }
 
+    @Override
+    public COSKey getObjectKey() {
+        return this.key;
+    }
+
     // OBJECT TYPE
     public COSObjType getType() {
         return getDirect().getType();

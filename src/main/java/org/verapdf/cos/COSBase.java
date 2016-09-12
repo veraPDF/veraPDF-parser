@@ -13,11 +13,21 @@ import java.util.Set;
  */
 public abstract class COSBase {
 
+	private COSKey indirectKey;
+
 	public COSBase() {
 	}
 
 	// Returns object type
 	public abstract COSObjType getType();
+
+	public COSKey getObjectKey() {
+		return this.indirectKey;
+	}
+
+	public void setObjectKey(COSKey indirectKey) {
+		this.indirectKey = indirectKey;
+	}
 
 	// VISITOR DESIGN PATTERN
 	public abstract void accept(final IVisitor visitor);

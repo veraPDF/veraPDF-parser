@@ -55,8 +55,11 @@ public class Reader extends XRefReader {
 			if (getHeader().getHeaderOffset() > 0) {
 				offset += getHeader().getHeaderOffset();
 			}
-			return getObject(offset);
+			COSObject result = getObject(offset);
+			result.setObjectKey(key);
+			return result;
 		} else {
+			//TODO : set object key
 			DecodedObjectStreamParser parser = objectStreams.get(-offset);
 			if(parser != null) {
 				return parser.getObject(key.getNumber());
