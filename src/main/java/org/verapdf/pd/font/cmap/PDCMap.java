@@ -124,9 +124,13 @@ public class PDCMap {
     }
 
     private COSDictionary getCIDSystemInfo() {
+        if(this.cMap.getType() != COSObjType.COS_NAME) {
+            // TODO: get ordering, supplement and registry for predefined CMAPs
+        }
+
         if (cidSystemInfo == null) {
             this.cidSystemInfo = (COSDictionary)
-                    this.cMap.getKey(ASAtom.CID_SYSTEM_INFO).get();
+                    this.cMap.getKey(ASAtom.CID_SYSTEM_INFO).getDirectBase();
             return this.cidSystemInfo;
         } else {
             return this.cidSystemInfo;
