@@ -50,7 +50,7 @@ public class PDXForm extends PDXObject implements PDContentStream {
 	public COSStream getPS() {
 		COSObject ps = getKey(ASAtom.PS);
 		if (ps != null && ps.getType() == COSObjType.COS_STREAM) {
-			return (COSStream) ps.get();
+			return (COSStream) ps.getDirectBase();
 		}
 		return null;
 	}
@@ -58,7 +58,7 @@ public class PDXForm extends PDXObject implements PDContentStream {
 	public COSDictionary getRef() {
 		COSObject ref = getKey(ASAtom.REF);
 		if (ref != null && ref.getType() == COSObjType.COS_DICT) {
-			return (COSDictionary) ref.get();
+			return (COSDictionary) ref.getDirectBase();
 		}
 		return null;
 	}
