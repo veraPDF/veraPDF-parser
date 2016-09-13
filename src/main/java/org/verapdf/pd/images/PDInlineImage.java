@@ -40,14 +40,14 @@ public class PDInlineImage extends PDResource {
 		if (filters != null) {
 			List<COSName> res = new ArrayList<>();
 			if (filters.getType() == COSObjType.COS_NAME) {
-				res.add((COSName) filters.get());
+				res.add((COSName) filters.getDirectBase());
 			} else if (filters.getType() == COSObjType.COS_ARRAY) {
-				for (COSObject filter : ((COSArray)filters.get())) {
+				for (COSObject filter : ((COSArray) filters.getDirectBase())) {
 					if (filter == null || filter.getType() != COSObjType.COS_NAME) {
 						LOGGER.debug("Filter array contains non name value");
 						return Collections.emptyList();
 					} else {
-						res.add((COSName) filter.get());
+						res.add((COSName) filter.getDirectBase());
 					}
 				}
 			}
@@ -63,7 +63,7 @@ public class PDInlineImage extends PDResource {
 	public COSName getIntent() {
 		COSObject object = getKey(ASAtom.INTENT);
 		if (object != null && object.getType() == COSObjType.COS_NAME) {
-			return (COSName) object.get();
+			return (COSName) object.getDirectBase();
 		}
 		return null;
 	}
