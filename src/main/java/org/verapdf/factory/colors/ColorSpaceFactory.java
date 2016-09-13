@@ -103,6 +103,7 @@ public class ColorSpaceFactory {
             for (int i = 0; i < object.size(); ++i) {
                 names.add(object.at(i));
             }
+            return names;
         }
         return null;
     }
