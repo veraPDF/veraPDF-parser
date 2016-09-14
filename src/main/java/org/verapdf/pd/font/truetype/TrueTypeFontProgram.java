@@ -23,13 +23,14 @@ public class TrueTypeFontProgram implements FontProgram {
     private boolean isSymbolic;
     private COSObject encoding;
     private String[] encodingMappingArray;
+    private boolean isFontParsed = false;
 
     /**
      * Constructor from stream, containing font data, and encoding details.
      *
-     * @param stream is stream containing font data.
+     * @param stream     is stream containing font data.
      * @param isSymbolic is true if font is marked as symbolic.
-     * @param encoding is value of /Encoding in font dictionary.
+     * @param encoding   is value of /Encoding in font dictionary.
      * @throws IOException if creation of @{link InternalInputStream} fails.
      */
     public TrueTypeFontProgram(ASInputStream stream, boolean isSymbolic,
@@ -50,19 +51,22 @@ public class TrueTypeFontProgram implements FontProgram {
      */
     @Override
     public void parseFont() throws IOException {
-        this.parser.readHeader();
-        this.parser.readTableDirectory();
-        this.parser.readTables();
+        if (!isFontParsed) {
+            isFontParsed = true;
+            this.parser.readHeader();
+            this.parser.readTableDirectory();
+            this.parser.readTables();
 
-        float quotient = 1000f / this.parser.getHeadParser().getUnitsPerEm();
-        int[] unconvertedWidths = this.parser.getHmtxParser().getLongHorMetrics();
-        widths = new float[unconvertedWidths.length];
-        for (int i = 0; i < unconvertedWidths.length; ++i) {
-            widths[i] = unconvertedWidths[i] * quotient;
-        }
+            float quotient = 1000f / this.parser.getHeadParser().getUnitsPerEm();
+            int[] unconvertedWidths = this.parser.getHmtxParser().getLongHorMetrics();
+            widths = new float[unconvertedWidths.length];
+            for (int i = 0; i < unconvertedWidths.length; ++i) {
+                widths[i] = unconvertedWidths[i] * quotient;
+            }
 
-        if (!isSymbolic) {
-            this.createCIDToNameTable();
+            if (!isSymbolic) {
+                this.createCIDToNameTable();
+            }
         }
     }
 
@@ -71,7 +75,11 @@ public class TrueTypeFontProgram implements FontProgram {
      * this True Type font.
      */
     public TrueTypeCmapSubtable[] getCmapEncodingPlatform() {
-        return this.parser.getCmapParser().getCmapInfos();
+        if(this.parser.getCmapParser() != null) {
+            return this.parser.getCmapParser().getCmapInfos();
+        } else {
+            return new TrueTypeCmapSubtable[0];
+        }
     }
 
     /**
@@ -198,7 +206,7 @@ public class TrueTypeFontProgram implements FontProgram {
                 throw new IOException("Error in reading /Encoding entry in font dictionary");
             }
         } else if (this.encoding.getType() == COSObjType.COS_DICT) {
-            createCIDToNameTableFromDict((COSDictionary) this.encoding.get());
+            createCIDToNameTableFromDict((COSDictionary) this.encoding.getDirectBase());
         } else {
             throw new IOException("Error in reading /Encoding entry in font dictionary");
         }
@@ -224,7 +232,7 @@ public class TrueTypeFontProgram implements FontProgram {
             System.arraycopy(TrueTypePredefined.STANDARD_ENCODING, 0,
                     encodingMappingArray, 0, 256);
         }
-        COSArray differences = (COSArray) encoding.getKey(ASAtom.DIFFERENCES).get();
+        COSArray differences = (COSArray) encoding.getKey(ASAtom.DIFFERENCES).getDirectBase();
         if (differences != null) {
             applyDiffsToEncoding(differences);
         }

@@ -25,6 +25,7 @@ public class OpenTypeFontProgram implements FontProgram {
     private ASInputStream source;
     private FontProgram font;
     private int numTables;
+    private boolean isFontParsed = false;
 
     /**
      * Constructor from stream, containing font data, and encoding details.
@@ -70,12 +71,15 @@ public class OpenTypeFontProgram implements FontProgram {
      */
     @Override
     public void parseFont() throws IOException {
-        if (!isCFF) {
-            this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
-            this.font.parseFont();
-        } else {
-            this.font = new CFFFontProgram(getCFFTable());
-            this.font.parseFont();
+        if (!isFontParsed) {
+            isFontParsed = true;
+            if (!isCFF) {
+                this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
+                this.font.parseFont();
+            } else {
+                this.font = new CFFFontProgram(getCFFTable());
+                this.font.parseFont();
+            }
         }
     }
 

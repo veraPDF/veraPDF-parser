@@ -14,6 +14,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
     private FontProgram font;
     private boolean isCIDFont = false;
+    private boolean isFontParsed = false;
 
     /**
      * Constructor from stream.
@@ -30,22 +31,25 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
      */
     @Override
     public void parseFont() throws IOException {
-        this.readHeader();
-        this.readIndex();   // name
-        long topOffset = this.source.getOffset();
-        CFFIndex top = this.readIndex();
-        this.definedNames = this.readIndex();
-        if (isCIDFont(top.get(0))) {
-            font = new CFFCIDFontProgram(this.source,
-                    topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
-                    topOffset + top.getOffset(1) - 1 + top.getOffsetShift());
-            font.parseFont();
-        } else {
-            font = new CFFType1FontProgram(this.source,
-                    this.definedNames,
-                    topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
-                    topOffset + top.getOffset(1) - 1 + top.getOffsetShift());
-            font.parseFont();
+        if (!isFontParsed) {
+            isFontParsed = true;
+            this.readHeader();
+            this.readIndex();   // name
+            long topOffset = this.source.getOffset();
+            CFFIndex top = this.readIndex();
+            this.definedNames = this.readIndex();
+            if (isCIDFont(top.get(0))) {
+                font = new CFFCIDFontProgram(this.source,
+                        topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
+                        topOffset + top.getOffset(1) - 1 + top.getOffsetShift());
+                font.parseFont();
+            } else {
+                font = new CFFType1FontProgram(this.source,
+                        this.definedNames,
+                        topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
+                        topOffset + top.getOffset(1) - 1 + top.getOffsetShift());
+                font.parseFont();
+            }
         }
     }
 

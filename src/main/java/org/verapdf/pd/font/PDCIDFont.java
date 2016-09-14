@@ -25,7 +25,7 @@ public class PDCIDFont extends PDFont {
 
     public COSStream getCIDSet() {
         COSObject cidSet = this.fontDescriptor.getKey(ASAtom.CID_SET);
-        return cidSet == null ? null : (COSStream) cidSet.get();
+        return cidSet == null ? null : (COSStream) cidSet.getDirectBase();
     }
 
     public COSObject getCIDToGIDMap() {
@@ -55,7 +55,7 @@ public class PDCIDFont extends PDFont {
             try {
                 COSStream fontFile =
                         getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE3));
-                COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).get();
+                COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).getDirectBase();
                 if (ASAtom.CID_FONT_TYPE0C == subtype.get()) {
                     this.fontProgram = new CFFFontProgram(
                             fontFile.getData(COSStream.FilterFlags.DECODE));
