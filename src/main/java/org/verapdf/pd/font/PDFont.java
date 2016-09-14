@@ -80,9 +80,8 @@ public abstract class PDFont extends PDResource {
             ASAtom typeFromDescriptor =
                     this.fontDescriptor.getNameKey(ASAtom.FONT_NAME);
             if (type != typeFromDescriptor) {
-                LOGGER.warn("Font names in font descriptor dictionary and in font dictionary are different: "
-                + type.getValue() + " in font dictionary, " + typeFromDescriptor.getValue() + " in font descriptor" +
-                        "dictionary.");
+                LOGGER.warn("Font names in font descriptor dictionary and in font dictionary are different for "
+                + type.getValue());
             }
         }
         return type;
@@ -119,12 +118,14 @@ public abstract class PDFont extends PDResource {
     }
 
     public COSStream getFontFile2() {
-        return (COSStream) this.fontDescriptor.getKey(ASAtom.FONT_FILE2).get();
+        return (COSStream)
+                this.fontDescriptor.getKey(ASAtom.FONT_FILE2).getDirectBase();
     }
 
     public Map<Integer, String> getDifferences() {
         COSObject encoding = this.getEncoding();
-        COSArray differences = (COSArray) encoding.getKey(ASAtom.DIFFERENCES).get();
+        COSArray differences = (COSArray)
+                encoding.getKey(ASAtom.DIFFERENCES).getDirectBase();
         if (differences == null) {
             return null;
         }
