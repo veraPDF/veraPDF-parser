@@ -250,6 +250,11 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
+    public boolean setArrayKey(ASAtom key, COSObject array) {
+        getDirect().setArrayKey(key, array);
+        return true;
+    }
+
     public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
         getDirect().setArrayKey(key, size, value);
         return true;
