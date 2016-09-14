@@ -83,6 +83,7 @@ public abstract class COSBase {
 	public abstract ASAtom getNameKey(final ASAtom key);
 	public abstract boolean setNameKey(final ASAtom key, final ASAtom value);
 	public abstract boolean setArrayKey(final ASAtom key);
+	public abstract boolean setArrayKey(final ASAtom key, final COSObject array);
 	public abstract boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value);
 	public abstract boolean setArrayKey(final ASAtom key, final int size, final double[] value);
 	public abstract void removeKey(final ASAtom key);

@@ -185,6 +185,10 @@ public abstract class COSDirect extends COSBase {
         return false;
     }
 
+    public boolean setArrayKey(ASAtom key, COSObject array) {
+        return false;
+    }
+
     public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
         return false;
     }

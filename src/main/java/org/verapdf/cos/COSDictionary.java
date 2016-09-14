@@ -204,6 +204,11 @@ public class COSDictionary extends COSDirect {
         return true;
     }
 
+    public boolean setArrayKey(final ASAtom key, final COSObject array) {
+        this.entries.put(key, array);
+        return true;
+    }
+
     public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
         COSObject obj = new COSObject();
         obj.setArray(size, value);
