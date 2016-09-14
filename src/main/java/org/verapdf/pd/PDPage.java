@@ -55,8 +55,11 @@ public class PDPage extends PDPageTreeNode {
 
     private void initializeContents(final COSObject pageDict) {
         COSObject contents = pageDict.getKey(ASAtom.CONTENTS);
-        if (!contents.empty()) {
+        if (!contents.empty() && contents.getType() == COSObjType.COS_STREAM) {
             this.content = new PDPageContentStream(contents);
+        } else if (!contents.empty() && contents.getType() == COSObjType.COS_ARRAY) {
+            //TODO : add content streams concatenation
+            this.content = new PDPageContentStream(contents.at(0));
         }
     }
 
