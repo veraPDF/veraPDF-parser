@@ -20,6 +20,7 @@ public class CMap {
 
     private int wMode;
     private String registry, ordering;
+    private int supplement;
     private String name;
     int shortestCodeSpaceLength;
 
@@ -148,6 +149,17 @@ public class CMap {
      */
     void setOrdering(String ordering) {
         this.ordering = ordering;
+    }
+
+    /**
+     * @return supplement of CMap.
+     */
+    public int getSupplement() {
+        return supplement;
+    }
+
+    public void setSupplement(int supplement) {
+        this.supplement = supplement;
     }
 
     /**
