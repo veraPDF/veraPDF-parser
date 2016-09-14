@@ -63,7 +63,7 @@ public class PDType1Font extends PDFont {
 
         if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
             COSStream type1FontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();
+                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).getDirectBase();
             try {
                 this.fontProgram = new Type1FontProgram(
                         type1FontFile.getData(COSStream.FilterFlags.DECODE));
@@ -73,7 +73,7 @@ public class PDType1Font extends PDFont {
             }
         } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
             COSStream type1FontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();
+                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE3).getDirectBase();
             ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
             if (subtype == ASAtom.TYPE1C) {
                 try {

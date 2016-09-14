@@ -63,6 +63,16 @@ public class COSObject {
 		this.set(null);
 	}
 
+	public COSKey getObjectKey() {
+		return this.base != null ? this.base.getObjectKey() : null;
+	}
+
+	public void setObjectKey(final COSKey key) {
+		if (this.base != null) {
+			this.base.setObjectKey(key);
+		}
+	}
+
 	// OBJECT TYPE
 	public COSObjType getType() {
 		return this.base != null ? this.base.getType() : COSObjType.COS_UNDEFINED;

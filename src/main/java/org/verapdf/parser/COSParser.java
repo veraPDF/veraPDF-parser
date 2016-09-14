@@ -216,6 +216,7 @@ public class COSParser extends BaseParser {
 			throw new IOException("PDFParser::GetDictionary()" + StringExceptions.INVALID_PDF_DICTONARY);
 		}
 
+		long reset = this.source.getOffset();
 		if (this.flag) {
 			nextToken();
 		}
@@ -224,6 +225,9 @@ public class COSParser extends BaseParser {
 		if (token.type == Token.Type.TT_KEYWORD &&
 				token.keyword == Token.Keyword.KW_STREAM) {
 			return getStream(dict);
+		} else {
+			this.source.seek(reset);
+			this.flag = true;
 		}
 
 		return dict;

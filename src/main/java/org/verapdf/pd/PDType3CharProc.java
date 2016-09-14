@@ -2,7 +2,6 @@ package org.verapdf.pd;
 
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
 
 /**
  * Class represents content stream that constructs and paints the glyph for
@@ -10,17 +9,15 @@ import org.verapdf.cos.COSStream;
  *
  * @author Sergey Shemyakov
  */
-public class PDType3CharProc implements PDContentStream {
-
-    private COSStream charStream;
+public class PDType3CharProc extends PDObject implements PDContentStream {
 
     /**
      * Constructor from stream.
      *
-     * @param charStream is COSStream, containing charProc content stream.
+     * @param charStream is COSObject containing charProc content stream.
      */
-    public PDType3CharProc(COSStream charStream) {
-        this.charStream = charStream;
+    public PDType3CharProc(COSObject charStream) {
+        super(charStream);
     }
 
     /**
@@ -28,7 +25,7 @@ public class PDType3CharProc implements PDContentStream {
      */
     @Override
     public COSObject getContents() {
-        return new COSObject(this.charStream);
+        return getObject();
     }
 
     /**
@@ -37,7 +34,7 @@ public class PDType3CharProc implements PDContentStream {
     @Override
     public void setContents(COSObject contents) {
         if (contents != null && contents.getType() == COSObjType.COS_STREAM) {
-            this.charStream = (COSStream) contents.get();
+            setObject(contents);
         }
     }
 }
