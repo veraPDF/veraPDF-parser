@@ -156,7 +156,7 @@ public abstract class PDFont extends PDResource {
         if (obj == null || obj.getDirectBase().getType() != COSObjType.COS_STREAM) {
             throw new IOException("Can't get COSStream from COSObject");
         } else {
-            return (COSStream) obj.get();
+            return (COSStream) obj.getDirectBase();
         }
     }
 }
