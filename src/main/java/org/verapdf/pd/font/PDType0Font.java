@@ -2,6 +2,7 @@ package org.verapdf.pd.font;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSName;

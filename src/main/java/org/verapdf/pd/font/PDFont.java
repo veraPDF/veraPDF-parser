@@ -225,7 +225,8 @@ public abstract class PDFont extends PDResource {
                 return fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
             }
         }
-        // TODO: process case of standard fonts
+
+        //if ()   // TODO: if is standard use AFMParser. See GFPDType1Font.
 
         try {
             this.getFontProgram().parseFont();
