@@ -4,6 +4,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.pd.optionalcontent.PDOptionalContentProperties;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,6 +67,14 @@ public class PDCatalog extends PDObject {
 			return Collections.unmodifiableList(result);
 		}
 		return Collections.emptyList();
+	}
+
+	public PDOptionalContentProperties getOCProperties() {
+		COSObject object = getKey(ASAtom.OCPROPERTIES);
+		if (!object.empty() && object.getType() == COSObjType.COS_DICT) {
+			return new PDOptionalContentProperties(object);
+		}
+		return null;
 	}
 
 }

@@ -23,6 +23,8 @@ public abstract class PDFont extends PDResource {
     protected COSDictionary dictionary;
     protected COSDictionary fontDescriptor;
     protected PDCMap toUnicodeCMap;
+    protected boolean isFontParsed = false;
+    protected FontProgram fontProgram;
 
     /**
      * Constructor from COSDictionary.
@@ -30,12 +32,15 @@ public abstract class PDFont extends PDResource {
      * @param dictionary is font dictionary.
      */
     public PDFont(COSDictionary dictionary) {
+        if(dictionary == null) {
+            dictionary = (COSDictionary) COSDictionary.construct().get();
+        }
         this.dictionary = dictionary;
         COSObject fd = dictionary.getKey(ASAtom.FONT_DESC);
-        if (fd.getType() == COSObjType.COS_DICT) {
+        if (fd != null && fd.getType() == COSObjType.COS_DICT) {
             fontDescriptor = (COSDictionary) fd.getDirectBase();
         } else {
-            fontDescriptor = null;
+            fontDescriptor = (COSDictionary) COSDictionary.construct().get();
         }
     }
 
@@ -74,13 +79,14 @@ public abstract class PDFont extends PDResource {
      * @throws IllegalStateException if font names specified in font dictionary
      *                               and font descriptor are different.
      */
-    public ASAtom getFontName() throws IllegalStateException {
+    public ASAtom getFontName() {
         ASAtom type = this.dictionary.getNameKey(ASAtom.BASE_FONT);
         if (this.fontDescriptor != null && type != null) {
             ASAtom typeFromDescriptor =
                     this.fontDescriptor.getNameKey(ASAtom.FONT_NAME);
             if (type != typeFromDescriptor) {
-                throw new IllegalStateException("Font names specified in font dictionary and font descriptor are different");
+                LOGGER.warn("Font names in font descriptor dictionary and in font dictionary are different for "
+                + type.getValue());
             }
         }
         return type;
@@ -90,17 +96,17 @@ public abstract class PDFont extends PDResource {
      * @return true if the font flags in the font descriptor dictionary mark
      * indicate that the font is symbolic (the entry /Flags has bit 3 set to 1
      * and bit 6 set to 0).
-     * @throws IllegalStateException if these flags are set to the same value,
-     *                               i. e. are both 1 or both 0, or if font
      *                               descriptor is null.
      */
-    public boolean isSymbolic() throws IllegalStateException {
+    public boolean isSymbolic() {
         if (this.fontDescriptor == null) {
-            throw new IllegalStateException("Font descriptor is null");
+            LOGGER.warn("Font descriptor is null");
+            return false;   // TODO?
         }
         Long flagsLong = this.fontDescriptor.getIntegerKey(ASAtom.FLAGS);
         if (flagsLong == null) {
-            throw new IllegalStateException("Font descriptor doesn't contain /Flags entry");
+            LOGGER.warn("Font descriptor doesn't contain /Flags entry");
+            return false;   // TODO?
         }
         int flags = flagsLong.intValue();
         return (flags & 0b00100100) == 4;
@@ -127,12 +133,14 @@ public abstract class PDFont extends PDResource {
     }
 
     public COSStream getFontFile2() {
-        return (COSStream) this.fontDescriptor.getKey(ASAtom.FONT_FILE2).get();
+        return (COSStream)
+                this.fontDescriptor.getKey(ASAtom.FONT_FILE2).getDirectBase();
     }
 
     public Map<Integer, String> getDifferences() {
         COSObject encoding = this.getEncoding();
-        COSArray differences = (COSArray) encoding.getKey(ASAtom.DIFFERENCES).get();
+        COSArray differences = (COSArray)
+                encoding.getKey(ASAtom.DIFFERENCES).getDirectBase();
         if (differences == null) {
             return null;
         }
@@ -158,6 +166,14 @@ public abstract class PDFont extends PDResource {
 
     public Long getLastChar() {
         return this.dictionary.getIntegerKey(ASAtom.LAST_CHAR);
+    }
+
+    protected COSStream getStreamFromObject(COSObject obj) throws IOException {
+        if (obj == null || obj.getDirectBase().getType() != COSObjType.COS_STREAM) {
+            throw new IOException("Can't get COSStream from COSObject");
+        } else {
+            return (COSStream) obj.getDirectBase();
+        }
     }
 
     /**

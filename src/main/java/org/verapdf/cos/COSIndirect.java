@@ -49,6 +49,11 @@ public class COSIndirect extends COSBase {
         return this.child.get();
     }
 
+    @Override
+    public COSKey getObjectKey() {
+        return this.key;
+    }
+
     // OBJECT TYPE
     public COSObjType getType() {
         return getDirect().getType();
@@ -242,6 +247,11 @@ public class COSIndirect extends COSBase {
 
     public boolean setArrayKey(final ASAtom key) {
         getDirect().setArrayKey(key);
+        return true;
+    }
+
+    public boolean setArrayKey(ASAtom key, COSObject array) {
+        getDirect().setArrayKey(key, array);
         return true;
     }
 

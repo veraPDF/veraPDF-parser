@@ -56,32 +56,37 @@ public class PDType1Font extends PDSimpleFont {
 
     @Override
     public FontProgram getFontProgram() {
-        if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
-            COSStream type1FontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();
-            try {
-                return new Type1FontProgram(
-                        type1FontFile.getData(COSStream.FilterFlags.DECODE));
-            } catch (IOException e) {
-                LOGGER.error("Can't read Type 1 font program.");
-            }
-        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
-            COSStream type1FontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE).get();
-            ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
-            if (subtype == ASAtom.TYPE1C) {
-                try {
-                    return new CFFFontProgram(type1FontFile.getData(
-                            COSStream.FilterFlags.DECODE));
-                } catch (IOException e) {
-                    LOGGER.error("Can't read Type 1 font program.");
-                }
-            } else if (subtype == ASAtom.OPEN_TYPE) {
-                return new OpenTypeFontProgram(type1FontFile.getData(
-                        COSStream.FilterFlags.DECODE), true, this.isSymbolic(),
-                        this.getEncoding());
-            }
+        if (this.isFontParsed) {
+            return this.fontProgram;
         }
+        this.isFontParsed = true;
+        try {
+            if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
+                COSStream type1FontFile =
+                        getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE));
+                this.fontProgram = new Type1FontProgram(
+                        type1FontFile.getData(COSStream.FilterFlags.DECODE));
+                return this.fontProgram;
+            } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+                COSStream type1FontFile =
+                        getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE3));
+                ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
+                if (subtype == ASAtom.TYPE1C) {
+
+                    this.fontProgram = new CFFFontProgram(type1FontFile.getData(
+                            COSStream.FilterFlags.DECODE));
+                    return this.fontProgram;
+                } else if (subtype == ASAtom.OPEN_TYPE) {
+                    this.fontProgram = new OpenTypeFontProgram(type1FontFile.getData(
+                            COSStream.FilterFlags.DECODE), true, this.isSymbolic(),
+                            this.getEncoding());
+                    return this.fontProgram;
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Can't read Type 1 font program.");
+        }
+        this.fontProgram = null;
         return null;
     }
 }

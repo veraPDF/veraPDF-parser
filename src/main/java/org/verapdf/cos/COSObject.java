@@ -63,6 +63,16 @@ public class COSObject {
 		this.set(null);
 	}
 
+	public COSKey getObjectKey() {
+		return this.base != null ? this.base.getObjectKey() : null;
+	}
+
+	public void setObjectKey(final COSKey key) {
+		if (this.base != null) {
+			this.base.setObjectKey(key);
+		}
+	}
+
 	// OBJECT TYPE
 	public COSObjType getType() {
 		return this.base != null ? this.base.getType() : COSObjType.COS_UNDEFINED;
@@ -257,6 +267,13 @@ public class COSObject {
 	}
 
 	public void setArrayKey(final ASAtom key) {
+		if (this.base == null || !this.base.setArrayKey(key)) {
+			COSObject obj = COSArray.construct();
+			this.base = new COSDictionary(key, obj);
+		}
+	}
+
+	public void setArrayKey(final ASAtom key, final COSObject array) {
 		if (this.base == null || !this.base.setArrayKey(key)) {
 			COSObject obj = COSArray.construct();
 			this.base = new COSDictionary(key, obj);

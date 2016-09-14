@@ -2,13 +2,8 @@ package org.verapdf.pd.font.truetype;
 
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.net.URISyntaxException;
+import java.io.*;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,17 +21,29 @@ public class AdobeGlyphList {
     private static final String AGL_FILE = "/font/AdobeGlyphList.txt";
     private static final AGLUnicode EMPTY = new AGLUnicode(-1);
 
-
-    private static String getSystemIndependentPath(String path)
-            throws URISyntaxException {
-        URL resourceUrl = ClassLoader.class.getResource(path);
-        Path resourcePath = Paths.get(resourceUrl.toURI());
-        return resourcePath.toString();
-    }
-
     static {
         try {
-            File aglFile = new File(getSystemIndependentPath(AGL_FILE));
+            File aglFile;
+            URL res = AdobeGlyphList.class.getResource(AGL_FILE);
+            if (res.toString().startsWith("jar:")) {
+                InputStream input = AdobeGlyphList.class.getResourceAsStream(AGL_FILE);
+                aglFile = File.createTempFile("tempfile", ".tmp");
+                OutputStream out = new FileOutputStream(aglFile);
+                int read;
+                byte[] bytes = new byte[1024];
+
+                while ((read = input.read(bytes)) != -1) {
+                    out.write(bytes, 0, read);
+                }
+                aglFile.deleteOnExit();
+            } else {
+                aglFile = new File(res.getFile());
+            }
+
+            if (!aglFile.exists()) {
+                throw new IOException("Error: File " + aglFile + " not found!");
+            }
+
             RandomAccessFile stream = new RandomAccessFile(aglFile, "r");
             String line;
             line = stream.readLine();
@@ -56,10 +63,9 @@ public class AdobeGlyphList {
                 }
                 line = stream.readLine();
             } while (line != null);
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             LOGGER.debug("Error in opening Adobe Glyph List file", e);
         }
-
     }
 
     /**
@@ -80,6 +86,7 @@ public class AdobeGlyphList {
 
     /**
      * Checks if Adobe Glyph List contains given glyph.
+     *
      * @param glyphName is name of glyph to check.
      * @return true if this glyph is contained in Adobe Glyph List.
      */

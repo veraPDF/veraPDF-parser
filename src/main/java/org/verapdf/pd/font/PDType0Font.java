@@ -2,7 +2,7 @@ package org.verapdf.pd.font;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
@@ -25,20 +25,26 @@ public class PDType0Font extends PDCIDFont {
 
     private org.verapdf.pd.font.cmap.PDCMap pdcMap;
     private COSDictionary cidSystemInfo;
+    private COSDictionary type0FontDict;
 
     public PDType0Font(COSDictionary dictionary) {
-        super(dictionary);
+        super(getDedcendantCOSDictionary(dictionary));
+        type0FontDict = dictionary == null ? null :
+                (COSDictionary) COSDictionary.construct().get();
     }
 
     public COSDictionary getCIDSystemInfo() {
         if (this.cidSystemInfo == null) {
-            COSDictionary cidFontDict = (COSDictionary)
-                    dictionary.getKey(ASAtom.DESCENDANT_FONTS).get();
-            if (cidFontDict != null) {
-                COSDictionary cidSystemInfo = (COSDictionary)
-                        cidFontDict.getKey(ASAtom.CID_SYSTEM_INFO).get();
-                this.cidSystemInfo = cidSystemInfo;
-                return cidSystemInfo;
+            COSObject cidFontDictObj =
+                    this.type0FontDict.getKey(ASAtom.DESCENDANT_FONTS).at(0);
+            if (!cidFontDictObj.empty()) {
+                COSDictionary cidFontDict = (COSDictionary) cidFontDictObj.getDirectBase();
+                if (cidFontDict != null) {
+                    COSDictionary cidSystemInfo = (COSDictionary)
+                            cidFontDict.getKey(ASAtom.CID_SYSTEM_INFO).getDirectBase();
+                    this.cidSystemInfo = cidSystemInfo;
+                    return cidSystemInfo;
+                }
             }
             return null;
         } else {
@@ -48,7 +54,7 @@ public class PDType0Font extends PDCIDFont {
 
     public org.verapdf.pd.font.cmap.PDCMap getCMap() {
         if (this.pdcMap == null) {
-            COSObject cMap = this.dictionary.getKey(ASAtom.ENCODING);
+            COSObject cMap = this.type0FontDict.getKey(ASAtom.ENCODING);
             if (!cMap.empty()) {
                 org.verapdf.pd.font.cmap.PDCMap pdcMap = new org.verapdf.pd.font.cmap.PDCMap(cMap);
                 this.pdcMap = pdcMap;
@@ -59,6 +65,17 @@ public class PDType0Font extends PDCIDFont {
         } else {
             return this.pdcMap;
         }
+    }
+
+    private static COSDictionary getDedcendantCOSDictionary(COSDictionary dict) {
+        if (dict != null) {
+            COSArray array =
+                    (COSArray) dict.getKey(ASAtom.DESCENDANT_FONTS).getDirectBase();
+            if (array != null) {
+                return (COSDictionary) array.at(0).getDirectBase();
+            }
+        }
+        return null;
     }
 
     @Override

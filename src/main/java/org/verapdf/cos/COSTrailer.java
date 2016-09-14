@@ -68,15 +68,7 @@ public class COSTrailer extends PDObject {
 	}
 
 	public void setID(final COSObject id) {
-		COSObject[] ids = new COSObject[2];
-
-		ids[0] = getObject().getKey(ASAtom.ID).at(0);
-		if (ids[0].empty()) {
-			ids[0] = id;
-		}
-		ids[1] = id;
-
-		getObject().setArrayKey(ASAtom.ID, 2, ids);
+		getObject().setArrayKey(ASAtom.ID, id);
 	}
 
 }

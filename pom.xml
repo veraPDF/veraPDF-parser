@@ -81,6 +81,13 @@
               <artifactId>versions-maven-plugin</artifactId>
             </plugin>
         </plugins>
+
+        <resources>
+            <!-- regular resource processsing for everything except logback.xml -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
     </build>
 
     <reporting>

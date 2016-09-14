@@ -131,7 +131,7 @@ public class PDFStreamParser extends COSParser {
 				// null
 				String nullString = readUntilWhitespace();
 				if (nullString.equals("null")) {
-					result = COSNull.NULL;
+					result = new COSObject(COSNull.NULL);
 				} else {
 					result = Operator.getOperator(nullString);
 				}
@@ -141,10 +141,10 @@ public class PDFStreamParser extends COSParser {
 			case 'f': {
 				String line = readUntilWhitespace();
 				if (line.equals("true")) {
-					result = COSBoolean.TRUE;
+					result = new COSObject(COSBoolean.TRUE);
 					break;
 				} else if (line.equals("false")) {
-					result = COSBoolean.FALSE;
+					result = new COSObject(COSBoolean.FALSE);
 				} else {
 					result = Operator.getOperator(line);
 				}
@@ -177,7 +177,8 @@ public class PDFStreamParser extends COSParser {
 				result = Operator.getOperator(token.getValue());
 				if (result instanceof InlineImageOperator) {
 					InlineImageOperator imageOperator = (InlineImageOperator) result;
-					COSObject imageParameters = COSDictionary.construct();
+					COSDictionary imageParameters = (COSDictionary) COSDictionary.construct().get();
+					imageOperator.setImageParameters(imageParameters);
 					Object nextToken = parseNextToken();
 					while (nextToken instanceof COSObject &&
 							((COSObject) nextToken).getType() == COSObjType.COS_NAME) {
@@ -187,6 +188,7 @@ public class PDFStreamParser extends COSParser {
 						} else {
 							//TODO : log some warning?
 						}
+						nextToken = parseNextToken();
 					}
 
 					//TODO : check for errors

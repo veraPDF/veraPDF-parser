@@ -24,7 +24,7 @@ public abstract class PDXObject extends PDResource {
 	public COSDictionary getOPI() {
 		COSObject opi = getKey(ASAtom.OPI);
 		if (opi != null && opi.getType() == COSObjType.COS_DICT) {
-			return (COSDictionary) opi.get();
+			return (COSDictionary) opi.getDirectBase();
 		}
 		return null;
 	}

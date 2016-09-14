@@ -16,7 +16,7 @@ public class PDType3Font extends PDSimpleFont {
     }
 
     public COSDictionary getCharProcDict() {
-        return (COSDictionary) this.dictionary.getKey(ASAtom.CHAR_PROCS).get();
+        return (COSDictionary) this.dictionary.getKey(ASAtom.CHAR_PROCS).getDirectBase();
     }
 
     @Override

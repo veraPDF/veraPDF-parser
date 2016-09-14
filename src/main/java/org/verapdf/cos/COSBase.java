@@ -13,11 +13,21 @@ import java.util.Set;
  */
 public abstract class COSBase {
 
+	private COSKey indirectKey;
+
 	public COSBase() {
 	}
 
 	// Returns object type
 	public abstract COSObjType getType();
+
+	public COSKey getObjectKey() {
+		return this.indirectKey;
+	}
+
+	public void setObjectKey(COSKey indirectKey) {
+		this.indirectKey = indirectKey;
+	}
 
 	// VISITOR DESIGN PATTERN
 	public abstract void accept(final IVisitor visitor);
@@ -73,6 +83,7 @@ public abstract class COSBase {
 	public abstract ASAtom getNameKey(final ASAtom key);
 	public abstract boolean setNameKey(final ASAtom key, final ASAtom value);
 	public abstract boolean setArrayKey(final ASAtom key);
+	public abstract boolean setArrayKey(final ASAtom key, final COSObject array);
 	public abstract boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value);
 	public abstract boolean setArrayKey(final ASAtom key, final int size, final double[] value);
 	public abstract void removeKey(final ASAtom key);

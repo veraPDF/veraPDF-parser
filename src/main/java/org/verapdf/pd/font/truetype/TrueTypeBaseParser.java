@@ -24,6 +24,11 @@ class TrueTypeBaseParser {
         this.source = source;
     }
 
+    /**
+     * Empty constructor for inherited classes.
+     */
+    protected TrueTypeBaseParser() {}
+
     protected int readByte() throws IOException {
         return this.source.readByte() & 0xFF;
     }

@@ -27,6 +27,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     private Map<String, Integer> glyphWidths;
     private static final byte[] CLEAR_TO_MARK_BYTES =
             Type1StringConstants.CLEARTOMARK_STRING.getBytes();
+    private boolean isFontParsed = false;
 
     /**
      * {@inheritDoc}
@@ -59,13 +60,16 @@ public class Type1FontProgram extends COSParser implements FontProgram {
      */
     @Override
     public void parseFont() throws IOException {
-        initializeToken();
+        if (!isFontParsed) {
+            isFontParsed = true;
+            initializeToken();
 
-        skipSpaces(true);
+            skipSpaces(true);
 
-        while (getToken().type != Token.Type.TT_EOF) {
-            nextToken();
-            processToken();
+            while (getToken().type != Token.Type.TT_EOF) {
+                nextToken();
+                processToken();
+            }
         }
     }
 
@@ -91,7 +95,11 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                         do {
                             nextToken();
                         } while (!this.getToken().getValue().equals(
-                                Type1StringConstants.DUP_STRING));
+                                Type1StringConstants.DUP_STRING) &&
+                                this.getToken().type != Token.Type.TT_EOF);
+                        if (this.getToken().type == Token.Type.TT_EOF) {
+                            throw new IOException("Can't parse Type 1 font program");
+                        }
                         this.source.unread(3);
 
                         while (true) {
@@ -99,6 +107,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                             if (this.getToken().getValue().equals(
                                     Type1StringConstants.READONLY_STRING)) {
                                 break;
+                            }
+                            if (this.getToken().type == Token.Type.TT_EOF) {
+                                throw new IOException("Can't parse Type 1 font program");
                             }
                             this.skipSpaces();
                             this.readNumber();

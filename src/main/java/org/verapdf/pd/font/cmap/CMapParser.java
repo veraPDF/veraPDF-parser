@@ -81,7 +81,7 @@ public class CMapParser extends BaseParser {
                         if (getToken().type.equals(Token.Type.TT_LITSTRING)) {
                             this.cMap.setRegistry(getToken().getValue());
                         } else {
-                            throw new IOException("CMap contains invalid /" + getToken().getValue() + " value");
+                            throw new IOException("CMap contains invalid /Registry value");
                         }
                         break;
                     case "Ordering":
@@ -89,7 +89,7 @@ public class CMapParser extends BaseParser {
                         if (getToken().type.equals(Token.Type.TT_LITSTRING)) {
                             this.cMap.setOrdering(getToken().getValue());
                         } else {
-                            throw new IOException("CMap contains invalid /" + getToken().getValue() + " value");
+                            throw new IOException("CMap contains invalid /Ordering value");
                         }
                         break;
                     case "CMapName":
@@ -97,7 +97,15 @@ public class CMapParser extends BaseParser {
                         if (getToken().type.equals(Token.Type.TT_NAME)) {
                             this.cMap.setName(getToken().getValue());
                         } else {
-                            throw new IOException("CMap contains invalid /" + getToken().getValue() + " value");
+                            throw new IOException("CMap contains invalid /CMapName value");
+                        }
+                        break;
+                    case "Supplement":
+                        nextToken();
+                        if(getToken().type == Token.Type.TT_INTEGER) {
+                            this.cMap.setSupplement((int) getToken().integer);
+                        } else {
+                            throw new IOException("CMap contains invalid /Supplement value");
                         }
                         break;
                     default:
