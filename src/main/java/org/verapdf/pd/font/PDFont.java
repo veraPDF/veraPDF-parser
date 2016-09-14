@@ -28,12 +28,15 @@ public abstract class PDFont extends PDResource {
      * @param dictionary is font dictionary.
      */
     public PDFont(COSDictionary dictionary) {
+        if(dictionary == null) {
+            dictionary = (COSDictionary) COSDictionary.construct().get();
+        }
         this.dictionary = dictionary;
         COSObject fd = dictionary.getKey(ASAtom.FONT_DESC);
-        if (fd.getType() == COSObjType.COS_DICT) {
+        if (fd != null && fd.getType() == COSObjType.COS_DICT) {
             fontDescriptor = (COSDictionary) fd.getDirectBase();
         } else {
-            fontDescriptor = null;
+            fontDescriptor = (COSDictionary) COSDictionary.construct().get();
         }
     }
 

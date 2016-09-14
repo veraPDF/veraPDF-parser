@@ -1,10 +1,7 @@
 package org.verapdf.pd.font.cmap;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -124,9 +121,25 @@ public class PDCMap {
     }
 
     private COSDictionary getCIDSystemInfo() {
+        if(this.cMap.getType() != COSObjType.COS_NAME) {
+            // actually creating COSDictionary with values from predefined CMap.
+            try {
+                String registry = this.getCMapFile().getRegistry();
+                String ordering = this.getCMapFile().getOrdering();
+                int supplement = this.getCMapFile().getSupplement();
+                COSDictionary res = (COSDictionary)
+                        COSDictionary.construct(ASAtom.REGISTRY, registry).get();
+                res.setStringKey(ASAtom.ORDERING, ordering);
+                res.setIntegerKey(ASAtom.SUPPLEMENT, supplement);
+                return res;
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
         if (cidSystemInfo == null) {
             this.cidSystemInfo = (COSDictionary)
-                    this.cMap.getKey(ASAtom.CID_SYSTEM_INFO).get();
+                    this.cMap.getKey(ASAtom.CID_SYSTEM_INFO).getDirectBase();
             return this.cidSystemInfo;
         } else {
             return this.cidSystemInfo;
