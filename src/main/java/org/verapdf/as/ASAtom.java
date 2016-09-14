@@ -115,6 +115,7 @@ public class ASAtom {
     public static final ASAtom COMPONENTS = new ASAtom("Components");
     public static final ASAtom CONTACT_INFO = new ASAtom("ContactInfo");
     public static final ASAtom CONTENTS = new ASAtom("Contents");
+    public static final ASAtom CONFIGS = new ASAtom("Configs");
     public static final ASAtom COORDS = new ASAtom("Coords");
     public static final ASAtom COUNT = new ASAtom("Count");
     public static final ASAtom COURIER = new ASAtom("Courier");
@@ -199,6 +200,7 @@ public class ASAtom {
     public static final ASAtom EXT_G_STATE = new ASAtom("ExtGState");
     public static final ASAtom EXTEND = new ASAtom("Extend");
     public static final ASAtom EXTENDS = new ASAtom("Extends");
+    public static final ASAtom EVENT = new ASAtom("Event");
     // F
     public static final ASAtom F = new ASAtom("F");
     public static final ASAtom F_DECODE_PARMS = new ASAtom("FDecodeParms");
