@@ -91,7 +91,11 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                         do {
                             nextToken();
                         } while (!this.getToken().getValue().equals(
-                                Type1StringConstants.DUP_STRING));
+                                Type1StringConstants.DUP_STRING) &&
+                                this.getToken().type != Token.Type.TT_EOF);
+                        if(this.getToken().type == Token.Type.TT_EOF) {
+                            throw new IOException("Can't parse Type 1 font program");
+                        }
                         this.source.unread(3);
 
                         while (true) {
@@ -99,6 +103,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                             if (this.getToken().getValue().equals(
                                     Type1StringConstants.READONLY_STRING)) {
                                 break;
+                            }
+                            if(this.getToken().type == Token.Type.TT_EOF) {
+                                throw new IOException("Can't parse Type 1 font program");
                             }
                             this.skipSpaces();
                             this.readNumber();
