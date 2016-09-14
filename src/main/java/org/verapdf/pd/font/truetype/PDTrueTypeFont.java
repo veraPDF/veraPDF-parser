@@ -27,28 +27,27 @@ public class PDTrueTypeFont extends PDFont {
             return this.fontProgram;
         }
         this.isFontParsed = true;
-
-        if (fontDescriptor.knownKey(ASAtom.FONT_FILE2)) {
-            COSStream trueTypeFontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE2).getDirectBase();
-            try {
+        try {
+            if (fontDescriptor.knownKey(ASAtom.FONT_FILE2)) {
+                COSStream trueTypeFontFile =
+                        getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE2));
                 this.fontProgram = new TrueTypeFontProgram(trueTypeFontFile.getData(
                         COSStream.FilterFlags.DECODE), this.isSymbolic(),
                         this.getEncoding());
                 return this.fontProgram;
-            } catch (IOException e) {
-                LOGGER.error("Can't read TrueType font program.");
+            } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+                COSStream trueTypeFontFile =
+                        getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE3));
+                ASAtom subtype = trueTypeFontFile.getNameKey(ASAtom.SUBTYPE);
+                if (subtype == ASAtom.OPEN_TYPE) {
+                    this.fontProgram = new OpenTypeFontProgram(trueTypeFontFile.getData(
+                            COSStream.FilterFlags.DECODE), false, this.isSymbolic(),
+                            this.getEncoding());
+                    return this.fontProgram;
+                }
             }
-        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
-            COSStream trueTypeFontFile =
-                    (COSStream) fontDescriptor.getKey(ASAtom.FONT_FILE3).get();
-            ASAtom subtype = trueTypeFontFile.getNameKey(ASAtom.SUBTYPE);
-            if (subtype == ASAtom.OPEN_TYPE) {
-                this.fontProgram = new OpenTypeFontProgram(trueTypeFontFile.getData(
-                        COSStream.FilterFlags.DECODE), false, this.isSymbolic(),
-                        this.getEncoding());
-                return this.fontProgram;
-            }
+        } catch (IOException e) {
+            LOGGER.error("Can't read TrueType font program.");
         }
         this.fontProgram = null;
         return null;

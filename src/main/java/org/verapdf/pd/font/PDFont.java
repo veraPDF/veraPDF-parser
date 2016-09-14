@@ -5,6 +5,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDResource;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -149,5 +150,13 @@ public abstract class PDFont extends PDResource {
 
     public Long getLastChar() {
         return this.dictionary.getIntegerKey(ASAtom.LAST_CHAR);
+    }
+
+    protected COSStream getStreamFromObject(COSObject obj) throws IOException {
+        if (obj == null || obj.getDirectBase().getType() != COSObjType.COS_STREAM) {
+            throw new IOException("Can't get COSStream from COSObject");
+        } else {
+            return (COSStream) obj.get();
+        }
     }
 }

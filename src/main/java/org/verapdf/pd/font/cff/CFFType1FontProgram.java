@@ -15,7 +15,9 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
+public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
+
+    private static final String NOTDEF_STRING = ".notdef";
 
     //Top DICT
     private long privateDictOffset;
@@ -24,6 +26,8 @@ class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
     private long encodingOffset;
     private int[] encoding;     // array with mapping code -> gid
     private Map<String, Integer> charSet;   // mappings glyphName -> gid
+    private Map<Integer, String> inverseCharSet;    // mappings gid -> glyph name
+    private String[] encodingStrings;
 
     CFFType1FontProgram(InternalInputStream stream, CFFIndex definedNames,
                         long topDictBeginOffset, long topDictEndOffset) {
@@ -135,7 +139,9 @@ class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
 
     private void readCharSet() throws IOException {
         this.charSet = new HashMap<>();
+        this.inverseCharSet = new HashMap<>();
         this.charSet.put(this.getStringBySID(0), 0);
+        this.inverseCharSet.put(0, this.getStringBySID(0));
         if (this.charSetOffset == 0) {
             initializeCharSet(CFFPredefined.ISO_ADOBE_CHARSET);
         } else if (this.charSetOffset == 1) {
@@ -147,7 +153,9 @@ class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
             switch (format) {
                 case 0:
                     for (int i = 1; i < nGlyphs; ++i) {
-                        this.charSet.put(this.getStringBySID(this.readCard16()), i);
+                        int sid = this.readCard16();
+                        this.charSet.put(this.getStringBySID(sid), i);
+                        this.inverseCharSet.put(i, this.getStringBySID(sid));
                     }
                     break;
                 case 1:
@@ -164,7 +172,9 @@ class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
                             }
                             for (int i = 0; i <= nLeft; ++i) {
                                 this.charSet.put(this.getStringBySID(first + i),
-                                        charSetPointer++);
+                                        charSetPointer);
+                                this.inverseCharSet.put(charSetPointer++,
+                                        this.getStringBySID(first + i));
                             }
                         }
                     } catch (ArrayIndexOutOfBoundsException e) {
@@ -231,6 +241,21 @@ class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
     private void initializeCharSet(String[] charSetArray) {
         for (int i = 0; i < charSetArray.length; ++i) {
             charSet.put(charSetArray[i], i);
+            inverseCharSet.put(i, charSetArray[i]);
+        }
+    }
+
+    public String[] getEncoding() {
+        if (this.encodingStrings == null) {
+            this.encodingStrings = new String[256];
+            for(int i = 0; i < 256; ++i) {
+                String glyphName = inverseCharSet.get(encoding[i]);
+                this.encodingStrings[i] =
+                        glyphName == null ? NOTDEF_STRING : glyphName;
+            }
+            return this.encodingStrings;
+        } else {
+            return this.encodingStrings;
         }
     }
 }

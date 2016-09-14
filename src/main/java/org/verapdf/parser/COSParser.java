@@ -59,6 +59,7 @@ public class COSParser extends BaseParser {
 		}
 
 		if (this.flag) {
+			initializeToken();
 			nextToken();
 		}
 		this.flag = true;

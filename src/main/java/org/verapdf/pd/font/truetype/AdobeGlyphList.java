@@ -66,7 +66,6 @@ public class AdobeGlyphList {
         } catch (IOException e) {
             LOGGER.debug("Error in opening Adobe Glyph List file", e);
         }
-
     }
 
     /**
