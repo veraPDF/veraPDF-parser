@@ -1,3 +1,4 @@
+.notdef 0000
 A 0041
 AE 00C6
 AEacute 01FC
