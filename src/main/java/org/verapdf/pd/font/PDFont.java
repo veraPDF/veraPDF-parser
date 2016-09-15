@@ -119,16 +119,17 @@ public abstract class PDFont extends PDResource {
     public Encoding getEncodingMapping() {
         if (this.encoding == null) {
             COSBase cosEncoding = this.getEncoding().getDirectBase();
-            if (cosEncoding.getType() == COSObjType.COS_NAME) {
-                this.encoding = new Encoding(cosEncoding.getName());
-                return this.encoding;
-            } else if (cosEncoding.getType() == COSObjType.COS_DICT) {
-                this.encoding = new Encoding(cosEncoding.getNameKey(ASAtom.BASE_ENCODING),
-                        this.getDifferences());
-                return this.encoding;
-            } else {
-                return null;
+            if (cosEncoding != null) {
+                if (cosEncoding.getType() == COSObjType.COS_NAME) {
+                    this.encoding = new Encoding(cosEncoding.getName());
+                    return this.encoding;
+                } else if (cosEncoding.getType() == COSObjType.COS_DICT) {
+                    this.encoding = new Encoding(cosEncoding.getNameKey(ASAtom.BASE_ENCODING),
+                            this.getDifferences());
+                    return this.encoding;
+                }
             }
+            return null;
         } else {
             return this.encoding;
         }

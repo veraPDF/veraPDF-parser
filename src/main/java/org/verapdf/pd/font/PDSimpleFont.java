@@ -34,14 +34,16 @@ public abstract class PDSimpleFont extends PDFont {
         }
 
         Encoding fontEncoding = this.getEncodingMapping();
-        String glyphName = fontEncoding.getName(code);
-        if(glyphName != null) {
-            AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
-            if(unicode != AdobeGlyphList.empty()) {
-                return unicode.getUnicodeString();
+        if (fontEncoding != null) {
+            String glyphName = fontEncoding.getName(code);
+            if (glyphName != null) {
+                AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
+                if (unicode != AdobeGlyphList.empty()) {
+                    return unicode.getUnicodeString();
+                }
+                LOGGER.warn("Cannot find glyph " + glyphName + " in Adobe Glyph List.");
+                return null;
             }
-            LOGGER.warn("Cannot find glyph " + glyphName + " in Adobe Glyph List.");
-            return null;
         }
         LOGGER.warn("Cannot find encoding for glyph with code" + code + " in font " + this.getName());
         return null;
