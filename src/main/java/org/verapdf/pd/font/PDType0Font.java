@@ -82,7 +82,15 @@ public class PDType0Font extends PDCIDFont {
     @Override
     public int readCode(InputStream stream) throws IOException {
         ASInputStream asInputStream = new InternalInputStream(stream);
-        return this.pdcMap.getCMapFile().getCIDFromStream(asInputStream);
+        PDCMap pdcMap = this.getCMap();
+        if(pdcMap != null) {
+            CMap cMap = pdcMap.getCMapFile();
+            if(cMap != null) {
+                return cMap.getCIDFromStream(asInputStream);
+            }
+        }
+        throw new IOException("No CMap for Type 0 font " +
+                (this.getName() == null ? "" : this.getName()));
     }
 
     /**
