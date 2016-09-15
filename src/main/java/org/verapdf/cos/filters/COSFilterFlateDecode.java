@@ -85,4 +85,10 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
         }
         return skipped;
     }
+
+    @Override
+    public void reset() throws IOException {
+        super.reset();
+        this.inflater.reset();
+    }
 }
