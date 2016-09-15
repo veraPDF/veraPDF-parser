@@ -5,6 +5,9 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDResource;
 import org.verapdf.pd.font.cmap.PDCMap;
+import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
+import org.verapdf.pd.font.stdmetrics.StandardFontMetricsFactory;
+import org.verapdf.pd.font.type1.PDType1Font;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +28,7 @@ public abstract class PDFont extends PDResource {
     protected PDCMap toUnicodeCMap;
     protected boolean isFontParsed = false;
     protected FontProgram fontProgram;
+    protected Encoding encoding = null;
 
     /**
      * Constructor from COSDictionary.
@@ -32,7 +36,7 @@ public abstract class PDFont extends PDResource {
      * @param dictionary is font dictionary.
      */
     public PDFont(COSDictionary dictionary) {
-        if(dictionary == null) {
+        if (dictionary == null) {
             dictionary = (COSDictionary) COSDictionary.construct().get();
         }
         this.dictionary = dictionary;
@@ -86,7 +90,7 @@ public abstract class PDFont extends PDResource {
                     this.fontDescriptor.getNameKey(ASAtom.FONT_NAME);
             if (type != typeFromDescriptor) {
                 LOGGER.warn("Font names in font descriptor dictionary and in font dictionary are different for "
-                + type.getValue());
+                        + type.getValue());
             }
         }
         return type;
@@ -96,31 +100,37 @@ public abstract class PDFont extends PDResource {
      * @return true if the font flags in the font descriptor dictionary mark
      * indicate that the font is symbolic (the entry /Flags has bit 3 set to 1
      * and bit 6 set to 0).
-     *                               descriptor is null.
+     * descriptor is null.
      */
     public boolean isSymbolic() {
         if (this.fontDescriptor == null) {
             LOGGER.warn("Font descriptor is null");
-            return false;   // TODO?
+            return false;
         }
         Long flagsLong = this.fontDescriptor.getIntegerKey(ASAtom.FLAGS);
         if (flagsLong == null) {
             LOGGER.warn("Font descriptor doesn't contain /Flags entry");
-            return false;   // TODO?
+            return false;
         }
         int flags = flagsLong.intValue();
         return (flags & 0b00100100) == 4;
     }
 
     public Encoding getEncodingMapping() {
-        COSBase encoding = this.getEncoding().getDirectBase();
-        if (encoding.getType() == COSObjType.COS_NAME) {
-            return new Encoding(encoding.getName());
-        } else if (encoding.getType() == COSObjType.COS_DICT) {
-            return new Encoding(encoding.getNameKey(ASAtom.BASE_ENCODING),
-                    this.getDifferences());
+        if (this.encoding == null) {
+            COSBase cosEncoding = this.getEncoding().getDirectBase();
+            if (cosEncoding.getType() == COSObjType.COS_NAME) {
+                this.encoding = new Encoding(cosEncoding.getName());
+                return this.encoding;
+            } else if (cosEncoding.getType() == COSObjType.COS_DICT) {
+                this.encoding = new Encoding(cosEncoding.getNameKey(ASAtom.BASE_ENCODING),
+                        this.getDifferences());
+                return this.encoding;
+            } else {
+                return null;
+            }
         } else {
-            return null;
+            return this.encoding;
         }
     }
 
@@ -168,7 +178,7 @@ public abstract class PDFont extends PDResource {
         return this.dictionary.getIntegerKey(ASAtom.LAST_CHAR);
     }
 
-    protected COSStream getStreamFromObject(COSObject obj) throws IOException {
+    protected static COSStream getStreamFromObject(COSObject obj) throws IOException {
         if (obj == null || obj.getDirectBase().getType() != COSObjType.COS_STREAM) {
             throw new IOException("Can't get COSStream from COSObject");
         } else {
@@ -226,7 +236,18 @@ public abstract class PDFont extends PDResource {
             }
         }
 
-        //if ()   // TODO: if is standard use AFMParser. See GFPDType1Font.
+        if (this instanceof PDType1Font && ((PDType1Font) this).isStandard()) {
+            StandardFontMetrics metrics =
+                    StandardFontMetricsFactory.getFontMetrics(this.getName());
+            Encoding enc = this.getEncodingMapping();
+            if (metrics != null) {
+                return metrics.getWidth(enc.getName(code));
+            } else {
+                // should not get here
+                LOGGER.error("Can't get standard metrics");
+                return 0;
+            }
+        }
 
         try {
             this.getFontProgram().parseFont();
