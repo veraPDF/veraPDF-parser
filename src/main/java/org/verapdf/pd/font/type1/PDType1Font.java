@@ -9,21 +9,37 @@ import org.verapdf.cos.COSStream;
 import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.parser.COSParser;
 import org.verapdf.pd.font.FontProgram;
-import org.verapdf.pd.font.PDFont;
+import org.verapdf.pd.font.PDSimpleFont;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
+import org.verapdf.pd.font.truetype.TrueTypePredefined;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * @author Sergey Shemyakov
  */
-public class PDType1Font extends PDFont {
+public class PDType1Font extends PDSimpleFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDType1Font.class);
+    public static final ASAtom[] STANDARD_FONT_NAMES = {
+            ASAtom.COURIER_BOLD,
+            ASAtom.COURIER_BOLD_OBLIQUE,
+            ASAtom.COURIER,
+            ASAtom.COURIER_OBLIQUE,
+            ASAtom.HELVETICA,
+            ASAtom.HELVETICA_BOLD,
+            ASAtom.HELVETICA_BOLD_OBLIQUE,
+            ASAtom.HELVETICA_OBLIQUE,
+            ASAtom.SYMBOL,
+            ASAtom.TIMES_BOLD,
+            ASAtom.TIMES_BOLD_ITALIC,
+            ASAtom.TIMES_ITALIC,
+            ASAtom.TIMES_ROMAN,
+            ASAtom.ZAPF_DINGBATS};
+
+    private Boolean isStandard = null;
 
     public PDType1Font(COSDictionary dictionary) {
         super(dictionary);
@@ -88,5 +104,72 @@ public class PDType1Font extends PDFont {
         }
         this.fontProgram = null;
         return null;
+    }
+
+    public Boolean isStandard() {
+        if(this.isStandard == null) {
+            if (!containsDiffs() && !isEmbedded() && isNameStandard()) {
+                isStandard = Boolean.valueOf(true);
+                return isStandard;
+            } else {
+                isStandard = Boolean.valueOf(false);
+                return isStandard;
+            }
+        } else {
+            return this.isStandard;
+        }
+    }
+
+    private boolean containsDiffs() {
+        if (this.dictionary.getKey(ASAtom.ENCODING).getType() ==
+                COSObjType.COS_DICT) {
+            Map<Integer, String> differences = this.getDifferences();
+            if (differences != null && differences.size() != 0) {
+                String[] baseEncoding = getBaseEncoding((COSDictionary)
+                        this.dictionary.getKey(ASAtom.ENCODING).getDirectBase());
+                if (baseEncoding.length == 0) {
+                    return true;
+                }
+                for (Map.Entry<Integer, String> entry : differences.entrySet()) {
+                    if (!entry.getValue().equals(baseEncoding[entry.getKey()])) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private static String[] getBaseEncoding(COSDictionary encoding) {
+        ASAtom baseEncoding = encoding.getNameKey(ASAtom.BASE_ENCODING);
+        if (baseEncoding == null) {
+            return new String[]{};
+        }
+        if (baseEncoding == ASAtom.MAC_ROMAN_ENCODING) {
+            return Arrays.copyOf(TrueTypePredefined.MAC_ROMAN_ENCODING,
+                    TrueTypePredefined.MAC_ROMAN_ENCODING.length);
+        } else if (baseEncoding == ASAtom.MAC_EXPERT_ENCODING) {
+            return Arrays.copyOf(TrueTypePredefined.MAC_EXPERT_ENCODING,
+                    TrueTypePredefined.MAC_EXPERT_ENCODING.length);
+        } else if (baseEncoding == ASAtom.WIN_ANSI_ENCODING) {
+            return Arrays.copyOf(TrueTypePredefined.WIN_ANSI_ENCODING,
+                    TrueTypePredefined.WIN_ANSI_ENCODING.length);
+        } else {
+            return new String[]{};
+        }
+    }
+
+    private boolean isEmbedded() {
+        return this.getFontProgram() == null;
+    }
+
+    private boolean isNameStandard() {
+        ASAtom fontName = this.getDictionary().getNameKey(ASAtom.BASE_FONT);
+        for (ASAtom standard : STANDARD_FONT_NAMES) {
+            if (standard == fontName) {
+                return true;
+            }
+        }
+        return false;
     }
 }

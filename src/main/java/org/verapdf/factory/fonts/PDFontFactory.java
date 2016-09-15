@@ -5,7 +5,6 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.pd.font.PDCIDFont;
 import org.verapdf.pd.font.PDFont;
 import org.verapdf.pd.font.PDType0Font;
 import org.verapdf.pd.font.PDType3Font;
@@ -41,9 +40,6 @@ public class PDFontFactory {
                 return new PDType3Font(dict);
             } else if (subtype == ASAtom.TYPE0) {
                 return new PDType0Font(dict);
-            } else if (subtype == ASAtom.CID_FONT_TYPE0 ||
-                    subtype == ASAtom.CID_FONT_TYPE2) {
-                return new PDCIDFont(dict);
             } else {
                 LOGGER.error("Invalid value of Subtype in font dictionary");
                 return null;

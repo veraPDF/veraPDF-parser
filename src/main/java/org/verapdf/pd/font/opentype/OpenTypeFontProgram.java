@@ -62,8 +62,8 @@ public class OpenTypeFontProgram implements FontProgram {
      * {@inheritDoc}
      */
     @Override
-    public boolean containsCID(int cid) {
-        return this.font.containsCID(cid);
+    public boolean containsCode(int code) {
+        return this.font.containsCode(code);
     }
 
     /**

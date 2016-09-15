@@ -4,10 +4,7 @@ import org.apache.log4j.Logger;
 import org.verapdf.as.io.ASInputStream;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class represents cmap.
@@ -27,11 +24,13 @@ public class CMap {
     private List<CIDMappable> cidMappings;
     private List<CodeSpace> codeSpaces;
     private List<CIDMappable> notDefMappings;
+    private Map<Integer, String> toUnicode;
 
     public CMap() {
         this.cidMappings = new LinkedList<>();
         this.codeSpaces = new ArrayList<>();
         this.notDefMappings = new ArrayList<>();
+        this.toUnicode = new HashMap<>();
         wMode = 0; // default
         shortestCodeSpaceLength = Integer.MAX_VALUE;
     }
@@ -56,7 +55,7 @@ public class CMap {
                 return res;
             }
         }
-        return -1;  //TODO: probably change that to something else.
+        return 0;
     }
 
     /**
@@ -107,6 +106,18 @@ public class CMap {
             previousShortestMatchingCodeSpaceLength = shortestMatchingCodeSpaceLength;
         }
         return 0;
+    }
+
+    /**
+     * Method adds all the data needed to this CMap from another CMap.
+     *
+     * @param another is another CMap.
+     */
+    public void useCMap(CMap another) {
+        this.cidMappings.addAll(another.cidMappings);
+        this.codeSpaces.addAll(another.codeSpaces);
+        this.notDefMappings.addAll(another.notDefMappings);
+        this.toUnicode.putAll(another.toUnicode);
     }
 
     /**
@@ -174,6 +185,20 @@ public class CMap {
      */
     void setCodeSpaces(List<CodeSpace> codeSpaces) {
         this.codeSpaces = codeSpaces;
+    }
+
+    void addUnicodeMapping(int code, String toUnicode) {
+        this.toUnicode.put(code, toUnicode);
+    }
+
+    /**
+     * Returns Unicode sequence for given character code.
+     *
+     * @param code is code of character.
+     * @return Unicode sequence obtained from this CMap.
+     */
+    public String getUnicode(int code) {
+        return this.toUnicode.get(code);
     }
 
     /**
