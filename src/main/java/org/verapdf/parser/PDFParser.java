@@ -29,6 +29,8 @@ public class PDFParser extends COSParser {
     private static final byte XREF_SEARCH_INC = 32;
     private static final byte XREF_SEARCH_STEP_MAX = 32;
 
+    private long offsetShift = 0;
+
     public PDFParser(final String filename) throws IOException {
         super(filename);
     }
@@ -71,10 +73,11 @@ public class PDFParser extends COSParser {
         final int headerStart = header.indexOf(HEADER_PATTERN);
         final long headerOffset = source.getOffset() - header.length() + headerStart;
 
+        this.offsetShift = headerOffset;
         result.setHeaderOffset(headerOffset);
         result.setHeader(header);
 
-        skipSpaces(false);
+        skipSingleEol();
 
         if (headerStart > 0) {
             //trim off any leading characters
@@ -225,6 +228,11 @@ public class PDFParser extends COSParser {
         }
         long generation = token.integer;
 
+        if ((source.readByte() != 32) || CharTable.isSpace(source.peek())) {
+            //check correct spacing (6.1.8 clause)
+            headerFormatComplyPDFA = false;
+        }
+
         nextToken();
         if (token.type != Token.Type.TT_KEYWORD &&
                 token.keyword != Token.Keyword.KW_OBJ) {
@@ -237,6 +245,12 @@ public class PDFParser extends COSParser {
         }
 
         COSObject obj = nextObject();
+
+        skipSpaces();
+        this.source.unread();
+        if (!isNextByteEOL()) {
+            endOfObjectComplyPDFA = false;
+        }
 
         if (this.flag) {
             nextToken();
@@ -361,7 +375,7 @@ public class PDFParser extends COSParser {
             if (!isDigit()) {
                 document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
             }
-        } else if (isLF(space) || !isDigit()) {
+        } else if (!isLF(space) || !isDigit()) {
             document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
         }
 
@@ -426,8 +440,8 @@ public class PDFParser extends COSParser {
 		clear();
 
         //for files with junk before header
-        if (getHeader().getHeaderOffset() > 0) {
-            offset += getHeader().getHeaderOffset();
+        if (offsetShift > 0) {
+            offset += offsetShift;
         }
 
         //we will skip eol marker in any case

@@ -34,8 +34,8 @@ public class COSDocument {
 
 	private byte postEOFDataSize;
 
-	private boolean xrefEOLMarkersComplyPDFA;
-	private boolean subsectionHeaderSpaceSeparated;
+	private boolean xrefEOLMarkersComplyPDFA = true;
+	private boolean subsectionHeaderSpaceSeparated = true;
 
 	public COSDocument(final PDDocument document) {
 		this.doc = document;
@@ -47,9 +47,6 @@ public class COSDocument {
 		this.lastTrailer = new COSTrailer();
 		this.linearized = false;
 		this.isNew = true;
-
-		this.xrefEOLMarkersComplyPDFA = true;
-		this.subsectionHeaderSpaceSeparated = true;
 	}
 
 	public COSDocument(final String fileName, final PDDocument document) throws IOException {
@@ -75,9 +72,6 @@ public class COSDocument {
 		this.firstTrailer = reader.getFirstTrailer();
 		this.lastTrailer = reader.getLastTrailer();
 		this.linearized = reader.isLinearized();
-
-		this.xrefEOLMarkersComplyPDFA = true;
-		this.subsectionHeaderSpaceSeparated = true;
 	}
 
 	private void initReader(final InputStream fileStream) throws IOException {

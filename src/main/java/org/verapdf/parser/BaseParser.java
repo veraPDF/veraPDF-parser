@@ -434,6 +434,8 @@ public class BaseParser {
 					uc <<= 4;
 					appendToToken(uc);
 				}
+				this.token.setContainsOnlyHex(containsOnlyHex);
+				this.token.setHexCount(hexCount);
 				return;
 			} else {
 				hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
