@@ -232,7 +232,8 @@ public abstract class PDFont extends PDResource {
             }
 
             if (this.fontDescriptor != null) {
-                return fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
+                Double res = fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
+                return res == null ? 0 : res.doubleValue();
             }
         }
 
