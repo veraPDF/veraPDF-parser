@@ -364,6 +364,7 @@ public class COSParser extends BaseParser {
 		}
 
 		stream.setRealStreamSize(approximateLength - eolCount);
+		nextToken();
 	}
 
 }
