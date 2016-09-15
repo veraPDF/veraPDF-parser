@@ -364,7 +364,7 @@ public class PDFParser extends COSParser {
             if (!isDigit()) {
                 document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
             }
-        } else if (isLF(space) || !isDigit()) {
+        } else if (!isLF(space) || !isDigit()) {
             document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
         }
 
