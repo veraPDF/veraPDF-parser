@@ -7,6 +7,7 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.io.ASMemoryInStream;
+import org.verapdf.pd.PDResources;
 import org.verapdf.pd.colors.*;
 import org.verapdf.pd.patterns.PDPattern;
 import org.verapdf.pd.patterns.PDShadingPattern;
@@ -23,6 +24,21 @@ public class ColorSpaceFactory {
     private static final Logger LOGGER = Logger.getLogger(ColorSpaceFactory.class);
 
     private ColorSpaceFactory() {
+    }
+
+    public static ASAtom getDefaultValue(PDResources resources, ASAtom name) {
+        if (name.equals(ASAtom.DEVICECMYK) &&
+                resources.hasColorSpace(ASAtom.DEFAULT_CMYK)) {
+            return ASAtom.DEFAULT_CMYK;
+        } else if (name.equals(ASAtom.DEVICERGB) &&
+                resources.hasColorSpace(ASAtom.DEFAULT_RGB)) {
+            return ASAtom.DEFAULT_RGB;
+        } else if (name.equals(ASAtom.DEVICEGRAY) &&
+                resources.hasColorSpace(ASAtom.DEFAULT_GRAY)) {
+            return ASAtom.DEFAULT_GRAY;
+        } else {
+            return null;
+        }
     }
 
     public static PDColorSpace getColorSpace(COSObject base) {
