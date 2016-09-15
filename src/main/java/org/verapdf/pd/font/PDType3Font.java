@@ -9,7 +9,7 @@ import org.verapdf.pd.PDResources;
 /**
  * @author Sergey Shemyakov
  */
-public class PDType3Font extends PDFont {
+public class PDType3Font extends PDSimpleFont {
 
     public PDType3Font(COSDictionary dictionary) {
         super(dictionary);
@@ -35,5 +35,4 @@ public class PDType3Font extends PDFont {
             return null;
         }
     }
-
 }

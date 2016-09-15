@@ -10,10 +10,7 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Represents CMap on PD layer.
@@ -26,6 +23,8 @@ public class PDCMap {
 
     private COSObject cMap;
     private COSDictionary cidSystemInfo;
+    private CMap cMapFile = null;
+    private boolean parsedCMap = false;
 
     /**
      * Constructor from COSObject.
@@ -62,23 +61,33 @@ public class PDCMap {
 
     /**
      * @return CMap file object read from stream or loaded from predefined CMap
-     * file.
-     * @throws IOException if CMap cannot be read.
+     * file or null if load failed.
      */
-    public CMap getCMapFile() throws IOException {
-        if (this.cMap.getType() == COSObjType.COS_STREAM) {
-            CMapParser parser =
-                    new CMapParser(this.cMap.getData(COSStream.FilterFlags.DECODE));
-            parser.parse();
-            return parser.getCMap();
-        } else if (this.cMap.getType() == COSObjType.COS_NAME) {
-            String name = this.cMap.getString();
-            String cMapPath = "/font/cmap/" + name;
-            CMapParser parser = new CMapParser(loadCMap(cMapPath));
-            parser.parse();
-            return parser.getCMap();
+    public CMap getCMapFile() {
+        if (!parsedCMap) {
+            parsedCMap = true;
+            try {
+                if (this.cMap.getType() == COSObjType.COS_STREAM) {
+                    CMapParser parser =
+                            new CMapParser(this.cMap.getData(COSStream.FilterFlags.DECODE));
+                    parser.parse();
+                    this.cMapFile = parser.getCMap();
+                    return this.cMapFile;
+                } else if (this.cMap.getType() == COSObjType.COS_NAME) {
+                    String name = this.cMap.getString();
+                    String cMapPath = "/font/cmap/" + name;
+                    CMapParser parser = new CMapParser(loadCMap(cMapPath));
+                    parser.parse();
+                    this.cMapFile = parser.getCMap();
+                    return this.cMapFile;
+                } else {
+                    return null;
+                }
+            } catch (IOException e) {
+                return null;
+            }
         } else {
-            return null;
+            return this.cMapFile;
         }
     }
 
@@ -122,18 +131,14 @@ public class PDCMap {
     private COSDictionary getCIDSystemInfo() {
         if (this.cMap.getType() != COSObjType.COS_NAME) {
             // actually creating COSDictionary with values from predefined CMap.
-            try {
-                String registry = this.getCMapFile().getRegistry();
-                String ordering = this.getCMapFile().getOrdering();
-                int supplement = this.getCMapFile().getSupplement();
-                COSDictionary res = (COSDictionary)
-                        COSDictionary.construct(ASAtom.REGISTRY, registry).get();
-                res.setStringKey(ASAtom.ORDERING, ordering);
-                res.setIntegerKey(ASAtom.SUPPLEMENT, supplement);
-                return res;
-            } catch (IOException e) {
-                return null;
-            }
+            String registry = this.getCMapFile().getRegistry();
+            String ordering = this.getCMapFile().getOrdering();
+            int supplement = this.getCMapFile().getSupplement();
+            COSDictionary res = (COSDictionary)
+                    COSDictionary.construct(ASAtom.REGISTRY, registry).get();
+            res.setStringKey(ASAtom.ORDERING, ordering);
+            res.setIntegerKey(ASAtom.SUPPLEMENT, supplement);
+            return res;
         }
 
         if (cidSystemInfo == null) {
@@ -143,13 +148,6 @@ public class PDCMap {
         } else {
             return this.cidSystemInfo;
         }
-    }
-
-    private static String getSystemIndependentPath(String path)
-            throws URISyntaxException {
-        URL resourceUrl = ClassLoader.class.getResource(path);
-        Path resourcePath = Paths.get(resourceUrl.toURI());
-        return resourcePath.toString();
     }
 
     private static ASInputStream loadCMap(String cMapName) {
@@ -179,5 +177,9 @@ public class PDCMap {
             LOGGER.debug("Error in opening predefined CMap " + cMapName, e);
             return null;
         }
+    }
+
+    public String toUnicode(int code) {
+        return this.getCMapFile() == null ? null : this.getCMapFile().getUnicode(code);
     }
 }

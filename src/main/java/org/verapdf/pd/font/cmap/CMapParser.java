@@ -2,6 +2,8 @@ package org.verapdf.pd.font.cmap;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSName;
+import org.verapdf.cos.COSObject;
 import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
 
@@ -17,6 +19,7 @@ import java.io.InputStream;
 public class CMapParser extends BaseParser {
 
     private static final Logger LOGGER = Logger.getLogger(CMapParser.class);
+    private COSObject lastCOSName;
 
     private CMap cMap;
 
@@ -105,6 +108,8 @@ public class CMapParser extends BaseParser {
                             throw new IOException("CMap contains invalid /Supplement value");
                         }
                         break;
+                    default:
+                        this.lastCOSName = COSName.construct(getToken().getValue());
                 }
                 break;
             case TT_INTEGER:
@@ -114,6 +119,20 @@ public class CMapParser extends BaseParser {
                     break;
                 }
                 processList(listLength, getToken().getValue());
+                break;
+            case TT_KEYWORD:
+                switch (getToken().getValue()) {
+                    case "usecmap":
+                        CMap usedCMap = new PDCMap(lastCOSName).getCMapFile();
+                        if (usedCMap != null) {
+                            this.cMap.useCMap(usedCMap);
+                        } else {
+                            LOGGER.warn("Can't load predefined CMap with name " + lastCOSName);
+                        }
+                        break;
+                    default:
+                }
+            default:
         }
     }
 
@@ -138,7 +157,13 @@ public class CMapParser extends BaseParser {
                 case "notdefchar":
                     readSingleNotDefMapping();
                     break;
-                //TODO: add here unicode mappings reading if needed
+                case "bfchar":
+                    readSingleToUnicodeMapping();
+                    break;
+                case "bfrange":
+                    readLineBFRange();
+                    break;
+                default:
             }
         }
         nextToken();
@@ -227,12 +252,55 @@ public class CMapParser extends BaseParser {
                 (int) getToken().integer));
     }
 
+    private void readSingleToUnicodeMapping() throws IOException {
+        nextToken();
+        checkTokenType(Token.Type.TT_HEXSTRING, "bfchar");
+        long bfCharCode = numberFromBytes(getRawBytes(getToken().getValue()));
+
+        String unicodeName = this.readStringFromUnicodeSequenceToken();
+        this.cMap.addUnicodeMapping((int) bfCharCode, unicodeName);
+    }
+
+    private void readLineBFRange() throws IOException {
+        nextToken();
+        checkTokenType(Token.Type.TT_HEXSTRING, "bfrange");
+        long bfRangeBegin = numberFromBytes(getRawBytes(getToken().getValue()));
+
+        nextToken();
+        checkTokenType(Token.Type.TT_HEXSTRING, "bfrange");
+        long bfRangeEnd = numberFromBytes(getRawBytes(getToken().getValue()));
+
+        nextToken();    // skip [
+
+        for(long i = bfRangeBegin; i < bfRangeEnd; ++i) {
+            this.cMap.addUnicodeMapping((int) i, readStringFromUnicodeSequenceToken());
+        }
+
+        nextToken();    // skip ]
+    }
+
     static long numberFromBytes(byte[] num) {
         long res = 0;
         for (int i = 0; i < num.length; ++i) {
             res += (num[i] & 0x00FF) << ((num.length - i - 1) * 8);
         }
         return res;
+    }
+
+    private String readStringFromUnicodeSequenceToken() throws IOException {
+        nextToken();
+        if (getToken().type == Token.Type.TT_NAME) {
+            return this.getToken().getValue();
+        } else if (getToken().type == Token.Type.TT_HEXSTRING) {
+            byte[] token = getRawBytes(getToken().getValue());
+            if (token.length == 1) {
+                return new String(token, "ISO-8859-1");
+            } else {
+                return new String(token, "UTF-16BE");
+            }
+        }
+        throw new IOException("CMap contains invalid entry in bfchar. Expected "
+                + Token.Type.TT_NAME + " or " + Token.Type.TT_HEXSTRING + " but got " + getToken().type);
     }
 
     private void checkTokenType(Token.Type type, String where) throws IOException {

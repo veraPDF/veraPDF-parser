@@ -26,6 +26,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private int supplement;
     private String registry;
     private String ordering;
+    private boolean fontParsed = false;
 
     CFFCIDFontProgram(InternalInputStream stream, long topDictBeginOffset,
                       long topDictEndOffset) {
@@ -39,25 +40,28 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
      */
     @Override
     public void parseFont() throws IOException {
-        this.source.seek(topDictBeginOffset);
-        while (this.source.getOffset() < topDictEndOffset) {
-            readTopDictUnit();
+        if (!fontParsed) {
+            fontParsed = true;
+            this.source.seek(topDictBeginOffset);
+            while (this.source.getOffset() < topDictEndOffset) {
+                readTopDictUnit();
+            }
+            this.stack.clear();
+
+            this.source.seek(charStringsOffset);
+            this.readCharStrings();
+
+            this.source.seek(charSetOffset);
+            this.readCharSet();
+
+            this.source.seek(fdSelectOffset);
+            this.readFDSelect();
+
+            this.source.seek(fdArrayOffset);
+            this.readFontDicts();
+
+            this.readWidths();
         }
-        this.stack.clear();
-
-        this.source.seek(charStringsOffset);
-        this.readCharStrings();
-
-        this.source.seek(charSetOffset);
-        this.readCharSet();
-
-        this.source.seek(fdSelectOffset);
-        this.readFDSelect();
-
-        this.source.seek(fdArrayOffset);
-        this.readFontDicts();
-
-        this.readWidths();
     }
 
     @Override
@@ -221,8 +225,8 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
      * {@inheritDoc}
      */
     @Override
-    public boolean containsCID(int cid) {
-        return this.charSet.containsKey(cid);
+    public boolean containsCode(int code) {
+        return this.charSet.containsKey(code);
     }
 
     public int getSupplement() {

@@ -94,6 +94,10 @@ public class AdobeGlyphList {
         return MAPPING.containsKey(glyphName);
     }
 
+    public static AGLUnicode empty() {
+        return EMPTY;
+    }
+
     /**
      * This class represents entity into which Adobe Glyph List maps glyph names,
      * i. a. it contains either Unicode of symbol or Unicode of symbol and
@@ -132,6 +136,16 @@ public class AdobeGlyphList {
          */
         public boolean hasDiacritic() {
             return this.diacriticCodes.length != 0;
+        }
+
+        /**
+         * @return String representation of given AGLUnicode.
+         */
+        public String getUnicodeString() {
+            int[] res = new int[diacriticCodes.length + 1];
+            res[0] = symbolCode;
+            System.arraycopy(diacriticCodes, 0, res, 1, diacriticCodes.length);
+            return new String(res, 0, res.length);
         }
     }
 }
