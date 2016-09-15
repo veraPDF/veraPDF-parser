@@ -76,7 +76,7 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
         byte[] temp = new byte[Math.min(BF_BUFFER_SIZE, size)];
         int skipped = 0;
         while (skipped != size) {
-            int read = this.read(temp, size - skipped);
+            int read = this.read(temp, Math.min(size - skipped, BF_BUFFER_SIZE));
             if (read == -1) {
                 return skipped;
             } else {
