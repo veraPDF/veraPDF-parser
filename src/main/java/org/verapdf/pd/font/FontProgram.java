@@ -35,8 +35,8 @@ public interface FontProgram {
     /**
      * Checks if font contains character with given ID.
      *
-     * @param cid is character code.
+     * @param code is character code.
      * @return true if font contains character with given ID.
      */
-    boolean containsCID(int cid);
+    boolean containsCode(int code);
 }

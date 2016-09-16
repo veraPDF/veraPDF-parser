@@ -78,7 +78,8 @@ class TrueTypePostTable extends TrueTypeTable {
     }
 
     int getGID(String s) {
-        return this.stringToGid.get(s);
+        Integer res = this.stringToGid.get(s);
+        return res == null ? 0 : res.intValue();    // gid for .notdef
     }
 
     private String readPascalString() throws IOException {

@@ -48,9 +48,9 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
         }
         try {
             int res = inflater.inflate(buffer, 0, size);
-            if(res == 0) {
+            if (res == 0) {
                 long added = this.addToBuffer(BF_BUFFER_SIZE);
-                if(added == -1) {
+                if (added == -1) {
                     return -1;
                 } else {
                     inflater.setInput(this.internalBuffer, 0, (int) (bytesFed + added));
@@ -62,5 +62,33 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
         } catch (DataFormatException e) {
             throw new IOException("Can't decode Flate encoded data", e);
         }
+    }
+
+    /**
+     * Skips given number of decoded bytes in stream.
+     *
+     * @param size is amount of bytes to skip.
+     * @return amount of actually skipped bytes.
+     * @throws IOException if stream-reading error occurs.
+     */
+    @Override
+    public int skip(int size) throws IOException {
+        byte[] temp = new byte[Math.min(BF_BUFFER_SIZE, size)];
+        int skipped = 0;
+        while (skipped != size) {
+            int read = this.read(temp, Math.min(size - skipped, BF_BUFFER_SIZE));
+            if (read == -1) {
+                return skipped;
+            } else {
+                skipped += read;
+            }
+        }
+        return skipped;
+    }
+
+    @Override
+    public void reset() throws IOException {
+        super.reset();
+        this.inflater.reset();
     }
 }

@@ -228,6 +228,11 @@ public class PDFParser extends COSParser {
         }
         long generation = token.integer;
 
+        if ((source.readByte() != 32) || CharTable.isSpace(source.peek())) {
+            //check correct spacing (6.1.8 clause)
+            headerFormatComplyPDFA = false;
+        }
+
         nextToken();
         if (token.type != Token.Type.TT_KEYWORD &&
                 token.keyword != Token.Keyword.KW_OBJ) {
@@ -240,6 +245,12 @@ public class PDFParser extends COSParser {
         }
 
         COSObject obj = nextObject();
+
+        skipSpaces();
+        this.source.unread();
+        if (!isNextByteEOL()) {
+            endOfObjectComplyPDFA = false;
+        }
 
         if (this.flag) {
             nextToken();
@@ -364,7 +375,7 @@ public class PDFParser extends COSParser {
             if (!isDigit()) {
                 document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
             }
-        } else if (isLF(space) || !isDigit()) {
+        } else if (!isLF(space) || !isDigit()) {
             document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
         }
 

@@ -13,6 +13,8 @@ import java.util.Map;
  */
 public class Encoding {
 
+    private static final String NOTDEF = ".notdef";
+
     private String[] predefinedEncoding;
     private Map<Integer, String> differences;
 
@@ -28,6 +30,8 @@ public class Encoding {
             this.predefinedEncoding = TrueTypePredefined.MAC_EXPERT_ENCODING;
         } else if (predefinedEncoding == ASAtom.WIN_ANSI_ENCODING) {
             this.predefinedEncoding = TrueTypePredefined.WIN_ANSI_ENCODING;
+        } else {
+            this.predefinedEncoding = new String[0];
         }
     }
 
@@ -67,7 +71,7 @@ public class Encoding {
                 if (code < predefinedEncoding.length) {
                     diffRes = predefinedEncoding[code];
                 } else {
-                    diffRes = predefinedEncoding[0];   //  .notdef
+                    diffRes = NOTDEF;   //  .notdef
                 }
             }
             return diffRes;

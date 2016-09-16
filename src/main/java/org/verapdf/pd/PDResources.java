@@ -24,6 +24,22 @@ public class PDResources extends PDObject {
 		return ColorSpaceFactory.getColorSpace(rawColorSpace);
 	}
 
+	public PDColorSpace getDefaultColorSpace(ASAtom name) {
+		ASAtom defaultName = ColorSpaceFactory.getDefaultValue(this, name);
+		if (hasColorSpace(defaultName)) {
+			return getColorSpace(defaultName);
+		}
+		return null;
+	}
+
+	public boolean hasColorSpace(ASAtom name) {
+		COSObject colorSpace = getResource(ASAtom.COLORSPACE, name);
+		if (colorSpace != null && !colorSpace.empty()) {
+			return true;
+		}
+		return false;
+	}
+
 	public PDColorSpace getPattern(ASAtom name) {
 		COSObject rawPattern = getResource(ASAtom.PATTERN, name);
 		return ColorSpaceFactory.getColorSpace(rawPattern);

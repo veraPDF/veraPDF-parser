@@ -165,8 +165,13 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     @Override
     public float getWidth(int charCode) {
         try {
-            Integer res = this.glyphWidths.get(encoding[charCode]);
-            return res == null ? -1 : res;
+            if(this.glyphWidths != null) {
+                Integer res = this.glyphWidths.get(encoding[charCode]);
+                if(res != null) {
+                    return res;
+                }
+            }
+            return -1;
         } catch (ArrayIndexOutOfBoundsException e) {
             return -1;
         }
@@ -179,8 +184,8 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     @Override
-    public boolean containsCID(int cid) {
-        return cid < 256;
+    public boolean containsCode(int code) {
+        return code < 256;
     }
 
     public String[] getEncoding() {

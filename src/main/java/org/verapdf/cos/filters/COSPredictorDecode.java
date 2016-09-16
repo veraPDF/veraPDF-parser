@@ -220,4 +220,9 @@ public class COSPredictorDecode extends ASBufferingInFilter {
             return COLUMNS_DEFAULT;
         }
     }
+
+    @Override
+    public void reset() throws IOException {
+        super.reset();
+    }
 }
