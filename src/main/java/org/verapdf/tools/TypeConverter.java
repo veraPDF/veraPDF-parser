@@ -114,7 +114,10 @@ public class TypeConverter {
 			if (isCorrect) {
 				Calendar res = new GregorianCalendar(year, month - 1, day, hour, minutes, seconds);
 				if (!sign.equals("Z")) {
-					res.setTimeZone(TimeZone.getTimeZone("GMT" + sign + timeZoneHours + ":" + timeZoneMins));
+					String timeZoneMinsString =
+							timeZoneMins < 10 ? "0" + Integer.toString(timeZoneMins)
+									: Integer.toString(timeZoneMins);
+					res.setTimeZone(TimeZone.getTimeZone("GMT" + sign + timeZoneHours + ":" + timeZoneMinsString));
 				} else {
 					res.setTimeZone(TimeZone.getTimeZone("GMT"));
 				}
