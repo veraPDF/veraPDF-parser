@@ -7,8 +7,11 @@ import org.verapdf.pd.colors.PDColorSpace;
 /**
  * @author Maksim Bezrukov
  */
-public abstract class PDPattern extends PDColorSpace {
+public class PDPattern extends PDColorSpace {
 
+    public static final PDPattern INSTANCE = new PDPattern(null);
+
+    public static final int TYPE_PATTERN = 0;
     public static final int TYPE_TILING_PATTERN = 1;
     public static final int TYPE_SHADING_PATTERN = 2;
 
@@ -26,5 +29,8 @@ public abstract class PDPattern extends PDColorSpace {
         return ASAtom.PATTERN;
     }
 
-    public abstract int getPatternType();
+    public int getPatternType() {
+        return TYPE_PATTERN;
+    }
+
 }
