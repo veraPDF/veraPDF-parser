@@ -381,14 +381,13 @@ public class PDFParser extends COSParser {
 
         nextToken();
 
-        //check spacings between header elements
-        //pdf/a-1b specification, clause 6.1.4
-        space = this.source.readByte();
-        if (!CharTable.isSpace(space) || !isDigit()) {
-            document.setSubsectionHeaderSpaceSeparated(Boolean.FALSE);
-        }
-
         while (getToken().type == Token.Type.TT_INTEGER) {
+            //check spacings between header elements
+            //pdf/a-1b specification, clause 6.1.4
+            space = this.source.readByte();
+            if (space != CharTable.ASCII_SPACE || !isDigit()) {
+                document.setSubsectionHeaderSpaceSeparated(Boolean.FALSE);
+            }
             int number = (int) getToken().integer;
             nextToken();
             int count = (int) getToken().integer;
