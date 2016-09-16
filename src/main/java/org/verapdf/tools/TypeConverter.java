@@ -120,8 +120,9 @@ public class TypeConverter {
 	}
 
 	private static boolean isDigits(String toCheck, int offset, int length) {
-		for (int i = offset; i < offset + length; ++i) {
-			if (i >= toCheck.length() || Character.isDigit(toCheck.charAt(i))) {
+		int maxOffset = Math.min(offset + length, toCheck.length());
+		for (int i = offset; i < maxOffset; ++i) {
+			if (!Character.isDigit(toCheck.charAt(i))) {
 				return false;
 			}
 		}
