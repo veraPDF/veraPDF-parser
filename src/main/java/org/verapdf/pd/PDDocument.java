@@ -167,4 +167,8 @@ public class PDDocument {
 		return getCatalog().getOutputIntents();
 	}
 
+	public PDOutlineDictionary getOutlines() throws IOException {
+		return getCatalog().getOutlines();
+	}
+
 }
