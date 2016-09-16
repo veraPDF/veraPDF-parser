@@ -31,10 +31,10 @@ public class PDFontFactory {
         if (fontDictionary.getType() == COSObjType.COS_DICT) {
             COSDictionary dict = (COSDictionary) fontDictionary.getDirectBase();
             ASAtom subtype = fontDictionary.getNameKey(ASAtom.SUBTYPE);
-            if (subtype == ASAtom.TYPE1) {
-                return new PDType1Font(dict);
-            } else if (subtype == ASAtom.TRUE_TYPE ||
+            if (subtype == ASAtom.TYPE1 ||
                     subtype == ASAtom.MM_TYPE1) {
+                return new PDType1Font(dict);
+            } else if (subtype == ASAtom.TRUE_TYPE) {
                 return new PDTrueTypeFont(dict);
             } else if (subtype == ASAtom.TYPE3) {
                 return new PDType3Font(dict);
