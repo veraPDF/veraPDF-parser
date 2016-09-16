@@ -2,6 +2,7 @@ package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
+import org.verapdf.pd.actions.PDPageAdditionalActions;
 import org.verapdf.pd.colors.PDColorSpace;
 
 import java.util.ArrayList;
@@ -199,6 +200,14 @@ public class PDPage extends PDPageTreeNode {
             return Collections.unmodifiableList(res);
         }
         return Collections.emptyList();
+    }
+
+    public PDPageAdditionalActions getAdditionalActions() {
+        COSObject aaDict = getKey(ASAtom.AA);
+        if (aaDict != null && aaDict.getType() == COSObjType.COS_DICT) {
+            return new PDPageAdditionalActions(aaDict);
+        }
+        return null;
     }
 
     public int getPageNumber() {

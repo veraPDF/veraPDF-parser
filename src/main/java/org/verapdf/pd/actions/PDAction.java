@@ -20,7 +20,7 @@ public class PDAction extends PDObject {
 	}
 
 	public ASAtom getSubtype() {
-		return getObject().getNameKey(ASAtom.SUBTYPE);
+		return getObject().getNameKey(ASAtom.S);
 	}
 
 	public List<PDAction> getNext() {
