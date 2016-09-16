@@ -77,4 +77,12 @@ public class PDCatalog extends PDObject {
 		return null;
 	}
 
+	public PDOutlineDictionary getOutlines() {
+		COSObject outlines = getKey(ASAtom.OUTLINES);
+		if (outlines != null && outlines.getType().isDictionaryBased()) {
+			return new PDOutlineDictionary(outlines);
+		}
+		return null;
+	}
+
 }

@@ -1,6 +1,7 @@
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.factory.fonts.PDFontFactory;
@@ -21,7 +22,11 @@ public class PDResources extends PDObject {
 	//TODO : think about error cases
 	public PDColorSpace getColorSpace(ASAtom name) {
 		COSObject rawColorSpace = getResource(ASAtom.COLORSPACE, name);
-		return ColorSpaceFactory.getColorSpace(rawColorSpace);
+		if (rawColorSpace != null) {
+			return ColorSpaceFactory.getColorSpace(rawColorSpace);
+		} else {
+			return ColorSpaceFactory.getColorSpace(COSName.construct(name));
+		}
 	}
 
 	public PDColorSpace getDefaultColorSpace(ASAtom name) {
