@@ -100,14 +100,24 @@ public class TypeConverter {
 				}
 			}
 
+			// date format from PDF 1.4 spec
 			if (length > 22) {
+				if (!"'".equals(toParse.substring(22, 23))) {
+					isCorrect = false;
+				}
+			}
+
+			if (length > 23) {
 				isCorrect = false;
 			}
 
 			if (isCorrect) {
 				Calendar res = new GregorianCalendar(year, month - 1, day, hour, minutes, seconds);
 				if (!sign.equals("Z")) {
-					res.setTimeZone(TimeZone.getTimeZone("GMT" + sign + timeZoneHours + ":" + timeZoneMins));
+					String timeZoneMinsString =
+							timeZoneMins < 10 ? "0" + Integer.toString(timeZoneMins)
+									: Integer.toString(timeZoneMins);
+					res.setTimeZone(TimeZone.getTimeZone("GMT" + sign + timeZoneHours + ":" + timeZoneMinsString));
 				} else {
 					res.setTimeZone(TimeZone.getTimeZone("GMT"));
 				}
@@ -120,8 +130,9 @@ public class TypeConverter {
 	}
 
 	private static boolean isDigits(String toCheck, int offset, int length) {
-		for (int i = offset; i < offset + length; ++i) {
-			if (i >= toCheck.length() || Character.isDigit(toCheck.charAt(i))) {
+		int maxOffset = Math.min(offset + length, toCheck.length());
+		for (int i = offset; i < maxOffset; ++i) {
+			if (!Character.isDigit(toCheck.charAt(i))) {
 				return false;
 			}
 		}
