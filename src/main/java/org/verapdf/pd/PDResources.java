@@ -22,7 +22,7 @@ public class PDResources extends PDObject {
 	//TODO : think about error cases
 	public PDColorSpace getColorSpace(ASAtom name) {
 		COSObject rawColorSpace = getResource(ASAtom.COLORSPACE, name);
-		if (rawColorSpace != null) {
+		if (rawColorSpace != null && !rawColorSpace.empty()) {
 			return ColorSpaceFactory.getColorSpace(rawColorSpace);
 		} else {
 			return ColorSpaceFactory.getColorSpace(COSName.construct(name));

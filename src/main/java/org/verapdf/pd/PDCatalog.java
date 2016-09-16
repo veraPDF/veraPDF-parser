@@ -4,6 +4,8 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.pd.actions.PDAction;
+import org.verapdf.pd.actions.PDCatalogAdditionalActions;
 import org.verapdf.pd.optionalcontent.PDOptionalContentProperties;
 
 import java.io.IOException;
@@ -81,6 +83,22 @@ public class PDCatalog extends PDObject {
 		COSObject outlines = getKey(ASAtom.OUTLINES);
 		if (outlines != null && outlines.getType().isDictionaryBased()) {
 			return new PDOutlineDictionary(outlines);
+		}
+		return null;
+	}
+
+	public PDAction getOpenAction() {
+		COSObject openAction = getKey(ASAtom.OPEN_ACTION);
+		if (openAction != null && openAction.getType() == COSObjType.COS_DICT) {
+			return new PDAction(openAction);
+		}
+		return null;
+	}
+
+	public PDCatalogAdditionalActions getAdditionalActions() {
+		COSObject aaDict = getKey(ASAtom.AA);
+		if (aaDict != null && aaDict.getType() == COSObjType.COS_DICT) {
+			return new PDCatalogAdditionalActions(aaDict);
 		}
 		return null;
 	}
