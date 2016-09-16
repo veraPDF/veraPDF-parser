@@ -100,7 +100,14 @@ public class TypeConverter {
 				}
 			}
 
+			// date format from PDF 1.4 spec
 			if (length > 22) {
+				if (!"'".equals(toParse.substring(22, 23))) {
+					isCorrect = false;
+				}
+			}
+
+			if (length > 23) {
 				isCorrect = false;
 			}
 
