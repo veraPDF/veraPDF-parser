@@ -8,6 +8,7 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDResource;
+import org.verapdf.pd.PDResources;
 import org.verapdf.pd.colors.PDColorSpace;
 
 import java.util.ArrayList;
@@ -21,8 +22,14 @@ public class PDInlineImage extends PDResource {
 
 	private static final Logger LOGGER = Logger.getLogger(PDInlineImage.class);
 
-	public PDInlineImage(COSObject obj) {
+	private PDResources imageResources;
+	private PDResources pageResources;
+
+	public PDInlineImage(COSObject obj, PDResources imageResources,
+						 PDResources pageResources) {
 		super(obj);
+		this.imageResources = imageResources;
+		this.pageResources = pageResources;
 	}
 
 	public boolean isInterpolate() {
@@ -57,7 +64,15 @@ public class PDInlineImage extends PDResource {
 	}
 
 	public PDColorSpace getImageCS() {
-		return ColorSpaceFactory.getColorSpace(getKey(ASAtom.COLORSPACE));
+		COSObject cs = getKey(ASAtom.CS);
+		if (cs.empty()) {
+			cs = getKey(ASAtom.COLORSPACE);
+		}
+		PDColorSpace result = ColorSpaceFactory.getColorSpace(cs, imageResources);
+		if (result == null) {
+			result = ColorSpaceFactory.getColorSpace(cs, pageResources);
+		}
+		return result;
 	}
 
 	public COSName getIntent() {

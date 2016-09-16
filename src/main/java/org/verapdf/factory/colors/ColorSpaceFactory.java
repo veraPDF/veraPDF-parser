@@ -42,15 +42,26 @@ public class ColorSpaceFactory {
     }
 
     public static PDColorSpace getColorSpace(COSObject base) {
+        return getColorSpace(base, null);
+    }
+
+    public static PDColorSpace getColorSpace(COSObject base, PDResources resources) {
         if (base == null) {
             return null;
         }
         COSObjType type = base.getType();
         if (type == COSObjType.COS_NAME) {
-            return getColorSpaceFromName(base);
+            PDColorSpace cs = getColorSpaceFromName(base);
+            if (cs == null) {
+                if (resources != null) {
+                    cs = resources.getColorSpace(base.getName());
+                    return cs;
+                }
+            }
+            return cs;
         } else if (type == COSObjType.COS_ARRAY) {
             return getColorSpaceFromArray(base);
-        } else if (type == COSObjType.COS_DICT || type == COSObjType.COS_STREAM) {
+        } else if (type != null && type.isDictionaryBased()) {
             return getPattern(base);
         } else {
             LOGGER.debug("COSObject has to be a name or array, but it is not");
@@ -66,6 +77,8 @@ public class ColorSpaceFactory {
             return PDDeviceRGB.INSTANCE;
         } else if (ASAtom.DEVICECMYK.equals(name)) {
             return PDDeviceCMYK.INSTANCE;
+        } else if (ASAtom.PATTERN.equals(name)) {
+            return PDPattern.INSTANCE;
         } else {
             LOGGER.debug("Unknown ColorSpace name");
             return null;
