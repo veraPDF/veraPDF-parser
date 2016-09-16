@@ -53,6 +53,22 @@ public class PDObject {
 		object.setKey(key, value);
 	}
 
+	public String getStringKey(final ASAtom key) {
+		return object.getStringKey(key);
+	}
+
+	public void setStringKey(final ASAtom key, final String value) {
+		object.setStringKey(key, value);
+	}
+
+	public Long getIntegerKey(final ASAtom key) {
+		return object.getIntegerKey(key);
+	}
+
+	public void setIntegerKey(final ASAtom key, final Long value) {
+		object.setIntegerKey(key, value);
+	}
+
 	public void removeKey(final ASAtom key) {
 		object.removeKey(key);
 	}
