@@ -26,6 +26,8 @@ public class BaseParser {
 	protected InternalInputStream source;
 	private Token token;
 
+	// TODO: maybe rewrite BaseParser constructor so that it doesn't copy stream
+	// (e. g. in big file we need to parse only signature)
 	public BaseParser(String fileName) throws FileNotFoundException {
 		this.source = new InternalInputStream(fileName);
 	}
@@ -558,11 +560,19 @@ public class BaseParser {
 		this.token.append((char) ch);
 	}
 
-	protected byte[] getRawBytes(String string) {
+	public static byte[] getRawBytes(String string) {
 		byte[] res = new byte[string.length()];
 		for (int i = 0; i < string.length(); ++i) {
 			res[i] = (byte) string.charAt(i);
 		}
 		return res;
+	}
+
+	protected void skipExpectedCharacter(char exp) throws IOException {
+		char c = (char) this.source.readByte();
+		if(c != exp) {
+			throw new IOException("Unexpected character on byte " + (this.source.getOffset() - 1) +
+			"; expected " + exp + " but got " + c);
+		}
 	}
 }

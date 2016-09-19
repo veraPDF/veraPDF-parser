@@ -155,12 +155,14 @@ public class ASAtom {
     public static final ASAtom DI = new ASAtom("Di");
     public static final ASAtom DIFFERENCE = new ASAtom("Difference");
     public static final ASAtom DIFFERENCES = new ASAtom("Differences");
+    public static final ASAtom DIGEST_LOCATION = new ASAtom("DigestLocation");
     public static final ASAtom DIGEST_METHOD = new ASAtom("DigestMethod");
     public static final ASAtom DIGEST_RIPEMD160 = new ASAtom("RIPEMD160");
     public static final ASAtom DIGEST_SHA1 = new ASAtom("SHA1");
     public static final ASAtom DIGEST_SHA256 = new ASAtom("SHA256");
     public static final ASAtom DIGEST_SHA384 = new ASAtom("SHA384");
     public static final ASAtom DIGEST_SHA512 = new ASAtom("SHA512");
+    public static final ASAtom DIGEST_VALUE = new ASAtom("DigestValue");
     public static final ASAtom DIRECTION = new ASAtom("Direction");
     public static final ASAtom DISPLAY_DOC_TITLE = new ASAtom("DisplayDocTitle");
     public static final ASAtom DL = new ASAtom("DL");
@@ -419,6 +421,7 @@ public class ASAtom {
     public static final ASAtom RECIPIENTS = new ASAtom("Recipients");
     public static final ASAtom RECT = new ASAtom("Rect");
     public static final ASAtom REF = new ASAtom("Ref");
+    public static final ASAtom REFERENCE = new ASAtom("Reference");
     public static final ASAtom REGISTRY = new ASAtom("Registry");
     public static final ASAtom REGISTRY_NAME = new ASAtom("RegistryName");
     public static final ASAtom RENAME = new ASAtom("Rename");

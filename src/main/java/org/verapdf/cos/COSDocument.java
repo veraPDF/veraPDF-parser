@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.io.IReader;
+import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.Reader;
 import org.verapdf.pd.PDDocument;
 
@@ -152,6 +153,10 @@ public class COSDocument {
 		}
 	}
 
+	public Long getOffset(final COSKey key) {
+		return this.reader.getOffset(key);
+	}
+
 	public void setObject(final COSKey key, final COSObject obj) {
 		this.body.set(key, obj);
 		this.xref.newKey(key);
@@ -225,6 +230,10 @@ public class COSDocument {
 
 	public void save() {
 		//TODO : implement this
+	}
+
+	public InternalInputStream getPDFSource() {
+		return this.reader.getPDFSource();
 	}
 
 	public void saveAs(final Writer writer) {
