@@ -6,6 +6,7 @@ import org.verapdf.cos.COSIndirect;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
+import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -171,4 +172,7 @@ public class PDDocument {
 		return getCatalog().getOutlines();
 	}
 
+	public InternalInputStream getPDFSource() {
+		return this.document.getPDFSource();
+	}
 }

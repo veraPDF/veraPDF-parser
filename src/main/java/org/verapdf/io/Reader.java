@@ -88,6 +88,11 @@ public class Reader extends XRefReader {
 		return this.parser.isLinearized();
 	}
 
+	@Override
+	public InternalInputStream getPDFSource() {
+		return this.parser.getPDFSource();
+	}
+
 	// PRIVATE METHODS
 	private void init() throws IOException {
 		this.header = this.parser.getHeader();

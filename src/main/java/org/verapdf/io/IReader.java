@@ -13,6 +13,8 @@ import java.util.List;
  */
 public interface IReader {
 
+	InternalInputStream getPDFSource();
+
 	COSHeader getHeader();
 
 	List<COSKey> getKeys();
@@ -20,6 +22,8 @@ public interface IReader {
 	COSObject getObject(final COSKey key) throws IOException;
 
 	COSObject getObject(final long offset) throws IOException;
+
+	Long getOffset(final COSKey key);
 
 	long getStartXRef();
 
