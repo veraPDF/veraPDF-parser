@@ -68,11 +68,50 @@ public class PDInlineImage extends PDResource {
 		if (cs.empty()) {
 			cs = getKey(ASAtom.COLORSPACE);
 		}
+		if (cs != null && cs.getType() == COSObjType.COS_NAME) {
+			replaceAbbreviation((COSName) cs.getDirectBase());
+			PDColorSpace result = getDefaultColorSpace(cs.getName());
+			if (result != null) {
+				return result;
+			}
+		}
 		PDColorSpace result = ColorSpaceFactory.getColorSpace(cs, imageResources);
 		if (result == null) {
 			result = ColorSpaceFactory.getColorSpace(cs, pageResources);
 		}
 		return result;
+	}
+
+	private PDColorSpace getDefaultColorSpace(ASAtom name) {
+		if (this.isDeviceDependent(name)) {
+			if (imageResources != null) {
+				ASAtom value = org.verapdf.factory.colors.ColorSpaceFactory.getDefaultValue(imageResources, name);
+				if (value != null) {
+					return imageResources.getColorSpace(value);
+				}
+			} else {
+				ASAtom value = org.verapdf.factory.colors.ColorSpaceFactory.getDefaultValue(pageResources, name);
+				if (value != null) {
+					return pageResources.getColorSpace(value);
+				}
+			}
+		}
+		return null;
+	}
+
+	private boolean isDeviceDependent(ASAtom name) {
+		return ASAtom.DEVICERGB.equals(name) ||
+				ASAtom.DEVICEGRAY.equals(name) || ASAtom.DEVICECMYK.equals(name);
+	}
+
+	private void replaceAbbreviation(final COSName abbreviation) {
+		if (abbreviation.get().equals(ASAtom.CMYK)) {
+			abbreviation.set(ASAtom.DEVICECMYK);
+		} else if (abbreviation.get().equals(ASAtom.RGB)) {
+			abbreviation.set(ASAtom.DEVICERGB);
+		} else if (abbreviation.get().equals(ASAtom.G)) {
+			abbreviation.set(ASAtom.DEVICEGRAY);
+		}
 	}
 
 	public COSName getIntent() {
@@ -82,4 +121,5 @@ public class PDInlineImage extends PDResource {
 		}
 		return null;
 	}
+
 }
