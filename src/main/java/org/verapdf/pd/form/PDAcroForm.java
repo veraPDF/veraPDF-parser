@@ -29,7 +29,7 @@ public class PDAcroForm extends PDObject {
 			List<PDFormField> res = new ArrayList<>();
 			for (COSObject obj : (COSArray) fields.getDirectBase()) {
 				if (obj != null && obj.getType().isDictionaryBased()) {
-					res.add(new PDFormField(obj));
+					res.add(PDFormField.createTypedFormField(obj));
 				}
 			}
 			return Collections.unmodifiableList(res);

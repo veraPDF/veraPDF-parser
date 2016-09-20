@@ -14,8 +14,13 @@ import java.util.*;
  */
 public class PDFormField extends PDObject {
 
-	public PDFormField(COSObject obj) {
+	protected PDFormField(COSObject obj) {
 		super(obj);
+	}
+
+	public static PDFormField createTypedFormField(COSObject obj) {
+		// TODO: add PDSignatureField creation logic here
+		return new PDFormField(obj);
 	}
 
 	public ASAtom getFT() {
