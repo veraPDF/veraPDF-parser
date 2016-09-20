@@ -7,6 +7,7 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.io.InternalInputStream;
+import org.verapdf.pd.form.PDAcroForm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -170,6 +171,10 @@ public class PDDocument {
 
 	public PDOutlineDictionary getOutlines() throws IOException {
 		return getCatalog().getOutlines();
+	}
+
+	public PDAcroForm getAcroForm() throws IOException {
+		return getCatalog().getAcroForm();
 	}
 
 	public InternalInputStream getPDFSource() {
