@@ -62,6 +62,7 @@ public class ASAtom {
     public static final ASAtom BITS_PER_COORDINATE = new ASAtom("BitsPerCoordinate");
     public static final ASAtom BITS_PER_FLAG = new ASAtom("BitsPerFlag");
     public static final ASAtom BITS_PER_SAMPLE = new ASAtom("BitsPerSample");
+    public static final ASAtom BL_FOCUS = new ASAtom("Bl");
     public static final ASAtom BLACK_IS_1 = new ASAtom("BlackIs1");
     public static final ASAtom BLACK_POINT = new ASAtom("BlackPoint");
     public static final ASAtom BLEED_BOX = new ASAtom("BleedBox");
@@ -220,6 +221,7 @@ public class ASAtom {
     public static final ASAtom FLAGS = new ASAtom("Flags");
     public static final ASAtom FLATE_DECODE = new ASAtom("FlateDecode");
     public static final ASAtom FLATE_DECODE_ABBREVIATION = new ASAtom("Fl");
+    public static final ASAtom FOCUS_ABBREVIATION = new ASAtom("Fo");
     public static final ASAtom FONT = new ASAtom("Font");
     public static final ASAtom FONT_BBOX = new ASAtom("FontBBox");
     public static final ASAtom FONT_DESC = new ASAtom("FontDescriptor");
@@ -391,9 +393,12 @@ public class ASAtom {
     public static final ASAtom PARENT_TREE_NEXT_KEY = new ASAtom("ParentTreeNextKey");
     public static final ASAtom PATTERN = new ASAtom("Pattern");
     public static final ASAtom PATTERN_TYPE = new ASAtom("PatternType");
+    public static final ASAtom PC = new ASAtom("PC");
     public static final ASAtom PDF_DOC_ENCODING = new ASAtom("PDFDocEncoding");
     public static final ASAtom PERMS = new ASAtom("Perms");
     public static final ASAtom PG = new ASAtom("Pg");
+    public static final ASAtom PI = new ASAtom("PI");
+    public static final ASAtom PO = new ASAtom("PO");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");
     public static final ASAtom PREDICTOR = new ASAtom("Predictor");
     public static final ASAtom PRES_STEPS = new ASAtom("PresSteps");
@@ -408,6 +413,7 @@ public class ASAtom {
     public static final ASAtom PROPERTIES = new ASAtom("Properties");
     public static final ASAtom PS = new ASAtom("PS");
     public static final ASAtom PUB_SEC = new ASAtom("PubSec");
+    public static final ASAtom PV = new ASAtom("PV");
     // Q
     public static final ASAtom Q = new ASAtom("Q");
     public static final ASAtom QUADPOINTS = new ASAtom("QuadPoints");
@@ -533,12 +539,16 @@ public class ASAtom {
     // W
     public static final ASAtom W = new ASAtom("W");
     public static final ASAtom W2 = new ASAtom("W2");
+    public static final ASAtom WC = new ASAtom("WC");
     public static final ASAtom WHITE_POINT = new ASAtom("WhitePoint");
     public static final ASAtom WIDTH = new ASAtom("Width");
     public static final ASAtom WIDTHS = new ASAtom("Widths");
     public static final ASAtom WIN_ANSI_ENCODING = new ASAtom("WinAnsiEncoding");
+    public static final ASAtom WP = new ASAtom("WP");
+    public static final ASAtom WS = new ASAtom("WS");
     public static final ASAtom W_MODE = new ASAtom("WMode");
     // X
+    public static final ASAtom X = new ASAtom("X");
     public static final ASAtom XFA = new ASAtom("XFA");
     public static final ASAtom X_STEP = new ASAtom("XStep");
     public static final ASAtom XHEIGHT = new ASAtom("XHeight");

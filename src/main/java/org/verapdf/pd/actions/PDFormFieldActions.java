@@ -1,14 +1,12 @@
-package org.verapdf.pd.form;
+package org.verapdf.pd.actions;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
-import org.verapdf.pd.PDObject;
-import org.verapdf.pd.actions.PDAction;
 
 /**
  * @author Maksim Bezrukov
  */
-public class PDFormFieldActions extends PDObject {
+public class PDFormFieldActions extends PDAbstractAdditionalActions {
 
 	public PDFormFieldActions(COSObject obj) {
 		super(obj);
@@ -28,13 +26,5 @@ public class PDFormFieldActions extends PDObject {
 
 	public PDAction getC() {
 		return getAction(ASAtom.C);
-	}
-
-	private PDAction getAction(ASAtom key) {
-		COSObject obj = getKey(key);
-		if (obj != null && obj.getType().isDictionaryBased()) {
-			return new PDAction(obj);
-		}
-		return null;
 	}
 }
