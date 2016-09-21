@@ -108,6 +108,12 @@ public class CMapParser extends BaseParser {
                             throw new IOException("CMap contains invalid /Supplement value");
                         }
                         break;
+                    case "CIDCount":
+                        nextToken();
+                        checkTokenType(Token.Type.TT_INTEGER, "CIDCount");
+                        nextToken();
+                        checkTokenType(Token.Type.TT_KEYWORD, "CIDCount");
+                        break;
                     default:
                         this.lastCOSName = COSName.construct(getToken().getValue());
                 }
@@ -139,36 +145,36 @@ public class CMapParser extends BaseParser {
     private void processList(int listLength, String type) throws IOException {
         if (type.startsWith("begin")) {
             type = type.substring(5); //skipping leading "begin"
-        }
-        for (int i = 0; i < listLength; ++i) {
-            switch (type) {
-                case "codespacerange":
-                    readLineCodeSpaceRange();
-                    break;
-                case "cidrange":
-                    readLineCIDRange();
-                    break;
-                case "notdefrange":
-                    readLineNotDefRange();
-                    break;
-                case "cidchar":
-                    readSingleCharMapping();
-                    break;
-                case "notdefchar":
-                    readSingleNotDefMapping();
-                    break;
-                case "bfchar":
-                    readSingleToUnicodeMapping();
-                    break;
-                case "bfrange":
-                    readLineBFRange();
-                    break;
-                default:
+            for (int i = 0; i < listLength; ++i) {
+                switch (type) {
+                    case "codespacerange":
+                        readLineCodeSpaceRange();
+                        break;
+                    case "cidrange":
+                        readLineCIDRange();
+                        break;
+                    case "notdefrange":
+                        readLineNotDefRange();
+                        break;
+                    case "cidchar":
+                        readSingleCharMapping();
+                        break;
+                    case "notdefchar":
+                        readSingleNotDefMapping();
+                        break;
+                    case "bfchar":
+                        readSingleToUnicodeMapping();
+                        break;
+                    case "bfrange":
+                        readLineBFRange();
+                        break;
+                    default:
+                }
             }
-        }
-        nextToken();
-        if (!getToken().getValue().equals("end" + type)) {
-            LOGGER.warn("Unexpected end of " + type + " in CMap");
+            nextToken();
+            if (!getToken().getValue().equals("end" + type)) {
+                LOGGER.warn("Unexpected end of " + type + " in CMap");
+            }
         }
     }
 
@@ -271,12 +277,17 @@ public class CMapParser extends BaseParser {
         long bfRangeEnd = numberFromBytes(getRawBytes(getToken().getValue()));
 
         nextToken();    // skip [
+        if(getToken().getValue().equals("[")) {
 
-        for(long i = bfRangeBegin; i < bfRangeEnd; ++i) {
-            this.cMap.addUnicodeMapping((int) i, readStringFromUnicodeSequenceToken());
+            for (long i = bfRangeBegin; i < bfRangeEnd; ++i) {
+                this.cMap.addUnicodeMapping((int) i, readStringFromUnicodeSequenceToken());
+            }
+
+            nextToken();    // skip ]
+        } else {
+            this.cMap.addUnicodeInterval(new ToUnicodeInterval(bfRangeBegin, bfRangeEnd,
+                    numberFromBytes(getRawBytes(getToken().getValue()))));
         }
-
-        nextToken();    // skip ]
     }
 
     static long numberFromBytes(byte[] num) {
