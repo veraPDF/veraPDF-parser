@@ -4,6 +4,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.actions.PDAction;
+import org.verapdf.pd.actions.PDAnnotationAdditionalActions;
 import org.verapdf.tools.TypeConverter;
 
 /**
@@ -86,6 +87,14 @@ public class PDAnnotation extends PDObject {
 		COSObject action = getKey(ASAtom.A);
 		if (action != null && action.getType() == COSObjType.COS_DICT) {
 			return new PDAction(action);
+		}
+		return null;
+	}
+
+	public PDAnnotationAdditionalActions getAdditionalActions() {
+		COSObject aa = getKey(ASAtom.AA);
+		if (aa != null && aa.getType() == COSObjType.COS_DICT) {
+			return new PDAnnotationAdditionalActions(aa);
 		}
 		return null;
 	}

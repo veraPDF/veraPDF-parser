@@ -6,6 +6,7 @@ import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDObject;
+import org.verapdf.pd.actions.PDFormFieldActions;
 
 import java.util.*;
 
