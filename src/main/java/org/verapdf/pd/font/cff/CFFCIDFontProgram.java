@@ -28,9 +28,10 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private String ordering;
     private boolean fontParsed = false;
 
-    CFFCIDFontProgram(InternalInputStream stream, long topDictBeginOffset,
-                      long topDictEndOffset) {
+    CFFCIDFontProgram(InternalInputStream stream, CFFIndex definedNames,
+                      long topDictBeginOffset, long topDictEndOffset) {
         super(stream);
+        this.definedNames = definedNames;
         this.topDictBeginOffset = topDictBeginOffset;
         this.topDictEndOffset = topDictEndOffset;
     }
@@ -74,6 +75,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
                 this.registry = getStringBySID((int)
                         this.stack.get(this.stack.size() - 3).getInteger());
                 this.stack.clear();
+                break;
             case 36:
                 this.fdArrayOffset = this.stack.get(this.stack.size() - 1).getInteger();
                 this.stack.clear();
