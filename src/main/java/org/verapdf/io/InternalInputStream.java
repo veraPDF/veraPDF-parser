@@ -110,6 +110,7 @@ public class InternalInputStream extends ASInputStream {
 		FileOutputStream output = null;
 		try {
 			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
+			tmpFile.deleteOnExit();
 			output = new FileOutputStream(tmpFile);
 
 			//copy stream content
@@ -133,6 +134,7 @@ public class InternalInputStream extends ASInputStream {
 		FileOutputStream output = null;
 		try {
 			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
+			tmpFile.deleteOnExit();
 			output = new FileOutputStream(tmpFile);
 
 			//copy stream content
