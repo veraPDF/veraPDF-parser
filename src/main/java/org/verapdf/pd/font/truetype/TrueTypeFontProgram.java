@@ -103,8 +103,12 @@ public class TrueTypeFontProgram implements FontProgram {
         if (isSymbolic) {
             return getWidthSymbolic(code);
         } else {
-            String glyphName = encodingMappingArray[code];
-            return getWidth(glyphName);
+            if(code < 256) {
+                String glyphName = encodingMappingArray[code];
+                return getWidth(glyphName);
+            } else {
+                return getWidth(TrueTypePredefined.NOTDEF_STRING);
+            }
         }
     }
 
@@ -116,7 +120,7 @@ public class TrueTypeFontProgram implements FontProgram {
         if (isSymbolic) {
             return -1;
         }
-        if (glyphName.equals(TrueTypePredefined.NOTDEF_STRING)) {
+        if (TrueTypePredefined.NOTDEF_STRING.equals(glyphName)) {
             int gid = this.parser.getPostParser().getGID(glyphName);
             return getWidthWithCheck(gid);
         }
