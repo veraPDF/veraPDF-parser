@@ -28,7 +28,7 @@ public class ASFileInStream extends ASInputStream {
 			long prev = stream.getFilePointer();
 
 			stream.seek(this.offset + this.curPos);
-			byte result = this.stream.readByte();
+			int result = this.stream.readByte() & 0xFF;
 			curPos++;
 
 			this.stream.seek(prev);
