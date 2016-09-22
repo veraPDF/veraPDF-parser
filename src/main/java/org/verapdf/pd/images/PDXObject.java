@@ -42,11 +42,7 @@ public abstract class PDXObject extends PDResource {
 		if (ASAtom.IMAGE.equals(type)) {
 			return new PDXImage(object);
 		} else if (ASAtom.FORM.equals(type)) {
-			if (ASAtom.PS.equals(object.getNameKey(ASAtom.SUBTYPE_2))) {
-				return new PDXPostScript(object);
-			} else {
-				return new PDXForm(object);
-			}
+			return new PDXForm(object);
 		} else if (ASAtom.PS.equals(type)) {
 			return new PDXPostScript(object);
 		} else {

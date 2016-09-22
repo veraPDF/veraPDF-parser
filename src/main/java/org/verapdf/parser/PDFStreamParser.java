@@ -111,7 +111,8 @@ public class PDFStreamParser extends COSParser {
 					result = getDictionary();
 				} else {
 					nextToken();
-					result = COSString.construct(getToken().getValue());
+					Token token = getToken();
+					result = COSString.construct(token.getValue(), true, token.getHexCount(), token.isContainsOnlyHex());
 				}
 				break;
 			}

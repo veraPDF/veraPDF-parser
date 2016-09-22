@@ -6,6 +6,7 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.actions.PDAction;
 import org.verapdf.pd.actions.PDCatalogAdditionalActions;
+import org.verapdf.pd.form.PDAcroForm;
 import org.verapdf.pd.optionalcontent.PDOptionalContentProperties;
 
 import java.io.IOException;
@@ -99,6 +100,14 @@ public class PDCatalog extends PDObject {
 		COSObject aaDict = getKey(ASAtom.AA);
 		if (aaDict != null && aaDict.getType() == COSObjType.COS_DICT) {
 			return new PDCatalogAdditionalActions(aaDict);
+		}
+		return null;
+	}
+
+	public PDAcroForm getAcroForm() {
+		COSObject acroForm = getKey(ASAtom.ACRO_FORM);
+		if (acroForm != null && acroForm.getType().isDictionaryBased()) {
+			return new PDAcroForm(acroForm);
 		}
 		return null;
 	}

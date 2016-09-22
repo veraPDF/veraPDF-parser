@@ -25,7 +25,7 @@ public class COSParser extends BaseParser {
 
 	protected COSDocument document;
 	protected Queue<COSObject> objects = new LinkedList<>();
-	protected Queue<Integer> integers = new LinkedList<>();
+	protected Queue<Long> integers = new LinkedList<>();
 
 	protected boolean flag = true;
 
@@ -67,7 +67,7 @@ public class COSParser extends BaseParser {
 		final Token token = getToken();
 
 		if (token.type == Token.Type.TT_INTEGER) {  // looking for indirect reference
-			this.integers.add((int) token.integer);
+			this.integers.add(token.integer);
 			if (this.integers.size() == 3) {
 				COSObject result = COSInteger.construct(this.integers.peek());
 				this.integers.remove();
@@ -79,9 +79,9 @@ public class COSParser extends BaseParser {
 		if (token.type == Token.Type.TT_KEYWORD
 				&& token.keyword == Token.Keyword.KW_R
 				&& this.integers.size() == 2) {
-			final int number = this.integers.peek();
+			final int number = this.integers.peek().intValue();
 			this.integers.remove();
-			final int generation = this.integers.peek();
+			final int generation = this.integers.peek().intValue();
 			this.integers.remove();
 			return COSIndirect.construct(new COSKey(number, generation), document);
 		}

@@ -29,14 +29,23 @@ public class BaseParser {
 	// TODO: maybe rewrite BaseParser constructor so that it doesn't copy stream
 	// (e. g. in big file we need to parse only signature)
 	public BaseParser(String fileName) throws FileNotFoundException {
+		if(fileName == null) {
+			throw new FileNotFoundException("Can't create InternalInputStream from file " + fileName);
+		}
 		this.source = new InternalInputStream(fileName);
 	}
 
 	public BaseParser(InputStream fileStream) throws IOException {
+		if(fileStream == null) {
+			throw new IOException("Can't create InternalInputStream, fileStream is null");
+		}
 		this.source = new InternalInputStream(fileStream);
 	}
 
 	public BaseParser(ASInputStream asInputStream) throws IOException {
+		if(asInputStream == null) {
+			throw new IOException("Can't create InternalInputStream, asInputStream is null");
+		}
 		this.source = new InternalInputStream(asInputStream);
 	}
 

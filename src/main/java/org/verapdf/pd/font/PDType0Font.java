@@ -24,14 +24,15 @@ public class PDType0Font extends PDCIDFont {
     private static final Logger LOGGER = Logger.getLogger(PDType0Font.class);
     private static final String UCS2 = "UCS2";
 
-    private org.verapdf.pd.font.cmap.PDCMap pdcMap;
+    private PDCMap pdcMap;
+    private PDCMap ucsCMap;
     private COSDictionary cidSystemInfo;
     private COSDictionary type0FontDict;
 
     public PDType0Font(COSDictionary dictionary) {
         super(getDedcendantCOSDictionary(dictionary));
-        type0FontDict = dictionary == null ? null :
-                (COSDictionary) COSDictionary.construct().get();
+        type0FontDict = dictionary == null ?
+                (COSDictionary) COSDictionary.construct().get() : dictionary;
     }
 
     public COSDictionary getCIDSystemInfo() {
@@ -79,6 +80,10 @@ public class PDType0Font extends PDCIDFont {
         return null;
     }
 
+    public COSDictionary getDescendantFont() {
+        return getDedcendantCOSDictionary(this.type0FontDict);
+    }
+
     @Override
     public int readCode(InputStream stream) throws IOException {
         ASInputStream asInputStream = new InternalInputStream(stream);
@@ -108,6 +113,10 @@ public class PDType0Font extends PDCIDFont {
             return unicode;
         }
 
+        if(ucsCMap != null) {
+            return ucsCMap.toUnicode(code);
+        }
+
         PDCMap pdcMap = this.getCMap();
         if (pdcMap != null && pdcMap.getCMapFile() != null) {
             int cid = pdcMap.getCMapFile().toCID(code);
@@ -117,6 +126,7 @@ public class PDType0Font extends PDCIDFont {
             PDCMap pdUCSCMap = new PDCMap(COSName.construct(ucsName));
             CMap ucsCMap = pdUCSCMap.getCMapFile();
             if (ucsCMap != null) {
+                this.ucsCMap = pdUCSCMap;
                 return ucsCMap.getUnicode(cid);
             }
             LOGGER.warn("Can't load CMap " + ucsName);

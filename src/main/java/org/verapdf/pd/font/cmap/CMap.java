@@ -25,12 +25,14 @@ public class CMap {
     private List<CodeSpace> codeSpaces;
     private List<CIDMappable> notDefMappings;
     private Map<Integer, String> toUnicode;
+    private List<ToUnicodeInterval> unicodeIntervals;
 
     public CMap() {
         this.cidMappings = new LinkedList<>();
         this.codeSpaces = new ArrayList<>();
         this.notDefMappings = new ArrayList<>();
         this.toUnicode = new HashMap<>();
+        this.unicodeIntervals = new ArrayList<>();
         wMode = 0; // default
         shortestCodeSpaceLength = Integer.MAX_VALUE;
     }
@@ -198,7 +200,15 @@ public class CMap {
      * @return Unicode sequence obtained from this CMap.
      */
     public String getUnicode(int code) {
-        return this.toUnicode.get(code);
+        String res = this.toUnicode.get(code);
+        if(res == null) {
+            for(ToUnicodeInterval interval : this.unicodeIntervals) {
+                if(interval.containsCode(code)) {
+                    return interval.toUnicode(code);
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -226,5 +236,9 @@ public class CMap {
 
     void addSingleNotDefMapping(SingleCIDMapping mapping) {
         this.notDefMappings.add(mapping);
+    }
+
+    void addUnicodeInterval(ToUnicodeInterval interval) {
+        this.unicodeIntervals.add(interval);
     }
 }

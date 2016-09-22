@@ -125,11 +125,12 @@ public class PDCMap {
     }
 
     public COSObject getUseCMap() {
-        return this.cMap.getKey(ASAtom.USE_CMAP);
+        COSObject res = this.cMap.getKey(ASAtom.USE_CMAP);
+        return res == null ? COSObject.getEmpty() : res;
     }
 
     private COSDictionary getCIDSystemInfo() {
-        if (this.cMap.getType() != COSObjType.COS_NAME) {
+        if (this.cMap.getType() == COSObjType.COS_NAME) {
             // actually creating COSDictionary with values from predefined CMap.
             String registry = this.getCMapFile().getRegistry();
             String ordering = this.getCMapFile().getOrdering();
@@ -154,6 +155,9 @@ public class PDCMap {
         try {
             File cMapFile;
             URL res = PDCMap.class.getResource(cMapName);
+            if(res == null) {
+                throw new IOException("CMap " + cMapName + " can't be found.");
+            }
             if (res.toString().startsWith("jar:")) {
                 InputStream input = PDCMap.class.getResourceAsStream(cMapName);
                 cMapFile = File.createTempFile("tempfile", ".tmp");
