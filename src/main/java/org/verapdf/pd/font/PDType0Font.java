@@ -108,6 +108,11 @@ public class PDType0Font extends PDCIDFont {
      */
     @Override
     public String toUnicode(int code) {
+        if(this.toUnicodeCMap == null) {
+            this.toUnicodeCMap = new PDCMap(
+                    this.type0FontDict.getKey(ASAtom.TO_UNICODE));
+        }
+
         String unicode = super.toUnicode(code);
         if (unicode != null) {
             return unicode;
