@@ -223,19 +223,25 @@ public abstract class PDFont extends PDResource {
         return this.toUnicodeCMap.toUnicode(code);
     }
 
-    public double getWidth(int code) {
-        if (dictionary.knownKey(ASAtom.WIDTHS) ||
-                dictionary.knownKey(ASAtom.MISSING_WIDTH)) {
+    public Double getWidth(int code) {
+        if (dictionary.knownKey(ASAtom.WIDTHS)
+                && dictionary.knownKey(ASAtom.FIRST_CHAR)
+                && dictionary.knownKey(ASAtom.LAST_CHAR)) {
             int firstChar = dictionary.getIntegerKey(ASAtom.FIRST_CHAR).intValue();
             int lastChar = dictionary.getIntegerKey(ASAtom.LAST_CHAR).intValue();
             if (getWidths().size() > 0 && code >= firstChar && code <= lastChar) {
                 return getWidths().at(code - firstChar).getReal();
             }
+        }
 
+        if (fontDescriptor.knownKey(ASAtom.MISSING_WIDTH)) {
             if (this.fontDescriptor != null) {
-                Double res = fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
-                return res == null ? 0 : res.doubleValue();
+                return fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
             }
+        }
+
+        if (this instanceof PDType3Font) {
+            return null;
         }
 
         if (this instanceof PDType1Font && ((PDType1Font) this).isStandard()) {
@@ -243,20 +249,20 @@ public abstract class PDFont extends PDResource {
                     StandardFontMetricsFactory.getFontMetrics(this.getName());
             Encoding enc = this.getEncodingMapping();
             if (metrics != null) {
-                return metrics.getWidth(enc.getName(code));
+                return Double.valueOf(metrics.getWidth(enc.getName(code)));
             } else {
                 // should not get here
                 LOGGER.error("Can't get standard metrics");
-                return 0;
+                return null;
             }
         }
 
         try {
             this.getFontProgram().parseFont();
-            return this.getFontProgram().getWidth(code);
+            return Double.valueOf(this.getFontProgram().getWidth(code));
         } catch (IOException e) {
             LOGGER.warn("Can't parse font program of font " + this.getName());
-            return 0;
+            return null;
         }
     }
 }
