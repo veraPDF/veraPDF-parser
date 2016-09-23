@@ -1,9 +1,9 @@
 package org.verapdf.pd.font.cmap;
 
 import org.apache.log4j.Logger;
-import org.verapdf.as.io.ASInputStream;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -68,13 +68,13 @@ public class CMap {
      * @param stream is stream from which character codes will be read.
      * @return CID of read code.
      */
-    public int getCIDFromStream(ASInputStream stream) throws IOException {
+    public int getCIDFromStream(InputStream stream) throws IOException {
         byte[] charCode = new byte[4];
         byte[] temp = new byte[1];
         int previousShortestMatchingCodeSpaceLength = this.shortestCodeSpaceLength;
 
         for (int i = 0; i <= 4; ++i) {
-            stream.read(temp, 1);
+            temp[0] = (byte) stream.read();
             System.arraycopy(temp, 0, charCode, i, 1);
             byte[] currentCode = Arrays.copyOf(charCode, i + 1);
             for (CodeSpace codeSpace : codeSpaces) {     // Looking for complete match
@@ -102,7 +102,9 @@ public class CMap {
                 }
             }
             if (shortestMatchingCodeSpaceLength == Integer.MAX_VALUE) {
-                stream.read(charCode, previousShortestMatchingCodeSpaceLength - i - 1);    // No described partial matching, reading necessary amount of bytes and returning 0
+                byte[] tmp = new byte[previousShortestMatchingCodeSpaceLength - i - 1];
+                stream.read(tmp);
+                System.arraycopy(tmp, 0, charCode, 0, tmp.length);      // No described partial matching, reading necessary amount of bytes and returning 0
                 return 0;
             }
             previousShortestMatchingCodeSpaceLength = shortestMatchingCodeSpaceLength;

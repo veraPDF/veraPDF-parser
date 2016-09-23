@@ -2,12 +2,10 @@ package org.verapdf.pd.font;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
-import org.verapdf.io.InternalInputStream;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.cmap.PDCMap;
 
@@ -86,12 +84,11 @@ public class PDType0Font extends PDCIDFont {
 
     @Override
     public int readCode(InputStream stream) throws IOException {
-        ASInputStream asInputStream = new InternalInputStream(stream);
         PDCMap pdcMap = this.getCMap();
         if(pdcMap != null) {
             CMap cMap = pdcMap.getCMapFile();
             if(cMap != null) {
-                return cMap.getCIDFromStream(asInputStream);
+                return cMap.getCIDFromStream(stream);
             }
         }
         throw new IOException("No CMap for Type 0 font " +
@@ -108,6 +105,11 @@ public class PDType0Font extends PDCIDFont {
      */
     @Override
     public String toUnicode(int code) {
+        if(this.toUnicodeCMap == null) {
+            this.toUnicodeCMap = new PDCMap(
+                    this.type0FontDict.getKey(ASAtom.TO_UNICODE));
+        }
+
         String unicode = super.toUnicode(code);
         if (unicode != null) {
             return unicode;

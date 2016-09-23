@@ -22,7 +22,9 @@ public class PDXImage extends PDXObject {
 
 	private static final Logger LOGGER = Logger.getLogger(PDXImage.class);
 
+	private ASAtom colorSpaceName;
 	private PDColorSpace imageCS;
+
 	private JPEG2000 jpxStream;
 
 	public PDXImage(COSObject obj) {
@@ -36,19 +38,28 @@ public class PDXImage extends PDXObject {
 	}
 
 	private void parseJPXAndColorSpace() {
-		PDColorSpace colorSpace = ColorSpaceFactory.getColorSpace(getKey(ASAtom.COLORSPACE));
-		if (colorSpace != null) {
-			this.imageCS = colorSpace;
-		}
 		List<ASAtom> filters = getFilters();
 		if (filters.contains(ASAtom.JPX_DECODE)) {
 			this.jpxStream = JPEG2000.fromStream(getObject().getData());
 			this.imageCS = this.imageCS == null ? this.jpxStream.getImageColorSpace() : this.imageCS;
 		}
+		COSObject rawColorSpace = getKey(ASAtom.COLORSPACE);
+		if (rawColorSpace != null && !rawColorSpace.empty() && rawColorSpace.getType() != COSObjType.COS_NULL) {
+			if (rawColorSpace.getType() == COSObjType.COS_NAME) {
+				this.colorSpaceName = rawColorSpace.getName();
+			}
+			if (rawColorSpace.getType() == COSObjType.COS_ARRAY) {
+				this.imageCS = ColorSpaceFactory.getColorSpace(rawColorSpace);
+			}
+		}
 	}
 
 	public PDColorSpace getImageCS() {
 		return this.imageCS;
+	}
+
+	public ASAtom getImageCSName() {
+		return this.colorSpaceName;
 	}
 
 	public JPEG2000 getJPXStream() {
