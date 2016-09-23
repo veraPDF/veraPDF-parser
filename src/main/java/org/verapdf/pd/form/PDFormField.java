@@ -19,10 +19,13 @@ public class PDFormField extends PDObject {
 		super(obj);
 	}
 
-	public static PDFormField createTypedFormField(COSObject obj) {
-		// TODO: add PDSignatureField creation logic here
-		return new PDFormField(obj);
-	}
+    public static PDFormField createTypedFormField(COSObject obj) {
+        ASAtom fieldType = getFieldTypeCOSObject(obj);
+        if (fieldType == ASAtom.SIG) {
+            return new PDSignatureField(obj);
+        }
+        return new PDFormField(obj);
+    }
 
 	public ASAtom getFT() {
 		return getInheritedFT(getObject());
@@ -87,4 +90,16 @@ public class PDFormField extends PDObject {
 		}
 		return false;
 	}
+
+    private static ASAtom getFieldTypeCOSObject(COSObject field) {
+        ASAtom res = field.getNameKey(ASAtom.FT);
+        if (res != null) {
+            return res;
+        }
+        COSObject parent = field.getKey(ASAtom.PARENT);
+        if (parent != null) {
+            return getFieldTypeCOSObject(parent);
+        }
+        return null;
+    }
 }
