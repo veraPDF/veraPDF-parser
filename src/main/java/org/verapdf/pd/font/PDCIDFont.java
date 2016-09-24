@@ -7,8 +7,9 @@ import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.pd.font.cff.CFFFontProgram;
+import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
-import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
+import org.verapdf.pd.font.truetype.CIDFontType2Program;
 
 import java.io.IOException;
 
@@ -19,7 +20,17 @@ public class PDCIDFont extends PDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDCIDFont.class);
 
-    public PDCIDFont(COSDictionary dictionary) {
+    protected CMap cMap;
+
+    public PDCIDFont(COSDictionary dictionary, CMap cMap) {
+        super(dictionary);
+        this.cMap = cMap;
+    }
+
+    /*
+    Do not forget to set cMap!!!
+     */
+    protected PDCIDFont(COSDictionary dictionary) {
         super(dictionary);
     }
 
@@ -44,9 +55,9 @@ public class PDCIDFont extends PDFont {
             try {
                 COSStream trueTypeFontFile =
                         getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE2));
-                this.fontProgram = new TrueTypeFontProgram(
+                this.fontProgram = new CIDFontType2Program(
                         trueTypeFontFile.getData(COSStream.FilterFlags.DECODE),
-                        this.isSymbolic(), this.getEncoding());
+                        this.cMap, this.getCIDToGIDMap());
                 return this.fontProgram;
             } catch (IOException e) {
                 LOGGER.error("Can't read TrueType font program.");
