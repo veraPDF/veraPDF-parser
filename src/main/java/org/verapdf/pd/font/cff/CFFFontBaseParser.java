@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.cff;
 
-import org.verapdf.io.ASMemoryInStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.type1.Type1CharStringParser;

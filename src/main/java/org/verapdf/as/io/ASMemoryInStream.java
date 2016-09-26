@@ -1,6 +1,4 @@
-package org.verapdf.io;
-
-import org.verapdf.as.io.ASInputStream;
+package org.verapdf.as.io;
 
 import java.io.IOException;
 import java.util.Arrays;

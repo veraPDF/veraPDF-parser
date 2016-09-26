@@ -14,6 +14,10 @@ public class InternalInputStream extends ASInputStream {
 
 	private RandomAccessFile source;
 
+	public InternalInputStream(final RandomAccessFile source) {
+		this.source = source;
+	}
+
 	public InternalInputStream(final String fileName) throws FileNotFoundException {
 		this.source = new RandomAccessFile(fileName, READ_ONLY_MODE);
 	}

@@ -2,7 +2,7 @@ package org.verapdf.pd.font.cmap;
 
 import org.junit.Test;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.io.ASMemoryInStream;
+import org.verapdf.as.io.ASMemoryInStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

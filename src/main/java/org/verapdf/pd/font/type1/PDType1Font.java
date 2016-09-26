@@ -2,11 +2,11 @@ package org.verapdf.pd.font.type1;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
-import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.parser.COSParser;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDSimpleFont;
