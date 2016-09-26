@@ -31,6 +31,8 @@ public class PDType0Font extends PDCIDFont {
         super(getDedcendantCOSDictionary(dictionary));
         type0FontDict = dictionary == null ?
                 (COSDictionary) COSDictionary.construct().get() : dictionary;
+
+        this.cMap = getCMap().getCMapFile();
     }
 
     public COSDictionary getCIDSystemInfo() {

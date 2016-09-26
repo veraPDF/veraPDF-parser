@@ -11,22 +11,17 @@ import org.verapdf.pd.font.FontProgram;
 import java.io.IOException;
 
 /**
- * Instance of this class contains True Type Font data.
+ * Represents TrueTypeFontProgram.
  *
  * @author Sergey Shemyakov
  */
-public class TrueTypeFontProgram implements FontProgram {
+public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProgram {
 
-    private float[] widths;
-
-    private TrueTypeFontParser parser;
-    private boolean isSymbolic;
     private COSObject encoding;
-    private String[] encodingMappingArray;
-    private boolean isFontParsed = false;
+    protected boolean isSymbolic;
 
     /**
-     * Constructor from stream, containing font data, and encoding details.
+     * Constructor from stream containing font data, and encoding details.
      *
      * @param stream     is stream containing font data.
      * @param isSymbolic is true if font is marked as symbolic.
@@ -35,7 +30,7 @@ public class TrueTypeFontProgram implements FontProgram {
      */
     public TrueTypeFontProgram(ASInputStream stream, boolean isSymbolic,
                                COSObject encoding) throws IOException {
-        this.parser = new TrueTypeFontParser(stream);
+        super(stream);
         this.isSymbolic = isSymbolic;
         if (encoding != null) {
             this.encoding = encoding;
@@ -44,55 +39,12 @@ public class TrueTypeFontProgram implements FontProgram {
         }
     }
 
-    /**
-     * Parses True Type font from given stream and extracts all the data needed.
-     *
-     * @throws IOException if stream-reading error occurs.
-     */
     @Override
     public void parseFont() throws IOException {
-        if (!isFontParsed) {
-            isFontParsed = true;
-            this.parser.readHeader();
-            this.parser.readTableDirectory();
-            this.parser.readTables();
-
-            float quotient = 1000f / this.parser.getHeadParser().getUnitsPerEm();
-            int[] unconvertedWidths = this.parser.getHmtxParser().getLongHorMetrics();
-            widths = new float[unconvertedWidths.length];
-            for (int i = 0; i < unconvertedWidths.length; ++i) {
-                widths[i] = unconvertedWidths[i] * quotient;
-            }
-
-            if (!isSymbolic) {
-                this.createCIDToNameTable();
-            }
+        super.parseFont();
+        if (!isSymbolic) {
+            this.createCIDToNameTable();
         }
-    }
-
-    /**
-     * @return array, containing platform ID and encoding ID for each cmap in
-     * this True Type font.
-     */
-    public TrueTypeCmapSubtable[] getCmapEncodingPlatform() {
-        if(this.parser.getCmapParser() != null) {
-            return this.parser.getCmapParser().getCmapInfos();
-        } else {
-            return new TrueTypeCmapSubtable[0];
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean containsCode(int code) {
-        for (TrueTypeCmapSubtable cMap : getCmapEncodingPlatform()) {
-            if (cMap.containsCID(code)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -103,7 +55,7 @@ public class TrueTypeFontProgram implements FontProgram {
         if (isSymbolic) {
             return getWidthSymbolic(code);
         } else {
-            if(code < 256) {
+            if (code < 256) {
                 String glyphName = encodingMappingArray[code];
                 return getWidth(glyphName);
             } else {
@@ -148,25 +100,6 @@ public class TrueTypeFontProgram implements FontProgram {
         return isSymbolic;
     }
 
-    /**
-     * @return number of glyphs in this font.
-     */
-    public int getNGlyphs() {
-        return this.parser.getMaxpParser().getNumGlyphs();
-    }
-
-    /**
-     * Returns true if cmap table with given platform ID and encoding ID is
-     * present in the font.
-     *
-     * @param platformID is platform ID of requested cmap.
-     * @param encodingID is encoding ID of requested cmap.
-     * @return true if requested cmap is present.
-     */
-    public boolean isCmapPresent(int platformID, int encodingID) {
-        return this.parser.getCmapTable(platformID, encodingID) != null;
-    }
-
     private float getWidthSymbolic(int code) {
         TrueTypeCmapSubtable cmap30 = this.parser.getCmapTable(3, 0);
         if (cmap30 != null) {
@@ -186,14 +119,6 @@ public class TrueTypeFontProgram implements FontProgram {
             } else {
                 return -1;
             }
-        }
-    }
-
-    private float getWidthWithCheck(int gid) {
-        if (gid < widths.length) {
-            return widths[gid];
-        } else {
-            return widths[widths.length - 1];   // case of monospaced fonts
         }
     }
 
