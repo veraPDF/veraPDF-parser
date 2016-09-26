@@ -260,14 +260,14 @@ public class COSParser extends BaseParser {
 
 		if (streamLengthValid) {
 			dict.setRealStreamSize(size);
-			ASInputStream stm = super.getStream(size);
+			ASInputStream stm = super.getRandomAccess(size);
 			dict.setData(stm);
 		} else {
 			//trying to find endstream keyword
 			long realStreamSize = -1;
 			int bufferLength = (int) (size > 512 ? 512 : size);
 			byte[] buffer = new byte[bufferLength];
-			while (!source.isEof()) {
+			while (!source.isEOF()) {
 				long bytesRead = source.read(buffer, bufferLength);
 				for (int i = 0; i < bytesRead; i++) {
 					if (buffer[i] == 101) {
@@ -279,7 +279,7 @@ public class COSParser extends BaseParser {
 								token.keyword == Token.Keyword.KW_ENDSTREAM) {
 							realStreamSize = possibleEndstreamOffset - streamStartOffset;
 							dict.setRealStreamSize(realStreamSize);
-							ASInputStream stm = super.getStream(realStreamSize);
+							ASInputStream stm = super.getRandomAccess(realStreamSize);
 							dict.setData(stm);
 							source.seek(possibleEndstreamOffset);
 							break;

@@ -4,8 +4,8 @@ import org.apache.log4j.Logger;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.io.IReader;
-import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.Reader;
+import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.PDDocument;
 
 import java.io.IOException;
@@ -232,7 +232,7 @@ public class COSDocument {
 		//TODO : implement this
 	}
 
-	public InternalInputStream getPDFSource() {
+	public SeekableStream getPDFSource() {
 		return this.reader.getPDFSource();
 	}
 

@@ -1,6 +1,7 @@
 package org.verapdf.io;
 
-import java.io.Closeable;
+import org.verapdf.as.io.ASInputStream;
+
 import java.io.IOException;
 
 /**
@@ -10,62 +11,75 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public interface SeekableStream extends Closeable {
-
-    /**
-     * Reads next byte from stream.
-     *
-     * @return byte read.
-     */
-    int read() throws IOException;
-
-    /**
-     * Reads particular amount of bytes into buffer.
-     *
-     * @param buf  is buffer to read into.
-     * @param size amount of bytes to read.
-     * @return actual amount of read bytes.
-     */
-    int read(byte[] buf, int size) throws IOException;
+public abstract class SeekableStream extends ASInputStream {
 
     /**
      * Goes to a particular byte in stream.
      *
      * @param offset is offset of a byte to go to.
      */
-    void seek(long offset) throws IOException;
-
-    /**
-     * Skips bytes in stream without reading them.
-     *
-     * @param size is amount of bytes to skip.
-     * @return amount of actually skipped bytes.
-     */
-    int skip(int size) throws IOException;
-
-    /**
-     * Resets this stream.
-     */
-    void reset() throws IOException;
+    public abstract void seek(long offset) throws IOException;
 
     /**
      * Gets offset of current byte.
      *
      * @return offset of byte to be read next.
      */
-    long getOffset() throws IOException;
+    public abstract long getOffset() throws IOException;
 
     /**
      * Gets total length of stream.
      *
      * @return length of stream in bytes.
      */
-    long getLength() throws IOException;
+    public abstract long getStreamLength() throws IOException;
 
     /**
      * Gets next byte without reading it.
      *
      * @return next byte.
      */
-    int peek() throws IOException;
+    public abstract int peek() throws IOException;
+
+    /**
+     * @return true if end of stream is reached.
+     */
+    public boolean isEOF() throws IOException {
+        return this.getOffset() == this.getStreamLength();
+    }
+
+    public void unread() throws IOException {
+        this.seek(this.getOffset() - 1);
+    }
+
+
+    public void unread(final int count) throws IOException {
+        this.seek(this.getOffset() - count);
+    }
+
+    public void seekFromCurrentPosition(final long pos) throws IOException {
+        this.seek(getOffset() + pos);
+    }
+
+    public void seekFromEnd(final long pos) throws IOException {
+        final long size = this.getStreamLength();
+        this.seek(size - pos);
+    }
+
+    public byte readByte() throws IOException {
+        int next = this.read();
+        if(next < 0) {
+            throw new IOException("End of file is reached");
+        }
+        return (byte) next;
+    }
+
+    /**
+     * Gets substream of this stream that starts at given offset and has given
+     * length.
+     *
+     * @param startOffset is starting offset of substream.
+     * @param length is length of substream.
+     */
+    public abstract ASInputStream getStream(long startOffset, long length) throws IOException;
 }

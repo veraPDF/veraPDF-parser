@@ -1,7 +1,6 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
-import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.cos.*;
 import org.verapdf.operator.InlineImageOperator;
 import org.verapdf.operator.Operator;
@@ -93,7 +92,7 @@ public class PDFStreamParser extends COSParser {
 		Object result = null;
 
 		skipSpaces();
-		byte nextByte = source.peek();
+		byte nextByte = (byte) source.peek();
 		if (nextByte == -1) {
 			return null;
 		}
@@ -104,7 +103,7 @@ public class PDFStreamParser extends COSParser {
 			case '<': {
 				//check brackets
 				source.readByte();
-				c = source.peek();
+				c = (byte) source.peek();
 				source.unread();
 
 				if (c == '<') {
@@ -211,13 +210,14 @@ public class PDFStreamParser extends COSParser {
 				int imageStreamLength = 2;
 				byte previousByte = source.readByte();
 				byte currentByte = source.readByte();
-				while (!(previousByte == 'E' && currentByte == 'I') && !source.isEof()) {
+				while (!(previousByte == 'E' && currentByte == 'I') && !source.isEOF()) {
 					previousByte = currentByte;
 					currentByte = source.readByte();
 					imageStreamLength++;
 				}
 				result = Operator.getOperator("ID");
-				((InlineImageOperator) result).setImageData(new ASFileInStream(source.getStream(), startOffset, imageStreamLength));
+				((InlineImageOperator) result).setImageData(
+						source.getStream(startOffset, imageStreamLength));
 				break;
 			}
 			default: {
@@ -238,7 +238,7 @@ public class PDFStreamParser extends COSParser {
 
 		//maximum possible length of an operator is 3 and we'll leave some space for invalid cases
 		StringBuffer buffer = new StringBuffer(5);
-		byte nextByte = source.peek();
+		byte nextByte = (byte) source.peek();
 		while (source.getOffset() < source.getStreamLength() && // EOF
 				!CharTable.isSpace(nextByte) && nextByte != ']' &&
 				nextByte != '[' && nextByte != '<' &&
@@ -249,10 +249,10 @@ public class PDFStreamParser extends COSParser {
 
 			if (source.getOffset() < source.getStreamLength()) {
 				// d0 and d1 operators
-				nextByte = source.peek();
+				nextByte = (byte) source.peek();
 				if (currentByte == 'd' && (nextByte == '0' || nextByte == '1')) {
 					buffer.append((char) source.readByte());
-					nextByte = source.peek();
+					nextByte = (byte) source.peek();
 				}
 			}
 		}

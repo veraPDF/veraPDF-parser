@@ -89,7 +89,7 @@ public class Reader extends XRefReader {
 	}
 
 	@Override
-	public InternalInputStream getPDFSource() {
+	public SeekableStream getPDFSource() {
 		return this.parser.getPDFSource();
 	}
 

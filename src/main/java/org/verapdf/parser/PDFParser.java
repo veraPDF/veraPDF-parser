@@ -8,7 +8,7 @@ import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
-import org.verapdf.io.InternalInputStream;
+import org.verapdf.io.SeekableStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +52,7 @@ public class PDFParser extends COSParser {
         return parseHeader();
     }
 
-    public InternalInputStream getPDFSource() {
+    public SeekableStream getPDFSource() {
         return this.source;
     }
 

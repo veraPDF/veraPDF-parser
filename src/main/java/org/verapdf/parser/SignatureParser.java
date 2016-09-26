@@ -170,7 +170,7 @@ public class SignatureParser extends COSParser {
         source.unread(buffer.length - 1);
         while (!Arrays.equals(buffer, EOF_STRING)) {    //TODO: does it need to be optimized?
             source.read(buffer);
-            if (source.isEof()) {
+            if (source.isEOF()) {
                 source.seek(currentOffset + document.getHeader().getHeaderOffset());
                 return source.getStreamLength();
             }

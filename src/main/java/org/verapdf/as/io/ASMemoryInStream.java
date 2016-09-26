@@ -1,5 +1,7 @@
 package org.verapdf.as.io;
 
+import org.verapdf.io.SeekableStream;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -8,7 +10,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class ASMemoryInStream extends ASInputStream {
+public class ASMemoryInStream extends SeekableStream {
 
     private int bufferSize;
     private int currentPosition;
@@ -95,6 +97,17 @@ public class ASMemoryInStream extends ASInputStream {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int peek() throws IOException {
+        if (currentPosition == bufferSize) {
+            return -1;
+        }
+        return this.buffer[currentPosition];
+    }
+
+    /**
      * Skips up to size bytes of data.
      *
      * @param size is amount of bytes to skip.
@@ -131,6 +144,29 @@ public class ASMemoryInStream extends ASInputStream {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getStreamLength() throws IOException {
+        return this.bufferSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getOffset() throws IOException {
+        return this.currentPosition;
+    }
+
+    @Override
+    public void seek(long offset) throws IOException {
+        if (offset < 0 || offset >= this.bufferSize) {
+            throw new IOException("Can't seek for offset " + offset + " in ASMemoryInStream");
+        }
+    }
+
+    /**
      * @return the amount of bytes left in stream.
      */
     public int available() {
@@ -142,5 +178,16 @@ public class ASMemoryInStream extends ASInputStream {
      */
     public boolean isCopiedBuffer() {
         return copiedBuffer;
+    }
+
+    @Override
+    public ASInputStream getStream(long startOffset, long length) throws IOException {
+        if (startOffset > 0 && startOffset < this.bufferSize &&
+                startOffset + length < this.bufferSize) {
+            return new ASMemoryInStream(Arrays.copyOfRange(
+                    this.buffer, (int) startOffset, (int) (startOffset + length)));
+        } else {
+            throw new IOException();
+        }
     }
 }

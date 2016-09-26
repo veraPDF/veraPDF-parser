@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface IReader {
 
-	InternalInputStream getPDFSource();
+	SeekableStream getPDFSource();
 
 	COSHeader getHeader();
 
