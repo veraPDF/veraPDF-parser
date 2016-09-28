@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableStream;
@@ -37,27 +36,16 @@ public class BaseParser {
 
 	public BaseParser(String fileName) throws FileNotFoundException {
 		if(fileName == null) {
-			throw new FileNotFoundException("Can't create InternalInputStream from file " + fileName);
+			throw new FileNotFoundException("Can't create InternalInputStream from file, filename is null");
 		}
 		this.source = new InternalInputStream(fileName);
 	}
 
 	public BaseParser(InputStream fileStream) throws IOException {
-		if(fileStream == null) {
+		if (fileStream == null) {
 			throw new IOException("Can't create InternalInputStream, fileStream is null");
 		}
-		this.source = new InternalInputStream(fileStream);
-	}
-
-	public BaseParser(InputStream fileStream, int length) throws IOException {
-		if(fileStream == null) {
-			throw new IOException("Can't create InternalInputStream, fileStream is null");
-		}
-		if(length <= SeekableStream.MAX_BUFFER_SIZE) {
-			this.source = new ASMemoryInStream(fileStream);
-		} else {
-			this.source = new InternalInputStream(fileStream);
-		}
+		this.source = SeekableStream.getSeekableStream(fileStream);
 	}
 
 	public void closeInputStream() throws IOException {
@@ -294,7 +282,7 @@ public class BaseParser {
 		return isDigit((byte) this.source.peek());
 	}
 
-	protected boolean isDigit(byte c) {
+	protected static boolean isDigit(byte c) {
 		return c >= ASCII_ZERO && c <= ASCII_NINE;
 	}
 
@@ -304,11 +292,11 @@ public class BaseParser {
 				|| (ch >= 'A' && ch <= 'F');
 	}
 
-	protected boolean isLF(int c) {
+	protected static boolean isLF(int c) {
 		return ASCII_LF == c;
 	}
 
-	protected boolean isCR(int c) {
+	protected static boolean isCR(int c) {
 		return ASCII_CR == c;
 	}
 

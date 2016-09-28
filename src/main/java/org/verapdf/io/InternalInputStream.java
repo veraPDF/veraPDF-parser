@@ -31,10 +31,6 @@ public class InternalInputStream extends SeekableStream {
 		this.source = new RandomAccessFile(createTempFile(fileStream), READ_ONLY_MODE);
 	}
 
-	public InternalInputStream(final ASInputStream asInputStream) throws IOException {
-		this.source = new RandomAccessFile(createTempFile(asInputStream), READ_ONLY_MODE);
-	}
-
 	@Override
 	public int read() throws IOException {
 		return this.source.read();

@@ -1,8 +1,11 @@
 package org.verapdf.io;
 
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Represents stream in which seek for a particular byte offset can be performed.
@@ -13,7 +16,7 @@ import java.io.IOException;
  */
 public abstract class SeekableStream extends ASInputStream {
 
-    public static final int MAX_BUFFER_SIZE = 2048;     // TODO: discuss with Boris exact value
+    public static final int MAX_BUFFER_SIZE = 10240;
 
     /**
      * Goes to a particular byte in stream.
@@ -42,6 +45,15 @@ public abstract class SeekableStream extends ASInputStream {
      * @return next byte.
      */
     public abstract int peek() throws IOException;
+
+    /**
+     * Gets substream of this stream that starts at given offset and has given
+     * length.
+     *
+     * @param startOffset is starting offset of substream.
+     * @param length is length of substream.
+     */
+    public abstract ASInputStream getStream(long startOffset, long length) throws IOException;
 
     /**
      * @return true if end of stream is reached.
@@ -77,11 +89,25 @@ public abstract class SeekableStream extends ASInputStream {
     }
 
     /**
-     * Gets substream of this stream that starts at given offset and has given
-     * length.
+     * Returns InternalInputStream or ASMemoryInStream constructed from given
+     * stream depending on stream length.
      *
-     * @param startOffset is starting offset of substream.
-     * @param length is length of substream.
+     * @param stream is stream to turn into seekable stream.
+     * @return SeekableStream that contains data of passed stream.
      */
-    public abstract ASInputStream getStream(long startOffset, long length) throws IOException;
+    public static SeekableStream getSeekableStream(InputStream stream) throws IOException {
+        int totalRead = 0;
+        byte[] buffer = new byte[0];
+        byte[] temp = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+        int read = stream.read(temp);
+        do {
+            buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
+            totalRead += read;
+            read = stream.read(temp);
+            if(read == -1) {
+                return new ASMemoryInStream(buffer, buffer.length, false);
+            }
+        } while (totalRead < MAX_BUFFER_SIZE);
+        return new InternalInputStream(stream);
+    }
 }

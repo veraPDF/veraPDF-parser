@@ -29,9 +29,21 @@ public class ASMemoryInStream extends SeekableStream {
         this(buffer, buffer.length);
     }
 
+    /**
+     * Constructor from other stream. It reads stream into byte buffer.
+     *
+     * @param stream is stream to read into byte array.
+     */
     public ASMemoryInStream(InputStream stream) throws IOException {
+        this.currentPosition = 0;
+        this.copiedBuffer = true;
+        this.buffer = new byte[0];
         byte[] temp = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
-        // TODO: finish constructor
+        int read = stream.read(temp);
+        do {
+            buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
+            read = stream.read(temp);
+        } while (read != -1);
     }
 
     /**
