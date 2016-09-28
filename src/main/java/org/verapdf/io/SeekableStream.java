@@ -108,6 +108,7 @@ public abstract class SeekableStream extends ASInputStream {
                 return new ASMemoryInStream(buffer, buffer.length, false);
             }
         } while (totalRead < MAX_BUFFER_SIZE);
-        return new InternalInputStream(stream);
+        buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
+        return new InternalInputStream(buffer, stream);
     }
 }

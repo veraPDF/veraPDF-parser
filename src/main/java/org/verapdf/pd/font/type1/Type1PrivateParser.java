@@ -6,6 +6,7 @@ import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,7 @@ class Type1PrivateParser extends BaseParser {
     /**
      * {@inheritDoc}
      */
-    public Type1PrivateParser(ASInputStream stream, double[] fontMatrix) throws IOException {
+    public Type1PrivateParser(InputStream stream, double[] fontMatrix) throws IOException {
         super(stream);
         glyphWidths = new HashMap<>();
         this.fontMatrix = fontMatrix;

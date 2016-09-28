@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.truetype;
 
-import org.verapdf.io.InternalInputStream;
+import org.verapdf.io.SeekableStream;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ class TrueTypeHeadTable extends TrueTypeTable {
 
     private int unitsPerEm;
 
-    TrueTypeHeadTable(InternalInputStream source, long offset) {
+    TrueTypeHeadTable(SeekableStream source, long offset) {
         super(source, offset);
     }
 

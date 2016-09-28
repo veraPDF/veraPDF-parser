@@ -1,7 +1,6 @@
 package org.verapdf.pd.font.cmap;
 
 import org.apache.log4j.Logger;
-import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.BaseParser;
@@ -36,14 +35,6 @@ public class CMapParser extends BaseParser {
      */
     public CMapParser(InputStream fileStream) throws IOException {
         super(fileStream);
-        cMap = new CMap();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public CMapParser(ASInputStream asInputStream) throws IOException {
-        super(asInputStream);
         cMap = new CMap();
     }
 

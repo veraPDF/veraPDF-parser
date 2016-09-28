@@ -45,14 +45,6 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public Type1FontProgram(ASInputStream asInputStream) throws IOException {
-        super(asInputStream);
-        encoding = new String[256];
-    }
-
-    /**
      * This method is entry point for parsing process.
      *
      * @throws IOException if stream reading error occurs.

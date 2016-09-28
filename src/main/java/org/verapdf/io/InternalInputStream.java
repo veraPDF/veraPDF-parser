@@ -31,6 +31,20 @@ public class InternalInputStream extends SeekableStream {
 		this.source = new RandomAccessFile(createTempFile(fileStream), READ_ONLY_MODE);
 	}
 
+	/**
+	 * Constructor writes into temp file passed buffer, then passed stream.
+	 * After that, InternalInputStream from file is created.
+	 *
+	 * @param alreadyRead is byte array of data that was already read from the
+	 *                       beginning of stream.
+	 * @param stream is data left in stream.
+     */
+	public InternalInputStream(byte[] alreadyRead, final InputStream stream)
+			throws IOException {
+		this.source = new RandomAccessFile(createTempFile(alreadyRead, stream),
+				READ_ONLY_MODE);
+	}
+
 	@Override
 	public int read() throws IOException {
 		return this.source.read();
@@ -95,6 +109,31 @@ public class InternalInputStream extends SeekableStream {
 			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
 			tmpFile.deleteOnExit();
 			output = new FileOutputStream(tmpFile);
+
+			//copy stream content
+			byte[] buffer = new byte[4096];
+			int n;
+			while ((n = input.read(buffer)) != -1) {
+				output.write(buffer, 0, n);
+			}
+
+			return tmpFile;
+		}
+		finally {
+			input.close();
+			if (output != null) {
+				output.close();
+			}
+		}
+	}
+
+	private File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
+		FileOutputStream output = null;
+		try {
+			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
+			tmpFile.deleteOnExit();
+			output = new FileOutputStream(tmpFile);
+			output.write(alreadyRead);
 
 			//copy stream content
 			byte[] buffer = new byte[4096];

@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.truetype;
 
-import org.verapdf.io.InternalInputStream;
+import org.verapdf.io.SeekableStream;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ class TrueTypePostTable extends TrueTypeTable {
     private int numGlyphs;
     private Map<String, Integer> stringToGid;
 
-    TrueTypePostTable(InternalInputStream source, long offset, long length) {
+    TrueTypePostTable(SeekableStream source, long offset, long length) {
         super(source, offset);
         this.length = length;
         stringToGid = new HashMap<>();

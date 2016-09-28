@@ -47,6 +47,24 @@ public class ASMemoryInStream extends SeekableStream {
     }
 
     /**
+     * Constructor that creates substream from other ASMemoryInStream. Note that
+     * no buffer copy is performed.
+     *
+     * @param stream is stream, from which substream will be taken.
+     * @param offset is beginning of data to copy.
+     * @param length is length of data to copy.
+     */
+    public ASMemoryInStream(ASMemoryInStream stream, int offset, int length) {
+        this.buffer = stream.buffer;
+        if (offset >= 0 && offset < stream.bufferSize) {
+            this.currentPosition = offset;
+        } else {
+            this.currentPosition = 0;
+        }
+        this.bufferSize = Math.min(stream.bufferSize, offset + length);
+    }
+
+    /**
      * Constructor from byte array and actual data length. Buffer is copied
      * while initializing ASMemoryInStream.
      *
@@ -112,7 +130,7 @@ public class ASMemoryInStream extends SeekableStream {
         if (currentPosition == bufferSize) {
             return -1;
         }
-        return this.buffer[currentPosition++];
+        return this.buffer[currentPosition++] & 0xFF;
     }
 
     /**
@@ -123,7 +141,7 @@ public class ASMemoryInStream extends SeekableStream {
         if (currentPosition == bufferSize) {
             return -1;
         }
-        return this.buffer[currentPosition];
+        return this.buffer[currentPosition] & 0xFF;
     }
 
     /**
@@ -183,6 +201,7 @@ public class ASMemoryInStream extends SeekableStream {
         if (offset < 0 || offset >= this.bufferSize) {
             throw new IOException("Can't seek for offset " + offset + " in ASMemoryInStream");
         }
+        this.currentPosition = (int) offset;
     }
 
     /**
@@ -203,8 +222,7 @@ public class ASMemoryInStream extends SeekableStream {
     public ASInputStream getStream(long startOffset, long length) throws IOException {
         if (startOffset > 0 && startOffset < this.bufferSize &&
                 startOffset + length < this.bufferSize) {
-            return new ASMemoryInStream(Arrays.copyOfRange(
-                    this.buffer, (int) startOffset, (int) (startOffset + length)));
+            return new ASMemoryInStream(this, (int) startOffset, (int) length);
         } else {
             throw new IOException();
         }

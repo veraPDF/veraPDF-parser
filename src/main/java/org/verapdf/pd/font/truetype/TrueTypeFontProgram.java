@@ -26,7 +26,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      * @param stream     is stream containing font data.
      * @param isSymbolic is true if font is marked as symbolic.
      * @param encoding   is value of /Encoding in font dictionary.
-     * @throws IOException if creation of @{link InternalInputStream} fails.
+     * @throws IOException if creation of @{link SeekableStream} fails.
      */
     public TrueTypeFontProgram(ASInputStream stream, boolean isSymbolic,
                                COSObject encoding) throws IOException {

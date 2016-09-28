@@ -22,7 +22,7 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
      * Constructor from stream containing font data, and encoding details.
      *
      * @param stream     is stream containing font data.
-     * @throws IOException if creation of @{link InternalInputStream} fails.
+     * @throws IOException if creation of @{link SeekableStream} fails.
      */
     public BaseTrueTypeProgram(ASInputStream stream)
             throws IOException {

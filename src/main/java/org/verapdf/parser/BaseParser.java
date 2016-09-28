@@ -2,7 +2,6 @@ package org.verapdf.parser;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.CharTable;
-import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.io.InternalInputStream;
@@ -29,21 +28,21 @@ public class BaseParser {
 
 	public BaseParser(SeekableStream stream) throws IOException {
 		if(stream == null) {
-			throw new IOException("Can't create InternalInputStream, seekableeStream is null");
+			throw new IOException("Can't create SeekableStream, passed seekableeStream is null");
 		}
 		this.source = stream;
 	}
 
 	public BaseParser(String fileName) throws FileNotFoundException {
 		if(fileName == null) {
-			throw new FileNotFoundException("Can't create InternalInputStream from file, filename is null");
+			throw new FileNotFoundException("Can't create SeekableStream from file, filename is null");
 		}
 		this.source = new InternalInputStream(fileName);
 	}
 
 	public BaseParser(InputStream fileStream) throws IOException {
 		if (fileStream == null) {
-			throw new IOException("Can't create InternalInputStream, fileStream is null");
+			throw new IOException("Can't create SeekableStream, fileStream is null");
 		}
 		this.source = SeekableStream.getSeekableStream(fileStream);
 	}
@@ -210,16 +209,11 @@ public class BaseParser {
 	}
 
 	public ASInputStream getRandomAccess(final long length) throws IOException {
-        if (this.source instanceof InternalInputStream) {
-            skipEOL();
-            ASInputStream result = new ASFileInStream(((InternalInputStream)
-                    this.source).getStream(), this.source.getOffset(), length);
-            source.seekFromCurrentPosition(length);
-
-            return result;
-        } else {
-            throw new IOException("Can't get RandomAccess file from stream");
-        }
+		skipEOL();
+		ASInputStream result =
+				this.source.getStream(this.source.getOffset(), length);
+		source.seekFromCurrentPosition(length);
+		return result;
     }
 
 	protected boolean isNextByteEOL() throws IOException {
