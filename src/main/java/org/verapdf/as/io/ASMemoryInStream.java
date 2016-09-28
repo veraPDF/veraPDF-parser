@@ -1,8 +1,10 @@
 package org.verapdf.as.io;
 
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.io.SeekableStream;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 /**
@@ -25,6 +27,11 @@ public class ASMemoryInStream extends SeekableStream {
      */
     public ASMemoryInStream(byte[] buffer) {
         this(buffer, buffer.length);
+    }
+
+    public ASMemoryInStream(InputStream stream) throws IOException {
+        byte[] temp = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+        // TODO: finish constructor
     }
 
     /**

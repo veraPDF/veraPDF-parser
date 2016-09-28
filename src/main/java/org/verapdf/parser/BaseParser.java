@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableStream;
@@ -27,8 +28,13 @@ public class BaseParser {
 	protected SeekableStream source;
 	private Token token;
 
-	// TODO: maybe rewrite BaseParser constructor so that it doesn't copy stream
-	// (e. g. in big file we need to parse only signature)
+	public BaseParser(SeekableStream stream) throws IOException {
+		if(stream == null) {
+			throw new IOException("Can't create InternalInputStream, seekableeStream is null");
+		}
+		this.source = stream;
+	}
+
 	public BaseParser(String fileName) throws FileNotFoundException {
 		if(fileName == null) {
 			throw new FileNotFoundException("Can't create InternalInputStream from file " + fileName);
@@ -43,11 +49,15 @@ public class BaseParser {
 		this.source = new InternalInputStream(fileStream);
 	}
 
-	public BaseParser(ASInputStream asInputStream) throws IOException {
-		if(asInputStream == null) {
-			throw new IOException("Can't create InternalInputStream, asInputStream is null");
+	public BaseParser(InputStream fileStream, int length) throws IOException {
+		if(fileStream == null) {
+			throw new IOException("Can't create InternalInputStream, fileStream is null");
 		}
-		this.source = new InternalInputStream(asInputStream);
+		if(length <= SeekableStream.MAX_BUFFER_SIZE) {
+			this.source = new ASMemoryInStream(fileStream);
+		} else {
+			this.source = new InternalInputStream(fileStream);
+		}
 	}
 
 	public void closeInputStream() throws IOException {

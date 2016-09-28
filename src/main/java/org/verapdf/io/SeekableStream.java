@@ -13,6 +13,8 @@ import java.io.IOException;
  */
 public abstract class SeekableStream extends ASInputStream {
 
+    public static final int MAX_BUFFER_SIZE = 2048;     // TODO: discuss with Boris exact value
+
     /**
      * Goes to a particular byte in stream.
      *
