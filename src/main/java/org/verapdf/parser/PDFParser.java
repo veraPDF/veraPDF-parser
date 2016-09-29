@@ -8,6 +8,7 @@ import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
+import org.verapdf.exceptions.InvalidPasswordException;
 import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
@@ -473,7 +474,7 @@ public class PDFParser extends COSParser {
 
 		if (trailer.knownKey(ASAtom.ENCRYPT)) {
 			closeInputStream();
-			throw new IOException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+			throw new InvalidPasswordException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 		}
 	}
 
