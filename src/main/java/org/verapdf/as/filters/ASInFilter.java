@@ -35,6 +35,10 @@ public abstract class ASInFilter extends ASInputStream {
 		return this.storedInStream != null ? this.storedInStream.read(buffer, size) : -1;
 	}
 
+	public int read(byte[] buffer) throws IOException {
+		return this.read(buffer, buffer.length);
+	}
+
 	public int skip(int size) throws IOException {
 		return this.storedInStream != null ? this.storedInStream.skip(size) : 0;
 	}

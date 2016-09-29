@@ -56,6 +56,7 @@ public class ASMemoryInStream extends SeekableStream {
      */
     public ASMemoryInStream(ASMemoryInStream stream, int offset, int length) {
         this.buffer = stream.buffer;
+        this.copiedBuffer = false;
         if (offset >= 0 && offset < stream.bufferSize) {
             this.currentPosition = offset;
         } else {
