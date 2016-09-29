@@ -153,11 +153,11 @@ public class PDPage extends PDPageTreeNode {
     }
 
     public COSArray getCOSMediaBox() {
-        return getCOSBBox(ASAtom.MEDIA_BOX);
+        return getInheritedCOSBBox(ASAtom.MEDIA_BOX);
     }
 
     public COSArray getCOSCropBox() {
-        return getCOSBBox(ASAtom.CROP_BOX);
+        return getInheritedCOSBBox(ASAtom.CROP_BOX);
     }
 
     public COSArray getCOSBleedBox() {
@@ -175,10 +175,28 @@ public class PDPage extends PDPageTreeNode {
     private COSArray getCOSBBox(ASAtom type) {
         COSObject object = getKey(type);
         if (object != null && object.getType() == COSObjType.COS_ARRAY) {
-            return (COSArray) object.get();
+            return (COSArray) object.getDirectBase();
         }
         return null;
     }
+
+    private COSArray getInheritedCOSBBox(ASAtom type) {
+        COSObject current = getObject();
+        while (current != null && current.getType().isDictionaryBased()) {
+            COSObject object = current.getKey(type);
+            if (object != null && !object.empty()) {
+                if (object.getType() == COSObjType.COS_ARRAY) {
+                    return (COSArray) object.getDirectBase();
+                } else {
+                    return null;
+                }
+            } else {
+                current = current.getKey(ASAtom.PARENT);
+            }
+        }
+        return null;
+    }
+
 
     public COSObject getCOSPresSteps() {
         COSObject pres = getKey(ASAtom.PRES_STEPS);
