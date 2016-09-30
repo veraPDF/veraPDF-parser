@@ -201,7 +201,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         }
         if (!Arrays.equals(this.fontMatrix, CFFType1FontProgram.DEFAULT_FONT_MATRIX)) {
             for (int i = 0; i < widths.length; ++i) {
-                widths[i] = widths[i] * fontMatrix[0] * 1000;
+                widths[i] = widths[i] * (fontMatrix[0] * 1000);
             }
         }
     }

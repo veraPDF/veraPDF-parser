@@ -257,12 +257,6 @@ public abstract class PDFont extends PDResource {
             }
         }
 
-        try {
-            this.getFontProgram().parseFont();
-            return Double.valueOf(this.getFontProgram().getWidth(code));
-        } catch (IOException e) {
-            LOGGER.warn("Can't parse font program of font " + this.getName());
-            return null;
-        }
+        return Double.valueOf(0);
     }
 }

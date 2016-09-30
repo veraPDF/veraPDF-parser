@@ -185,7 +185,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         }
         if (!Arrays.equals(this.fontMatrix, DEFAULT_FONT_MATRIX)) {
             for (int i = 0; i < widths.length; ++i) {
-                widths[i] = widths[i] * fontMatrix[0] * 1000;
+                widths[i] = widths[i] * (fontMatrix[0] * 1000);
             }
         }
     }

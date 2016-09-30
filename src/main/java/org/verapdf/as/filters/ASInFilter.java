@@ -28,7 +28,11 @@ public abstract class ASInFilter extends ASInputStream {
 
 	@Override
 	public int read() throws IOException {
-		return this.storedInStream != null ? this.storedInStream.read() : -1;
+		byte[] temp = new byte[1];
+		if (this.read(temp, 1) != -1) {
+			return temp[0] & 0xFF;
+		}
+		return -1;
 	}
 
 	public int read(byte[] buffer, int size) throws IOException {

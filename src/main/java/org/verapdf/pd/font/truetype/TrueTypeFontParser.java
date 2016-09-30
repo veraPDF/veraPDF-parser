@@ -85,7 +85,7 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         if (cmapParser != null) {
             this.cmapParser.readTable();
         } else {
-            throw new IOException("True type font doesn't contain cmap table.");
+            LOGGER.warn("True type font doesn't contain cmap table.");
         }
 
         if (this.maxpParser != null) {

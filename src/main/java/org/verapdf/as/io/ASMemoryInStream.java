@@ -18,6 +18,7 @@ public class ASMemoryInStream extends SeekableStream {
     private int currentPosition;
     private byte[] buffer;
     private boolean copiedBuffer;
+    private int resetPosition = 0;
 
     /**
      * Constructor from byte array. Buffer is copied while initializing
@@ -62,6 +63,7 @@ public class ASMemoryInStream extends SeekableStream {
         } else {
             this.currentPosition = 0;
         }
+        this.resetPosition = this.currentPosition;
         this.bufferSize = Math.min(stream.bufferSize, offset + length);
     }
 
@@ -178,7 +180,7 @@ public class ASMemoryInStream extends SeekableStream {
      */
     @Override
     public void reset() throws IOException {
-        currentPosition = 0;
+        currentPosition = resetPosition;
     }
 
     /**
@@ -199,7 +201,7 @@ public class ASMemoryInStream extends SeekableStream {
 
     @Override
     public void seek(long offset) throws IOException {
-        if (offset < 0 || offset >= this.bufferSize) {
+        if (offset < 0 || offset > this.bufferSize) {
             throw new IOException("Can't seek for offset " + offset + " in ASMemoryInStream");
         }
         this.currentPosition = (int) offset;

@@ -9,9 +9,6 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.cmap.PDCMap;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * Represents Type0 font on pd level.
  *
@@ -82,19 +79,6 @@ public class PDType0Font extends PDCIDFont {
 
     public COSDictionary getDescendantFont() {
         return getDedcendantCOSDictionary(this.type0FontDict);
-    }
-
-    @Override
-    public int readCode(InputStream stream) throws IOException {
-        PDCMap pdcMap = this.getCMap();
-        if(pdcMap != null) {
-            CMap cMap = pdcMap.getCMapFile();
-            if(cMap != null) {
-                return cMap.getCIDFromStream(stream);
-            }
-        }
-        throw new IOException("No CMap for Type 0 font " +
-                (this.getName() == null ? "" : this.getName()));
     }
 
     /**
