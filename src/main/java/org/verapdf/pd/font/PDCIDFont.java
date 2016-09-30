@@ -91,7 +91,7 @@ public class PDCIDFont extends PDFont {
                         this.cMap, this.getCIDToGIDMap());
                 return this.fontProgram;
             } catch (IOException e) {
-                LOGGER.error("Can't read TrueType font program.");
+                LOGGER.debug("Can't read TrueType font program.");
             }
         } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
             try {
@@ -117,7 +117,7 @@ public class PDCIDFont extends PDFont {
                     }
                 }
             } catch (IOException e) {
-                LOGGER.error("Can't read CFF font program.");
+                LOGGER.debug("Can't read CFF font program.");
             }
         }
         this.fontProgram = null;

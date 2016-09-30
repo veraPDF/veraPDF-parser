@@ -89,7 +89,7 @@ public abstract class PDFont extends PDResource {
             ASAtom typeFromDescriptor =
                     this.fontDescriptor.getNameKey(ASAtom.FONT_NAME);
             if (type != typeFromDescriptor) {
-                LOGGER.warn("Font names in font descriptor dictionary and in font dictionary are different for "
+                LOGGER.debug("Font names in font descriptor dictionary and in font dictionary are different for "
                         + type.getValue());
             }
         }
@@ -104,12 +104,12 @@ public abstract class PDFont extends PDResource {
      */
     public boolean isSymbolic() {
         if (this.fontDescriptor == null) {
-            LOGGER.warn("Font descriptor is null");
+            LOGGER.debug("Font descriptor is null");
             return false;
         }
         Long flagsLong = this.fontDescriptor.getIntegerKey(ASAtom.FLAGS);
         if (flagsLong == null) {
-            LOGGER.warn("Font descriptor doesn't contain /Flags entry");
+            LOGGER.debug("Font descriptor doesn't contain /Flags entry");
             return false;
         }
         int flags = flagsLong.intValue();
@@ -252,7 +252,7 @@ public abstract class PDFont extends PDResource {
                 return Double.valueOf(metrics.getWidth(enc.getName(code)));
             } else {
                 // should not get here
-                LOGGER.error("Can't get standard metrics");
+                LOGGER.debug("Can't get standard metrics");
                 return null;
             }
         }

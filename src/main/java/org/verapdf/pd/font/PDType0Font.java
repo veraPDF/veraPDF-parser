@@ -117,10 +117,10 @@ public class PDType0Font extends PDCIDFont {
                 this.ucsCMap = pdUCSCMap;
                 return ucsCMap.getUnicode(cid);
             }
-            LOGGER.warn("Can't load CMap " + ucsName);
+            LOGGER.debug("Can't load CMap " + ucsName);
             return null;
         } else {
-            LOGGER.warn("Can't get CMap for font " + this.getName());
+            LOGGER.debug("Can't get CMap for font " + this.getName());
             return null;
         }
     }

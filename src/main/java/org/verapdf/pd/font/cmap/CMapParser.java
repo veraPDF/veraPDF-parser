@@ -124,7 +124,7 @@ public class CMapParser extends BaseParser {
                         if (usedCMap != null) {
                             this.cMap.useCMap(usedCMap);
                         } else {
-                            LOGGER.warn("Can't load predefined CMap with name " + lastCOSName);
+                            LOGGER.debug("Can't load predefined CMap with name " + lastCOSName);
                         }
                         break;
                     default:
@@ -164,7 +164,7 @@ public class CMapParser extends BaseParser {
             }
             nextToken();
             if (!getToken().getValue().equals("end" + type)) {
-                LOGGER.warn("Unexpected end of " + type + " in CMap");
+                LOGGER.debug("Unexpected end of " + type + " in CMap");
             }
         }
     }

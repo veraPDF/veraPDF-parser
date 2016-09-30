@@ -104,7 +104,7 @@ public class COSDocument {
 					this.body.set(key, newObj);
 					result.add(newObj);
 				} catch (IOException e) {
-					LOGGER.warn("Error while parsing object : " + key.getNumber() +
+					LOGGER.debug("Error while parsing object : " + key.getNumber() +
 							" " + key.getGeneration());
 				}
 			}
@@ -125,7 +125,7 @@ public class COSDocument {
 					this.body.set(key, newObj);
 					result.put(key, newObj);
 				} catch (IOException e) {
-					LOGGER.warn("Error while parsing object : " + key.getNumber() +
+					LOGGER.debug("Error while parsing object : " + key.getNumber() +
 							" " + key.getGeneration());
 				}
 			}

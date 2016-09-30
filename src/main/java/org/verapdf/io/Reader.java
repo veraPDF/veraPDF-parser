@@ -46,7 +46,7 @@ public class Reader extends XRefReader {
 
 	public COSObject getObject(final COSKey key) throws IOException {
 		if (!super.containsKey(key)) {
-			LOGGER.warn("Trying to get object " + key.getNumber() + " " +
+			LOGGER.debug("Trying to get object " + key.getNumber() + " " +
 					key.getGeneration() + " that is not present in the document");
 			return null;
 		}

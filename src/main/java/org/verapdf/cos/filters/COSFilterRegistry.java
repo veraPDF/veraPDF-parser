@@ -31,7 +31,7 @@ public class COSFilterRegistry {
 			registerFactory(ASAtom.ASCII_HEX_DECODE, new ASFilterFactory(ASAtom.ASCII_HEX_DECODE));
 			registerFactory(ASAtom.ASCII85_DECODE, new ASFilterFactory(ASAtom.ASCII85_DECODE));
 		} catch (Exception e) {
-			LOGGER.warn("Trying to register factory twice", e);
+			LOGGER.debug("Trying to register factory twice", e);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class COSFilterRegistry {
 		if (filterFactory != null) {
 			return filterFactory.getInFilter(inputStream, decodeParams);
 		} else {
-			LOGGER.warn("Trying to use unimplemented decoding filter.");
+			LOGGER.debug("Trying to use unimplemented decoding filter.");
 			return new ASBufferingInFilter(inputStream);
 		}
 	}

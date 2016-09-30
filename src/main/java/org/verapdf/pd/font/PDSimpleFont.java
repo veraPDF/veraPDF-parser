@@ -41,11 +41,11 @@ public abstract class PDSimpleFont extends PDFont {
                 if (unicode != AdobeGlyphList.empty()) {
                     return unicode.getUnicodeString();
                 }
-                LOGGER.warn("Cannot find glyph " + glyphName + " in Adobe Glyph List.");
+                LOGGER.debug("Cannot find glyph " + glyphName + " in Adobe Glyph List.");
                 return null;
             }
         }
-        LOGGER.warn("Cannot find encoding for glyph with code" + code + " in font " + this.getName());
+        LOGGER.debug("Cannot find encoding for glyph with code" + code + " in font " + this.getName());
         return null;
     }
 }

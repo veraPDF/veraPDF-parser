@@ -60,7 +60,7 @@ public class SignatureParser extends COSParser {
                 }
             } else {
                 // invalid dictionary, we were expecting a /Name, read until the end or until we can recover
-                LOGGER.warn("Invalid dictionary, found: '" + c + "' but expected: '/'");
+                LOGGER.debug("Invalid dictionary, found: '" + c + "' but expected: '/'");
                 return;
             }
         }

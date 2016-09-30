@@ -65,7 +65,7 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         if (headParser != null) {
             this.headParser.readTable();
         } else {
-            LOGGER.warn("True type font doesn't contain head table. Default value for unitsPerEm used.");
+            LOGGER.debug("True type font doesn't contain head table. Default value for unitsPerEm used.");
             this.headParser = new TrueTypeHeadTable();
         }
 
@@ -85,7 +85,7 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         if (cmapParser != null) {
             this.cmapParser.readTable();
         } else {
-            LOGGER.warn("True type font doesn't contain cmap table.");
+            LOGGER.debug("True type font doesn't contain cmap table.");
         }
 
         if (this.maxpParser != null) {
@@ -93,14 +93,14 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         } else {
             this.maxpParser = new TrueTypeMaxpTable(
                     this.hmtxParser.getLongHorMetrics().length);
-            LOGGER.warn("True type font doesn't contain maxp table. Default value for numGlyphs used.");
+            LOGGER.debug("True type font doesn't contain maxp table. Default value for numGlyphs used.");
         }
 
         if (this.postParser != null) {
             this.postParser.setNumGlyphs(maxpParser.getNumGlyphs());
             this.postParser.readTable();
         } else {
-            LOGGER.warn("True type font doesn't contain post table.");
+            LOGGER.debug("True type font doesn't contain post table.");
         }
     }
 

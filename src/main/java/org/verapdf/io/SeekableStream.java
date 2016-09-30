@@ -51,7 +51,7 @@ public abstract class SeekableStream extends ASInputStream {
      * length.
      *
      * @param startOffset is starting offset of substream.
-     * @param length is length of substream.
+     * @param length      is length of substream.
      */
     public abstract ASInputStream getStream(long startOffset, long length) throws IOException;
 
@@ -82,7 +82,7 @@ public abstract class SeekableStream extends ASInputStream {
 
     public byte readByte() throws IOException {
         int next = this.read();
-        if(next < 0) {
+        if (next < 0) {
             throw new IOException("End of file is reached");
         }
         return (byte) next;
@@ -99,16 +99,14 @@ public abstract class SeekableStream extends ASInputStream {
         int totalRead = 0;
         byte[] buffer = new byte[0];
         byte[] temp = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
-        int read = stream.read(temp);
-        do {
-            buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
-            totalRead += read;
-            read = stream.read(temp);
-            if(read == -1) {
+        while (totalRead < MAX_BUFFER_SIZE) {
+            int read = stream.read(temp);
+            if (read == -1) {
                 return new ASMemoryInStream(buffer, buffer.length, false);
             }
-        } while (totalRead < MAX_BUFFER_SIZE);
-        buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
+            buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
+            totalRead += read;
+        }
         return new InternalInputStream(buffer, stream);
     }
 }

@@ -1,5 +1,6 @@
 package org.verapdf.io;
 
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 
@@ -136,7 +137,7 @@ public class InternalInputStream extends SeekableStream {
 			output.write(alreadyRead);
 
 			//copy stream content
-			byte[] buffer = new byte[4096];
+			byte[] buffer = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
 			int n;
 			while ((n = input.read(buffer)) != -1) {
 				output.write(buffer, 0, n);

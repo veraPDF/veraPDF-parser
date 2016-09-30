@@ -41,10 +41,10 @@ public class ASMemoryInStream extends SeekableStream {
         this.buffer = new byte[0];
         byte[] temp = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
         int read = stream.read(temp);
-        do {
+        while (read != -1) {
             buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
             read = stream.read(temp);
-        } while (read != -1);
+        }
     }
 
     /**
