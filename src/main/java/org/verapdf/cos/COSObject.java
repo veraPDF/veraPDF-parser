@@ -274,7 +274,7 @@ public class COSObject {
 	}
 
 	public void setArrayKey(final ASAtom key, final COSObject array) {
-		if (this.base == null || !this.base.setArrayKey(key)) {
+		if (this.base == null || !this.base.setArrayKey(key, array)) {
 			COSObject obj = COSArray.construct();
 			this.base = new COSDictionary(key, obj);
 		}

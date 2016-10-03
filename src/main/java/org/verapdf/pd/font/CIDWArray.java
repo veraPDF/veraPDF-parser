@@ -46,7 +46,7 @@ public class CIDWArray {
 
     private void addSingleMappings(int cidBegin, COSArray arr) {
         for (int i = 0; i < arr.size(); i++) {
-            if(arr.at(i).getType().isNumber()) {
+            if(!arr.at(i).getType().isNumber()) {
                 LOGGER.debug("W array in CIDFont has invalid entry.");
                 continue;
             }
