@@ -61,6 +61,26 @@ public class CMap {
     }
 
     /**
+     * @return true if this CMap can convert given code to CID.
+     */
+    public boolean containsCode(int character) {
+        for (CIDMappable cidMapping : cidMappings) {
+            int res = cidMapping.getCID(character);
+            if (res != -1) {
+                return true;
+            }
+        }
+
+        for (CIDMappable notDefMapping : notDefMappings) {
+            int res = notDefMapping.getCID(character);
+            if (res != -1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Reads character code from input stream and returnes it's CID. This uses
      * codespace information from CMap. Details are described in PDF32000 in
      * 9.7.6.2 "CMap Mapping".

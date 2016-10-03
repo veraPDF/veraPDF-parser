@@ -125,6 +125,10 @@ public class PDType0Font extends PDCIDFont {
         }
     }
 
+    public COSDictionary getType0FontDict() {
+        return type0FontDict;
+    }
+
     public int toCID(int code) {
         return this.pdcMap.getCMapFile().toCID(code);
     }
