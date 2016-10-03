@@ -2,16 +2,14 @@ package org.verapdf.pd.font;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.truetype.CIDFontType2Program;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Sergey Shemyakov
@@ -19,8 +17,10 @@ import java.io.IOException;
 public class PDCIDFont extends PDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDCIDFont.class);
+    private static final Double DEFAULT_CID_FONT_WIDTH = 1000d;
 
     protected CMap cMap;
+    private CIDWArray widths;
 
     public PDCIDFont(COSDictionary dictionary, CMap cMap) {
         super(dictionary);
@@ -44,6 +44,37 @@ public class PDCIDFont extends PDFont {
     }
 
     @Override
+    public Double getWidth(int code) {
+        int CID = cMap.toCID(code);
+        if (this.widths == null) {
+            COSObject w = this.dictionary.getKey(ASAtom.W);
+            if (w.empty() || w.getType() != COSObjType.COS_ARRAY) {
+                return Double.valueOf(0);
+            }
+            this.widths = new CIDWArray((COSArray) w.getDirectBase());
+        }
+        Double res = widths.getWidth(code);
+        if (res == null) {
+            COSObject dw = this.dictionary.getKey(ASAtom.DW);
+            if (!dw.empty()) {
+                res = dw.getReal();
+            } else {
+                res = Double.valueOf(DEFAULT_CID_FONT_WIDTH);
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public int readCode(InputStream stream) throws IOException {
+        if (cMap != null) {
+            return cMap.getCIDFromStream(stream);
+        }
+        throw new IOException("No CMap for Type 0 font " +
+                (this.getName() == null ? "" : this.getName()));
+    }
+
+    @Override
     public FontProgram getFontProgram() {
         if (this.isFontParsed) {
             return this.fontProgram;
@@ -60,7 +91,7 @@ public class PDCIDFont extends PDFont {
                         this.cMap, this.getCIDToGIDMap());
                 return this.fontProgram;
             } catch (IOException e) {
-                LOGGER.error("Can't read TrueType font program.");
+                LOGGER.debug("Can't read TrueType font program.");
             }
         } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
             try {
@@ -86,7 +117,7 @@ public class PDCIDFont extends PDFont {
                     }
                 }
             } catch (IOException e) {
-                LOGGER.error("Can't read CFF font program.");
+                LOGGER.debug("Can't read CFF font program.");
             }
         }
         this.fontProgram = null;

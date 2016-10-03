@@ -118,7 +118,7 @@ public class COSStream extends COSDictionary {
 			result.reset();
 			return result;
 		} catch (IOException e) {
-			LOGGER.error("Can't get stream data", e);
+			LOGGER.debug("Can't get stream data", e);
 			return null;
 		}
 	}

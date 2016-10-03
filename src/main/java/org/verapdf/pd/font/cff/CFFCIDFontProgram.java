@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.cff;
 
-import org.verapdf.io.InternalInputStream;
+import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.FontProgram;
 
@@ -28,7 +28,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private String ordering;
     private boolean fontParsed = false;
 
-    CFFCIDFontProgram(InternalInputStream stream, CFFIndex definedNames,
+    CFFCIDFontProgram(SeekableStream stream, CFFIndex definedNames,
                       long topDictBeginOffset, long topDictEndOffset) {
         super(stream);
         this.definedNames = definedNames;
@@ -185,7 +185,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         }
         if (!Arrays.equals(this.fontMatrix, DEFAULT_FONT_MATRIX)) {
             for (int i = 0; i < widths.length; ++i) {
-                widths[i] = widths[i] * fontMatrix[0] * 1000;
+                widths[i] = widths[i] * (fontMatrix[0] * 1000);
             }
         }
     }

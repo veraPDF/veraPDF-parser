@@ -1,6 +1,5 @@
 package org.verapdf.pd.font.type1;
 
-import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
@@ -42,14 +41,6 @@ public class Type1FontProgram extends COSParser implements FontProgram {
      */
     public Type1FontProgram(InputStream fileStream) throws IOException {
         super(fileStream);
-        encoding = new String[256];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Type1FontProgram(ASInputStream asInputStream) throws IOException {
-        super(asInputStream);
         encoding = new String[256];
     }
 
@@ -129,8 +120,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                     case Type1StringConstants.EEXEC_STRING:
                         this.skipSpaces();
                         long clearToMarkOffset = this.findOffsetCleartomark();
-                        ASFileInStream eexecEncoded = new ASFileInStream(
-                                this.source.getStream(), this.source.getOffset(),
+                        ASInputStream eexecEncoded = this.source.getStream(this.source.getOffset(),
                                 clearToMarkOffset - this.source.getOffset());
                         ASInputStream eexecDecoded = new EexecFilterDecode(
                                 new COSFilterASCIIHexDecode(eexecEncoded), false);

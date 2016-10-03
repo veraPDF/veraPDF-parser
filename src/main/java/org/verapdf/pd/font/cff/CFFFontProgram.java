@@ -20,7 +20,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
      * Constructor from stream.
      *
      * @param stream is stream with CFF program.
-     * @throws IOException if creation of @{link InternalInputStream} fails.
+     * @throws IOException if creation of @{link SeekableStream} fails.
      */
     public CFFFontProgram(ASInputStream stream) throws IOException {
         super(stream);

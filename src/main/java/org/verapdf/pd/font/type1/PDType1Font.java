@@ -2,11 +2,11 @@ package org.verapdf.pd.font.type1;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
-import org.verapdf.io.ASMemoryInStream;
 import org.verapdf.parser.COSParser;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDSimpleFont;
@@ -63,7 +63,7 @@ public class PDType1Font extends PDSimpleFont {
                 }
                 return descriptorCharSet;
             } catch (IOException ex) {
-                LOGGER.error("Can't parse /CharSet entry in Type 1 font descriptor");
+                LOGGER.debug("Can't parse /CharSet entry in Type 1 font descriptor");
                 return Collections.emptySet();
             }
         }
@@ -100,7 +100,7 @@ public class PDType1Font extends PDSimpleFont {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Can't read Type 1 font program.");
+            LOGGER.debug("Can't read Type 1 font program.");
         }
         this.fontProgram = null;
         return null;

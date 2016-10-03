@@ -2,10 +2,10 @@ package org.verapdf.pd.colors;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.external.ICCProfile;
-import org.verapdf.io.ASMemoryInStream;
 
 /**
  * @author Maksim Bezrukov

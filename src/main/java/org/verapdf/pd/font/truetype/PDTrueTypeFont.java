@@ -47,7 +47,7 @@ public class PDTrueTypeFont extends PDSimpleFont {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Can't read TrueType font program.");
+            LOGGER.debug("Can't read TrueType font program.");
         }
         this.fontProgram = null;
         return null;

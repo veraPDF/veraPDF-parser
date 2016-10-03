@@ -1,9 +1,8 @@
 package org.verapdf.pd.font.opentype;
 
-import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
-import org.verapdf.io.InternalInputStream;
+import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
@@ -91,7 +90,7 @@ public class OpenTypeFontProgram implements FontProgram {
     }
 
     private ASInputStream getCFFTable() throws IOException {
-        this.source = new InternalInputStream(this.source);
+        this.source = SeekableStream.getSeekableStream(this.source);
         this.readHeader();
         for (int i = 0; i < numTables; ++i) {
             long tabName = this.readULong();
@@ -99,9 +98,7 @@ public class OpenTypeFontProgram implements FontProgram {
             long offset = this.readULong();
             long length = this.readULong();   // length
             if (tabName == CFF) {
-                return new ASFileInStream(
-                        ((InternalInputStream) this.source).getStream(),
-                        offset, length);
+                return ((SeekableStream) this.source).getStream(offset, length);
             }
         }
         throw new IOException("Can't locate \"CFF \" table in CFF OpenType font program.");

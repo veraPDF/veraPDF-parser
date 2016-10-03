@@ -60,7 +60,7 @@ public class SignatureParser extends COSParser {
                 }
             } else {
                 // invalid dictionary, we were expecting a /Name, read until the end or until we can recover
-                LOGGER.warn("Invalid dictionary, found: '" + c + "' but expected: '/'");
+                LOGGER.debug("Invalid dictionary, found: '" + c + "' but expected: '/'");
                 return;
             }
         }
@@ -170,7 +170,7 @@ public class SignatureParser extends COSParser {
         source.unread(buffer.length - 1);
         while (!Arrays.equals(buffer, EOF_STRING)) {    //TODO: does it need to be optimized?
             source.read(buffer);
-            if (source.isEof()) {
+            if (source.isEOF()) {
                 source.seek(currentOffset + document.getHeader().getHeaderOffset());
                 return source.getStreamLength();
             }

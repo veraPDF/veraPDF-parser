@@ -1,12 +1,12 @@
 package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.filters.io.ASBufferingInFilter;
-import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ class Type1PrivateParser extends BaseParser {
     /**
      * {@inheritDoc}
      */
-    public Type1PrivateParser(ASInputStream stream, double[] fontMatrix) throws IOException {
+    public Type1PrivateParser(InputStream stream, double[] fontMatrix) throws IOException {
         super(stream);
         glyphWidths = new HashMap<>();
         this.fontMatrix = fontMatrix;
@@ -109,7 +109,7 @@ class Type1PrivateParser extends BaseParser {
         long beginOffset = this.source.getOffset();
         this.source.skip((int) charstringLength);
         ASBufferingInFilter charString = new ASBufferingInFilter(
-                new ASFileInStream(this.source.getStream(), beginOffset, charstringLength));
+                this.source.getStream(beginOffset, charstringLength));
         ASInputStream decodedCharString = new EexecFilterDecode(
                 charString, true, this.getLenIV());
         Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);

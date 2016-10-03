@@ -41,11 +41,11 @@ public class PDFontFactory {
             } else if (subtype == ASAtom.TYPE0) {
                 return new PDType0Font(dict);
             } else {
-                LOGGER.error("Invalid value of Subtype in font dictionary");
+                LOGGER.debug("Invalid value of Subtype in font dictionary");
                 return null;
             }
         } else {
-            LOGGER.warn("Expected COSDictionary");
+            LOGGER.debug("Expected COSDictionary");
             return null;
         }
     }

@@ -44,7 +44,7 @@ public class ToUnicodeInterval {
                 return new String(arr, "UTF-16BE");
             }
         } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Can't find String encoding UTF-16BE");
+            LOGGER.debug("Can't find String encoding UTF-16BE");
             return null;    // I'm sure this won't be reached
         }
     }

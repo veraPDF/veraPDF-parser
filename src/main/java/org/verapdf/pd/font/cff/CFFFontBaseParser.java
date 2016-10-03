@@ -1,7 +1,7 @@
 package org.verapdf.pd.font.cff;
 
-import org.verapdf.io.ASMemoryInStream;
-import org.verapdf.io.InternalInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.type1.Type1CharStringParser;
 
@@ -36,7 +36,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected int defaultWidthX;
     protected int nominalWidthX;
 
-    public CFFFontBaseParser(InternalInputStream source) {
+    public CFFFontBaseParser(SeekableStream source) {
         super(source);
         stack = new ArrayList<>(48);
         System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,

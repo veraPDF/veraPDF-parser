@@ -31,7 +31,7 @@ public class StandardFontMetricsFactory {
                 res = parser.parse();
                 FONT_METRICS_MAP.put(fontName, res);
             } catch (IOException e) {
-                LOGGER.error("Can't open file input stream for predefined font file " + DIR_PATH + fontName + EXTENSION);
+                LOGGER.debug("Can't open file input stream for predefined font file " + DIR_PATH + fontName + EXTENSION);
                 return null;
             }
         }

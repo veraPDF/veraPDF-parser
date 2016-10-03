@@ -27,7 +27,7 @@ public abstract class COSDirect extends COSBase {
 
     // BOOLEAN VALUES
     public Boolean getBoolean() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, "COSBoolean", getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, "COSBoolean", getClass().toString()));
         return null;
     }
 
@@ -37,7 +37,7 @@ public abstract class COSDirect extends COSBase {
 
     // INTEGER NUMBERS
     public Long getInteger() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, "COSInteger", getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, "COSInteger", getClass().toString()));
         return null;
     }
 
@@ -47,7 +47,7 @@ public abstract class COSDirect extends COSBase {
 
     // REAL NUMBERS
     public Double getReal() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, "COSReal", getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, "COSReal", getClass().toString()));
         return null;
     }
 
@@ -57,7 +57,7 @@ public abstract class COSDirect extends COSBase {
 
     // STRINGS
     public String getString() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, "COSString", getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, "COSString", getClass().toString()));
         return null;
     }
 
@@ -71,7 +71,7 @@ public abstract class COSDirect extends COSBase {
 
     // NAMES
     public ASAtom getName() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, "COSName", getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, "COSName", getClass().toString()));
         return null;
     }
 
@@ -81,13 +81,13 @@ public abstract class COSDirect extends COSBase {
 
     // NUMBERS OF ELEMENTS FOR ARRAY AND DICTIONARY
     public Integer size() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, "COSInteger", getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, "COSInteger", getClass().toString()));
         return null;
     }
 
     // ARRAYS
     public COSObject at(final int i) {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, "COSArray", getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, "COSArray", getClass().toString()));
         return null;
     }
 
@@ -123,12 +123,12 @@ public abstract class COSDirect extends COSBase {
 
     // DICTIONARIES
     public Boolean knownKey(final ASAtom key) {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }
 
     public COSObject getKey(final ASAtom key) {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }
 
@@ -137,7 +137,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public Boolean getBooleanKey(final ASAtom key) {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }
 
@@ -146,7 +146,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public Long getIntegerKey(final ASAtom key) {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }
 
@@ -155,7 +155,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public Double getRealKey(final ASAtom key) {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }
 
@@ -164,7 +164,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public String getStringKey(final ASAtom key) {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }
 
@@ -173,7 +173,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public ASAtom getNameKey(final ASAtom key) {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }
 
@@ -201,12 +201,12 @@ public abstract class COSDirect extends COSBase {
     }
 
     public Set<ASAtom> getKeySet() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }
 
     public Collection<COSObject> getValues() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }
 
@@ -216,7 +216,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public ASInputStream getData(final COSStream.FilterFlags flags) {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_STREAM_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_STREAM_TYPE, getClass().toString()));
         return null;
     }
 
@@ -229,7 +229,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public Boolean isStreamKeywordCRLFCompliant() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_STREAM_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_STREAM_TYPE, getClass().toString()));
         return null;
     }
 
@@ -238,7 +238,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public Boolean isEndstreamKeywordCRLFCompliant() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_STREAM_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_STREAM_TYPE, getClass().toString()));
         return null;
     }
 
@@ -247,7 +247,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public Long getRealStreamSize() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_STREAM_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_STREAM_TYPE, getClass().toString()));
         return null;
     }
 
@@ -261,12 +261,12 @@ public abstract class COSDirect extends COSBase {
     }
 
     public COSKey getKey() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_INDIRECT_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_INDIRECT_TYPE, getClass().toString()));
         return null;
     }
 
     public COSDocument getDocument() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_INDIRECT_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_INDIRECT_TYPE, getClass().toString()));
         return null;
     }
 
@@ -275,7 +275,7 @@ public abstract class COSDirect extends COSBase {
     }
 
     public COSObject getDirect() {
-        LOGGER.warn(String.format(INVALID_TYPE_MESSAGE, COS_INDIRECT_TYPE, getClass().toString()));
+        LOGGER.debug(String.format(INVALID_TYPE_MESSAGE, COS_INDIRECT_TYPE, getClass().toString()));
         return null;
     }
 

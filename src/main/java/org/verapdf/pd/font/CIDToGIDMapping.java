@@ -22,7 +22,6 @@ public class CIDToGIDMapping {
      * Constructor from COSObject, containing CIDToGID.
      *
      * @param obj is COSObject, obtained via key CIDToGIDMap in CIDFontType2 dict.
-     * @throws IOException if obj is not a COSStream and not "Identity" COSName.
      */
     public CIDToGIDMapping(COSObject obj) throws IOException {
         if (obj != null && (obj.getType() == COSObjType.COS_STREAM ||
@@ -40,7 +39,8 @@ public class CIDToGIDMapping {
                 return;
             }
         }
-        throw new IOException("Can't create CIDToGIDMapping from " + obj.getType());
+        this.isIdentity = true;     // Default value.
+        this.mapping = new int[0];
     }
 
     /**

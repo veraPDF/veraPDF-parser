@@ -1,8 +1,10 @@
-package org.verapdf.io;
+package org.verapdf.as.io;
 
-import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.io.SeekableStream;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 /**
@@ -10,12 +12,13 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class ASMemoryInStream extends ASInputStream {
+public class ASMemoryInStream extends SeekableStream {
 
     private int bufferSize;
     private int currentPosition;
     private byte[] buffer;
     private boolean copiedBuffer;
+    private int resetPosition = 0;
 
     /**
      * Constructor from byte array. Buffer is copied while initializing
@@ -25,6 +28,43 @@ public class ASMemoryInStream extends ASInputStream {
      */
     public ASMemoryInStream(byte[] buffer) {
         this(buffer, buffer.length);
+    }
+
+    /**
+     * Constructor from other stream. It reads stream into byte buffer.
+     *
+     * @param stream is stream to read into byte array.
+     */
+    public ASMemoryInStream(InputStream stream) throws IOException {
+        this.currentPosition = 0;
+        this.copiedBuffer = true;
+        this.buffer = new byte[0];
+        byte[] temp = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+        int read = stream.read(temp);
+        while (read != -1) {
+            buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
+            read = stream.read(temp);
+        }
+    }
+
+    /**
+     * Constructor that creates substream from other ASMemoryInStream. Note that
+     * no buffer copy is performed.
+     *
+     * @param stream is stream, from which substream will be taken.
+     * @param offset is beginning of data to copy.
+     * @param length is length of data to copy.
+     */
+    public ASMemoryInStream(ASMemoryInStream stream, int offset, int length) {
+        this.buffer = stream.buffer;
+        this.copiedBuffer = false;
+        if (offset >= 0 && offset < stream.bufferSize) {
+            this.currentPosition = offset;
+        } else {
+            this.currentPosition = 0;
+        }
+        this.resetPosition = this.currentPosition;
+        this.bufferSize = Math.min(stream.bufferSize, offset + length);
     }
 
     /**
@@ -93,7 +133,18 @@ public class ASMemoryInStream extends ASInputStream {
         if (currentPosition == bufferSize) {
             return -1;
         }
-        return this.buffer[currentPosition++];
+        return this.buffer[currentPosition++] & 0xFF;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int peek() throws IOException {
+        if (currentPosition == bufferSize) {
+            return -1;
+        }
+        return this.buffer[currentPosition] & 0xFF;
     }
 
     /**
@@ -129,7 +180,31 @@ public class ASMemoryInStream extends ASInputStream {
      */
     @Override
     public void reset() throws IOException {
-        currentPosition = 0;
+        currentPosition = resetPosition;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getStreamLength() throws IOException {
+        return this.bufferSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getOffset() throws IOException {
+        return this.currentPosition;
+    }
+
+    @Override
+    public void seek(long offset) throws IOException {
+        if (offset < 0 || offset > this.bufferSize) {
+            throw new IOException("Can't seek for offset " + offset + " in ASMemoryInStream");
+        }
+        this.currentPosition = (int) offset;
     }
 
     /**
@@ -144,5 +219,15 @@ public class ASMemoryInStream extends ASInputStream {
      */
     public boolean isCopiedBuffer() {
         return copiedBuffer;
+    }
+
+    @Override
+    public ASInputStream getStream(long startOffset, long length) throws IOException {
+        if (startOffset > 0 && startOffset < this.bufferSize &&
+                startOffset + length < this.bufferSize) {
+            return new ASMemoryInStream(this, (int) startOffset, (int) length);
+        } else {
+            throw new IOException();
+        }
     }
 }
