@@ -52,13 +52,25 @@ public class CIDToGIDMapping {
     public int getGID(int cid) {
         if (isIdentity) {
             return cid;
-        } else {
-            if (cid < mapping.length) {
-                return mapping[cid];
-            } else {
-                return 0;
-            }
         }
+        if (cid < mapping.length) {
+            return mapping[cid];
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Checks if given CID can be mapped into GID with this CIDToGID mapping.
+     *
+     * @param cid is CID to check.
+     * @return true if cid can be mapped into GID.
+     */
+    public boolean contains(int cid) {
+        if (isIdentity) {
+            return true;
+        }
+        return cid < mapping.length && cid >= 0;
     }
 
     private void parseCIDToGIDStream(ASInputStream stream) throws IOException {

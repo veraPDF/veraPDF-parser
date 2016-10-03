@@ -45,4 +45,10 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
     public float getWidth(String glyphName) {
         return 0;   // no need in this method
     }
+
+    @Override
+    public boolean containsCode(int code) {
+        return this.cMap.containsCode(code) &&
+                this.cidToGID.contains(this.cMap.toCID(code));
+    }
 }
