@@ -2,10 +2,7 @@ package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.COSInteger;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,8 +30,8 @@ public class DecodedObjectStreamParser extends COSParser {
      */
     public DecodedObjectStreamParser(final ASInputStream inputStream,
                                      COSStream objectStream,
-                                     COSKey streamKey) throws IOException {
-        super(inputStream);
+                                     COSKey streamKey, COSDocument doc) throws IOException {
+        super(doc, inputStream);
         this.objectStream = objectStream;
         this.internalOffsets = new HashMap<>();
         try {
