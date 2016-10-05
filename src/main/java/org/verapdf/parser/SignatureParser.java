@@ -2,11 +2,11 @@ package org.verapdf.parser;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.io.SeekableStream;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -29,10 +29,10 @@ public class SignatureParser extends COSParser {
     /**
      * Constructor.
      *
-     * @param stream The COS stream to read the data from.
+     * @param stream The stream to read the data from.
      * @throws IOException If there is an error reading the input stream.
      */
-    public SignatureParser(ASInputStream stream, COSDocument document) throws IOException {
+    public SignatureParser(SeekableStream stream, COSDocument document) throws IOException {
         super(stream);
         this.document = document;
     }
@@ -45,6 +45,7 @@ public class SignatureParser extends COSParser {
      */
     private void parseDictionary()
             throws IOException {
+        skipSpaces();
         skipExpectedCharacter('<');
         skipExpectedCharacter('<');
         skipSpaces();
@@ -176,20 +177,15 @@ public class SignatureParser extends COSParser {
             }
             source.unread(buffer.length - 1);
         }
-        long result = source.getOffset() + buffer.length - 1;
+        long result = source.getOffset() + buffer.length;
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         return result;
     }
 
     private void skipID() throws IOException {
         nextObject();
-        skipSpaces();
-        nextObject();
-        skipSpaces();
-        skipExpectedCharacter('o');
-        skipExpectedCharacter('b');
-        skipExpectedCharacter('j');
-        skipSpaces();
+        this.objects.clear();
+        this.flag = true;
     }
 
 }

@@ -73,7 +73,8 @@ public class Reader extends XRefReader {
 				COSStream objectStream = (COSStream) object.get();
 				parser = new DecodedObjectStreamParser(
 						objectStream.getData(COSStream.FilterFlags.DECODE),
-						objectStream, new COSKey((int) -offset, 0));
+						objectStream, new COSKey((int) -offset, 0),
+						this.parser.getDocument());
 				objectStreams.put(-offset, parser);
 				return parser.getObject(key.getNumber());
 			}

@@ -5,6 +5,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
+import org.verapdf.io.SeekableStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +29,10 @@ public class COSParser extends BaseParser {
 	protected Queue<Long> integers = new LinkedList<>();
 
 	protected boolean flag = true;
+
+	public COSParser(final SeekableStream seekableStream) throws IOException {
+		super(seekableStream);
+	}
 
 	public COSParser(final String filename) throws IOException {
 		super(filename);
@@ -367,4 +372,7 @@ public class COSParser extends BaseParser {
 		nextToken();
 	}
 
+	public COSDocument getDocument() {
+		return document;
+	}
 }
