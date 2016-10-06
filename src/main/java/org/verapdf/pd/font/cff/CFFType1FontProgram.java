@@ -2,12 +2,14 @@ package org.verapdf.pd.font.cff;
 
 import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.font.CFFNumber;
+import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Instance of this class represent a Type1 font from FontSet of
@@ -23,20 +25,25 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     private long privateDictOffset;
     private long privateDictSize;
 
+    private Encoding pdEncoding;    // mapping code -> glyphName
     private long encodingOffset;
     private int[] encoding;     // array with mapping code -> gid
+    private boolean isStandardEncoding = false;
+    private boolean isExpertEncoding = false;
     private Map<String, Integer> charSet;   // mappings glyphName -> gid
     private Map<Integer, String> inverseCharSet;    // mappings gid -> glyph name
     private String[] encodingStrings;
 
     CFFType1FontProgram(SeekableStream stream, CFFIndex definedNames,
-                        long topDictBeginOffset, long topDictEndOffset) {
+                        long topDictBeginOffset, long topDictEndOffset,
+                        Encoding pdEncoding) {
         super(stream);
         encodingOffset = 0;
         encoding = new int[256];
         this.definedNames = definedNames;
         this.topDictBeginOffset = topDictBeginOffset;
         this.topDictEndOffset = topDictEndOffset;
+        this.pdEncoding = pdEncoding;
     }
 
     /**
@@ -88,9 +95,9 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     private void readEncoding() throws IOException {
         if (encodingOffset == 0) {
-            this.encoding = CFFPredefined.STANDARD_ENCODING;
+            this.isStandardEncoding = true;
         } else if (encodingOffset == 1) {
-            this.encoding = CFFPredefined.EXPERT_ENCODING;
+            this.isExpertEncoding = true;
         } else {
             int format = this.readCard8() & 0xFF;
             int amount;
@@ -206,13 +213,35 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         }
     }
 
+    private String getGlyphName(int code) {
+        if(pdEncoding != null) {
+            return pdEncoding.getName(code);
+        }
+        if(isStandardEncoding) {
+            return CFFPredefined.STANDARD_STRINGS[CFFPredefined.STANDARD_ENCODING[code]];
+        } else if (isExpertEncoding) {
+            int sid = CFFPredefined.EXPERT_ENCODING[code];
+            if(sid == CFFPredefined.SPACE_SID_EXPERT) {
+                return CFFPredefined.EXPERT_CHARSET[CFFPredefined.SPACE_SID_EXPERT];
+            } else if (sid < CFFPredefined.ISO_ADOBE_CHARSET.length) {
+                return CFFPredefined.STANDARD_STRINGS[sid];
+            } else if (sid <= CFFPredefined.EXPERT_ENCODING_LAST_SID) {
+                return CFFPredefined.EXPERT_CHARSET[sid -
+                        CFFPredefined.ISO_ADOBE_CHARSET.length - 2];
+            }
+            return NOTDEF_STRING;
+        } else {
+            return inverseCharSet.get(encoding[code]);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public float getWidth(int charCode) {
         try {
-            return this.widths[this.encoding[charCode]];
+            return this.getWidth(getGlyphName(charCode));
         } catch (ArrayIndexOutOfBoundsException e) {
             return this.widths[0];
         }
@@ -235,7 +264,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
      */
     @Override
     public boolean containsCode(int code) {
-        return code < nGlyphs;
+        return this.charSet.keySet().contains(this.getGlyphName(code));
     }
 
     private void initializeCharSet(String[] charSetArray) {
@@ -257,5 +286,13 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         } else {
             return this.encodingStrings;
         }
+    }
+
+    /**
+     * @return list of names for all glyphs in this font.
+     */
+    public String[] getCharSet() {
+        Set<String> set = this.charSet.keySet();
+        return set.toArray(new String[set.size()]);
     }
 }

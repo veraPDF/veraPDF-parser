@@ -4,6 +4,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.PDFont;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
 
@@ -76,7 +77,8 @@ public class OpenTypeFontProgram implements FontProgram {
                 this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
                 this.font.parseFont();
             } else {
-                this.font = new CFFFontProgram(getCFFTable());
+                this.font = new CFFFontProgram(getCFFTable(),
+                        PDFont.getEncodingMappingFromCOSObject(encoding));
                 this.font.parseFont();
             }
         }

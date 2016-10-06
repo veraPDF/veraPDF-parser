@@ -222,6 +222,8 @@ public class COSStream extends COSDictionary {
 	}
 
 	private boolean equalsStreams(ASInputStream first, ASInputStream second) throws IOException {
+		first.reset();
+		second.reset();
 		byte[] tempOne = new byte[1024];
 		byte[] tempTwo = new byte[1024];
 		int readFromOne;
@@ -232,7 +234,7 @@ public class COSStream extends COSDictionary {
 			if (readFromOne != readFromTwo || !Arrays.equals(tempOne, tempTwo)) {
 				return false;
 			}
-		} while (readFromOne != 0);
+		} while (readFromOne != -1);
 
 		return true;
 	}
