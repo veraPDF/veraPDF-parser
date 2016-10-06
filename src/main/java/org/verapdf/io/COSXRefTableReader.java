@@ -72,11 +72,6 @@ public class COSXRefTableReader {
 				return;
 			}
 		}
-
-//		Set<Long> offsets = trailers.keySet();
-//		SortedSet<Long> sortedOffset = new TreeSet<>(offsets);
-//		this.firstTrailer = trailers.get(sortedOffset.first());
-//		this.lastTrailer = trailers.get(sortedOffset.last());
 	}
 
 	public void set(final COSXRefInfo info) {
