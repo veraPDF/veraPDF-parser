@@ -157,6 +157,11 @@ public class PDType0Font extends PDCIDFont {
         }
     }
 
+    public void setFontProgramFromDescendant(PDCIDFont descendant) {
+        this.fontProgram = descendant.fontProgram;
+        this.isFontParsed = true;
+    }
+
     public COSDictionary getType0FontDict() {
         return type0FontDict;
     }

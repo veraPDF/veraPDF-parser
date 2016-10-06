@@ -4,6 +4,7 @@ import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     private long privateDictSize;
 
     private Encoding pdEncoding;    // mapping code -> glyphName
+    private CMap externalCMap;  // in case if font is located in
     private long encodingOffset;
     private int[] encoding;     // array with mapping code -> gid
     private boolean isStandardEncoding = false;
@@ -36,7 +38,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     CFFType1FontProgram(SeekableStream stream, CFFIndex definedNames,
                         long topDictBeginOffset, long topDictEndOffset,
-                        Encoding pdEncoding) {
+                        Encoding pdEncoding, CMap externalCMap) {
         super(stream);
         encodingOffset = 0;
         encoding = new int[256];
@@ -44,6 +46,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         this.topDictBeginOffset = topDictBeginOffset;
         this.topDictEndOffset = topDictEndOffset;
         this.pdEncoding = pdEncoding;
+        this.externalCMap = externalCMap;
     }
 
     /**
@@ -240,6 +243,14 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
      */
     @Override
     public float getWidth(int charCode) {
+        if(externalCMap != null) {
+            int gid = this.externalCMap.toCID(charCode);
+            if(gid < widths.length) {
+                return widths[gid];
+            } else {
+                return widths[0];
+            }
+        }
         try {
             return this.getWidth(getGlyphName(charCode));
         } catch (ArrayIndexOutOfBoundsException e) {

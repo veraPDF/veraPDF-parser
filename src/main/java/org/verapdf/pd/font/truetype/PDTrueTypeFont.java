@@ -42,7 +42,7 @@ public class PDTrueTypeFont extends PDSimpleFont {
                 if (subtype == ASAtom.OPEN_TYPE) {
                     this.fontProgram = new OpenTypeFontProgram(trueTypeFontFile.getData(
                             COSStream.FilterFlags.DECODE), false, this.isSymbolic(),
-                            this.getEncoding());
+                            this.getEncoding(), null);
                     return this.fontProgram;
                 }
             }

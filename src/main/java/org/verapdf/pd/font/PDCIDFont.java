@@ -101,19 +101,19 @@ public class PDCIDFont extends PDFont {
                 if (ASAtom.CID_FONT_TYPE0C == subtype.get()) {
                     this.fontProgram = new CFFFontProgram(
                             fontFile.getData(COSStream.FilterFlags.DECODE),
-                            this.getEncodingMapping());
+                            this.getEncodingMapping(), this.cMap);
                     return this.fontProgram;
                 } else if (ASAtom.OPEN_TYPE == subtype.get()) {
                     ASAtom fontName = this.getFontName();
                     if (fontName == ASAtom.TRUE_TYPE || fontName == ASAtom.CID_FONT_TYPE2) {
                         this.fontProgram = new OpenTypeFontProgram(
                                 fontFile.getData(COSStream.FilterFlags.DECODE),
-                                false, this.isSymbolic(), this.getEncoding());
+                                false, this.isSymbolic(), this.getEncoding(), this.cMap);
                         return this.fontProgram;
                     } else {
                         this.fontProgram = new OpenTypeFontProgram(
                                 fontFile.getData(COSStream.FilterFlags.DECODE),
-                                true, this.isSymbolic(), this.getEncoding());
+                                true, this.isSymbolic(), this.getEncoding(), this.cMap);
                         return this.fontProgram;
                     }
                 }

@@ -6,6 +6,7 @@ import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDFont;
 import org.verapdf.pd.font.cff.CFFFontProgram;
+import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class OpenTypeFontProgram implements FontProgram {
     private FontProgram font;
     private int numTables;
     private boolean isFontParsed = false;
+    private CMap externalCMap;
 
     /**
      * Constructor from stream, containing font data, and encoding details.
@@ -35,11 +37,12 @@ public class OpenTypeFontProgram implements FontProgram {
      * @param encoding   is value of /Encoding in font dictionary.
      */
     public OpenTypeFontProgram(ASInputStream source, boolean isCFF, boolean isSymbolic,
-                               COSObject encoding) {
+                               COSObject encoding, CMap externalCMap) {
         this.source = source;
         this.isCFF = isCFF;
         this.isSymbolic = isSymbolic;
         this.encoding = encoding;
+        this.externalCMap = externalCMap;
     }
 
     /**
@@ -78,7 +81,7 @@ public class OpenTypeFontProgram implements FontProgram {
                 this.font.parseFont();
             } else {
                 this.font = new CFFFontProgram(getCFFTable(),
-                        PDFont.getEncodingMappingFromCOSObject(encoding));
+                        PDFont.getEncodingMappingFromCOSObject(encoding), externalCMap);
                 this.font.parseFont();
             }
         }

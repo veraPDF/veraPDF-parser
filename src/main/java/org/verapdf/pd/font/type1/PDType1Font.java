@@ -90,12 +90,12 @@ public class PDType1Font extends PDSimpleFont {
                 if (subtype == ASAtom.TYPE1C) {
 
                     this.fontProgram = new CFFFontProgram(type1FontFile.getData(
-                            COSStream.FilterFlags.DECODE), this.getEncodingMapping());
+                            COSStream.FilterFlags.DECODE), this.getEncodingMapping(), null);
                     return this.fontProgram;
                 } else if (subtype == ASAtom.OPEN_TYPE) {
                     this.fontProgram = new OpenTypeFontProgram(type1FontFile.getData(
                             COSStream.FilterFlags.DECODE), true, this.isSymbolic(),
-                            this.getEncoding());
+                            this.getEncoding(), null);
                     return this.fontProgram;
                 }
             }

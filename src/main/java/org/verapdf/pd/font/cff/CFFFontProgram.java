@@ -3,6 +3,7 @@ package org.verapdf.pd.font.cff;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
 
@@ -15,6 +16,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
     private FontProgram font;
     private Encoding pdEncoding;
+    private CMap externalCMap;
     private boolean isCIDFont = false;
     private boolean isFontParsed = false;
 
@@ -25,9 +27,11 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
      * @param pdEncoding is encoding object specified in font dictionary.
      * @throws IOException if creation of @{link SeekableStream} fails.
      */
-    public CFFFontProgram(ASInputStream stream, Encoding pdEncoding) throws IOException {
+    public CFFFontProgram(ASInputStream stream, Encoding pdEncoding, CMap cMap)
+            throws IOException {
         super(stream);
         this.pdEncoding = pdEncoding;
+        this.externalCMap = cMap;
     }
 
     /**
@@ -51,7 +55,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
                 font = new CFFType1FontProgram(this.source, this.definedNames,
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                         topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
-                        this.pdEncoding);
+                        this.pdEncoding, this.externalCMap);
                 font.parseFont();
             }
         }
