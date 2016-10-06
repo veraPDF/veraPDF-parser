@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class does parsing of Type 1 font files.
@@ -180,5 +181,10 @@ public class Type1FontProgram extends COSParser implements FontProgram {
 
     public String[] getEncoding() {
         return encoding;
+    }
+
+    public String[] getCharSet() {
+        Set<String> charSet = this.glyphWidths.keySet();
+        return charSet.toArray(new String[charSet.size()]);
     }
 }
