@@ -76,7 +76,7 @@ public class PDXForm extends PDXObject implements PDContentStream {
 		if (res != null && res.getType() == COSObjType.COS_DICT) {
 			return new PDResources(res);
 		}
-		return null;
+		return new PDResources(COSDictionary.construct());
 	}
 
 	public PDMetadata getMetadata() {
