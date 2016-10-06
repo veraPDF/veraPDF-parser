@@ -32,7 +32,7 @@ public class PDType3Font extends PDSimpleFont {
             }
             return new PDResources(resources);
         } else {
-            return null;
+            return new PDResources(COSDictionary.construct());
         }
     }
 }

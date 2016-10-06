@@ -1,6 +1,7 @@
 package org.verapdf.pd.patterns;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDContentStream;
@@ -60,6 +61,6 @@ public class PDTilingPattern extends PDPattern implements PDContentStream {
         if (resources != null && resources.getType() == COSObjType.COS_DICT) {
             return new PDResources(resources);
         }
-        return null;
+        return new PDResources(COSDictionary.construct());
     }
 }
