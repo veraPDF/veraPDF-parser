@@ -375,8 +375,6 @@ public class COSIndirect extends COSBase {
 
         COSIndirect that = (COSIndirect) o;
 
-        if (key != null ? !key.equals(that.key) : that.key != null) return false;
-        return document == that.document;
-
+        return this.getDirect().equals(that.getDirect());
     }
 }

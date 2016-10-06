@@ -26,4 +26,9 @@ public class COSNull extends COSDirect {
         return visitor.visitFromNull(this);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        return o instanceof COSNull;
+    }
 }

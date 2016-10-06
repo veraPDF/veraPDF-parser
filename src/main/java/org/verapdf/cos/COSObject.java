@@ -467,9 +467,6 @@ public class COSObject {
 
 		COSObject cosObject = (COSObject) o;
 
-		if (isHeaderOfObjectComplyPDFA != cosObject.isHeaderOfObjectComplyPDFA) return false;
-		if (isEndOfObjectComplyPDFA != cosObject.isEndOfObjectComplyPDFA) return false;
-		if (isHeaderFormatComplyPDFA != cosObject.isHeaderFormatComplyPDFA) return false;
 		return base != null ? base.equals(cosObject.base) : cosObject.base == null;
 
 	}
