@@ -118,21 +118,25 @@ public abstract class PDFont extends PDResource {
 
     public Encoding getEncodingMapping() {
         if (this.encoding == null) {
-            COSBase cosEncoding = this.getEncoding().getDirectBase();
-            if (cosEncoding != null) {
-                if (cosEncoding.getType() == COSObjType.COS_NAME) {
-                    this.encoding = new Encoding(cosEncoding.getName());
-                    return this.encoding;
-                } else if (cosEncoding.getType() == COSObjType.COS_DICT) {
-                    this.encoding = new Encoding(cosEncoding.getNameKey(ASAtom.BASE_ENCODING),
-                            this.getDifferences());
-                    return this.encoding;
-                }
-            }
-            return null;
-        } else {
-            return this.encoding;
+            this.encoding = getEncodingMappingFromCOSObject(this.getEncoding());
         }
+        return this.encoding;
+    }
+
+    public static Encoding getEncodingMappingFromCOSObject(COSObject e) {
+        Encoding encodingObj;
+        COSBase cosEncoding = e.getDirectBase();
+        if (cosEncoding != null) {
+            if (cosEncoding.getType() == COSObjType.COS_NAME) {
+                encodingObj = new Encoding(cosEncoding.getName());
+                return encodingObj;
+            } else if (cosEncoding.getType() == COSObjType.COS_DICT) {
+                encodingObj = new Encoding(cosEncoding.getNameKey(ASAtom.BASE_ENCODING),
+                        getDifferencesFromCosEncoding(e));
+                return encodingObj;
+            }
+        }
+        return null;
     }
 
     public String getName() {
@@ -149,9 +153,12 @@ public abstract class PDFont extends PDResource {
     }
 
     public Map<Integer, String> getDifferences() {
-        COSObject encoding = this.getEncoding();
+        return getDifferencesFromCosEncoding(this.getEncoding());
+    }
+
+    public static Map<Integer, String> getDifferencesFromCosEncoding(COSObject e) {
         COSArray differences = (COSArray)
-                encoding.getKey(ASAtom.DIFFERENCES).getDirectBase();
+                e.getKey(ASAtom.DIFFERENCES).getDirectBase();
         if (differences == null) {
             return null;
         }

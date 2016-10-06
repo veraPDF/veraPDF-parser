@@ -59,7 +59,7 @@ public class PDCIDFont extends PDFont {
             if (!dw.empty()) {
                 res = dw.getReal();
             } else {
-                res = Double.valueOf(DEFAULT_CID_FONT_WIDTH);
+                res = DEFAULT_CID_FONT_WIDTH;
             }
         }
         return res;
@@ -100,7 +100,8 @@ public class PDCIDFont extends PDFont {
                 COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).getDirectBase();
                 if (ASAtom.CID_FONT_TYPE0C == subtype.get()) {
                     this.fontProgram = new CFFFontProgram(
-                            fontFile.getData(COSStream.FilterFlags.DECODE));
+                            fontFile.getData(COSStream.FilterFlags.DECODE),
+                            this.getEncodingMapping());
                     return this.fontProgram;
                 } else if (ASAtom.OPEN_TYPE == subtype.get()) {
                     ASAtom fontName = this.getFontName();
