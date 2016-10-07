@@ -13,6 +13,7 @@ public class PDType3Font extends PDSimpleFont {
 
     public PDType3Font(COSDictionary dictionary) {
         super(dictionary);
+        this.setSuccessfullyParsed(true);
     }
 
     public COSDictionary getCharProcDict() {

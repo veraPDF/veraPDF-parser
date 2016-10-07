@@ -102,13 +102,13 @@ public class PDResources extends PDObject {
 	}
 
 	public PDFont getFont(ASAtom name) {
-		// TODO: check logic in fonts (null pointer case)
-//		if (fontMap.containsKey(name)) {
-//			return fontMap.get(name);
-//		}
+
+		if (fontMap.containsKey(name)) {
+			return fontMap.get(name);
+		}
 		COSObject rawFont = getResource(ASAtom.FONT, name);
 		PDFont font = PDFontFactory.getPDFont(rawFont);
-//		fontMap.put(name, font);
+		fontMap.put(name, font);
 		return font;
 	}
 
