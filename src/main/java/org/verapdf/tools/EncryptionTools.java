@@ -38,11 +38,16 @@ public class EncryptionTools {
         if(revision >= 3) {
             for(int i = 0; i < AMOUNT_OF_REPEATS; ++i) {
                 md5.reset();
-                md5.update(Arrays.copyOf(res, length));
+                md5.update(Arrays.copyOf(res, length / 8));
                 res = md5.digest();
             }
         }
-        return Arrays.copyOf()
+        return Arrays.copyOf(res, length / 8);
+    }
+
+    public static byte[] computeOValue(String password, int revision, int length,
+                                       ) {
+
     }
 
     private static byte[] getPaddedPassword(String password) {
