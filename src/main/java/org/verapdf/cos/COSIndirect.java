@@ -56,7 +56,8 @@ public class COSIndirect extends COSBase {
 
     // OBJECT TYPE
     public COSObjType getType() {
-        return getDirect().getType();
+        COSObject direct = getDirect();
+        return direct == null ? COSObjType.COS_UNDEFINED : direct.getType();
     }
 
     public static COSObject construct(final COSKey value) {
