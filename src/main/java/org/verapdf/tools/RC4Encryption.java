@@ -8,9 +8,9 @@ package org.verapdf.tools;
 public class RC4Encryption {
 
     private int[] s = new int[256];
-    private byte[] key;
-    int i;
-    int j;
+    private int[] key;
+    private int i;
+    private int j;
 
     /**
      * Constructor from encryption key.
@@ -18,21 +18,37 @@ public class RC4Encryption {
      * @param key is encryption key.
      */
     public RC4Encryption(byte[] key) {
-        this.key = key;
-        keySchedulingAlgorithm();
+        this.key = new int[key.length];
+        arraysCopy(key, this.key);
         this.i = 0;
         this.j = 0;
+        keySchedulingAlgorithm();
     }
 
     /**
-     * Encrypts passed data with use of current inner state of encryptor.
+     * Encrypts or decrypts passed data with use of current inner state of
+     * encryptor.
      *
-     * @param data is unencrypted data.
-     * @return encrypted data.
+     * @param data is data to process.
+     * @return processed data.
      */
-    public byte[] encrypt(byte[] data) {
-        byte[] res = new byte[data.length];
-        for (int k = 0; k < data.length; k++) {
+    public byte[] process(byte[] data) {
+        return process(data, 0, data.length);
+    }
+
+    /**
+     * Encrypts or decrypts passed data with use of current inner state of
+     * encryptor.
+     *
+     * @param data   is data to process.
+     * @param offset is offset of beginning of data to process.
+     * @param size   is amount of bytes to process.
+     * @return processed data.
+     */
+    public byte[] process(byte[] data, int offset, int size) {
+        int actualSize = Math.min(size, data.length - offset);
+        byte[] res = new byte[actualSize];
+        for (int k = offset; k < actualSize; k++) {
             res[k] = (byte) (data[k] ^ getNextPseudoRandomByte());
         }
         return res;
@@ -69,5 +85,11 @@ public class RC4Encryption {
         tmp = s[i];
         s[i] = s[j];
         s[j] = tmp;
+    }
+
+    private static void arraysCopy(byte[] src, int[] dst) {
+        for (int i = 0; i < src.length; i++) {
+            dst[i] = src[i] & 0xFF;
+        }
     }
 }
