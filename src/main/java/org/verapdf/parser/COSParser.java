@@ -136,7 +136,13 @@ public class COSParser extends BaseParser {
 			case TT_LITSTRING:
 				return COSString.construct(token.getValue());
 			case TT_HEXSTRING:
-				return COSString.construct(token.getValue(), true, token.getHexCount(), token.isContainsOnlyHex());
+				COSObject res = COSString.construct(token.getValue(), true,
+						token.getHexCount(), token.isContainsOnlyHex());
+				if(!this.document.getPDDocument().isEncrypted()) {
+					return res;
+				} else {
+					return this.decryptCOSString(res);
+				}
 			case TT_NAME:
 				return COSName.construct(token.getValue());
 			case TT_OPENARRAY:
@@ -374,5 +380,12 @@ public class COSParser extends BaseParser {
 
 	public COSDocument getDocument() {
 		return document;
+	}
+
+	private COSObject decryptCOSString(COSObject string) {
+		/*StandardSecurityHandler ssh =
+				this.document.getPDDocument().getStandardSecurityHandler();
+		ssh.decodeString();TODO: finish*/
+		return null;
 	}
 }

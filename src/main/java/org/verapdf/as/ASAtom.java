@@ -22,6 +22,7 @@ public class ASAtom {
     public static final ASAtom ADBE_PKCS7_SHA1 = new ASAtom("adbe.pkcs7.sha1");
     public static final ASAtom ADBE_X509_RSA_SHA1 = new ASAtom("adbe.x509.rsa_sha1");
     public static final ASAtom ADOBE_PPKLITE = new ASAtom("Adobe.PPKLite");
+    public static final ASAtom AESV2 = new ASAtom("AESV2");
     public static final ASAtom AESV3 = new ASAtom("AESV3");
     public static final ASAtom AF_RELATIONSHIP = new ASAtom("AFRelationship");
     public static final ASAtom AFTER = new ASAtom("After");
@@ -461,6 +462,7 @@ public class ASAtom {
     public static final ASAtom SOFT_LIGHT = new ASAtom("SoftLight");
     public static final ASAtom SS = new ASAtom("SS");
     public static final ASAtom ST = new ASAtom("St");
+    public static final ASAtom STANDARD = new ASAtom("Standard");
     public static final ASAtom STANDARD_ENCODING = new ASAtom("StandardEncoding");
     public static final ASAtom STATE = new ASAtom("State");
     public static final ASAtom STATE_MODEL = new ASAtom("StateModel");

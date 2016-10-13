@@ -8,8 +8,10 @@ import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
-import org.verapdf.io.SeekableStream;
 import org.verapdf.exceptions.InvalidPasswordException;
+import org.verapdf.io.SeekableStream;
+import org.verapdf.pd.encryption.PDEncryption;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -473,9 +475,24 @@ public class PDFParser extends COSParser {
 		}
 
 		if (trailer.knownKey(ASAtom.ENCRYPT)) {
-			closeInputStream();
-			throw new InvalidPasswordException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+			if(!docCanBeDecrypted(trailer)) {
+                throw new InvalidPasswordException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+            }
 		}
 	}
+
+	private boolean docCanBeDecrypted(final COSTrailer trailer) {
+        PDEncryption encryption = new PDEncryption(trailer.getEncrypt());
+        if(encryption.getFilter() != ASAtom.STANDARD) {
+            return false;
+        }
+        StandardSecurityHandler ssh = new StandardSecurityHandler(encryption,
+                trailer.getID());
+        boolean res = ssh.isEmptyStringPassword();
+        if(res) {
+            this.document.getPDDocument().setStandardSecurityHandler(ssh);
+        }
+        return res;
+    }
 
 }

@@ -3,6 +3,7 @@ package org.verapdf.cos;
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
@@ -40,7 +41,7 @@ public class COSStream extends COSDictionary {
 
 	protected COSStream(final String string) {
 		super();
-		//TODO : Memory in stream
+		this.stream = new ASMemoryInStream(string.getBytes());
 		this.flags = FilterFlags.RAW_DATA;
 	}
 
@@ -56,7 +57,7 @@ public class COSStream extends COSDictionary {
 
 	protected COSStream(final COSDictionary dictionary, final String string, final FilterFlags flags) {
 		super(dictionary);
-		//TODO : Memory in stream
+		this.stream = new ASMemoryInStream(string.getBytes());
 		this.flags = flags;
 	}
 

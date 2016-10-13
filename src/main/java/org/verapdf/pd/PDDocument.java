@@ -7,6 +7,7 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.io.SeekableStream;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
 import org.verapdf.pd.form.PDAcroForm;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class PDDocument {
 
 	private PDCatalog catalog;
 	private COSDocument document;
+	private StandardSecurityHandler standardSecurityHandler;
 
 	public PDDocument() throws IOException {
 		this.catalog = new PDCatalog();
@@ -179,5 +181,17 @@ public class PDDocument {
 
 	public SeekableStream getPDFSource() {
 		return this.document.getPDFSource();
+	}
+
+	public void setStandardSecurityHandler(StandardSecurityHandler standardSecurityHandler) {
+		this.standardSecurityHandler = standardSecurityHandler;
+	}
+
+	public StandardSecurityHandler getStandardSecurityHandler() {
+		return standardSecurityHandler;
+	}
+
+	public boolean isEncrypted() {
+		return this.standardSecurityHandler != null;
 	}
 }

@@ -18,9 +18,20 @@ import java.util.Arrays;
  */
 public class COSFilterRC4DecryptionDefault extends ASBufferingInFilter {
 
-    private static final int MAXIMAL_KEY_LENGTH = 16;
+    public static final int MAXIMAL_KEY_LENGTH = 16;
     private RC4Encryption rc4;
 
+    /**
+     * Constructor.
+     *
+     * @param stream is stream with encrypted data.
+     * @param objectKey contains object and generation numbers from object
+     *                  identifier for object that is being decrypted. If it is
+     *                  direct object, objectKey is taken from indirect object
+     *                  that contains it.
+     * @param encryptionKey is encryption key that is calculated from user
+     *                      password and encryption dictionary.
+     */
     public COSFilterRC4DecryptionDefault(ASInputStream stream, COSKey objectKey,
                                          byte[] encryptionKey)
             throws IOException, NoSuchAlgorithmException {
@@ -38,7 +49,9 @@ public class COSFilterRC4DecryptionDefault extends ASBufferingInFilter {
         }
         byte[] encData = new byte[BF_BUFFER_SIZE];
         int encDataLength = this.bufferPopArray(encData, size);
-        rc4.process();
+        byte[] res = rc4.process(encData, 0, encDataLength);
+        System.arraycopy(res, 0, buffer, 0, encDataLength);
+        return encDataLength;
     }
 
     @Override
@@ -58,7 +71,7 @@ public class COSFilterRC4DecryptionDefault extends ASBufferingInFilter {
         rc4 = new RC4Encryption(Arrays.copyOf(resultEncryptionKey, keyLength));
     }
 
-    private byte[] getObjectKeyDigest(COSKey objectKey) {
+    public static byte[] getObjectKeyDigest(COSKey objectKey) {
         byte[] res = new byte[5];
         System.arraycopy(EncryptionTools.intToBytesLowOrderFirst(
                 objectKey.getNumber()), 0, res, 0, 3);
