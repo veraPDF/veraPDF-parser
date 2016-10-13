@@ -6,9 +6,11 @@ import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.io.SeekableStream;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -27,6 +29,7 @@ public class COSParser extends BaseParser {
 	protected COSDocument document;
 	protected Queue<COSObject> objects = new LinkedList<>();
 	protected Queue<Long> integers = new LinkedList<>();
+    protected COSKey keyOfCurrentObject;
 
 	protected boolean flag = true;
 
@@ -138,7 +141,7 @@ public class COSParser extends BaseParser {
 			case TT_HEXSTRING:
 				COSObject res = COSString.construct(token.getValue(), true,
 						token.getHexCount(), token.isContainsOnlyHex());
-				if(!this.document.getPDDocument().isEncrypted()) {
+				if(!this.document.isEncrypted()) {
 					return res;
 				} else {
 					return this.decryptCOSString(res);
@@ -272,7 +275,8 @@ public class COSParser extends BaseParser {
 		if (streamLengthValid) {
 			dict.setRealStreamSize(size);
 			ASInputStream stm = super.getRandomAccess(size);
-			dict.setData(stm);
+			dict.setData(stm, this.document.isEncrypted() ?
+					COSStream.FilterFlags.DECRYPT : COSStream.FilterFlags.RAW_DATA);
 		} else {
 			//trying to find endstream keyword
 			long realStreamSize = -1;
@@ -291,7 +295,8 @@ public class COSParser extends BaseParser {
 							realStreamSize = possibleEndstreamOffset - streamStartOffset;
 							dict.setRealStreamSize(realStreamSize);
 							ASInputStream stm = super.getRandomAccess(realStreamSize);
-							dict.setData(stm);
+							dict.setData(stm, this.document.isEncrypted() ?
+									COSStream.FilterFlags.DECRYPT : COSStream.FilterFlags.RAW_DATA);
 							source.seek(possibleEndstreamOffset);
 							break;
 						}
@@ -309,6 +314,7 @@ public class COSParser extends BaseParser {
 
 		checkEndstreamSpacings(dict, streamStartOffset, size);
 
+        dict.setObjectKey(this.keyOfCurrentObject);
 		return dict;
 	}
 
@@ -383,9 +389,14 @@ public class COSParser extends BaseParser {
 	}
 
 	private COSObject decryptCOSString(COSObject string) {
-		/*StandardSecurityHandler ssh =
-				this.document.getPDDocument().getStandardSecurityHandler();
-		ssh.decodeString();TODO: finish*/
-		return null;
+		StandardSecurityHandler ssh =
+				this.document.getStandardSecurityHandler();
+        try {
+            ssh.decodeString((COSString) string.get(), this.keyOfCurrentObject);
+            return string;
+        } catch (IOException | GeneralSecurityException e) {
+            LOG.warn("Can't decrypt string in object " + this.keyOfCurrentObject);
+            return string;
+        }
 	}
 }

@@ -7,6 +7,7 @@ import org.verapdf.io.IReader;
 import org.verapdf.io.Reader;
 import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.PDDocument;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,7 @@ public class COSDocument {
 	private COSTrailer lastTrailer;
 	private boolean linearized;
 	private boolean isNew;
+	private StandardSecurityHandler standardSecurityHandler;
 
 	private byte postEOFDataSize;
 
@@ -247,6 +249,18 @@ public class COSDocument {
 		writer.writeXRefInfo();
 
 		writer.clear();
+	}
+
+	public void setStandardSecurityHandler(StandardSecurityHandler standardSecurityHandler) {
+		this.standardSecurityHandler = standardSecurityHandler;
+	}
+
+	public StandardSecurityHandler getStandardSecurityHandler() {
+		return standardSecurityHandler;
+	}
+
+	public boolean isEncrypted() {
+		return this.standardSecurityHandler != null;
 	}
 
 }

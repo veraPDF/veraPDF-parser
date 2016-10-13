@@ -247,6 +247,8 @@ public class PDFParser extends COSParser {
             return new COSObject();
         }
 
+        this.keyOfCurrentObject = new COSKey((int) number, (int) generation);
+
         if (!isNextByteEOL()) {
             // eol marker shall follow the "obj" keyword
             headerOfObjectComplyPDFA = false;
@@ -490,7 +492,7 @@ public class PDFParser extends COSParser {
                 trailer.getID());
         boolean res = ssh.isEmptyStringPassword();
         if(res) {
-            this.document.getPDDocument().setStandardSecurityHandler(ssh);
+            this.document.setStandardSecurityHandler(ssh);
         }
         return res;
     }

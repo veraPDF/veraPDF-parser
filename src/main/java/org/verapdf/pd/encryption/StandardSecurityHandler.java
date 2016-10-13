@@ -107,6 +107,12 @@ public class StandardSecurityHandler {
         return this.isEmptyStringPassword;
     }
 
+    /**
+     * Decrypts string and writes result into string.
+     *
+     * @param string is COSString to decrypt.
+     * @param stringKey is COSKey of object that contains this COSString.
+     */
     public void decodeString(COSString string, COSKey stringKey)
             throws IOException, GeneralSecurityException {
         byte[] stringBytes = getBytesOfHexString(string);
@@ -128,6 +134,13 @@ public class StandardSecurityHandler {
         }
         filter.close();
         string.set(new String(res));
+    }
+
+    /**
+     * @return PDEncryption of this security handler.
+     */
+    public PDEncryption getPdEncryption() {
+        return pdEncryption;
     }
 
     private byte[] getO() {
