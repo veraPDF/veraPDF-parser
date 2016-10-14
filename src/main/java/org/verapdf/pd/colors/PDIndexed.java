@@ -2,32 +2,40 @@ package org.verapdf.pd.colors;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
+import org.verapdf.factory.colors.ColorSpaceFactory;
 
 /**
  * @author Maksim Bezrukov
  */
 public class PDIndexed extends PDColorSpace {
 
-    private final PDColorSpace base;
-    private final Long hival;
-    private final ASInputStream lookup;
-
-    public PDIndexed(PDColorSpace base, Long hival, ASInputStream lookup) {
-        this.base = base;
-        this.hival = hival;
-        this.lookup = lookup;
+    public PDIndexed(COSObject obj) {
+        super(obj);
     }
 
     public PDColorSpace getBase() {
-        return base;
+        return ColorSpaceFactory.getColorSpace(getObject().at(1));
     }
 
     public Long getHival() {
-        return hival;
+        return getObject().at(2).getInteger();
     }
 
     public ASInputStream getLookup() {
-        return lookup;
+        COSObject object = getObject().at(3);
+        if (object != null) {
+            COSObjType type = object.getType();
+            if (type == COSObjType.COS_STRING) {
+                return new ASMemoryInStream(object.getString().getBytes());
+            } else if (type == COSObjType.COS_STREAM) {
+                return object.getData(COSStream.FilterFlags.DECODE);
+            }
+        }
+        return null;
     }
 
     @Override
