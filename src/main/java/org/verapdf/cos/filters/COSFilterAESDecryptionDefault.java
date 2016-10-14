@@ -53,8 +53,8 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
         byte[] encData = new byte[BF_BUFFER_SIZE];
         int encDataLength = this.bufferPopArray(encData, size);
         byte[] res = this.aes.update(encData, 0, encDataLength);
-        System.arraycopy(res, 0, buffer, 0, encDataLength);
-        return encDataLength;
+        System.arraycopy(res, 0, buffer, 0, res.length);
+        return res.length;
     }
 
     private void initAES(COSKey objectKey, byte[] encryptionKey)

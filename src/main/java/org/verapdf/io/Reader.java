@@ -109,23 +109,33 @@ public class Reader extends XRefReader {
 		setXRefInfo(infos);
 
 		if(this.parser.isEncrypted()) {
-			if(!docCanBeDecrypted(this.parser.getEncryption(), this.parser.getId())) {
+			if(!docCanBeDecrypted()) {
 				throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 			}
 		}
 	}
 
-	private boolean docCanBeDecrypted(final COSObject encrypt, final COSObject id) {
-		PDEncryption encryption = new PDEncryption(encrypt);
-		if(encryption.getFilter() != ASAtom.STANDARD) {
+	private boolean docCanBeDecrypted() {
+		try {
+			COSObject cosEncrypt = this.parser.getEncryption();
+			if (cosEncrypt.isIndirect()) {
+				cosEncrypt = this.parser.getObject(this.getOffset(cosEncrypt.getObjectKey()));
+			}
+			PDEncryption encryption = new PDEncryption(cosEncrypt);
+			if (encryption.getFilter() != ASAtom.STANDARD) {
+				return false;
+			}
+			StandardSecurityHandler ssh = new StandardSecurityHandler(encryption,
+					this.parser.getId());
+			boolean res = ssh.isEmptyStringPassword();
+			if (res) {
+				this.parser.getDocument().setStandardSecurityHandler(ssh);
+			}
+			return res;
+		} catch (IOException e) {
+			LOGGER.debug("Cannot read object " + this.parser.getEncryption().getKey());
 			return false;
 		}
-		StandardSecurityHandler ssh = new StandardSecurityHandler(encryption, id);
-		boolean res = ssh.isEmptyStringPassword();
-		if(res) {
-			this.parser.getDocument().setStandardSecurityHandler(ssh);
-		}
-		return res;
 	}
 
 }
