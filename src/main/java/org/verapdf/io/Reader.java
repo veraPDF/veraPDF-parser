@@ -1,11 +1,16 @@
 package org.verapdf.io;
 
 import org.apache.log4j.Logger;
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefInfo;
+import org.verapdf.exceptions.InvalidPasswordException;
 import org.verapdf.parser.DecodedObjectStreamParser;
 import org.verapdf.parser.PDFParser;
 import org.verapdf.parser.XRefReader;
+import org.verapdf.pd.encryption.PDEncryption;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,6 +106,25 @@ public class Reader extends XRefReader {
 		List<COSXRefInfo> infos = new ArrayList<COSXRefInfo>();
 		this.parser.getXRefInfo(infos);
 		setXRefInfo(infos);
+
+		if(this.parser.isEncrypted()) {
+			if(!docCanBeDecrypted(this.parser.getEncryption(), this.parser.getId())) {
+				throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+			}
+		}
+	}
+
+	private boolean docCanBeDecrypted(final COSObject encrypt, final COSObject id) {
+		PDEncryption encryption = new PDEncryption(encrypt);
+		if(encryption.getFilter() != ASAtom.STANDARD) {
+			return false;
+		}
+		StandardSecurityHandler ssh = new StandardSecurityHandler(encryption, id);
+		boolean res = ssh.isEmptyStringPassword();
+		if(res) {
+			this.parser.getDocument().setStandardSecurityHandler(ssh);
+		}
+		return res;
 	}
 
 }

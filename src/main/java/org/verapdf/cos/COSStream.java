@@ -19,7 +19,6 @@ public class COSStream extends COSDictionary {
 
 	private ASInputStream stream;
 	private FilterFlags flags;
-    private COSKey streamKey;
 
 	private boolean streamKeywordCRLFCompliant = true;
 	private boolean endstreamKeywordCRLFCompliant = true;
@@ -182,10 +181,6 @@ public class COSStream extends COSDictionary {
 		return getIntegerKey(ASAtom.LENGTH);
 	}
 
-    public void setStreamKey(COSKey streamKey) {
-        this.streamKey = streamKey;
-    }
-
     public void setLength(final long length) {
 		setIntegerKey(ASAtom.LENGTH, length);
 	}
@@ -198,7 +193,6 @@ public class COSStream extends COSDictionary {
 			setKey(ASAtom.LENGTH, obj);
 		}
 	}
-
 
 	public enum FilterFlags {
 		RAW_DATA,

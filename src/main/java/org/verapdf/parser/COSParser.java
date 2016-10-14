@@ -275,8 +275,7 @@ public class COSParser extends BaseParser {
 		if (streamLengthValid) {
 			dict.setRealStreamSize(size);
 			ASInputStream stm = super.getRandomAccess(size);
-			dict.setData(stm, this.document.isEncrypted() ?
-					COSStream.FilterFlags.DECRYPT : COSStream.FilterFlags.RAW_DATA);
+			dict.setData(stm);
 		} else {
 			//trying to find endstream keyword
 			long realStreamSize = -1;
@@ -295,8 +294,7 @@ public class COSParser extends BaseParser {
 							realStreamSize = possibleEndstreamOffset - streamStartOffset;
 							dict.setRealStreamSize(realStreamSize);
 							ASInputStream stm = super.getRandomAccess(realStreamSize);
-							dict.setData(stm, this.document.isEncrypted() ?
-									COSStream.FilterFlags.DECRYPT : COSStream.FilterFlags.RAW_DATA);
+							dict.setData(stm);
 							source.seek(possibleEndstreamOffset);
 							break;
 						}
@@ -314,7 +312,14 @@ public class COSParser extends BaseParser {
 
 		checkEndstreamSpacings(dict, streamStartOffset, size);
 
-        dict.setObjectKey(this.keyOfCurrentObject);
+		try {
+			if (this.document.isEncrypted()) {
+				this.document.getStandardSecurityHandler().decryptStream(
+						(COSStream) dict.getDirectBase(), this.keyOfCurrentObject);
+			}
+		} catch (GeneralSecurityException e) {
+			throw new IOException("Stream " + this.keyOfCurrentObject + " cannot be decrypted");
+		}
 		return dict;
 	}
 
@@ -392,7 +397,7 @@ public class COSParser extends BaseParser {
 		StandardSecurityHandler ssh =
 				this.document.getStandardSecurityHandler();
         try {
-            ssh.decodeString((COSString) string.get(), this.keyOfCurrentObject);
+            ssh.decryptString((COSString) string.get(), this.keyOfCurrentObject);
             return string;
         } catch (IOException | GeneralSecurityException e) {
             LOG.warn("Can't decrypt string in object " + this.keyOfCurrentObject);

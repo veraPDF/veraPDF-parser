@@ -5,10 +5,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSString;
+import org.verapdf.cos.*;
 import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
 import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
 import org.verapdf.tools.EncryptionTools;
@@ -110,10 +107,10 @@ public class StandardSecurityHandler {
     /**
      * Decrypts string and writes result into string.
      *
-     * @param string is COSString to decrypt.
+     * @param string    is COSString to decrypt.
      * @param stringKey is COSKey of object that contains this COSString.
      */
-    public void decodeString(COSString string, COSKey stringKey)
+    public void decryptString(COSString string, COSKey stringKey)
             throws IOException, GeneralSecurityException {
         byte[] stringBytes = getBytesOfHexString(string);
         ASInputStream stream = new ASMemoryInStream(stringBytes);
@@ -134,6 +131,26 @@ public class StandardSecurityHandler {
         }
         filter.close();
         string.set(new String(res));
+    }
+
+    /**
+     * Applies decryption filter to the stream so it can be read as unencrypted.
+     *
+     * @param stream is COSStream with encrypted data.
+     * @param key    is COSKey of this stream.
+     */
+    public void decryptStream(COSStream stream, COSKey key)
+            throws IOException, GeneralSecurityException {
+        ASInputStream encStream = stream.getData();
+        ASInputStream filter;
+        if (isRC4Decryption) {
+            filter = new COSFilterRC4DecryptionDefault(encStream, key,
+                    this.encryptionKey);
+        } else {
+            filter = new COSFilterAESDecryptionDefault(encStream, key,
+                    this.encryptionKey);
+        }
+        stream.setData(filter);
     }
 
     /**

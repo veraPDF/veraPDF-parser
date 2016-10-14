@@ -8,10 +8,7 @@ import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
-import org.verapdf.exceptions.InvalidPasswordException;
 import org.verapdf.io.SeekableStream;
-import org.verapdf.pd.encryption.PDEncryption;
-import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +31,9 @@ public class PDFParser extends COSParser {
     private static final byte XREF_SEARCH_STEP_MAX = 32;
 
     private long offsetShift = 0;
+    private boolean isEncrypted;
+    private COSObject encryption;
+    private COSObject id;
 
     public PDFParser(final String filename) throws IOException {
         super(filename);
@@ -477,24 +477,22 @@ public class PDFParser extends COSParser {
 		}
 
 		if (trailer.knownKey(ASAtom.ENCRYPT)) {
-			if(!docCanBeDecrypted(trailer)) {
-                throw new InvalidPasswordException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
-            }
+		    this.isEncrypted = true;
+            this.encryption = trailer.getEncrypt();
+            this.id = trailer.getID();
+         //       throw new InvalidPasswordException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 		}
 	}
 
-	private boolean docCanBeDecrypted(final COSTrailer trailer) {
-        PDEncryption encryption = new PDEncryption(trailer.getEncrypt());
-        if(encryption.getFilter() != ASAtom.STANDARD) {
-            return false;
-        }
-        StandardSecurityHandler ssh = new StandardSecurityHandler(encryption,
-                trailer.getID());
-        boolean res = ssh.isEmptyStringPassword();
-        if(res) {
-            this.document.setStandardSecurityHandler(ssh);
-        }
-        return res;
+    public boolean isEncrypted() {
+        return isEncrypted;
     }
 
+    public COSObject getEncryption() {
+        return encryption;
+    }
+
+    public COSObject getId() {
+        return id;
+    }
 }
