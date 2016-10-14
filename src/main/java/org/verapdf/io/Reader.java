@@ -71,9 +71,10 @@ public class Reader extends XRefReader {
 			} else {
 				COSKey newKey = new COSKey(- (int)offset, 0);
 				COSObject object = getObject(newKey);
-				if(!object.getType().equals(COSObjType.COS_STREAM)) {
+				if(object == null || !object.getType().equals(COSObjType.COS_STREAM)) {
 					throw new IOException("Object number " + (-offset) + " should" +
-							" be object stream, but in fact it is " + object.getType());
+							" be object stream, but in fact it is " +
+							(object == null ? "null" : object.getType()));
 				}
 				COSStream objectStream = (COSStream) object.get();
 				parser = new DecodedObjectStreamParser(

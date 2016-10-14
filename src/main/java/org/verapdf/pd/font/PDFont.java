@@ -29,6 +29,7 @@ public abstract class PDFont extends PDResource {
     protected boolean isFontParsed = false;
     protected FontProgram fontProgram;
     protected Encoding encoding = null;
+    private boolean successfullyParsed = false;
 
     /**
      * Constructor from COSDictionary.
@@ -265,5 +266,13 @@ public abstract class PDFont extends PDResource {
         }
 
         return Double.valueOf(0);
+    }
+
+    public boolean isSuccessfullyParsed() {
+        return successfullyParsed;
+    }
+
+    public void setSuccessfullyParsed(boolean successfullyParsed) {
+        this.successfullyParsed = successfullyParsed;
     }
 }

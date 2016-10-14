@@ -2,32 +2,27 @@ package org.verapdf.pd.colors;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
+import org.verapdf.factory.colors.ColorSpaceFactory;
 
 /**
  * @author Maksim Bezrukov
  */
 public class PDSeparation extends PDColorSpace {
 
-    private final COSObject colorantName;
-    private final PDColorSpace alternate;
-    private final COSObject tintTransform;
-
-    public PDSeparation(COSObject colorantName, PDColorSpace alternate, COSObject tintTransform) {
-        this.colorantName = colorantName;
-        this.alternate = alternate;
-        this.tintTransform = tintTransform;
+    public PDSeparation(COSObject obj) {
+        super(obj);
     }
 
     public COSObject getColorantName() {
-        return this.colorantName;
+        return getObject().at(1);
     }
 
     public PDColorSpace getAlternate() {
-        return this.alternate;
+        return ColorSpaceFactory.getColorSpace(getObject().at(2));
     }
 
     public COSObject getTintTransform() {
-        return this.tintTransform;
+        return getObject().at(3);
     }
 
     @Override

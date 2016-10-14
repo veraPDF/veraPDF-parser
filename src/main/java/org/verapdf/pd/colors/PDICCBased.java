@@ -3,6 +3,7 @@ package org.verapdf.pd.colors;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.external.ICCProfile;
@@ -32,9 +33,15 @@ public class PDICCBased extends PDColorSpace {
 
 	public PDICCBased(COSObject obj) {
 		super(obj);
-		this.iccProfile = new ICCProfile(obj);
-		Long n = this.iccProfile.getNumberOfColorants();
-		this.numberOfComponents = n == null ? -1 : n.intValue();
+		COSObject stream = obj.at(1);
+		if (stream != null && stream.getType() == COSObjType.COS_STREAM) {
+			this.iccProfile = new ICCProfile(stream);
+			Long n = this.iccProfile.getNumberOfColorants();
+			this.numberOfComponents = n == null ? -1 : n.intValue();
+		} else {
+			this.iccProfile = null;
+			this.numberOfComponents = -1;
+		}
 	}
 
 	public ICCProfile getICCProfile() {
@@ -58,9 +65,4 @@ public class PDICCBased extends PDColorSpace {
 	public PDColorSpace getAlternate() {
 		return this.iccProfile == null ? null : this.iccProfile.getAlternate();
 	}
-
-//	TODO: implement me
-//	public PDMetadata getMetadata() {
-//		return this.iccProfile == null ? null : this.iccProfile.getMetadata();
-//	}
 }

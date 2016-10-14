@@ -27,10 +27,10 @@ public class PDCalRGB extends PDCIEDictionaryBased {
     }
 
     public double[] getGamma() {
-        return TypeConverter.getRealArray(getObject().getKey(ASAtom.GAMMA), 3, "Gamma");
+        return TypeConverter.getRealArray(this.dictionary.getKey(ASAtom.GAMMA), 3, "Gamma");
     }
 
     public double[] getMatrix() {
-        return TypeConverter.getRealArray(getObject().getKey(ASAtom.MATRIX), 9, "Matrix");
+        return TypeConverter.getRealArray(this.dictionary.getKey(ASAtom.MATRIX), 9, "Matrix");
     }
 }
