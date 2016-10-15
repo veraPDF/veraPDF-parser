@@ -23,6 +23,8 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
     private static final byte[] SALT_BYTES = new byte[]{0x73, 0x41, 0x6C, 0x54};
 
     private Cipher aes;
+    private int decryptedPointer;
+    private byte[] decryptedBytes;
 
     /**
      * Constructor.
@@ -40,10 +42,17 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
             throws IOException, GeneralSecurityException {
         super(stream);
         initAES(objectKey, encryptionKey);
+        decryptedBytes = new byte[0];
+        decryptedPointer = 0;
     }
 
     @Override
     public int read(byte[] buffer, int size) throws IOException {
+            int readDecrypted = this.readFromDecryptedBytes(buffer, size);
+        if(readDecrypted != -1) {
+            return readDecrypted;
+        }
+
         if (this.bufferSize() == 0) {
             int bytesFed = (int) this.feedBuffer(getBufferCapacity());
             if (bytesFed == -1) {
@@ -51,10 +60,16 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
             }
         }
         byte[] encData = new byte[BF_BUFFER_SIZE];
-        int encDataLength = this.bufferPopArray(encData, size);
-        byte[] res = this.aes.update(encData, 0, encDataLength);
-        System.arraycopy(res, 0, buffer, 0, res.length);
-        return res.length;
+        int encDataLength = this.bufferPopArray(encData, BF_BUFFER_SIZE);
+        try {
+            this.decryptedBytes = this.aes.update(encData, 0, encDataLength);
+            byte[] fin = this.aes.doFinal();
+            this.decryptedBytes = concatenate(this.decryptedBytes,
+                    decryptedBytes.length, fin, fin.length);
+            return this.readFromDecryptedBytes(buffer, size);
+        } catch (GeneralSecurityException e) {
+            throw new IOException("Can't decrypt AES data.");
+        }
     }
 
     private void initAES(COSKey objectKey, byte[] encryptionKey)
@@ -84,5 +99,15 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
                     " vector is not fully read.");
         }
         return initVector;
+    }
+
+    private int readFromDecryptedBytes(byte[] buffer, int size) {
+        if(decryptedBytes.length == decryptedPointer) {
+            return -1;
+        }
+        int actualRead = Math.min(size, decryptedBytes.length - decryptedPointer);
+        System.arraycopy(decryptedBytes, decryptedPointer, buffer, 0, actualRead);
+        decryptedPointer += actualRead;
+        return actualRead;
     }
 }

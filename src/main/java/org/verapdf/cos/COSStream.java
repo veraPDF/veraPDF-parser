@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
@@ -116,7 +117,9 @@ public class COSStream extends COSDictionary {
 				return this.stream;
 			}
 			ASInputStream result = getFilters().getInputStream(stream, this.getKey(ASAtom.DECODE_PARMS));
-			result.reset();
+			if(!(result instanceof COSFilterAESDecryptionDefault)) {
+				result.reset();
+			}
 			return result;
 		} catch (IOException e) {
 			LOGGER.debug("Can't get stream data", e);

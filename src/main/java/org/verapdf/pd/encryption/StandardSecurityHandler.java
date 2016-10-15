@@ -130,7 +130,7 @@ public class StandardSecurityHandler {
             read = filter.read(buf, buf.length);
         }
         filter.close();
-        string.set(new String(res));
+        string.set(new String(res, "ISO-8859-1"));
     }
 
     /**
