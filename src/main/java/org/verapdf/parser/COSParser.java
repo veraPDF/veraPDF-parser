@@ -141,7 +141,7 @@ public class COSParser extends BaseParser {
 			case TT_HEXSTRING:
 				COSObject res = COSString.construct(token.getValue(), true,
 						token.getHexCount(), token.isContainsOnlyHex());
-				if(!this.document.isEncrypted()) {
+				if(this.document == null || !this.document.isEncrypted()) {
 					return res;
 				} else {
 					return this.decryptCOSString(res);
