@@ -2,19 +2,13 @@ package org.verapdf.factory.colors;
 
 import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASInputStream;
-import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
 import org.verapdf.pd.PDResources;
 import org.verapdf.pd.colors.*;
 import org.verapdf.pd.patterns.PDPattern;
 import org.verapdf.pd.patterns.PDShadingPattern;
 import org.verapdf.pd.patterns.PDTilingPattern;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Maksim Bezrukov
@@ -92,49 +86,23 @@ public class ColorSpaceFactory {
         }
         ASAtom name = base.at(0).getName();
         if (ASAtom.CALGRAY.equals(name)) {
-            return new PDCalGray(base.at(1));
+            return new PDCalGray(base);
         } else if (ASAtom.CALRGB.equals(name)) {
-            return new PDCalRGB(base.at(1));
+            return new PDCalRGB(base);
         } else if (ASAtom.LAB.equals(name)) {
-            return new PDLab(base.at(1));
+            return new PDLab(base);
         } else if (ASAtom.ICCBASED.equals(name)) {
-            return new PDICCBased(base.at(1));
+            return new PDICCBased(base);
         } else if (ASAtom.SEPARATION.equals(name)) {
-            return new PDSeparation(base.at(1), ColorSpaceFactory.getColorSpace(base.at(2)), base.at(3));
+            return new PDSeparation(base);
         } else if (ASAtom.DEVICEN.equals(name)) {
-            return new PDDeviceN(getListOfNames(base.at(1)), ColorSpaceFactory.getColorSpace(base.at(2)),
-                    base.at(3), base.at(4));
+            return new PDDeviceN(base);
         } else if (ASAtom.INDEXED.equals(name)) {
-            return new PDIndexed(ColorSpaceFactory.getColorSpace(base.at(1)), base.at(2).getInteger(), getLookup(base.at(3)));
+            return new PDIndexed(base);
         } else {
             LOGGER.debug("Unknown ColorSpace name");
             return null;
         }
-    }
-
-    private static ASInputStream getLookup(COSObject object) {
-        COSObjType type = object.getType();
-        if (type == COSObjType.COS_STRING) {
-            return new ASMemoryInStream(object.getString().getBytes());
-        } else if (type == COSObjType.COS_STREAM) {
-            return object.getData(COSStream.FilterFlags.DECODE);
-        } else {
-            if (!object.empty()) {
-                LOGGER.debug("Unknown lookup type");
-            }
-            return null;
-        }
-    }
-
-    private static List<COSObject> getListOfNames(COSObject object) {
-        if (object.getType() == COSObjType.COS_ARRAY) {
-            List<COSObject> names = new ArrayList<>();
-            for (int i = 0; i < object.size(); ++i) {
-                names.add(object.at(i));
-            }
-            return names;
-        }
-        return null;
     }
 
     private static PDPattern getPattern(COSObject base) {

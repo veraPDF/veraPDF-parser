@@ -6,9 +6,11 @@ import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.io.SeekableStream;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -27,6 +29,7 @@ public class COSParser extends BaseParser {
 	protected COSDocument document;
 	protected Queue<COSObject> objects = new LinkedList<>();
 	protected Queue<Long> integers = new LinkedList<>();
+    protected COSKey keyOfCurrentObject;
 
 	protected boolean flag = true;
 
@@ -136,7 +139,13 @@ public class COSParser extends BaseParser {
 			case TT_LITSTRING:
 				return COSString.construct(token.getValue());
 			case TT_HEXSTRING:
-				return COSString.construct(token.getValue(), true, token.getHexCount(), token.isContainsOnlyHex());
+				COSObject res = COSString.construct(token.getValue(), true,
+						token.getHexCount(), token.isContainsOnlyHex());
+				if(this.document == null || !this.document.isEncrypted()) {
+					return res;
+				} else {
+					return this.decryptCOSString(res);
+				}
 			case TT_NAME:
 				return COSName.construct(token.getValue());
 			case TT_OPENARRAY:
@@ -303,6 +312,14 @@ public class COSParser extends BaseParser {
 
 		checkEndstreamSpacings(dict, streamStartOffset, size);
 
+		try {
+			if (this.document.isEncrypted()) {
+				this.document.getStandardSecurityHandler().decryptStream(
+						(COSStream) dict.getDirectBase(), this.keyOfCurrentObject);
+			}
+		} catch (GeneralSecurityException e) {
+			throw new IOException("Stream " + this.keyOfCurrentObject + " cannot be decrypted");
+		}
 		return dict;
 	}
 
@@ -374,5 +391,17 @@ public class COSParser extends BaseParser {
 
 	public COSDocument getDocument() {
 		return document;
+	}
+
+	private COSObject decryptCOSString(COSObject string) {
+		StandardSecurityHandler ssh =
+				this.document.getStandardSecurityHandler();
+        try {
+            ssh.decryptString((COSString) string.get(), this.keyOfCurrentObject);
+            return string;
+        } catch (IOException | GeneralSecurityException e) {
+            LOG.warn("Can't decrypt string in object " + this.keyOfCurrentObject);
+            return string;
+        }
 	}
 }

@@ -80,6 +80,10 @@ public class COSString extends COSDirect {
         return true;
     }
 
+    public void setHex(boolean hex) {
+        isHex = hex;
+    }
+
     public boolean setString(final String value, final boolean isHex) {
         this.value = value;
         this.isHex = isHex;

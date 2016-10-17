@@ -27,6 +27,6 @@ public class PDLab extends PDCIEDictionaryBased {
     }
 
     public double[] getRange() {
-        return TypeConverter.getRealArray(getObject().getKey(ASAtom.RANGE), 4, "Range");
+        return TypeConverter.getRealArray(this.dictionary.getKey(ASAtom.RANGE), 4, "Range");
     }
 }

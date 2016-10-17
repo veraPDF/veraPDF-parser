@@ -26,7 +26,7 @@ public class PDCalGray extends PDCIEDictionaryBased {
     }
 
     public Double getGamma() {
-        return getNumber(getObject().getKey(ASAtom.GAMMA));
+        return getNumber(this.dictionary.getKey(ASAtom.GAMMA));
     }
 
     private static Double getNumber(COSObject object) {
