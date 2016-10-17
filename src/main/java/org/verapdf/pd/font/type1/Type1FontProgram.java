@@ -2,7 +2,6 @@ package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
 import org.verapdf.pd.font.FontProgram;
@@ -119,7 +118,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                         break;
                 }
                 break;
-            case TT_NONE:
+            case TT_KEYWORD:
                 switch (getToken().getValue()) {
                     //Do processing of keywords like eexec
                     case Type1StringConstants.EEXEC_STRING:
@@ -128,7 +127,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                         ASInputStream eexecEncoded = this.source.getStream(this.source.getOffset(),
                                 clearToMarkOffset - this.source.getOffset());
                         ASInputStream eexecDecoded = new EexecFilterDecode(
-                                new COSFilterASCIIHexDecode(eexecEncoded), false);
+                                eexecEncoded, false);
                         Type1PrivateParser parser = new Type1PrivateParser(
                                 eexecDecoded, fontMatrix);
                         parser.parse();

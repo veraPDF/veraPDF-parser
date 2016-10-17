@@ -1,6 +1,7 @@
 package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.io.ASInputStream;
 
 import java.io.IOException;
 
@@ -30,8 +31,8 @@ public class EexecFilterDecode extends ASBufferingInFilter {
      * @param lenIV        is number of random bytes added to encoded data, value of
      *                     LenIV in Private dictionary.
      */
-    public EexecFilterDecode(ASBufferingInFilter stream, boolean isCharstring,
-                             int lenIV) {
+    public EexecFilterDecode(ASInputStream stream, boolean isCharstring,
+                             int lenIV) throws IOException {
         super(stream);
         if (!isCharstring) {
             bytesToDiscard = EEXEC_NUMBER_OF_RANDOM_BYTES;
@@ -48,7 +49,7 @@ public class EexecFilterDecode extends ASBufferingInFilter {
      * @param stream       is eexec-encoded stream.
      * @param isCharstring is true if passed stream is encoded charstring.
      */
-    public EexecFilterDecode(ASBufferingInFilter stream, boolean isCharstring) {
+    public EexecFilterDecode(ASInputStream stream, boolean isCharstring) throws IOException {
         this(stream, isCharstring, EEXEC_NUMBER_OF_RANDOM_BYTES);
     }
 
