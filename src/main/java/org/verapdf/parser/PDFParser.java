@@ -439,7 +439,6 @@ public class PDFParser extends COSParser {
             this.isEncrypted = true;
             this.encryption = section.getTrailer().getEncrypt();
             this.id = section.getTrailer().getID();
-            //       throw new InvalidPasswordException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
         }
     }
 
@@ -486,7 +485,6 @@ public class PDFParser extends COSParser {
 		    this.isEncrypted = true;
             this.encryption = trailer.getEncrypt();
             this.id = trailer.getID();
-         //       throw new InvalidPasswordException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 		}
 	}
 
