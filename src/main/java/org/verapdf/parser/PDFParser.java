@@ -9,7 +9,6 @@ import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
 import org.verapdf.io.SeekableStream;
-import org.verapdf.exceptions.InvalidPasswordException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +31,9 @@ public class PDFParser extends COSParser {
     private static final byte XREF_SEARCH_STEP_MAX = 32;
 
     private long offsetShift = 0;
+    private boolean isEncrypted;
+    private COSObject encryption;
+    private COSObject id;
 
     public PDFParser(final String filename) throws IOException {
         super(filename);
@@ -245,6 +247,8 @@ public class PDFParser extends COSParser {
             return new COSObject();
         }
 
+        this.keyOfCurrentObject = new COSKey((int) number, (int) generation);
+
         if (!isNextByteEOL()) {
             // eol marker shall follow the "obj" keyword
             headerOfObjectComplyPDFA = false;
@@ -431,6 +435,11 @@ public class PDFParser extends COSParser {
         }
         XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.get());
         xrefStreamParser.parseStreamAndTrailer();
+        if (section.getTrailer().knownKey(ASAtom.ENCRYPT)) {
+            this.isEncrypted = true;
+            this.encryption = section.getTrailer().getEncrypt();
+            this.id = section.getTrailer().getID();
+        }
     }
 
 	private void getXRefInfo(final List<COSXRefInfo> info, Long offset) throws IOException {
@@ -473,9 +482,21 @@ public class PDFParser extends COSParser {
 		}
 
 		if (trailer.knownKey(ASAtom.ENCRYPT)) {
-			closeInputStream();
-			throw new InvalidPasswordException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+		    this.isEncrypted = true;
+            this.encryption = trailer.getEncrypt();
+            this.id = trailer.getID();
 		}
 	}
 
+    public boolean isEncrypted() {
+        return isEncrypted;
+    }
+
+    public COSObject getEncryption() {
+        return encryption;
+    }
+
+    public COSObject getId() {
+        return id;
+    }
 }
