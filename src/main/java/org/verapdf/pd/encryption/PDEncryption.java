@@ -48,22 +48,14 @@ public class PDEncryption extends PDObject {
      * decrypting the document.
      */
     public int getV() {
-        Long v = getIntegerKey(ASAtom.V);
-        if (v != null) {
-            return v.intValue();
-        }
-        return DEFAULT_V;
+        return getIntWithDefault(ASAtom.V, DEFAULT_V);
     }
 
     /**
      * @return the length of the encryption key, in bits.
      */
     public int getLength() {
-        Long length = getIntegerKey(ASAtom.LENGTH);
-        if (length != null) {
-            return length.intValue();
-        }
-        return DEFAULT_LENGTH;
+        return getIntWithDefault(ASAtom.LENGTH, DEFAULT_LENGTH);
     }
 
     // Methods for standard encryption dictionary
@@ -76,19 +68,11 @@ public class PDEncryption extends PDObject {
     }
 
     public COSString getO() {
-        COSObject o = getKey(ASAtom.O);
-        if (o != null && o.getType() == COSObjType.COS_STRING) {
-            return (COSString) o.getDirectBase();
-        }
-        return null;
+        return getCOSString(ASAtom.O);
     }
 
     public COSString getU() {
-        COSObject o = getKey(ASAtom.U);
-        if (o != null && o.getType() == COSObjType.COS_STRING) {
-            return (COSString) o.getDirectBase();
-        }
-        return null;
+        return getCOSString(ASAtom.U);
     }
 
     public Long getP() {
@@ -135,5 +119,21 @@ public class PDEncryption extends PDObject {
             res.put(filterName, new PDCryptFilter(cf.getKey(filterName)));
         }
         return res;
+    }
+
+    private COSString getCOSString(ASAtom key) {
+        COSObject o = getKey(key);
+        if (o != null && o.getType() == COSObjType.COS_STRING) {
+            return (COSString) o.getDirectBase();
+        }
+        return null;
+    }
+
+    private int getIntWithDefault(ASAtom key, int defaultValue) {
+        Long res = getIntegerKey(key);
+        if (res != null) {
+            return res.intValue();
+        }
+        return defaultValue;
     }
 }

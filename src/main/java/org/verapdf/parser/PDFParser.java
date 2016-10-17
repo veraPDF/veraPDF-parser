@@ -435,6 +435,12 @@ public class PDFParser extends COSParser {
         }
         XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.get());
         xrefStreamParser.parseStreamAndTrailer();
+        if (section.getTrailer().knownKey(ASAtom.ENCRYPT)) {
+            this.isEncrypted = true;
+            this.encryption = section.getTrailer().getEncrypt();
+            this.id = section.getTrailer().getID();
+            //       throw new InvalidPasswordException("PDFParser::GetTrailer(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+        }
     }
 
 	private void getXRefInfo(final List<COSXRefInfo> info, Long offset) throws IOException {

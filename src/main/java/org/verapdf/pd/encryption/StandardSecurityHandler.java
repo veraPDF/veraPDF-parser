@@ -161,19 +161,11 @@ public class StandardSecurityHandler {
     }
 
     private byte[] getO() {
-        COSString o = pdEncryption.getO();
-        if (o != null) {
-            return getBytesOfHexString(o);
-        }
-        return null;
+        return getBytesOfHexString(pdEncryption.getO());
     }
 
     private byte[] getU() {
-        COSString u = pdEncryption.getU();
-        if (u != null) {
-            return getBytesOfHexString(u);
-        }
-        return null;
+        return getBytesOfHexString(pdEncryption.getU());
     }
 
     private byte[] getID() {
@@ -187,9 +179,14 @@ public class StandardSecurityHandler {
     }
 
     private static byte[] getBytesOfHexString(COSString s) {
+        if (s == null) {
+            return null;
+        }
         try {
             return s.get().getBytes("ISO-8859-1");
         } catch (UnsupportedEncodingException e) {
+            // should not get here, ISO-8859 should be present
+            LOGGER.error("ISO-8859-1 Charset can't be found, can't get bytes of string.");
             return s.get().getBytes();
         }
     }
