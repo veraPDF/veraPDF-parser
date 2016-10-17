@@ -6,6 +6,7 @@ import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.truetype.TrueTypePredefined;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,6 +85,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                         }
                         break;
                     case Type1StringConstants.ENCODING_STRING:
+                        if (isEncodingName()) {
+                            break;
+                        }
                         do {
                             nextToken();
                         } while (!this.getToken().getValue().equals(
@@ -156,9 +160,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     @Override
     public float getWidth(int charCode) {
         try {
-            if(this.glyphWidths != null) {
+            if (this.glyphWidths != null) {
                 Integer res = this.glyphWidths.get(encoding[charCode]);
-                if(res != null) {
+                if (res != null) {
                     return res;
                 }
             }
@@ -186,5 +190,23 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     public String[] getCharSet() {
         Set<String> charSet = this.glyphWidths.keySet();
         return charSet.toArray(new String[charSet.size()]);
+    }
+
+    private boolean isEncodingName() throws IOException {
+        long startOffset = this.source.getOffset();
+        nextToken();
+        String possibleEncodingName = getToken().getValue();
+        nextToken();
+        if (Type1StringConstants.DEF_STRING.equals(getToken().getValue())) {
+            if (Type1StringConstants.STANDARD_ENCODING_STRING.equals(possibleEncodingName)) {
+                this.encoding = TrueTypePredefined.STANDARD_ENCODING;
+                this.source.seek(startOffset);
+                return true;
+            } else {
+                throw new IOException("Can't get encoding " + possibleEncodingName + " as internal encoding of type 1 font program.");
+            }
+        }
+        this.source.seek(startOffset);
+        return false;
     }
 }
