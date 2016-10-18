@@ -1,19 +1,24 @@
 package org.verapdf.pd.encryption;
 
-import org.apache.log4j.Logger;
-import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
-import org.verapdf.as.io.ASInputStream;
-import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.cos.*;
-import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
-import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
-import org.verapdf.tools.EncryptionTools;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.COSKey;
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
+import org.verapdf.cos.COSString;
+import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
+import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
+import org.verapdf.tools.EncryptionTools;
 
 /**
  * Class represents standard security handler. It authenticates user password
@@ -23,7 +28,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class StandardSecurityHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(StandardSecurityHandler.class);
+    private static final Logger LOGGER = Logger.getLogger(StandardSecurityHandler.class.getCanonicalName());
 
     private PDEncryption pdEncryption;
     private COSObject id;
@@ -70,12 +75,12 @@ public class StandardSecurityHandler {
                         Boolean.valueOf(this.encryptionKey != null);
                 return this.isEmptyStringPassword;
             } catch (NoSuchAlgorithmException e) {
-                LOGGER.debug("Caught NoSuchAlgorithmException while document decryption", e);
+                LOGGER.log(Level.FINE, "Caught NoSuchAlgorithmException while document decryption", e);
                 this.isEmptyStringPassword = Boolean.valueOf(false);
                 return this.isEmptyStringPassword;
             }
         }
-        LOGGER.debug("Can't authenticate password in encrypted PDF, something is null.");
+        LOGGER.log(Level.FINE, "Can't authenticate password in encrypted PDF, something is null.");
         this.isEmptyStringPassword = Boolean.valueOf(false);
         return this.isEmptyStringPassword;
     }
@@ -88,7 +93,7 @@ public class StandardSecurityHandler {
         if (this.isEmptyStringPassword == null) {
             authenticateEmptyPassword();
         }
-        if (!this.isEmptyStringPassword) {
+        if (!this.isEmptyStringPassword.booleanValue()) {
             return null;
         }
         return this.encryptionKey;
@@ -101,7 +106,7 @@ public class StandardSecurityHandler {
         if (this.isEmptyStringPassword == null) {
             authenticateEmptyPassword();
         }
-        return this.isEmptyStringPassword;
+        return this.isEmptyStringPassword.booleanValue();
     }
 
     /**
@@ -186,7 +191,7 @@ public class StandardSecurityHandler {
             return s.get().getBytes("ISO-8859-1");
         } catch (UnsupportedEncodingException e) {
             // should not get here, ISO-8859 should be present
-            LOGGER.error("ISO-8859-1 Charset can't be found, can't get bytes of string.");
+            LOGGER.log(Level.SEVERE, "ISO-8859-1 Charset can't be found, can't get bytes of string.", e);
             return s.get().getBytes();
         }
     }

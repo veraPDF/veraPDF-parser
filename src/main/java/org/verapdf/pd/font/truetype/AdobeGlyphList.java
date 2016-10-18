@@ -1,11 +1,17 @@
 package org.verapdf.pd.font.truetype;
 
-import org.apache.log4j.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class provides methods to work with Adobe Glyph List.
@@ -14,7 +20,7 @@ import java.util.Map;
  */
 public class AdobeGlyphList {
 
-    private static final Logger LOGGER = Logger.getLogger(AdobeGlyphList.class);
+    private static final Logger LOGGER = Logger.getLogger(AdobeGlyphList.class.getCanonicalName());
 
     private static final Map<String, AGLUnicode> MAPPING =
             new HashMap<>();
@@ -64,7 +70,7 @@ public class AdobeGlyphList {
                 line = stream.readLine();
             } while (line != null);
         } catch (IOException e) {
-            LOGGER.debug("Error in opening Adobe Glyph List file", e);
+            LOGGER.log(Level.FINE, "Error in opening Adobe Glyph List file", e);
         }
     }
 
@@ -78,7 +84,7 @@ public class AdobeGlyphList {
     public static AGLUnicode get(String glyphName) {
         AGLUnicode res = MAPPING.get(glyphName);
         if (res == null) {
-            LOGGER.debug("Cannot find glyph " + glyphName + " in Adobe Glyph List");
+            LOGGER.log(Level.FINE, "Cannot find glyph " + glyphName + " in Adobe Glyph List");
             return EMPTY;
         }
         return res;

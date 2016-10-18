@@ -1,6 +1,15 @@
 package org.verapdf.external;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObjType;
@@ -11,16 +20,12 @@ import org.verapdf.pd.PDMetadata;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.colors.PDColorSpace;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
 /**
  * @author Maksim Bezrukov
  */
 public class ICCProfile extends PDObject {
 
-	private static final Logger LOGGER = Logger.getLogger(ICCProfile.class);
+	private static final Logger LOGGER = Logger.getLogger(ICCProfile.class.getCanonicalName());
 
 	/** Length of icc profile header */
 	public static final int HEADER_LENGTH = 128;
@@ -93,7 +98,7 @@ public class ICCProfile extends PDObject {
 			parseTags(data);
 		} catch (IOException e) {
 			this.isLooksValid = false;
-			LOGGER.debug("Exception during obtaining ICCProfile header", e);
+			LOGGER.log(Level.FINE, "Exception during obtaining ICCProfile header", e);
 		}
 	}
 
@@ -200,7 +205,7 @@ public class ICCProfile extends PDObject {
 			byte[] buffer = Arrays.copyOfRange(bytes, start, start + length);
 			return new String(buffer);
 		}
-		LOGGER.debug("Length of given byte array less than " + (start + length));
+		LOGGER.log(Level.FINE, "Length of given byte array less than " + (start + length));
 		return null;
 	}
 
@@ -215,7 +220,7 @@ public class ICCProfile extends PDObject {
 
 			return Double.valueOf(version.toString());
 		}
-		LOGGER.debug("ICC profile contain less than 10 bytes of data.");
+		LOGGER.log(Level.FINE, "ICC profile contain less than 10 bytes of data.");
 		return null;
 	}
 
@@ -308,7 +313,7 @@ public class ICCProfile extends PDObject {
 		}
 	}
 
-	private String getTagValue(ASInputStream data, int tagOffset, int tagLength, boolean isCprt) throws IOException {
+	private static String getTagValue(ASInputStream data, int tagOffset, int tagLength, boolean isCprt) throws IOException {
 		data.reset();
 		int currOffset = data.skip(tagOffset);
 		if (currOffset != tagOffset) {
@@ -350,9 +355,8 @@ public class ICCProfile extends PDObject {
 					currOffset += Math.max(data.read(temporary, length), 0);
 					if (currOffset == offset + length) {
 						return new String(temporary, StandardCharsets.UTF_16BE).trim();
-					} else {
-						return null;
 					}
+					return null;
 				}
 				currOffset += data.skip(REQUIRED_LENGTH*2);
 				if (currOffset != prevOffset + REQUIRED_LENGTH*3) {
@@ -408,21 +412,20 @@ public class ICCProfile extends PDObject {
 	public double[] getRange() {
 		COSObject rangeObject = getObject().getKey(ASAtom.RANGE);
 		if (rangeObject != null && rangeObject.getType() == COSObjType.COS_ARRAY) {
-			int size = rangeObject.size();
+			int size = rangeObject.size().intValue();
 			Long estimatedSize = getNumberOfColorants();
 			if (estimatedSize != null && size != estimatedSize.intValue()*2) {
-				LOGGER.debug("Range array doesn't consist of " + estimatedSize.intValue()*2 + " elements");
+				LOGGER.log(Level.FINE, "Range array doesn't consist of " + estimatedSize.intValue()*2 + " elements");
 			}
 
 			double[] res = new double[size];
 			for (int i = 0; i < size; ++i) {
 				COSObject number = rangeObject.at(i);
 				if (number == null || number.getReal() == null) {
-					LOGGER.debug("Range array contains non number value");
+					LOGGER.log(Level.FINE, "Range array contains non number value");
 					return null;
-				} else {
-					res[i] = number.getReal();
 				}
+				res[i] = number.getReal().doubleValue();
 			}
 			return res;
 		}

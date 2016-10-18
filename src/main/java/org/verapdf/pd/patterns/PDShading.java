@@ -1,6 +1,8 @@
 package org.verapdf.pd.patterns;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 import org.verapdf.factory.colors.ColorSpaceFactory;
@@ -13,7 +15,7 @@ import org.verapdf.tools.TypeConverter;
  */
 public class PDShading extends PDResource {
 
-	private static final Logger LOGGER = Logger.getLogger(PDShading.class);
+	private static final Logger LOGGER = Logger.getLogger(PDShading.class.getCanonicalName());
 
 	public PDShading(COSObject obj) {
 		super(obj);
@@ -23,20 +25,18 @@ public class PDShading extends PDResource {
 		Long type = getObject().getIntegerKey(ASAtom.SHADING_TYPE);
 		if (type != null) {
 			return type.intValue();
-		} else {
-			LOGGER.debug("Shading object do not contain required key ShadingType");
-			return 0;
 		}
+		LOGGER.log(Level.FINE, "Shading object do not contain required key ShadingType");
+		return 0;
 	}
 
 	public PDColorSpace getColorSpace() {
 		COSObject obj = getObject().getKey(ASAtom.COLORSPACE);
 		if (obj != null && !obj.empty()) {
 			return ColorSpaceFactory.getColorSpace(obj);
-		} else {
-			LOGGER.debug("Shading object do not contain required key ColorSpace");
-			return null;
 		}
+		LOGGER.log(Level.FINE,"Shading object do not contain required key ColorSpace");
+		return null;
 	}
 
 	public double[] getBBox() {

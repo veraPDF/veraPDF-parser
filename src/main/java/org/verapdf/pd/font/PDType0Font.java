@@ -1,6 +1,8 @@
 package org.verapdf.pd.font;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
@@ -16,7 +18,7 @@ import org.verapdf.pd.font.cmap.PDCMap;
  */
 public class PDType0Font extends PDCIDFont {
 
-    private static final Logger LOGGER = Logger.getLogger(PDType0Font.class);
+    private static final Logger LOGGER = Logger.getLogger(PDType0Font.class.getCanonicalName());
     private static final String UCS2 = "UCS2";
     private static final String IDENTITY_H = "Identity-H";
     private static final String IDENTITY_V = "Identity-V";
@@ -53,9 +55,8 @@ public class PDType0Font extends PDCIDFont {
                 }
             }
             return null;
-        } else {
-            return this.cidSystemInfo;
         }
+		return this.cidSystemInfo;
     }
 
     public org.verapdf.pd.font.cmap.PDCMap getCMap() {
@@ -65,12 +66,10 @@ public class PDType0Font extends PDCIDFont {
                 org.verapdf.pd.font.cmap.PDCMap pdcMap = new org.verapdf.pd.font.cmap.PDCMap(cMap);
                 this.pdcMap = pdcMap;
                 return pdcMap;
-            } else {
-                return null;
             }
-        } else {
-            return this.pdcMap;
+			return null;
         }
+		return this.pdcMap;
     }
 
     private static COSDictionary getDedcendantCOSDictionary(COSDictionary dict) {
@@ -116,31 +115,28 @@ public class PDType0Font extends PDCIDFont {
                 IDENTITY_V.equals(pdcMap.getCMapName())) {
             setUcsCMapFromIdentity(this.getCIDSystemInfo());
             if(this.ucsCMap == null) {
-                LOGGER.debug("Can't create toUnicode CMap from " + pdcMap.getCMapName());
-                return null;
-            } else {
-                return ucsCMap.toUnicode(code);
-            }
-        } else {
-            PDCMap pdcMap = this.getCMap();
-            if (pdcMap != null && pdcMap.getCMapFile() != null) {
-                int cid = pdcMap.getCMapFile().toCID(code);
-                String registry = pdcMap.getRegistry();
-                String ordering = pdcMap.getOrdering();
-                String ucsName = registry + "-" + ordering + "-" + UCS2;
-                PDCMap pdUCSCMap = new PDCMap(COSName.construct(ucsName));
-                CMap ucsCMap = pdUCSCMap.getCMapFile();
-                if (ucsCMap != null) {
-                    this.ucsCMap = pdUCSCMap;
-                    return ucsCMap.getUnicode(cid);
-                }
-                LOGGER.debug("Can't load CMap " + ucsName);
-                return null;
-            } else {
-                LOGGER.debug("Can't get CMap for font " + this.getName());
+                LOGGER.log(Level.FINE, "Can't create toUnicode CMap from " + pdcMap.getCMapName());
                 return null;
             }
+			return ucsCMap.toUnicode(code);
         }
+		PDCMap pdcMap = this.getCMap();
+		if (pdcMap != null && pdcMap.getCMapFile() != null) {
+		    int cid = pdcMap.getCMapFile().toCID(code);
+		    String registry = pdcMap.getRegistry();
+		    String ordering = pdcMap.getOrdering();
+		    String ucsName = registry + "-" + ordering + "-" + UCS2;
+		    PDCMap pdUCSCMap = new PDCMap(COSName.construct(ucsName));
+		    CMap ucsCMap = pdUCSCMap.getCMapFile();
+		    if (ucsCMap != null) {
+		        this.ucsCMap = pdUCSCMap;
+		        return ucsCMap.getUnicode(cid);
+		    }
+		    LOGGER.log(Level.FINE, "Can't load CMap " + ucsName);
+		    return null;
+		}
+		LOGGER.log(Level.FINE, "Can't get CMap for font " + this.getName());
+		return null;
     }
 
     private void setUcsCMapFromIdentity(COSDictionary cidSystemInfo) {

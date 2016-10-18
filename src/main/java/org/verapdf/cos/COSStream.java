@@ -1,6 +1,10 @@
 package org.verapdf.cos;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
@@ -8,15 +12,12 @@ import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 /**
  * @author Timur Kamalov
  */
 public class COSStream extends COSDictionary {
 
-	private static final Logger LOGGER = Logger.getLogger(COSStream.class);
+	private static final Logger LOGGER = Logger.getLogger(COSStream.class.getCanonicalName());
 
 	private ASInputStream stream;
 	private FilterFlags flags;
@@ -94,25 +95,30 @@ public class COSStream extends COSDictionary {
 		return new COSObject(new COSStream(dictionary, string, flags));
 	}
 
+	@Override
 	public COSObjType getType() {
 		return COSObjType.COS_STREAM;
 	}
 
+	@Override
 	public void accept(final IVisitor visitor) {
 		visitor.visitFromStream(this);
 	}
 
+	@Override
 	public Object accept(final ICOSVisitor visitor) {
 		return visitor.visitFromStream(this);
 	}
 
+	@Override
 	public ASInputStream getData() {
 		return getData(FilterFlags.RAW_DATA);
 	}
 
-	public ASInputStream getData(final FilterFlags flags) {
+	@Override
+	public ASInputStream getData(final FilterFlags filterFlags) {
 		try {
-			if (flags == FilterFlags.RAW_DATA || this.flags != FilterFlags.RAW_DATA) {
+			if (filterFlags == FilterFlags.RAW_DATA || this.flags != FilterFlags.RAW_DATA) {
 				this.stream.reset();
 				return this.stream;
 			}
@@ -122,43 +128,51 @@ public class COSStream extends COSDictionary {
 			}
 			return result;
 		} catch (IOException e) {
-			LOGGER.debug("Can't get stream data", e);
+			LOGGER.log(Level.FINE, "Can't get stream data", e);
 			return null;
 		}
 	}
 
+	@Override
 	public boolean setData(final ASInputStream stream) {
 		return setData(stream, FilterFlags.RAW_DATA);
 	}
 
+	@Override
 	public boolean setData(final ASInputStream stream, FilterFlags flags) {
 		this.stream = stream;
 		this.flags = flags;
 		return true;
 	}
 
+	@Override
 	public Boolean isStreamKeywordCRLFCompliant() {
-		return streamKeywordCRLFCompliant;
+		return Boolean.valueOf(streamKeywordCRLFCompliant);
 	}
 
+	@Override
 	public boolean setStreamKeywordCRLFCompliant(boolean streamKeywordCRLFCompliant) {
 		this.streamKeywordCRLFCompliant = streamKeywordCRLFCompliant;
 		return true;
 	}
 
+	@Override
 	public Boolean isEndstreamKeywordCRLFCompliant() {
-		return endstreamKeywordCRLFCompliant;
+		return Boolean.valueOf(endstreamKeywordCRLFCompliant);
 	}
 
+	@Override
 	public boolean setEndstreamKeywordCRLFCompliant(boolean endstreamKeywordCRLFCompliant) {
 		this.endstreamKeywordCRLFCompliant = endstreamKeywordCRLFCompliant;
 		return true;
 	}
 
+	@Override
 	public Long getRealStreamSize() {
-		return realStreamSize;
+		return Long.valueOf(realStreamSize);
 	}
 
+	@Override
 	public boolean setRealStreamSize(long realStreamSize) {
 		this.realStreamSize = realStreamSize;
 		return true;
@@ -181,7 +195,7 @@ public class COSStream extends COSDictionary {
 	}
 
 	public long getLength() {
-		return getIntegerKey(ASAtom.LENGTH);
+		return getIntegerKey(ASAtom.LENGTH).longValue();
 	}
 
     public void setLength(final long length) {
@@ -191,7 +205,7 @@ public class COSStream extends COSDictionary {
 	public void setIndirectLength(final long length) {
 		COSObject obj = getKey(ASAtom.LENGTH);
 		obj.setInteger(length);
-		if (obj.isIndirect()) {
+		if (obj.isIndirect().booleanValue()) {
 			obj = COSIndirect.construct(obj);
 			setKey(ASAtom.LENGTH, obj);
 		}
@@ -218,13 +232,13 @@ public class COSStream extends COSDictionary {
 		try {
 			if (stream != null ? !equalsStreams(stream, cosStream.stream) : cosStream.stream != null) return false;
 		} catch (IOException e) {
-			LOGGER.debug("Exception during comparing streams");
+			LOGGER.log(Level.FINE, "Exception during comparing streams", e);
 			return false;
 		}
 		return flags == cosStream.flags;
 	}
 
-	private boolean equalsStreams(ASInputStream first, ASInputStream second) throws IOException {
+	private static boolean equalsStreams(ASInputStream first, ASInputStream second) throws IOException {
 		first.reset();
 		second.reset();
 		byte[] tempOne = new byte[1024];

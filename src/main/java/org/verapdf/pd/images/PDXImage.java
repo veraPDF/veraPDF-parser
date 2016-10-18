@@ -1,6 +1,11 @@
 package org.verapdf.pd.images;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSName;
@@ -11,16 +16,12 @@ import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDMetadata;
 import org.verapdf.pd.colors.PDColorSpace;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author Maksim Bezrukov
  */
 public class PDXImage extends PDXObject {
 
-	private static final Logger LOGGER = Logger.getLogger(PDXImage.class);
+	private static final Logger LOGGER = Logger.getLogger(PDXImage.class.getCanonicalName());
 
 	private ASAtom colorSpaceName;
 	private PDColorSpace imageCS;
@@ -81,11 +82,11 @@ public class PDXImage extends PDXObject {
 					if (image != null && image.getType() == COSObjType.COS_STREAM) {
 						res.add(new PDXImage(image));
 					} else {
-						LOGGER.debug("Image key in alternate dictionary contains non stream value");
+						LOGGER.log(Level.FINE, "Image key in alternate dictionary contains non stream value");
 						return null;
 					}
 				} else {
-					LOGGER.debug("Alternates array contains non dictionary value");
+					LOGGER.log(Level.FINE, "Alternates array contains non dictionary value");
 				}
 			}
 			return Collections.unmodifiableList(res);
@@ -139,11 +140,10 @@ public class PDXImage extends PDXObject {
 			} else if (filters.getType() == COSObjType.COS_ARRAY) {
 				for (COSObject filter : ((COSArray)filters.getDirectBase())) {
 					if (filter == null || filter.getType() != COSObjType.COS_NAME) {
-						LOGGER.debug("Filter array contains non name value");
+						LOGGER.log(Level.FINE, "Filter array contains non name value");
 						return Collections.emptyList();
-					} else {
-						res.add(filter.getName());
 					}
+					res.add(filter.getName());
 				}
 			}
 			return Collections.unmodifiableList(res);

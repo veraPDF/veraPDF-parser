@@ -1,20 +1,26 @@
 package org.verapdf.pd.font.stdmetrics;
 
-import org.apache.log4j.Logger;
-import org.verapdf.as.io.ASFileInStream;
-import org.verapdf.as.io.ASInputStream;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.verapdf.as.io.ASFileInStream;
+import org.verapdf.as.io.ASInputStream;
 
 /**
  * @author Sergey Shemyakov
  */
 public class StandardFontMetricsFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(StandardFontMetricsFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(StandardFontMetricsFactory.class.getCanonicalName());
     private static final String DIR_PATH = "/font/stdmetrics/";
     private static final String EXTENSION = ".afm";
     private static final Map<String, StandardFontMetrics> FONT_METRICS_MAP =
@@ -31,7 +37,7 @@ public class StandardFontMetricsFactory {
                 res = parser.parse();
                 FONT_METRICS_MAP.put(fontName, res);
             } catch (IOException e) {
-                LOGGER.debug("Can't open file input stream for predefined font file " + DIR_PATH + fontName + EXTENSION);
+                LOGGER.log(Level.FINE, "Can't open file input stream for predefined font file " + DIR_PATH + fontName + EXTENSION, e);
                 return null;
             }
         }
@@ -52,6 +58,8 @@ public class StandardFontMetricsFactory {
                 while ((read = input.read(bytes)) != -1) {
                     out.write(bytes, 0, read);
                 }
+                input.close();
+                out.close();
                 afmFile.deleteOnExit();
             } else {
                 afmFile = new File(res.getFile());
@@ -62,7 +70,7 @@ public class StandardFontMetricsFactory {
             return new ASFileInStream(
                     new RandomAccessFile(afmFile, "r"), 0, afmFile.length());
         } catch (IOException e) {
-            LOGGER.debug("Error in opening predefined font metrics file " + fileName, e);
+            LOGGER.log(Level.FINE, "Error in opening predefined font metrics file " + fileName, e);
             return null;
         }
     }
