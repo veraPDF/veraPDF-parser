@@ -60,6 +60,7 @@ public class RC4Encryption {
     public void reset() {
         this.i = 0;
         this.j = 0;
+        keySchedulingAlgorithm();
     }
 
     private void keySchedulingAlgorithm() {

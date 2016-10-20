@@ -62,6 +62,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                 nextToken();
                 processToken();
             }
+            if(glyphWidths == null) {
+                throw new IOException("Type 1 font doesn't contain charstrings.");
+            }
         }
     }
 
@@ -179,7 +182,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
 
     @Override
     public boolean containsCode(int code) {
-        return code < 256;
+        String glyphName = encoding[code];
+        return this.glyphWidths != null &&
+                this.glyphWidths.keySet().contains(glyphName);
     }
 
     public String[] getEncoding() {

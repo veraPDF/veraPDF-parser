@@ -1,5 +1,6 @@
 package org.verapdf.pd.font.truetype;
 
+import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSArray;
@@ -16,6 +17,8 @@ import java.io.IOException;
  * @author Sergey Shemyakov
  */
 public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProgram {
+
+    private static final Logger LOGGER = Logger.getLogger(TrueTypeFontProgram.class);
 
     private COSObject encoding;
     protected boolean isSymbolic;
@@ -34,8 +37,6 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         this.isSymbolic = isSymbolic;
         if (encoding != null) {
             this.encoding = encoding;
-        } else {
-            this.isSymbolic = true;
         }
     }
 
@@ -51,10 +52,28 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      * {@inheritDoc}
      */
     @Override
+    public boolean containsCode(int code) {
+        for (TrueTypeCmapSubtable cMap : getCmapEncodingPlatform()) {
+            if (cMap.containsCID(code)) {
+                return cMap.getGlyph(code) <
+                        parser.getMaxpParser().getNumGlyphs();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public float getWidth(int code) {
         if (isSymbolic) {
             return getWidthSymbolic(code);
         } else {
+            if(encodingMappingArray == null) {  // no external encoding
+                int gid = this.parser.getCmapParser().getGID(code);
+                return getWidthWithCheck(gid);
+            }
             if (code < 256) {
                 String glyphName = encodingMappingArray[code];
                 return getWidth(glyphName);
@@ -102,24 +121,25 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
 
     private float getWidthSymbolic(int code) {
         TrueTypeCmapSubtable cmap30 = this.parser.getCmapTable(3, 0);
+        int gid;
         if (cmap30 != null) {
             int sampleCode = cmap30.getSampleCharCode();
             int highByteMask = sampleCode & 0x0000FF00;
-            if (highByteMask != 0x00000000 && highByteMask != 0x0000F000 &&
-                    highByteMask != 0x0000F100 && highByteMask != 0x0000F200) { // should we check this at all?
-                return -1;
-            }
-            int gid = cmap30.getGlyph(highByteMask & code);     // we suppose that code is in fact 1-byte value
-            return getWidthWithCheck(gid);
-        } else {
-            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
-            if (cmap10 != null) {
-                int gid = cmap10.getGlyph(code);
-                return getWidthWithCheck(gid);
-            } else {
-                return -1;
+
+            if (highByteMask == 0x00000000 || highByteMask == 0x0000F000 ||
+                    highByteMask == 0x0000F100 || highByteMask == 0x0000F200) { // should we check this at all?
+                gid = cmap30.getGlyph(highByteMask & code);     // we suppose that code is in fact 1-byte value
+                if (gid != 0) {
+                    return getWidthWithCheck(gid);
+                }
             }
         }
+            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+            if (cmap10 != null) {
+                gid = cmap10.getGlyph(code);
+                return getWidthWithCheck(gid);
+            }
+        return -1;
     }
 
     private void createCIDToNameTable() throws IOException {

@@ -64,19 +64,6 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean containsCode(int code) {
-        for (TrueTypeCmapSubtable cMap : getCmapEncodingPlatform()) {
-            if (cMap.containsCID(code)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * @return number of glyphs in this font.
      */
     public int getNGlyphs() {
@@ -99,7 +86,11 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
         if (gid < widths.length) {
             return widths[gid];
         } else {
-            return widths[widths.length - 1];   // case of monospaced fonts
+            if(gid < this.parser.getMaxpParser().getNumGlyphs()) {
+                return widths[widths.length - 1];   // case of monospaced fonts
+            } else {
+                return -1;
+            }
         }
     }
 }

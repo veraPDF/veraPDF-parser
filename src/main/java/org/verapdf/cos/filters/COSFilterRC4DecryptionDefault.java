@@ -55,6 +55,21 @@ public class COSFilterRC4DecryptionDefault extends ASBufferingInFilter {
     }
 
     @Override
+    public int read(byte[] buffer, int off, int size) throws IOException {
+        if(this.bufferSize() == 0) {
+            int bytesFed = (int) this.feedBuffer(getBufferCapacity());
+            if (bytesFed == -1) {
+                return -1;
+            }
+        }
+        byte[] encData = new byte[BF_BUFFER_SIZE];
+        int encDataLength = this.bufferPopArray(encData, size - off);
+        byte[] res = rc4.process(encData, 0, encDataLength);
+        System.arraycopy(res, 0, buffer, off, encDataLength);
+        return encDataLength;
+    }
+
+    @Override
     public void reset() throws IOException {
         super.reset();
         this.rc4.reset();
