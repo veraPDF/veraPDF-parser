@@ -7,9 +7,11 @@ import org.verapdf.as.ASAtom;
  */
 public class PDDeviceRGB extends PDColorSpace {
 
-    public static final PDDeviceRGB INSTANCE = new PDDeviceRGB();
+    public static final PDDeviceRGB INSTANCE = new PDDeviceRGB(false);
+    public static final PDDeviceRGB INHERITED_INSTANCE = new PDDeviceRGB(true);
 
-    private PDDeviceRGB() {
+    private PDDeviceRGB(boolean isInherited) {
+        setInherited(isInherited);
     }
 
     @Override
