@@ -2,10 +2,10 @@ package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.truetype.TrueTypePredefined;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,6 +62,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                 nextToken();
                 processToken();
             }
+            if(glyphWidths == null) {
+                throw new IOException("Type 1 font doesn't contain charstrings.");
+            }
         }
     }
 
@@ -84,6 +87,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                         }
                         break;
                     case Type1StringConstants.ENCODING_STRING:
+                        if (isEncodingName()) {
+                            break;
+                        }
                         do {
                             nextToken();
                         } while (!this.getToken().getValue().equals(
@@ -115,7 +121,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                         break;
                 }
                 break;
-            case TT_NONE:
+            case TT_KEYWORD:
                 switch (getToken().getValue()) {
                     //Do processing of keywords like eexec
                     case Type1StringConstants.EEXEC_STRING:
@@ -124,7 +130,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                         ASInputStream eexecEncoded = this.source.getStream(this.source.getOffset(),
                                 clearToMarkOffset - this.source.getOffset());
                         ASInputStream eexecDecoded = new EexecFilterDecode(
-                                new COSFilterASCIIHexDecode(eexecEncoded), false);
+                                eexecEncoded, false);
                         Type1PrivateParser parser = new Type1PrivateParser(
                                 eexecDecoded, fontMatrix);
                         parser.parse();
@@ -156,9 +162,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     @Override
     public float getWidth(int charCode) {
         try {
-            if(this.glyphWidths != null) {
+            if (this.glyphWidths != null) {
                 Integer res = this.glyphWidths.get(encoding[charCode]);
-                if(res != null) {
+                if (res != null) {
                     return res;
                 }
             }
@@ -176,7 +182,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
 
     @Override
     public boolean containsCode(int code) {
-        return code < 256;
+        String glyphName = encoding[code];
+        return this.glyphWidths != null &&
+                this.glyphWidths.keySet().contains(glyphName);
     }
 
     public String[] getEncoding() {
@@ -186,5 +194,23 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     public String[] getCharSet() {
         Set<String> charSet = this.glyphWidths.keySet();
         return charSet.toArray(new String[charSet.size()]);
+    }
+
+    private boolean isEncodingName() throws IOException {
+        long startOffset = this.source.getOffset();
+        nextToken();
+        String possibleEncodingName = getToken().getValue();
+        nextToken();
+        if (Type1StringConstants.DEF_STRING.equals(getToken().getValue())) {
+            if (Type1StringConstants.STANDARD_ENCODING_STRING.equals(possibleEncodingName)) {
+                this.encoding = TrueTypePredefined.STANDARD_ENCODING;
+                this.source.seek(startOffset);
+                return true;
+            } else {
+                throw new IOException("Can't get encoding " + possibleEncodingName + " as internal encoding of type 1 font program.");
+            }
+        }
+        this.source.seek(startOffset);
+        return false;
     }
 }

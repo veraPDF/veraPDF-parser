@@ -268,6 +268,14 @@ public abstract class PDFont extends PDResource {
         return Double.valueOf(0);
     }
 
+    public Double getDefaultWidth() {
+        if (fontDescriptor.knownKey(ASAtom.MISSING_WIDTH) &&
+                this.fontDescriptor != null) {
+                return fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
+        }
+        return null;
+    }
+
     public boolean isSuccessfullyParsed() {
         return successfullyParsed;
     }
