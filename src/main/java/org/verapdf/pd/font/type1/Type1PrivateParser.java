@@ -29,7 +29,6 @@ class Type1PrivateParser extends BaseParser {
      */
     public Type1PrivateParser(InputStream stream, double[] fontMatrix) throws IOException {
         super(stream);
-        glyphWidths = new HashMap<>();
         this.fontMatrix = fontMatrix;
         isDefaultFontMatrix = Arrays.equals(this.fontMatrix,
                 Type1FontProgram.DEFAULT_FONT_MATRIX);
@@ -98,6 +97,9 @@ class Type1PrivateParser extends BaseParser {
     }
 
     private void decodeCharString() throws IOException {
+        if(glyphWidths == null) {
+            this.glyphWidths = new HashMap<>();
+        }
         this.nextToken();
         checkTokenType(Token.Type.TT_NAME);
         String glyphName = this.getToken().getValue();

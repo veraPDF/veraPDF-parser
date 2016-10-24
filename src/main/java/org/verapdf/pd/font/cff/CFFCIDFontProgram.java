@@ -152,23 +152,35 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         this.nominalWidths = new int[fontDictIndex.size()];
         this.defaultWidths = new int[fontDictIndex.size()];
         for (int i = 0; i < fontDictIndex.size(); ++i) {
-            this.readPrivateDict(fontDictIndex.getOffset(i) + fdArrayOffset +
+            this.readTopDict(fontDictIndex.getOffset(i) + fdArrayOffset +
                     fontDictIndex.getOffsetShift(),
                     fontDictIndex.getOffset(i + 1) + fdArrayOffset +
                             fontDictIndex.getOffsetShift());
+            this.readPrivateDict(this.privateDictOffset, this.privateDictSize);
             this.nominalWidths[i] = this.nominalWidthX;
             this.defaultWidths[i] = this.defaultWidthX;
         }
     }
 
-    private void readPrivateDict(long from, long to) throws IOException {
+    private void readPrivateDict(long from, long size) throws IOException {
+        this.stack.clear();
+        long startingOffset = this.source.getOffset();
+        this.source.seek(from);
+        while (this.source.getOffset() < from + size) {
+            this.readPrivateDictUnit();
+        }
+        this.source.seek(startingOffset);
+    }
+
+    private void readTopDict(long from, long to) throws IOException {
         this.stack.clear();
         long startingOffset = this.source.getOffset();
         this.source.seek(from);
         while (this.source.getOffset() < to) {
-            this.readPrivateDictUnit();
+            this.readTopDictUnit();
         }
         this.source.seek(startingOffset);
+
     }
 
     private void readWidths() throws IOException {

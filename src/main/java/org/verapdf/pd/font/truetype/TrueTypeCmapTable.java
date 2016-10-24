@@ -128,4 +128,13 @@ class TrueTypeCmapTable extends TrueTypeTable {
             cmap.put(firstCode + i, readUShort());
         }
     }
+
+    public int getGID(int code) {
+        for(TrueTypeCmapSubtable ttcs : cmapInfos) {
+            if(ttcs.containsCID(code)) {
+                return ttcs.getGlyph(code);
+            }
+        }
+        return 0;
+    }
 }

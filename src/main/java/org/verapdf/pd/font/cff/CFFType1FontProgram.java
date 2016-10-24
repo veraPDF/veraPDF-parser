@@ -22,10 +22,6 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     private static final String NOTDEF_STRING = ".notdef";
 
-    //Top DICT
-    private long privateDictOffset;
-    private long privateDictSize;
-
     private Encoding pdEncoding;    // mapping code -> glyphName
     private CMap externalCMap;  // in case if font is located in
     private long encodingOffset;
@@ -82,13 +78,6 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         switch (lastRead) {
             case 16:    // encoding
                 this.encodingOffset = stack.get(stack.size() - 1).getInteger();
-                this.stack.clear();
-                break;
-            case 18:    // Private
-                this.privateDictSize =
-                        this.stack.get(stack.size() - 2).getInteger();
-                this.privateDictOffset =
-                        this.stack.get(stack.size() - 1).getInteger();
                 this.stack.clear();
                 break;
             default:

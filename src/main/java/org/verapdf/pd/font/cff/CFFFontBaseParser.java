@@ -20,6 +20,8 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected ArrayList<CFFNumber> stack;
 
     //Top DICT
+    protected long privateDictOffset;
+    protected long privateDictSize;
     protected long topDictBeginOffset;
     protected long topDictEndOffset;
     protected float[] fontMatrix = new float[6];
@@ -61,6 +63,13 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                             break;
                         case 17:    // CharStrings
                             this.charStringsOffset =
+                                    this.stack.get(stack.size() - 1).getInteger();
+                            this.stack.clear();
+                            break;
+                        case 18:    // Private
+                            this.privateDictSize =
+                                    this.stack.get(stack.size() - 2).getInteger();
+                            this.privateDictOffset =
                                     this.stack.get(stack.size() - 1).getInteger();
                             this.stack.clear();
                             break;

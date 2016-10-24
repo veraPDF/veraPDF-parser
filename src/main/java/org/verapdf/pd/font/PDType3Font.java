@@ -36,4 +36,18 @@ public class PDType3Font extends PDSimpleFont {
             return new PDResources(COSDictionary.construct());
         }
     }
+
+    public boolean containsCharString(int code) {
+        String glyphName = this.getEncodingMapping().getName(code);
+        COSDictionary charProcs = this.getCharProcs();
+        if(charProcs != null) {
+            ASAtom asAtomGlyph = ASAtom.getASAtom(glyphName);
+            return charProcs.knownKey(asAtomGlyph);
+        }
+        return false;
+    }
+
+    private COSDictionary getCharProcs() {
+        return (COSDictionary) this.dictionary.getKey(ASAtom.CHAR_PROCS).getDirectBase();
+    }
 }
