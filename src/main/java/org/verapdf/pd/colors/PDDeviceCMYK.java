@@ -7,9 +7,11 @@ import org.verapdf.as.ASAtom;
  */
 public class PDDeviceCMYK extends PDColorSpace {
 
-    public static final PDDeviceCMYK INSTANCE = new PDDeviceCMYK();
+    public static final PDDeviceCMYK INSTANCE = new PDDeviceCMYK(false);
+    public static final PDDeviceCMYK INHERITED_INSTANCE = new PDDeviceCMYK(true);
 
-    private PDDeviceCMYK() {
+    private PDDeviceCMYK(boolean isInherited) {
+        setInherited(isInherited);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package org.verapdf.pd.font;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.pd.font.truetype.AdobeGlyphList;
 
@@ -11,7 +13,7 @@ import org.verapdf.pd.font.truetype.AdobeGlyphList;
  */
 public abstract class PDSimpleFont extends PDFont {
 
-    private static final Logger LOGGER = Logger.getLogger(PDSimpleFont.class);
+    private static final Logger LOGGER = Logger.getLogger(PDSimpleFont.class.getCanonicalName());
 
     public PDSimpleFont(COSDictionary dictionary) {
         super(dictionary);
@@ -41,11 +43,11 @@ public abstract class PDSimpleFont extends PDFont {
                 if (unicode != AdobeGlyphList.empty()) {
                     return unicode.getUnicodeString();
                 }
-                LOGGER.debug("Cannot find glyph " + glyphName + " in Adobe Glyph List.");
+                LOGGER.log(Level.FINE, "Cannot find glyph " + glyphName + " in Adobe Glyph List.");
                 return null;
             }
         }
-        LOGGER.debug("Cannot find encoding for glyph with code" + code + " in font " + this.getName());
+        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code" + code + " in font " + this.getName());
         return null;
     }
 }

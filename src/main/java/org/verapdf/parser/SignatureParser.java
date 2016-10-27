@@ -1,15 +1,16 @@
 package org.verapdf.parser;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.io.SeekableStream;
-
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Class is extension of BaseParser for parsing of digital signature dictionaries.
@@ -20,7 +21,7 @@ import java.util.Arrays;
 public class SignatureParser extends COSParser {
 
 
-    private static final Logger LOGGER = Logger.getLogger(SignatureParser.class);
+    private static final Logger LOGGER = Logger.getLogger(SignatureParser.class.getCanonicalName());
     private static final byte[] EOF_STRING = "%%EOF".getBytes();
 
     private long[] byteRange = new long[4];
@@ -61,7 +62,7 @@ public class SignatureParser extends COSParser {
                 }
             } else {
                 // invalid dictionary, we were expecting a /Name, read until the end or until we can recover
-                LOGGER.debug("Invalid dictionary, found: '" + c + "' but expected: '/'");
+                LOGGER.log(Level.FINE, "Invalid dictionary, found: '" + c + "' but expected: '/'");
                 return;
             }
         }
@@ -79,7 +80,7 @@ public class SignatureParser extends COSParser {
         if (!isDigit()) {
             return;
         }
-        long genOffset = source.getOffset();
+        source.getOffset();
         COSObject generationNumber = nextObject();
         skipSpaces();
         skipExpectedCharacter('R');
@@ -139,7 +140,7 @@ public class SignatureParser extends COSParser {
             }
             COSKey key = new COSKey(number.getInteger().intValue(),
                     generationNumber.getInteger().intValue());
-            long keyOffset = this.document.getOffset(key);
+            long keyOffset = this.document.getOffset(key).longValue();
             source.seek(keyOffset + document.getHeader().getHeaderOffset());
             parseSignatureValue();    // Recursive parsing to get to the contents hex string itself
         }

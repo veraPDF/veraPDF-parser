@@ -1,6 +1,15 @@
 package org.verapdf.pd.font.cmap;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
@@ -9,9 +18,6 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 
-import java.io.*;
-import java.net.URL;
-
 /**
  * Represents CMap on PD layer.
  *
@@ -19,7 +25,7 @@ import java.net.URL;
  */
 public class PDCMap {
 
-    private static final Logger LOGGER = Logger.getLogger(PDCMap.class);
+    private static final Logger LOGGER = Logger.getLogger(PDCMap.class.getCanonicalName());
 
     private COSObject cMap;
     private COSDictionary cidSystemInfo;
@@ -84,11 +90,11 @@ public class PDCMap {
                     return null;
                 }
             } catch (IOException e) {
+            	LOGGER.log(Level.FINE, "IO Exception parsing CMAP", e);
                 return null;
             }
-        } else {
-            return this.cMapFile;
         }
+		return this.cMapFile;
     }
 
     /**
@@ -97,9 +103,8 @@ public class PDCMap {
     public String getRegistry() {
         if (this.getCIDSystemInfo() == null) {
             return null;
-        } else {
-            return this.getCIDSystemInfo().getStringKey(ASAtom.REGISTRY);
         }
+		return this.getCIDSystemInfo().getStringKey(ASAtom.REGISTRY);
     }
 
     /**
@@ -108,9 +113,8 @@ public class PDCMap {
     public String getOrdering() {
         if (this.getCIDSystemInfo() == null) {
             return null;
-        } else {
-            return this.getCIDSystemInfo().getStringKey(ASAtom.ORDERING);
         }
+		return this.getCIDSystemInfo().getStringKey(ASAtom.ORDERING);
     }
 
     /**
@@ -119,9 +123,8 @@ public class PDCMap {
     public Long getSupplement() {
         if (this.getCIDSystemInfo() == null) {
             return null;
-        } else {
-            return this.getCIDSystemInfo().getIntegerKey(ASAtom.SUPPLEMENT);
         }
+		return this.getCIDSystemInfo().getIntegerKey(ASAtom.SUPPLEMENT);
     }
 
     public COSObject getUseCMap() {
@@ -146,9 +149,8 @@ public class PDCMap {
             this.cidSystemInfo = (COSDictionary)
                     this.cMap.getKey(ASAtom.CID_SYSTEM_INFO).getDirectBase();
             return this.cidSystemInfo;
-        } else {
-            return this.cidSystemInfo;
         }
+		return this.cidSystemInfo;
     }
 
     private static ASInputStream loadCMap(String cMapName) {
@@ -159,8 +161,8 @@ public class PDCMap {
                 throw new IOException("CMap " + cMapName + " can't be found.");
             }
             if (res.toString().startsWith("jar:")) {
-                InputStream input = PDCMap.class.getResourceAsStream(cMapName);
                 cMapFile = File.createTempFile("tempfile", ".tmp");
+                InputStream input = PDCMap.class.getResourceAsStream(cMapName);
                 OutputStream out = new FileOutputStream(cMapFile);
                 int read;
                 byte[] bytes = new byte[1024];
@@ -168,6 +170,8 @@ public class PDCMap {
                 while ((read = input.read(bytes)) != -1) {
                     out.write(bytes, 0, read);
                 }
+                input.close();
+                out.close();
                 cMapFile.deleteOnExit();
             } else {
                 cMapFile = new File(res.getFile());
@@ -178,7 +182,7 @@ public class PDCMap {
             return new ASFileInStream(
                     new RandomAccessFile(cMapFile, "r"), 0, cMapFile.length());
         } catch (IOException e) {
-            LOGGER.debug("Error in opening predefined CMap " + cMapName, e);
+            LOGGER.log(Level.FINE, "Error in opening predefined CMap " + cMapName, e);
             return null;
         }
     }

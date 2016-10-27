@@ -1,21 +1,22 @@
 package org.verapdf.tools;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDStructElem;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Maksim Bezrukov
  */
 public class TaggedPDFHelper {
 
-	private static final Logger LOGGER = Logger.getLogger(TaggedPDFHelper.class);
+	private static final Logger LOGGER = Logger.getLogger(TaggedPDFHelper.class.getCanonicalName());
 
 	private static final int MAX_NUMBER_OF_ELEMENTS = 1;
 
@@ -39,7 +40,7 @@ public class TaggedPDFHelper {
 	 */
 	private static List<PDStructElem> getChildren(COSObject parent, boolean checkType) {
 		if (parent == null || parent.getType() != COSObjType.COS_DICT) {
-			LOGGER.debug("Parent element for struct elements is null or not a COSDictionary");
+			LOGGER.log(Level.FINE, "Parent element for struct elements is null or not a COSDictionary");
 			return Collections.emptyList();
 		}
 
@@ -63,9 +64,9 @@ public class TaggedPDFHelper {
 	 * @return list of structure elements
 	 */
 	private static List<PDStructElem> getChildrenFromArray(COSObject children, boolean checkType) {
-		if (children.size() > 0) {
+		if (children.size().intValue() > 0) {
 			List<PDStructElem> list = new ArrayList<>();
-			for (int i = 0; i < children.size(); ++i) {
+			for (int i = 0; i < children.size().intValue(); ++i) {
 				COSObject elem = children.at(i);
 				if (elem.getType() == COSObjType.COS_DICT && isStructElem(elem, checkType)) {
 					list.add(new PDStructElem(elem));

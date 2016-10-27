@@ -1,6 +1,7 @@
 package org.verapdf.pd.font.cmap;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class represents codespace range.
@@ -10,7 +11,7 @@ import org.apache.log4j.Logger;
 class CodeSpace {
     private byte[] begin, end;
 
-    private static final Logger LOGGER = Logger.getLogger(CodeSpace.class);
+    private static final Logger LOGGER = Logger.getLogger(CodeSpace.class.getCanonicalName());
 
     /**
      * Constructor for codespace range.
@@ -28,7 +29,7 @@ class CodeSpace {
                 }
                 this.begin = new byte[0];
                 this.end = new byte[0];
-                LOGGER.debug("In codespace byte " + i + "in begin array is bigger than in end array.");
+                LOGGER.log(Level.FINE, "In codespace byte " + i + "in begin array is bigger than in end array.");
                 return;
             }
             this.begin = begin;
@@ -36,7 +37,7 @@ class CodeSpace {
         } else {
             this.begin = new byte[0];
             this.end = new byte[0];
-            LOGGER.debug("In codespace two passed arrays have different lengths");
+            LOGGER.log(Level.FINE, "In codespace two passed arrays have different lengths");
         }
     }
 

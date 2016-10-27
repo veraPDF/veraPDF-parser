@@ -1,24 +1,28 @@
 package org.verapdf.parser;
 
-import org.apache.log4j.Logger;
+import static org.verapdf.as.CharTable.ASCII_CR;
+import static org.verapdf.as.CharTable.ASCII_LF;
+import static org.verapdf.as.CharTable.ASCII_SPACE;
+import static org.verapdf.as.CharTable.isSpace;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableStream;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-
-import static org.verapdf.as.CharTable.*;
-
 /**
  * @author Timur Kamalov
  */
 public class BaseParser {
 
-	private static final Logger LOGGER = Logger.getLogger(BaseParser.class);
+	private static final Logger LOGGER = Logger.getLogger(BaseParser.class.getCanonicalName());
 
 	private static final byte ASCII_ZERO = 48;
 	private static final byte ASCII_NINE = 57;
@@ -396,9 +400,8 @@ public class BaseParser {
 								if (ch < '0' || ch > '7') {
 									this.source.unread();
 									break;
-								} else {
-									ch1 = (char) ((ch1 << 3) + (ch - '0'));
 								}
+								ch1 = (char) ((ch1 << 3) + (ch - '0'));
 							}
 							appendToToken(ch1);
 							break;
@@ -444,7 +447,7 @@ public class BaseParser {
 					appendToToken(uc);
 				}
 				this.token.setContainsOnlyHex(containsOnlyHex);
-				this.token.setHexCount(hexCount);
+				this.token.setHexCount(Long.valueOf(hexCount));
 				return;
 			} else {
 				hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
@@ -465,7 +468,7 @@ public class BaseParser {
 		}
 
 		this.token.setContainsOnlyHex(containsOnlyHex);
-		this.token.setHexCount(hexCount);
+		this.token.setHexCount(Long.valueOf(hexCount));
 	}
 
 	private void readName() throws IOException {
@@ -540,16 +543,16 @@ public class BaseParser {
 				}
 			}
 			if (this.token.type == Token.Type.TT_INTEGER) {
-				long value = Long.valueOf(this.token.getValue());
+				long value = Long.valueOf(this.token.getValue()).longValue();
 				this.token.integer = value;
-				this.token.real = (double) value;
+				this.token.real = value;
 			} else {
-				double value = Double.valueOf(this.token.getValue());
+				double value = Double.valueOf(this.token.getValue()).doubleValue();
 				this.token.integer = Math.round(value);
 				this.token.real = value;
 			}
 		} catch (NumberFormatException e) {
-			LOGGER.debug(e);
+			LOGGER.log(Level.FINE, "", e);
 		}
 	}
 

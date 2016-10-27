@@ -1,6 +1,11 @@
 package org.verapdf.pd.images;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSName;
@@ -11,16 +16,12 @@ import org.verapdf.pd.PDResource;
 import org.verapdf.pd.PDResources;
 import org.verapdf.pd.colors.PDColorSpace;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author Maksim Bezrukov
  */
 public class PDInlineImage extends PDResource {
 
-	private static final Logger LOGGER = Logger.getLogger(PDInlineImage.class);
+	private static final Logger LOGGER = Logger.getLogger(PDInlineImage.class.getCanonicalName());
 
 	private PDResources imageResources;
 	private PDResources pageResources;
@@ -51,11 +52,10 @@ public class PDInlineImage extends PDResource {
 			} else if (filters.getType() == COSObjType.COS_ARRAY) {
 				for (COSObject filter : ((COSArray) filters.getDirectBase())) {
 					if (filter == null || filter.getType() != COSObjType.COS_NAME) {
-						LOGGER.debug("Filter array contains non name value");
+						LOGGER.log(Level.FINE, "Filter array contains non name value");
 						return Collections.emptyList();
-					} else {
-						res.add((COSName) filter.getDirectBase());
 					}
+					res.add((COSName) filter.getDirectBase());
 				}
 			}
 			return Collections.unmodifiableList(res);
@@ -83,7 +83,7 @@ public class PDInlineImage extends PDResource {
 	}
 
 	private PDColorSpace getDefaultColorSpace(ASAtom name) {
-		if (this.isDeviceDependent(name)) {
+		if (isDeviceDependent(name)) {
 			if (imageResources != null) {
 				ASAtom value = org.verapdf.factory.colors.ColorSpaceFactory.getDefaultValue(imageResources, name);
 				if (value != null) {
@@ -99,12 +99,12 @@ public class PDInlineImage extends PDResource {
 		return null;
 	}
 
-	private boolean isDeviceDependent(ASAtom name) {
+	private static boolean isDeviceDependent(ASAtom name) {
 		return ASAtom.DEVICERGB.equals(name) ||
 				ASAtom.DEVICEGRAY.equals(name) || ASAtom.DEVICECMYK.equals(name);
 	}
 
-	private void replaceAbbreviation(final COSName abbreviation) {
+	private static void replaceAbbreviation(final COSName abbreviation) {
 		if (abbreviation.get().equals(ASAtom.CMYK)) {
 			abbreviation.set(ASAtom.DEVICECMYK);
 		} else if (abbreviation.get().equals(ASAtom.RGB)) {

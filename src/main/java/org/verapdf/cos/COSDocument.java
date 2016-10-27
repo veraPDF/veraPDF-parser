@@ -1,6 +1,14 @@
 package org.verapdf.cos;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.io.IReader;
@@ -9,19 +17,12 @@ import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.PDDocument;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Timur Kamalov
  */
 public class COSDocument {
 
-	private static final Logger LOGGER = Logger.getLogger(COSDocument.class);
+	private static final Logger LOGGER = Logger.getLogger(COSDocument.class.getCanonicalName());
 
 	private PDDocument doc;
 	private IReader reader;
@@ -106,8 +107,8 @@ public class COSDocument {
 					this.body.set(key, newObj);
 					result.add(newObj);
 				} catch (IOException e) {
-					LOGGER.debug("Error while parsing object : " + key.getNumber() +
-							" " + key.getGeneration());
+					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
+							" " + key.getGeneration(), e);
 				}
 			}
 		}
@@ -115,7 +116,7 @@ public class COSDocument {
 	}
 
 	public Map<COSKey, COSObject> getObjectsMap() {
-		Map<COSKey, COSObject> result = new HashMap();
+		Map<COSKey, COSObject> result = new HashMap<>();
 		for (COSKey key : this.xref.getAllKeys()) {
 			COSObject obj = this.body.get(key);
 			if (!obj.empty()) {
@@ -127,8 +128,8 @@ public class COSDocument {
 					this.body.set(key, newObj);
 					result.put(key, newObj);
 				} catch (IOException e) {
-					LOGGER.debug("Error while parsing object : " + key.getNumber() +
-							" " + key.getGeneration());
+					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
+							" " + key.getGeneration(), e);
 				}
 			}
 		}
@@ -151,7 +152,7 @@ public class COSDocument {
 		} catch (IOException e) {
 			//TODO : maybe not runtime, maybe no exception at all
 			throw new RuntimeException("Error while parsing object : " + key.getNumber() +
-									   " " + key.getGeneration());
+									   " " + key.getGeneration(), e);
 		}
 	}
 

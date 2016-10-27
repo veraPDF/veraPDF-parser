@@ -1,14 +1,15 @@
 package org.verapdf.pd.font.cmap;
 
-import org.apache.log4j.Logger;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * This class parses CMap files and constructs CMap objects.
@@ -17,7 +18,7 @@ import java.io.InputStream;
  */
 public class CMapParser extends BaseParser {
 
-    private static final Logger LOGGER = Logger.getLogger(CMapParser.class);
+    private static final Logger LOGGER = Logger.getLogger(CMapParser.class.getCanonicalName());
     private COSObject lastCOSName;
 
     private CMap cMap;
@@ -124,48 +125,50 @@ public class CMapParser extends BaseParser {
                         if (usedCMap != null) {
                             this.cMap.useCMap(usedCMap);
                         } else {
-                            LOGGER.debug("Can't load predefined CMap with name " + lastCOSName);
+                            LOGGER.log(Level.FINE, "Can't load predefined CMap with name " + lastCOSName);
                         }
                         break;
                     default:
                 }
-            default:
+            //$FALL-THROUGH$
+		default:
         }
     }
 
     private void processList(int listLength, String type) throws IOException {
-        if (type.startsWith("begin")) {
-            type = type.substring(5); //skipping leading "begin"
-            for (int i = 0; i < listLength; ++i) {
-                switch (type) {
-                    case "codespacerange":
-                        readLineCodeSpaceRange();
-                        break;
-                    case "cidrange":
-                        readLineCIDRange();
-                        break;
-                    case "notdefrange":
-                        readLineNotDefRange();
-                        break;
-                    case "cidchar":
-                        readSingleCharMapping();
-                        break;
-                    case "notdefchar":
-                        readSingleNotDefMapping();
-                        break;
-                    case "bfchar":
-                        readSingleToUnicodeMapping();
-                        break;
-                    case "bfrange":
-                        readLineBFRange();
-                        break;
-                    default:
-                }
+        if (! type.startsWith("begin")) {
+        	return;
+        }
+        String key = type.substring(5); //skipping leading "begin"
+        for (int i = 0; i < listLength; ++i) {
+            switch (key) {
+                case "codespacerange":
+                    readLineCodeSpaceRange();
+                    break;
+                case "cidrange":
+                    readLineCIDRange();
+                    break;
+                case "notdefrange":
+                    readLineNotDefRange();
+                    break;
+                case "cidchar":
+                    readSingleCharMapping();
+                    break;
+                case "notdefchar":
+                    readSingleNotDefMapping();
+                    break;
+                case "bfchar":
+                    readSingleToUnicodeMapping();
+                    break;
+                case "bfrange":
+                    readLineBFRange();
+                    break;
+                default:
             }
-            nextToken();
-            if (!getToken().getValue().equals("end" + type)) {
-                LOGGER.debug("Unexpected end of " + type + " in CMap");
-            }
+        }
+        nextToken();
+        if (!getToken().getValue().equals("end" + key)) {
+            LOGGER.log(Level.FINE, "Unexpected end of " + key + " in CMap");
         }
     }
 
@@ -193,7 +196,7 @@ public class CMapParser extends BaseParser {
                 cMap.shortestCodeSpaceLength = begin.length;
             }
         } else {
-            LOGGER.debug("CMap " + cMap.getName() + " has overlapping codespace ranges.");
+            LOGGER.log(Level.FINE, "CMap " + cMap.getName() + " has overlapping codespace ranges.");
         }
     }
 
@@ -297,9 +300,8 @@ public class CMapParser extends BaseParser {
             byte[] token = getRawBytes(getToken().getValue());
             if (token.length == 1) {
                 return new String(token, "ISO-8859-1");
-            } else {
-                return new String(token, "UTF-16BE");
             }
+			return new String(token, "UTF-16BE");
         }
         throw new IOException("CMap contains invalid entry in bfchar. Expected "
                 + Token.Type.TT_NAME + " or " + Token.Type.TT_HEXSTRING + " but got " + getToken().type);

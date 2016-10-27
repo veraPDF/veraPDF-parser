@@ -1,23 +1,29 @@
 package org.verapdf.pd.font;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.*;
+import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSDictionary;
+import org.verapdf.cos.COSName;
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.truetype.CIDFontType2Program;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author Sergey Shemyakov
  */
 public class PDCIDFont extends PDFont {
 
-    private static final Logger LOGGER = Logger.getLogger(PDCIDFont.class);
-    private static final Double DEFAULT_CID_FONT_WIDTH = 1000d;
+    private static final Logger LOGGER = Logger.getLogger(PDCIDFont.class.getCanonicalName());
+    private static final Double DEFAULT_CID_FONT_WIDTH = Double.valueOf(1000d);
 
     protected CMap cMap;
     private CIDWArray widths;
@@ -90,7 +96,7 @@ public class PDCIDFont extends PDFont {
         }
         this.isFontParsed = true;
 
-        if (fontDescriptor.knownKey(ASAtom.FONT_FILE2) &&
+        if (fontDescriptor.knownKey(ASAtom.FONT_FILE2).booleanValue() &&
                 this.getSubtype() == ASAtom.CID_FONT_TYPE2) {
             try {
                 COSStream trueTypeFontFile =
@@ -100,9 +106,9 @@ public class PDCIDFont extends PDFont {
                         this.cMap, this.getCIDToGIDMap());
                 return this.fontProgram;
             } catch (IOException e) {
-                LOGGER.debug("Can't read TrueType font program.");
+                LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
             }
-        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3).booleanValue()) {
             try {
                 COSStream fontFile =
                         getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE3));
@@ -119,15 +125,14 @@ public class PDCIDFont extends PDFont {
                                 fontFile.getData(COSStream.FilterFlags.DECODE),
                                 false, this.isSymbolic(), this.getEncoding(), this.cMap);
                         return this.fontProgram;
-                    } else {
-                        this.fontProgram = new OpenTypeFontProgram(
-                                fontFile.getData(COSStream.FilterFlags.DECODE),
-                                true, this.isSymbolic(), this.getEncoding(), this.cMap);
-                        return this.fontProgram;
                     }
+					this.fontProgram = new OpenTypeFontProgram(
+					        fontFile.getData(COSStream.FilterFlags.DECODE),
+					        true, this.isSymbolic(), this.getEncoding(), this.cMap);
+					return this.fontProgram;
                 }
             } catch (IOException e) {
-                LOGGER.debug("Can't read CFF font program.");
+                LOGGER.log(Level.FINE, "Can't read CFF font program.", e);
             }
         }
         this.fontProgram = null;

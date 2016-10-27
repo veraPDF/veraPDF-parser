@@ -1,18 +1,24 @@
 package org.verapdf.pd.font;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.*;
+import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSBase;
+import org.verapdf.cos.COSDictionary;
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
 import org.verapdf.pd.PDResource;
 import org.verapdf.pd.font.cmap.PDCMap;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetricsFactory;
 import org.verapdf.pd.font.type1.PDType1Font;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This is PD representation of font.
@@ -21,7 +27,7 @@ import java.util.Map;
  */
 public abstract class PDFont extends PDResource {
 
-    private static final Logger LOGGER = Logger.getLogger(PDFont.class);
+    private static final Logger LOGGER = Logger.getLogger(PDFont.class.getCanonicalName());
 
     protected COSDictionary dictionary;
     protected COSDictionary fontDescriptor;
@@ -90,7 +96,7 @@ public abstract class PDFont extends PDResource {
             ASAtom typeFromDescriptor =
                     this.fontDescriptor.getNameKey(ASAtom.FONT_NAME);
             if (type != typeFromDescriptor) {
-                LOGGER.debug("Font names in font descriptor dictionary and in font dictionary are different for "
+                LOGGER.log(Level.FINE, "Font names in font descriptor dictionary and in font dictionary are different for "
                         + type.getValue());
             }
         }
@@ -105,12 +111,12 @@ public abstract class PDFont extends PDResource {
      */
     public boolean isSymbolic() {
         if (this.fontDescriptor == null) {
-            LOGGER.debug("Font descriptor is null");
+            LOGGER.log(Level.FINE, "Font descriptor is null");
             return false;
         }
         Long flagsLong = this.fontDescriptor.getIntegerKey(ASAtom.FLAGS);
         if (flagsLong == null) {
-            LOGGER.debug("Font descriptor doesn't contain /Flags entry");
+            LOGGER.log(Level.FINE, "Font descriptor doesn't contain /Flags entry");
             return false;
         }
         int flags = flagsLong.intValue();
@@ -170,7 +176,7 @@ public abstract class PDFont extends PDResource {
             if (obj.getType() == COSObjType.COS_INTEGER) {
                 diffIndex = obj.getInteger().intValue();
             } else if (obj.getType() == COSObjType.COS_NAME && diffIndex != -1) {
-                res.put(diffIndex++, obj.getString());
+                res.put(Integer.valueOf(diffIndex++), obj.getString());
             }
         }
         return res;
@@ -191,9 +197,8 @@ public abstract class PDFont extends PDResource {
     protected static COSStream getStreamFromObject(COSObject obj) throws IOException {
         if (obj == null || obj.getDirectBase().getType() != COSObjType.COS_STREAM) {
             throw new IOException("Can't get COSStream from COSObject");
-        } else {
-            return (COSStream) obj.getDirectBase();
         }
+		return (COSStream) obj.getDirectBase();
     }
 
     /**
@@ -233,17 +238,17 @@ public abstract class PDFont extends PDResource {
     }
 
     public Double getWidth(int code) {
-        if (dictionary.knownKey(ASAtom.WIDTHS)
-                && dictionary.knownKey(ASAtom.FIRST_CHAR)
-                && dictionary.knownKey(ASAtom.LAST_CHAR)) {
+        if (dictionary.knownKey(ASAtom.WIDTHS).booleanValue()
+                && dictionary.knownKey(ASAtom.FIRST_CHAR).booleanValue()
+                && dictionary.knownKey(ASAtom.LAST_CHAR).booleanValue()) {
             int firstChar = dictionary.getIntegerKey(ASAtom.FIRST_CHAR).intValue();
             int lastChar = dictionary.getIntegerKey(ASAtom.LAST_CHAR).intValue();
-            if (getWidths().size() > 0 && code >= firstChar && code <= lastChar) {
+            if (getWidths().size().intValue() > 0 && code >= firstChar && code <= lastChar) {
                 return getWidths().at(code - firstChar).getReal();
             }
         }
 
-        if (fontDescriptor.knownKey(ASAtom.MISSING_WIDTH)) {
+        if (fontDescriptor.knownKey(ASAtom.MISSING_WIDTH).booleanValue()) {
             if (this.fontDescriptor != null) {
                 return fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
             }
@@ -253,17 +258,16 @@ public abstract class PDFont extends PDResource {
             return null;
         }
 
-        if (this instanceof PDType1Font && ((PDType1Font) this).isStandard()) {
+        if (this instanceof PDType1Font && ((PDType1Font) this).isStandard().booleanValue()) {
             StandardFontMetrics metrics =
                     StandardFontMetricsFactory.getFontMetrics(this.getName());
             Encoding enc = this.getEncodingMapping();
             if (metrics != null) {
                 return Double.valueOf(metrics.getWidth(enc.getName(code)));
-            } else {
-                // should not get here
-                LOGGER.debug("Can't get standard metrics");
-                return null;
             }
+			// should not get here
+			LOGGER.log(Level.FINE, "Can't get standard metrics");
+			return null;
         }
 
         return Double.valueOf(0);

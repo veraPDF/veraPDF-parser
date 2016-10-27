@@ -1,11 +1,23 @@
 package org.verapdf.factory.colors;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResources;
-import org.verapdf.pd.colors.*;
+import org.verapdf.pd.colors.PDCalGray;
+import org.verapdf.pd.colors.PDCalRGB;
+import org.verapdf.pd.colors.PDColorSpace;
+import org.verapdf.pd.colors.PDDeviceCMYK;
+import org.verapdf.pd.colors.PDDeviceGray;
+import org.verapdf.pd.colors.PDDeviceN;
+import org.verapdf.pd.colors.PDDeviceRGB;
+import org.verapdf.pd.colors.PDICCBased;
+import org.verapdf.pd.colors.PDIndexed;
+import org.verapdf.pd.colors.PDLab;
+import org.verapdf.pd.colors.PDSeparation;
 import org.verapdf.pd.patterns.PDPattern;
 import org.verapdf.pd.patterns.PDShadingPattern;
 import org.verapdf.pd.patterns.PDTilingPattern;
@@ -15,7 +27,7 @@ import org.verapdf.pd.patterns.PDTilingPattern;
  */
 public class ColorSpaceFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(ColorSpaceFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(ColorSpaceFactory.class.getCanonicalName());
 
     private ColorSpaceFactory() {
     }
@@ -58,7 +70,7 @@ public class ColorSpaceFactory {
         } else if (type != null && type.isDictionaryBased()) {
             return getPattern(base);
         } else {
-            LOGGER.debug("COSObject has to be a name or array, but it is not");
+            LOGGER.log(Level.FINE, "COSObject has to be a name or array, but it is not");
             return null;
         }
     }
@@ -74,14 +86,14 @@ public class ColorSpaceFactory {
         } else if (ASAtom.PATTERN.equals(name)) {
             return PDPattern.INSTANCE;
         } else {
-            LOGGER.debug("Unknown ColorSpace name");
+            LOGGER.log(Level.FINE, "Unknown ColorSpace name");
             return null;
         }
     }
 
     private static PDColorSpace getColorSpaceFromArray(COSObject base) {
-        if (base.size() < 2) {
-            LOGGER.debug("ColorSpace array can not contain less than two elements");
+        if (base.size().intValue() < 2) {
+            LOGGER.log(Level.FINE, "ColorSpace array can not contain less than two elements");
             return null;
         }
         ASAtom name = base.at(0).getName();
@@ -100,7 +112,7 @@ public class ColorSpaceFactory {
         } else if (ASAtom.INDEXED.equals(name)) {
             return new PDIndexed(base);
         } else {
-            LOGGER.debug("Unknown ColorSpace name");
+            LOGGER.log(Level.FINE, "Unknown ColorSpace name");
             return null;
         }
     }
@@ -115,13 +127,12 @@ public class ColorSpaceFactory {
                 case PDPattern.TYPE_SHADING_PATTERN:
                     return new PDShadingPattern(base);
                 default:
-                    LOGGER.debug("PatternType value is not correct");
+                    LOGGER.log(Level.FINE, "PatternType value is not correct");
                     return null;
             }
-        } else {
-            LOGGER.debug("COSObject doesn't contain PatternType key");
-            return null;
         }
+		LOGGER.log(Level.FINE, "COSObject doesn't contain PatternType key");
+		return null;
     }
 
 }
