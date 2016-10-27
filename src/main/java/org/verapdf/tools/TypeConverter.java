@@ -1,18 +1,19 @@
 package org.verapdf.tools;
 
-import org.apache.log4j.Logger;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
 
 /**
  * @author Maksim Bezrukov
  */
 public class TypeConverter {
-	private static final Logger LOGGER = Logger.getLogger(TypeConverter.class);
+	private static final Logger LOGGER = Logger.getLogger(TypeConverter.class.getCanonicalName());
 
 	public static Calendar parseDate(String toParse) {
 		if (toParse != null
@@ -125,7 +126,7 @@ public class TypeConverter {
 			}
 		}
 
-		LOGGER.debug("Parsed string is not complies pdf date format");
+		LOGGER.log(Level.FINE, "Parsed string is not complies pdf date format");
 		return null;
 	}
 
@@ -145,21 +146,20 @@ public class TypeConverter {
 		}
 
 		if (array != null && array.getType() == COSObjType.COS_ARRAY) {
-			int size = array.size();
+			int size = array.size().intValue();
 
 			if (size != estimatedSize) {
-				LOGGER.debug(arrayName + " array doesn't consist of " + estimatedSize + " elements");
+				LOGGER.log(Level.FINE, arrayName + " array doesn't consist of " + estimatedSize + " elements");
 			}
 
 			double[] res = new double[size];
 			for (int i = 0; i < size; ++i) {
 				COSObject number = array.at(i);
 				if (number == null || number.getReal() == null) {
-					LOGGER.debug(arrayName + " array contains non number value");
+					LOGGER.log(Level.FINE, arrayName + " array contains non number value");
 					return null;
-				} else {
-					res[i] = number.getReal();
 				}
+				res[i] = number.getReal().doubleValue();
 			}
 			return res;
 		}

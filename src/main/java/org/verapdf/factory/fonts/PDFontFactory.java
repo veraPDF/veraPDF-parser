@@ -1,6 +1,8 @@
 package org.verapdf.factory.fonts;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
@@ -18,7 +20,7 @@ import org.verapdf.pd.font.type1.PDType1Font;
  */
 public class PDFontFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(PDFontFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(PDFontFactory.class.getCanonicalName());
 
     private PDFontFactory() {
     }
@@ -41,12 +43,11 @@ public class PDFontFactory {
             } else if (subtype == ASAtom.TYPE0) {
                 return new PDType0Font(dict);
             } else {
-                LOGGER.debug("Invalid value of Subtype in font dictionary");
+                LOGGER.log(Level.FINE, "Invalid value of Subtype in font dictionary");
                 return null;
             }
-        } else {
-            LOGGER.debug("Expected COSDictionary");
-            return null;
         }
+		LOGGER.log(Level.FINE, "Expected COSDictionary");
+		return null;
     }
 }

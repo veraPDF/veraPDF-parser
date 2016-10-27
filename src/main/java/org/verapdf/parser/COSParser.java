@@ -1,25 +1,38 @@
 package org.verapdf.parser;
 
-import org.apache.log4j.Logger;
-import org.verapdf.as.ASAtom;
-import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.*;
-import org.verapdf.io.SeekableStream;
-import org.verapdf.pd.encryption.StandardSecurityHandler;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.exceptions.StringExceptions;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSBoolean;
+import org.verapdf.cos.COSDictionary;
+import org.verapdf.cos.COSDocument;
+import org.verapdf.cos.COSIndirect;
+import org.verapdf.cos.COSInteger;
+import org.verapdf.cos.COSKey;
+import org.verapdf.cos.COSName;
+import org.verapdf.cos.COSNull;
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSReal;
+import org.verapdf.cos.COSStream;
+import org.verapdf.cos.COSString;
+import org.verapdf.io.SeekableStream;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 /**
  * @author Timur Kamalov
  */
 public class COSParser extends BaseParser {
 
-	private static final Logger LOG = Logger.getLogger(COSParser.class);
+	private static final Logger LOG = Logger.getLogger(COSParser.class.getCanonicalName());
 
 	/**
 	 * Linearization dictionary must be in first 1024 bytes of document
@@ -75,9 +88,9 @@ public class COSParser extends BaseParser {
 		final Token token = getToken();
 
 		if (token.type == Token.Type.TT_INTEGER) {  // looking for indirect reference
-			this.integers.add(token.integer);
+			this.integers.add(Long.valueOf(token.integer));
 			if (this.integers.size() == 3) {
-				COSObject result = COSInteger.construct(this.integers.peek());
+				COSObject result = COSInteger.construct(this.integers.peek().longValue());
 				this.integers.remove();
 				return result;
 			}
@@ -95,10 +108,10 @@ public class COSParser extends BaseParser {
 		}
 
 		if (!this.integers.isEmpty()) {
-			COSObject result = COSInteger.construct(this.integers.peek());
+			COSObject result = COSInteger.construct(this.integers.peek().longValue());
 			this.integers.remove();
 			while (!this.integers.isEmpty()) {
-				this.objects.add(COSInteger.construct(this.integers.peek()));
+				this.objects.add(COSInteger.construct(this.integers.peek().longValue()));
 				this.integers.remove();
 			}
 			this.flag = false;
@@ -140,12 +153,11 @@ public class COSParser extends BaseParser {
 				return COSString.construct(token.getValue());
 			case TT_HEXSTRING:
 				COSObject res = COSString.construct(token.getValue(), true,
-						token.getHexCount(), token.isContainsOnlyHex());
+						token.getHexCount().longValue(), token.isContainsOnlyHex());
 				if(this.document == null || !this.document.isEncrypted()) {
 					return res;
-				} else {
-					return this.decryptCOSString(res);
 				}
+			return this.decryptCOSString(res);
 			case TT_NAME:
 				return COSName.construct(token.getValue());
 			case TT_OPENARRAY:
@@ -240,10 +252,9 @@ public class COSParser extends BaseParser {
 		if (token.type == Token.Type.TT_KEYWORD &&
 				token.keyword == Token.Keyword.KW_STREAM) {
 			return getStream(dict);
-		} else {
-			this.source.seek(reset);
-			this.flag = true;
 		}
+		this.source.seek(reset);
+		this.flag = true;
 
 		return dict;
 	}
@@ -267,7 +278,7 @@ public class COSParser extends BaseParser {
 
 		skipStreamSpaces();
 
-		long size = dict.getKey(ASAtom.LENGTH).getInteger();
+		long size = dict.getKey(ASAtom.LENGTH).getInteger().longValue();
 		source.seek(streamStartOffset);
 
 		boolean streamLengthValid = checkStreamLength(size);
@@ -318,7 +329,7 @@ public class COSParser extends BaseParser {
 						(COSStream) dict.getDirectBase(), this.keyOfCurrentObject);
 			}
 		} catch (GeneralSecurityException e) {
-			throw new IOException("Stream " + this.keyOfCurrentObject + " cannot be decrypted");
+			throw new IOException("Stream " + this.keyOfCurrentObject + " cannot be decrypted", e);
 		}
 		return dict;
 	}
@@ -329,12 +340,12 @@ public class COSParser extends BaseParser {
 		if (whiteSpace == 13) {
 			whiteSpace = source.readByte();
 			if (whiteSpace != 10) {
-				stream.setStreamKeywordCRLFCompliant(Boolean.FALSE);
+				stream.setStreamKeywordCRLFCompliant(false);
 				source.unread();
 			}
 		} else if (whiteSpace != 10) {
-			LOG.warn("Stream at " + source.getOffset() + " offset has no EOL marker.");
-			stream.setStreamKeywordCRLFCompliant(Boolean.FALSE);
+			LOG.log(Level.WARNING, "Stream at " + source.getOffset() + " offset has no EOL marker.");
+			stream.setStreamKeywordCRLFCompliant(false);
 			source.unread();
 		}
 	}
@@ -345,7 +356,7 @@ public class COSParser extends BaseParser {
 		long expectedEndstreamOffset = start + streamLength;
 		if (expectedEndstreamOffset > source.getStreamLength()) {
 			validLength = false;
-			LOG.warn("Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
+			LOG.log(Level.WARNING, "Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
 		} else {
 			source.seek(expectedEndstreamOffset);
 
@@ -354,7 +365,7 @@ public class COSParser extends BaseParser {
 			if (token.type != Token.Type.TT_KEYWORD ||
 					token.keyword != Token.Keyword.KW_ENDSTREAM) {
 				validLength = false;
-				LOG.warn("Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
+				LOG.log(Level.WARNING, "Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
 			}
 
 			source.seek(start);
@@ -381,7 +392,7 @@ public class COSParser extends BaseParser {
 		} else if (secondSymbol == 13) {
 			eolCount = 1;
 		} else {
-			LOG.warn("End of stream at " + source.getOffset() + " offset doesn't contain EOL marker.");
+			LOG.log(Level.WARNING, "End of stream at " + source.getOffset() + " offset doesn't contain EOL marker.");
 			stream.setEndstreamKeywordCRLFCompliant(false);
 		}
 
@@ -400,7 +411,7 @@ public class COSParser extends BaseParser {
             ssh.decryptString((COSString) string.get(), this.keyOfCurrentObject);
             return string;
         } catch (IOException | GeneralSecurityException e) {
-            LOG.warn("Can't decrypt string in object " + this.keyOfCurrentObject);
+            LOG.log(Level.WARNING, "Can't decrypt string in object " + this.keyOfCurrentObject);
             return string;
         }
 	}

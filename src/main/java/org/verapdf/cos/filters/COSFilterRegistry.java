@@ -1,6 +1,11 @@
 package org.verapdf.cos.filters;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.filters.ASFilterFactory;
@@ -12,17 +17,13 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.COSDictionary;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Timur Kamalov
  */
 public class COSFilterRegistry {
 
 	private static Map<ASAtom, IASFilterFactory> registeredFactories;
-	private static final Logger LOGGER = Logger.getLogger(COSFilterRegistry.class);
+	private static final Logger LOGGER = Logger.getLogger(COSFilterRegistry.class.getCanonicalName());
 
 	static {
 		registeredFactories = new HashMap<>();
@@ -31,7 +32,7 @@ public class COSFilterRegistry {
 			registerFactory(ASAtom.ASCII_HEX_DECODE, new ASFilterFactory(ASAtom.ASCII_HEX_DECODE));
 			registerFactory(ASAtom.ASCII85_DECODE, new ASFilterFactory(ASAtom.ASCII85_DECODE));
 		} catch (Exception e) {
-			LOGGER.debug("Trying to register factory twice", e);
+			LOGGER.log(Level.FINE, "Trying to register factory twice", e);
 		}
 	}
 
@@ -46,9 +47,8 @@ public class COSFilterRegistry {
 	public static void registerFactory(final ASAtom filterName, final IASFilterFactory factory) throws Exception {
 		if (registeredFactories.containsKey(filterName)) {
 			throw new Exception("COSFilterRegistry::RegisterFactory(...)" + StringExceptions.DUPLICATE_FACTORY_NAMES);
-		} else {
-			registeredFactories.put(filterName, factory);
 		}
+		registeredFactories.put(filterName, factory);
 	}
 
 	public static ASInFilter getDecodeFilter(final ASAtom filterName,
@@ -57,10 +57,9 @@ public class COSFilterRegistry {
 		final IASFilterFactory filterFactory = factoryByName(filterName);
 		if (filterFactory != null) {
 			return filterFactory.getInFilter(inputStream, decodeParams);
-		} else {
-			LOGGER.debug("Trying to use unimplemented decoding filter.");
-			return new ASBufferingInFilter(inputStream);
 		}
+		LOGGER.log(Level.FINE, "Trying to use unimplemented decoding filter.");
+		return new ASBufferingInFilter(inputStream);
 	}
 
 	public static ASOutFilter getEncodeFilter(final ASAtom filterName,
@@ -68,9 +67,8 @@ public class COSFilterRegistry {
 		final IASFilterFactory filterFactory = factoryByName(filterName);
 		if (filterFactory != null) {
 			return filterFactory.getOutFilter(outputStream);
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 }

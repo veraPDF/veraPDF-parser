@@ -1,6 +1,14 @@
 package org.verapdf.pd.font.type1;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSDictionary;
@@ -14,15 +22,12 @@ import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
 
-import java.io.IOException;
-import java.util.*;
-
 /**
  * @author Sergey Shemyakov
  */
 public class PDType1Font extends PDSimpleFont {
 
-    private static final Logger LOGGER = Logger.getLogger(PDType1Font.class);
+    private static final Logger LOGGER = Logger.getLogger(PDType1Font.class.getCanonicalName());
     public static final ASAtom[] STANDARD_FONT_NAMES = {
             ASAtom.COURIER_BOLD,
             ASAtom.COURIER_BOLD_OBLIQUE,
@@ -63,7 +68,7 @@ public class PDType1Font extends PDSimpleFont {
                 }
                 return descriptorCharSet;
             } catch (IOException ex) {
-                LOGGER.debug("Can't parse /CharSet entry in Type 1 font descriptor");
+                LOGGER.log(Level.FINE, "Can't parse /CharSet entry in Type 1 font descriptor", ex);
                 return Collections.emptySet();
             }
         }
@@ -77,13 +82,13 @@ public class PDType1Font extends PDSimpleFont {
         }
         this.isFontParsed = true;
         try {
-            if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
+            if (fontDescriptor.knownKey(ASAtom.FONT_FILE).booleanValue()) {
                 COSStream type1FontFile =
                         getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE));
                 this.fontProgram = new Type1FontProgram(
                         type1FontFile.getData(COSStream.FilterFlags.DECODE));
                 return this.fontProgram;
-            } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+            } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3).booleanValue()) {
                 COSStream type1FontFile =
                         getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE3));
                 ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
@@ -100,7 +105,7 @@ public class PDType1Font extends PDSimpleFont {
                 }
             }
         } catch (IOException e) {
-            LOGGER.debug("Can't read Type 1 font program.");
+            LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
         }
         this.fontProgram = null;
         return null;
@@ -111,13 +116,11 @@ public class PDType1Font extends PDSimpleFont {
             if (!containsDiffs() && !isEmbedded() && isNameStandard()) {
                 isStandard = Boolean.valueOf(true);
                 return isStandard;
-            } else {
-                isStandard = Boolean.valueOf(false);
-                return isStandard;
             }
-        } else {
-            return this.isStandard;
+			isStandard = Boolean.valueOf(false);
+			return isStandard;
         }
+		return this.isStandard;
     }
 
     private boolean containsDiffs() {
@@ -131,7 +134,7 @@ public class PDType1Font extends PDSimpleFont {
                     return true;
                 }
                 for (Map.Entry<Integer, String> entry : differences.entrySet()) {
-                    if (!entry.getValue().equals(baseEncoding[entry.getKey()])) {
+                    if (!entry.getValue().equals(baseEncoding[entry.getKey().intValue()])) {
                         return true;
                     }
                 }

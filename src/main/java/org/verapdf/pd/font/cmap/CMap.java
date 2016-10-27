@@ -1,10 +1,15 @@
 package org.verapdf.pd.font.cmap;
 
-import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class represents cmap.
@@ -13,7 +18,7 @@ import java.util.*;
  */
 public class CMap {
 
-    private static final Logger LOGGER = Logger.getLogger(CMap.class);
+    private static final Logger LOGGER = Logger.getLogger(CMap.class.getCanonicalName());
 
     private int wMode;
     private String registry, ordering;
@@ -102,9 +107,8 @@ public class CMap {
                     int res = toCID((int) CMapParser.numberFromBytes(currentCode));
                     if (res != -1) {
                         return res;
-                    } else {
-                        LOGGER.debug("CMap " + this.name + " has invalid codespace information.");
                     }
+					LOGGER.log(Level.FINE, "CMap " + this.name + " has invalid codespace information.");
                 }
             }
             int shortestMatchingCodeSpaceLength = Integer.MAX_VALUE;
@@ -211,8 +215,8 @@ public class CMap {
         this.codeSpaces = codeSpaces;
     }
 
-    void addUnicodeMapping(int code, String toUnicode) {
-        this.toUnicode.put(code, toUnicode);
+    void addUnicodeMapping(int code, String toUnicodeMap) {
+        this.toUnicode.put(Integer.valueOf(code), toUnicodeMap);
     }
 
     /**
@@ -222,7 +226,7 @@ public class CMap {
      * @return Unicode sequence obtained from this CMap.
      */
     public String getUnicode(int code) {
-        String res = this.toUnicode.get(code);
+        String res = this.toUnicode.get(Integer.valueOf(code));
         if(res == null) {
             for(ToUnicodeInterval interval : this.unicodeIntervals) {
                 if(interval.containsCode(code)) {

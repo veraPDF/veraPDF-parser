@@ -1,8 +1,8 @@
 package org.verapdf.pd.font.cmap;
 
-import org.apache.log4j.Logger;
-
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents interval of mappings to Unicode.
@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class ToUnicodeInterval {
 
-    private static final Logger LOGGER = Logger.getLogger(ToUnicodeInterval.class);
+    private static final Logger LOGGER = Logger.getLogger(ToUnicodeInterval.class.getCanonicalName());
 
     private long intervalBegin;
     private long intervalEnd;
@@ -40,11 +40,10 @@ public class ToUnicodeInterval {
         try {
             if (arr[0] == 0) {
                 return String.valueOf(arr[1]);
-            } else {
-                return new String(arr, "UTF-16BE");
             }
+			return new String(arr, "UTF-16BE");
         } catch (UnsupportedEncodingException e) {
-            LOGGER.debug("Can't find String encoding UTF-16BE");
+            LOGGER.log(Level.FINE, "Can't find String encoding UTF-16BE", e);
             return null;    // I'm sure this won't be reached
         }
     }

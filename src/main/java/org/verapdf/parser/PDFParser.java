@@ -1,34 +1,38 @@
 package org.verapdf.parser;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.cos.*;
+import org.verapdf.cos.COSDocument;
+import org.verapdf.cos.COSHeader;
+import org.verapdf.cos.COSKey;
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
+import org.verapdf.cos.COSTrailer;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
 import org.verapdf.io.SeekableStream;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
 /**
  * @author Timur Kamalov
  */
 public class PDFParser extends COSParser {
 
-    private static final Logger LOG = Logger.getLogger(PDFParser.class);
+    private static final Logger LOG = Logger.getLogger(PDFParser.class.getCanonicalName());
 
     private static final String HEADER_PATTERN = "%PDF-";
     private static final String PDF_DEFAULT_VERSION = "1.4";
 
     //%%EOF marker byte representation
     private static final byte[] EOF_MARKER = new byte[]{37, 37, 69, 79, 70};
-
-    private static final byte XREF_SEARCH_INC = 32;
-    private static final byte XREF_SEARCH_STEP_MAX = 32;
 
     private long offsetShift = 0;
     private boolean isEncrypted;
@@ -97,7 +101,7 @@ public class PDFParser extends COSParser {
             if (header.length() < HEADER_PATTERN.length() + 3) {
                 // No version number at all, set to 1.4 as default
                 header = HEADER_PATTERN + PDF_DEFAULT_VERSION;
-                LOG.warn("No version found, set to " + PDF_DEFAULT_VERSION + " as default.");
+                LOG.log(Level.WARNING, "No version found, set to " + PDF_DEFAULT_VERSION + " as default.");
             } else {
                 // trying to parse header version if it has some garbage
                 Integer pos = null;
@@ -107,8 +111,8 @@ public class PDFParser extends COSParser {
                     pos = Integer.valueOf(header.indexOf("PDF-"));
                 }
                 if (pos != null) {
-                    Integer length = Math.min(8, header.substring(pos).length());
-                    header = header.substring(pos, pos + length);
+                    int length = Math.min(8, header.substring(pos.intValue()).length());
+                    header = header.substring(pos.intValue(), pos.intValue() + length);
                 }
             }
         }
@@ -119,7 +123,7 @@ public class PDFParser extends COSParser {
                 headerVersion = Float.parseFloat(headerParts[1]);
             }
         } catch (NumberFormatException e) {
-            LOG.warn("Can't parse the header version.", e);
+            LOG.log(Level.WARNING, "Can't parse the header version.", e);
         }
 
         result.setVersion(headerVersion);
@@ -135,15 +139,15 @@ public class PDFParser extends COSParser {
             COSObject linDict = findFirstDictionary();
 
             if (linDict != null && !linDict.empty() && linDict.getType() == COSObjType.COS_DICT) {
-                if (linDict.knownKey(ASAtom.LINEARIZED)) {
-                    long length = linDict.getIntegerKey(ASAtom.L);
+                if (linDict.knownKey(ASAtom.LINEARIZED).booleanValue()) {
+                    long length = linDict.getIntegerKey(ASAtom.L).longValue();
                     if (length != 0) {
                         return length == this.source.getStreamLength() && this.source.getOffset() < LINEARIZATION_DICTIONARY_LOOKUP_SIZE;
                     }
                 }
             }
         } catch (IOException e) {
-            LOG.warn("IO error while trying to find first document dictionary");
+            LOG.log(Level.WARNING, "IO error while trying to find first document dictionary", e);
         }
 
         return false;
@@ -163,9 +167,8 @@ public class PDFParser extends COSParser {
 
             COSObject linDict = getObject(source.getOffset());
             return linDict;
-        } else {
-            return null;
         }
+		return null;
     }
 
     /**
@@ -197,7 +200,7 @@ public class PDFParser extends COSParser {
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         calculatePostEOFDataSize();
-        this.getXRefInfo(infos, 0L);
+        this.getXRefInfo(infos, Long.valueOf(0L));
     }
 
     public COSObject getObject(final long offset) throws IOException {
@@ -278,9 +281,9 @@ public class PDFParser extends COSParser {
             endOfObjectComplyPDFA = false;
         }
 
-        obj.setIsHeaderOfObjectComplyPDFA(headerOfObjectComplyPDFA);
-        obj.setIsHeaderFormatComplyPDFA(headerFormatComplyPDFA);
-        obj.setIsEndOfObjectComplyPDFA(endOfObjectComplyPDFA);
+        obj.setIsHeaderOfObjectComplyPDFA(Boolean.valueOf(headerOfObjectComplyPDFA));
+        obj.setIsHeaderFormatComplyPDFA(Boolean.valueOf(headerFormatComplyPDFA));
+        obj.setIsEndOfObjectComplyPDFA(Boolean.valueOf(endOfObjectComplyPDFA));
 
         return obj;
     }
@@ -296,10 +299,10 @@ public class PDFParser extends COSParser {
         if (findKeyword(Token.Keyword.KW_STARTXREF)) {
             nextToken();
             if (getToken().type == Token.Type.TT_INTEGER) {
-                return getToken().integer;
+                return Long.valueOf(getToken().integer);
             }
         }
-        return 0L;
+        return Long.valueOf(0L);
     }
 
     private void calculatePostEOFDataSize() throws IOException {
@@ -329,11 +332,10 @@ public class PDFParser extends COSParser {
                                 postEOFDataSize -= 2;
                                 document.setPostEOFDataSize(postEOFDataSize);
                                 return;
-                            } else {
-                                postEOFDataSize -= 1;
-                                document.setPostEOFDataSize(postEOFDataSize);
-                                return;
                             }
+							postEOFDataSize -= 1;
+							document.setPostEOFDataSize(postEOFDataSize);
+							return;
                         } else if (buffer[currentBufferOffset + EOF_MARKER.length] == 0x0A) {
                             postEOFDataSize -= 1;
                             document.setPostEOFDataSize(postEOFDataSize);
@@ -383,10 +385,10 @@ public class PDFParser extends COSParser {
                 this.source.readByte();
             }
             if (!isDigit()) {
-                document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
+                document.setXrefEOLMarkersComplyPDFA(false);
             }
         } else if (!isLF(space) || !isDigit()) {
-            document.setXrefEOLMarkersComplyPDFA(Boolean.FALSE);
+            document.setXrefEOLMarkersComplyPDFA(false);
         }
 
         nextToken();
@@ -396,7 +398,7 @@ public class PDFParser extends COSParser {
             //pdf/a-1b specification, clause 6.1.4
             space = this.source.readByte();
             if (space != CharTable.ASCII_SPACE || !isDigit()) {
-                document.setSubsectionHeaderSpaceSeparated(Boolean.FALSE);
+                document.setSubsectionHeaderSpaceSeparated(false);
             }
             int number = (int) getToken().integer;
             nextToken();
@@ -443,9 +445,9 @@ public class PDFParser extends COSParser {
     }
 
 	private void getXRefInfo(final List<COSXRefInfo> info, Long offset) throws IOException {
-		if (offset == 0) {
+		if (offset.longValue() == 0) {
 			offset = findLastXRef();
-			if (offset == 0) {
+			if (offset.longValue() == 0) {
 				closeInputStream();
 				throw new IOException("PDFParser::GetXRefInfo(...)" + StringExceptions.START_XREF_VALIDATION);
 			}
@@ -459,16 +461,16 @@ public class PDFParser extends COSParser {
         }
 
         //we will skip eol marker in any case
-        source.seek(offset - 1);
+        source.seek(offset.intValue() - 1);
 
 		COSXRefInfo section = new COSXRefInfo();
 		info.add(0, section);
 
-		section.setStartXRef(offset);
+		section.setStartXRef(offset.longValue());
         getXRefSectionAndTrailer(section);
 
         offset = section.getTrailer().getPrev();
-		if (offset == null || offset == 0) {
+		if (offset == null || offset.longValue() == 0) {
 			return;
 		}
 

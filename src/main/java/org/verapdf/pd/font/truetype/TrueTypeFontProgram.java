@@ -1,6 +1,5 @@
 package org.verapdf.pd.font.truetype;
 
-import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSArray;
@@ -17,8 +16,6 @@ import java.io.IOException;
  * @author Sergey Shemyakov
  */
 public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProgram {
-
-    private static final Logger LOGGER = Logger.getLogger(TrueTypeFontProgram.class);
 
     private COSObject encoding;
     protected boolean isSymbolic;

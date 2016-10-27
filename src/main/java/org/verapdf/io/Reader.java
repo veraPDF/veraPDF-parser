@@ -1,9 +1,22 @@
 package org.verapdf.io;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.cos.*;
+import org.verapdf.cos.COSDocument;
+import org.verapdf.cos.COSHeader;
+import org.verapdf.cos.COSKey;
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.exceptions.InvalidPasswordException;
 import org.verapdf.parser.DecodedObjectStreamParser;
@@ -12,19 +25,12 @@ import org.verapdf.parser.XRefReader;
 import org.verapdf.pd.encryption.PDEncryption;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Timur Kamalov
  */
 public class Reader extends XRefReader {
 
-	private static final Logger LOGGER = Logger.getLogger(Reader.class);
+	private static final Logger LOGGER = Logger.getLogger(Reader.class.getCanonicalName());
 
 	private PDFParser parser;
 	private COSHeader header;
@@ -45,17 +51,19 @@ public class Reader extends XRefReader {
 	}
 
 	//PUBLIC METHODS
+	@Override
 	public COSHeader getHeader() {
 		return this.header;
 	}
 
+	@Override
 	public COSObject getObject(final COSKey key) throws IOException {
 		if (!super.containsKey(key)) {
-			LOGGER.debug("Trying to get object " + key.getNumber() + " " +
+			LOGGER.log(Level.FINE, "Trying to get object " + key.getNumber() + " " +
 					key.getGeneration() + " that is not present in the document");
 			return null;
 		}
-		long offset = getOffset(key);
+		long offset = getOffset(key).longValue();
 		if(offset > 0) {
 			if (getHeader().getHeaderOffset() > 0) {
 				offset += getHeader().getHeaderOffset();
@@ -63,34 +71,34 @@ public class Reader extends XRefReader {
 			COSObject result = getObject(offset);
 			result.setObjectKey(key);
 			return result;
-		} else {
-			//TODO : set object key
-			DecodedObjectStreamParser parser = objectStreams.get(-offset);
-			if(parser != null) {
-				return parser.getObject(key.getNumber());
-			} else {
-				COSKey newKey = new COSKey(- (int)offset, 0);
-				COSObject object = getObject(newKey);
-				if(object == null || !object.getType().equals(COSObjType.COS_STREAM)) {
-					throw new IOException("Object number " + (-offset) + " should" +
-							" be object stream, but in fact it is " +
-							(object == null ? "null" : object.getType()));
-				}
-				COSStream objectStream = (COSStream) object.get();
-				parser = new DecodedObjectStreamParser(
-						objectStream.getData(COSStream.FilterFlags.DECODE),
-						objectStream, new COSKey((int) -offset, 0),
-						this.parser.getDocument());
-				objectStreams.put(-offset, parser);
-				return parser.getObject(key.getNumber());
-			}
 		}
+		//TODO : set object key
+		DecodedObjectStreamParser parser = objectStreams.get(Long.valueOf(-offset));
+		if(parser != null) {
+			return parser.getObject(key.getNumber());
+		}
+		COSKey newKey = new COSKey(- (int)offset, 0);
+		COSObject object = getObject(newKey);
+		if(object == null || !object.getType().equals(COSObjType.COS_STREAM)) {
+			throw new IOException("Object number " + (-offset) + " should" +
+					" be object stream, but in fact it is " +
+					(object == null ? "null" : object.getType()));
+		}
+		COSStream objectStream = (COSStream) object.get();
+		parser = new DecodedObjectStreamParser(
+				objectStream.getData(COSStream.FilterFlags.DECODE),
+				objectStream, new COSKey((int) -offset, 0),
+				this.parser.getDocument());
+		objectStreams.put(Long.valueOf(-offset), parser);
+		return parser.getObject(key.getNumber());
 	}
 
+	@Override
 	public COSObject getObject(final long offset) throws IOException {
 		return this.parser.getObject(offset);
 	}
 
+	@Override
 	public boolean isLinearized() {
 		return this.parser.isLinearized();
 	}
@@ -104,7 +112,7 @@ public class Reader extends XRefReader {
 	private void init() throws IOException {
 		this.header = this.parser.getHeader();
 
-		List<COSXRefInfo> infos = new ArrayList<COSXRefInfo>();
+		List<COSXRefInfo> infos = new ArrayList<>();
 		this.parser.getXRefInfo(infos);
 		setXRefInfo(infos);
 
@@ -118,8 +126,8 @@ public class Reader extends XRefReader {
 	private boolean docCanBeDecrypted() {
 		try {
 			COSObject cosEncrypt = this.parser.getEncryption();
-			if (cosEncrypt.isIndirect()) {
-				cosEncrypt = this.parser.getObject(this.getOffset(cosEncrypt.getObjectKey()));
+			if (cosEncrypt.isIndirect().booleanValue()) {
+				cosEncrypt = this.parser.getObject(this.getOffset(cosEncrypt.getObjectKey()).longValue());
 			}
 			PDEncryption encryption = new PDEncryption(cosEncrypt);
 			if (encryption.getFilter() != ASAtom.STANDARD) {
@@ -133,7 +141,7 @@ public class Reader extends XRefReader {
 			}
 			return res;
 		} catch (IOException e) {
-			LOGGER.debug("Cannot read object " + this.parser.getEncryption().getKey());
+			LOGGER.log(Level.FINE, "Cannot read object " + this.parser.getEncryption().getKey(), e);
 			return false;
 		}
 	}
