@@ -1,6 +1,5 @@
 package org.verapdf.pd.font.truetype;
 
-import org.apache.log4j.Logger;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSArray;
@@ -17,8 +16,6 @@ import java.io.IOException;
  * @author Sergey Shemyakov
  */
 public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProgram {
-
-    private static final Logger LOGGER = Logger.getLogger(TrueTypeFontProgram.class);
 
     private COSObject encoding;
     protected boolean isSymbolic;
@@ -53,11 +50,27 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      */
     @Override
     public boolean containsCode(int code) {
-        for (TrueTypeCmapSubtable cMap : getCmapEncodingPlatform()) {
-            if (cMap.containsCID(code)) {
-                return cMap.getGlyph(code) <
-                        parser.getMaxpParser().getNumGlyphs();
+        String glyph;
+        if (this.encodingMappingArray != null && code < this.encodingMappingArray.length) {
+            glyph = this.encodingMappingArray[code];
+        } else {
+            glyph = TrueTypePredefined.NOTDEF_STRING;
+        }
+        if (TrueTypePredefined.NOTDEF_STRING.equals(glyph)) {
+            return false;
+        }
+        AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyph);
+        TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
+        if (cmap31 != null) {
+            if (cmap31.getGlyph(unicode.getSymbolCode()) != 0) {
+                return true;
             }
+        }
+        TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+        if (cmap10 != null) {
+            int charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyph);
+            return cmap10.getGlyph(charCode) != 0;
+
         }
         return false;
     }
@@ -70,7 +83,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         if (isSymbolic) {
             return getWidthSymbolic(code);
         } else {
-            if(encodingMappingArray == null) {  // no external encoding
+            if (encodingMappingArray == null) {  // no external encoding
                 int gid = this.parser.getCmapParser().getGID(code);
                 return getWidthWithCheck(gid);
             }
@@ -99,16 +112,17 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         if (cmap31 != null) {
             AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
             int gid = cmap31.getGlyph(unicode.getSymbolCode());
+            if (gid != 0) {
+                return getWidthWithCheck(gid);
+            }
+        }
+        TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+        if (cmap10 != null) {
+            int charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyphName);
+            int gid = cmap10.getGlyph(charCode);
             return getWidthWithCheck(gid);
         } else {
-            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
-            if (cmap10 != null) {
-                int charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyphName);
-                int gid = cmap10.getGlyph(charCode);
-                return getWidthWithCheck(gid);
-            } else {
-                return -1;  //case when no cmap (3,1) and no (1,0) is found
-            }
+            return -1;  //case when no cmap (3,1) and no (1,0) is found
         }
     }
 
@@ -134,11 +148,11 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
                 }
             }
         }
-            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
-            if (cmap10 != null) {
-                gid = cmap10.getGlyph(code);
-                return getWidthWithCheck(gid);
-            }
+        TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+        if (cmap10 != null) {
+            gid = cmap10.getGlyph(code);
+            return getWidthWithCheck(gid);
+        }
         return -1;
     }
 

@@ -242,7 +242,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
      */
     @Override
     public boolean containsCode(int code) {
-        return this.charSet.containsKey(code);
+        return this.charSet.containsKey(code) && this.charSet.get(code) != 0;
     }
 
     public int getSupplement() {

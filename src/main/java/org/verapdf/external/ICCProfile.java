@@ -87,7 +87,7 @@ public class ICCProfile extends PDObject {
 				this.profileHeader = Arrays.copyOf(temp, count);
 			}
 			this.creationDate = parseCreationDate(this.profileHeader);
-			if (this.profileHeader.length != HEADER_LENGTH || this.creationDate == null) {
+			if (this.profileHeader.length != HEADER_LENGTH) {
 				this.isLooksValid = false;
 			}
 			parseTags(data);
