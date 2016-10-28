@@ -51,8 +51,10 @@ public class Type1CharStringParser extends BaseCharStringParser {
                     popStack(6);
                     break;
                 case 13:    //hsbw
-                    this.setWidth(this.stack.pop());
-                    popStack(1);
+                    if(!this.stack.empty()) {
+                        this.setWidth(this.stack.pop());
+                        popStack(1);
+                    }
                     return true;
                 case 10:    // callsubr
                     //TODO: should we parse this?
