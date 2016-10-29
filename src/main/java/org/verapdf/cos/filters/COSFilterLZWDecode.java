@@ -92,7 +92,7 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
         }
     }
 
-    private byte[] getChunkFromLZWTable() {
+    private byte[] getChunkFromLZWTable() throws IOException {
         if (thisWord < lzwTable.size()) {
             byte[] res = lzwTable.get((int) thisWord);
             if (previousWord != -1) {
@@ -105,6 +105,9 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
             }
             return res;
         } else {
+            if(previousWord == -1) {
+                throw new IOException("Error in decoding LZW: first symbol in message can't be decoded.");
+            }
             byte[] previous = lzwTable.get((int) previousWord);
             byte[] res = Arrays.copyOf(previous, previous.length + 1);
             res[previous.length] = previous[0];
