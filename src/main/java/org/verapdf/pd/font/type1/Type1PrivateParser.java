@@ -111,8 +111,6 @@ class Type1PrivateParser extends BaseParser {
         this.source.skip((int) charstringLength);
         ASBufferingInFilter charString = new ASBufferingInFilter(
                 this.source.getStream(beginOffset, charstringLength));
-//        ASInputStream decodedCharString = new EexecFilterDecode(
-//                charString, true, this.getLenIV());
         Type1CharStringParser parser = new Type1CharStringParser(charString);
         if (!isDefaultFontMatrix) {
             glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getInteger()));

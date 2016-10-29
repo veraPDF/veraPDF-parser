@@ -1,21 +1,16 @@
 package org.verapdf.pd.font;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.truetype.CIDFontType2Program;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Sergey Shemyakov
@@ -83,7 +78,7 @@ public class PDCIDFont extends PDFont {
     @Override
     public int readCode(InputStream stream) throws IOException {
         if (cMap != null) {
-            return cMap.getCIDFromStream(stream);
+            return cMap.getCodeFromStream(stream);
         }
         throw new IOException("No CMap for Type 0 font " +
                 (this.getName() == null ? "" : this.getName()));
