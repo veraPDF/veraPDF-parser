@@ -5,6 +5,8 @@ import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSNumber;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.factory.fonts.PDFontFactory;
+import org.verapdf.pd.font.PDFont;
 
 /**
  * @author Maksim Bezrukov
@@ -92,8 +94,14 @@ public class PDExtGState extends PDResource {
         return getKey(ASAtom.HTP);
     }
 
-//    TODO: implement me
-//    public PDFont getFont() {
-//
-//    }
+    public PDFont getFont() {
+        COSObject fontArray = getKey(ASAtom.FONT);
+        if (fontArray != null && fontArray.getType() == COSObjType.COS_ARRAY) {
+            COSObject res = fontArray.at(0);
+            if (res != null && res.getType().isDictionaryBased()) {
+                return PDFontFactory.getPDFont(res);
+            }
+        }
+        return null;
+    }
 }

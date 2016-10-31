@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author Maksim Bezrukov
  */
-public class PDStructElem extends PDObject {
+public class PDStructElem extends PDStructTreeNode {
 
 	public PDStructElem(COSObject obj) {
 		super(obj);
@@ -42,6 +42,7 @@ public class PDStructElem extends PDObject {
 		return null;
 	}
 
+	@Override
 	public List<PDStructElem> getChildren() {
 		return TaggedPDFHelper.getStructElemChildren(getObject());
 	}

@@ -10,12 +10,13 @@ import java.util.*;
 /**
  * @author Maksim Bezrukov
  */
-public class PDStructTreeRoot extends PDObject {
+public class PDStructTreeRoot extends PDStructTreeNode {
 
 	public PDStructTreeRoot(COSObject obj) {
 		super(obj);
 	}
 
+	@Override
 	public List<PDStructElem> getChildren() {
 		return TaggedPDFHelper.getStructTreeRootChildren(getObject());
 	}
