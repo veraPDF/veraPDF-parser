@@ -1,7 +1,9 @@
 package org.verapdf.pd.patterns;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.pd.PDExtGState;
 import org.verapdf.tools.TypeConverter;
 
 /**
@@ -31,8 +33,11 @@ public class PDShadingPattern extends PDPattern {
         return TypeConverter.getRealArray(getKey(ASAtom.MATRIX), 6, "Matrix");
     }
 
-//    TODO: implement me
-//    public PDGraphicsState getExtGState() {
-//
-//    }
+    public PDExtGState getExtGState() {
+        COSObject obj = getKey(ASAtom.EXT_G_STATE);
+        if (obj.getType() == COSObjType.COS_DICT) {
+            return new PDExtGState(obj);
+        }
+        return null;
+    }
 }
