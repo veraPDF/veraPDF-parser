@@ -37,7 +37,8 @@ public class ASFilterFactory implements IASFilterFactory{
             case "ASCII85Decode":
                 return new COSFilterASCII85Decode(inputStream);
             case "LZWDecode":
-                return new COSFilterLZWDecode(inputStream);
+                return new COSPredictorDecode(new COSFilterLZWDecode(inputStream,
+                        decodeParams), decodeParams);
             default:
                 throw new IOException("Filter " + filterType.getValue() +
                         " is not supported.");

@@ -1,7 +1,9 @@
 package org.verapdf.cos.filters;
 
+import org.verapdf.as.ASAtom;
 import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSDictionary;
 
 import javax.imageio.stream.MemoryCacheImageInputStream;
 import java.io.EOFException;
@@ -30,11 +32,17 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
     private List<byte[]> lzwTable;
     private byte[] leftoverData;
     private int codeLengthBits = 9;
+    private int earlyChange;
     private long thisWord = -1;
     private long previousWord = -1;
 
-    public COSFilterLZWDecode(ASInputStream stream) throws IOException {
+    public COSFilterLZWDecode(ASInputStream stream, COSDictionary decodeParams) throws IOException {
         super(stream);
+        Long earlyChange = decodeParams.getIntegerKey(ASAtom.EARLY_CHANGE);
+        this.earlyChange = earlyChange == null ? 1 : earlyChange.intValue();
+        if (this.earlyChange != 0 && this.earlyChange != 1) {
+            this.earlyChange = 1;   // 0 and 1 are only possible values.
+        }
         this.bitStream = new MemoryCacheImageInputStream(stream);
         initLZWTable();
     }
@@ -119,11 +127,11 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
     }
 
     private int calculateCodeLength() {
-        if (lzwTable.size() > 510) {
+        if (lzwTable.size() > 511 - earlyChange) {
             return 10;
-        } else if (lzwTable.size() > 1022) {
+        } else if (lzwTable.size() > 1023 - earlyChange) {
             return 11;
-        } else if (lzwTable.size() > 2046) {
+        } else if (lzwTable.size() > 2047 - earlyChange) {
             return 12;
         }
         return 9;
