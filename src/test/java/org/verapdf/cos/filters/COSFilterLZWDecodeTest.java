@@ -1,6 +1,7 @@
 package org.verapdf.cos.filters;
 
 import org.junit.Test;
+import org.verapdf.cos.COSDictionary;
 import org.verapdf.io.SeekableStream;
 
 import java.io.FileInputStream;
@@ -18,7 +19,7 @@ public class COSFilterLZWDecodeTest {
     @Test
     public void test() throws IOException {
         FileInputStream stream = new FileInputStream(lzwPath);
-        COSFilterLZWDecode lzwDecode = new COSFilterLZWDecode(SeekableStream.getSeekableStream(stream));
+        COSFilterLZWDecode lzwDecode = new COSFilterLZWDecode(SeekableStream.getSeekableStream(stream), (COSDictionary) COSDictionary.construct().get());
         byte[] buf = new byte[2048];
         int read = lzwDecode.read(buf, 2048);
         assertEquals(buf[0], 66);
