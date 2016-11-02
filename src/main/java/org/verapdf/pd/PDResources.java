@@ -8,10 +8,12 @@ import org.verapdf.factory.fonts.PDFontFactory;
 import org.verapdf.pd.colors.PDColorSpace;
 import org.verapdf.pd.font.PDFont;
 import org.verapdf.pd.images.PDXObject;
+import org.verapdf.pd.patterns.PDPattern;
 import org.verapdf.pd.patterns.PDShading;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Timur Kamalov
@@ -19,7 +21,7 @@ import java.util.Map;
 public class PDResources extends PDObject {
 
 	private Map<ASAtom, PDColorSpace> colorSpaceMap = new HashMap<>();
-	private Map<ASAtom, PDColorSpace> patternMap = new HashMap<>();
+	private Map<ASAtom, PDPattern> patternMap = new HashMap<>();
 	private Map<ASAtom, PDShading> shadingMap = new HashMap<>();
 	private Map<ASAtom, PDXObject> xObjectMap = new HashMap<>();
 	private Map<ASAtom, PDExtGState> extGStateMap = new HashMap<>();
@@ -61,14 +63,20 @@ public class PDResources extends PDObject {
 		return false;
 	}
 
-	public PDColorSpace getPattern(ASAtom name) {
+	public PDPattern getPattern(ASAtom name) {
 		if (patternMap.containsKey(name)) {
 			return patternMap.get(name);
 		}
 		COSObject rawPattern = getResource(ASAtom.PATTERN, name);
-		PDColorSpace pattern = ColorSpaceFactory.getColorSpace(rawPattern);
-		patternMap.put(name, pattern);
-		return pattern;
+		PDColorSpace cs = ColorSpaceFactory.getColorSpace(rawPattern);
+		if (cs != null && ASAtom.PATTERN.equals(cs.getType())) {
+			PDPattern pattern = (PDPattern) cs;
+			patternMap.put(name, pattern);
+			return pattern;
+		} else {
+			patternMap.put(name, null);
+			return null;
+		}
 	}
 
 	public PDShading getShading(ASAtom name) {
@@ -112,8 +120,40 @@ public class PDResources extends PDObject {
 		return font;
 	}
 
+	public Set<ASAtom> getExtGStateNames() {
+		return getNames(ASAtom.EXT_G_STATE);
+	}
+
+	public Set<ASAtom> getColorSpaceNames() {
+		return getNames(ASAtom.COLORSPACE);
+	}
+
+	public Set<ASAtom> getPatternNames() {
+		return getNames(ASAtom.PATTERN);
+	}
+
+	public Set<ASAtom> getShadingNames() {
+		return getNames(ASAtom.SHADING);
+	}
+
+	public Set<ASAtom> getXObjectNames() {
+		return getNames(ASAtom.XOBJECT);
+	}
+
+	public Set<ASAtom> getFontNames() {
+		return getNames(ASAtom.FONT);
+	}
+
+	private Set<ASAtom> getNames(ASAtom type) {
+		COSObject dict = getKey(type);
+		if (dict != null) {
+			return dict.getKeySet();
+		}
+		return null;
+	}
+
 	private COSObject getResource(ASAtom type, ASAtom name) {
-		COSObject dict = getObject().getKey(type);
+		COSObject dict = getKey(type);
 		if (dict == null) {
 			return null;
 		}

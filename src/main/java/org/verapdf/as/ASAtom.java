@@ -24,6 +24,7 @@ public class ASAtom {
     public static final ASAtom ADOBE_PPKLITE = new ASAtom("Adobe.PPKLite");
     public static final ASAtom AESV2 = new ASAtom("AESV2");
     public static final ASAtom AESV3 = new ASAtom("AESV3");
+    public static final ASAtom AF = new ASAtom("AF");
     public static final ASAtom AF_RELATIONSHIP = new ASAtom("AFRelationship");
     public static final ASAtom AFTER = new ASAtom("After");
     public static final ASAtom AIS = new ASAtom("AIS");
