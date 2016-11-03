@@ -1,6 +1,7 @@
 package org.verapdf.pd.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.type1.BaseCharStringParser;
 
@@ -26,25 +27,37 @@ class Type2CharStringParser extends BaseCharStringParser {
     /**
      * {@inheritDoc}
      */
+    Type2CharStringParser(ASInputStream stream, CFFIndex localSubrs, int bias,
+                          CFFIndex globalSubrs) throws IOException {
+        super(stream, localSubrs, bias, globalSubrs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean processNextOperator(int nextByte) throws IOException {
         switch (nextByte) {
             case 14:    // endchar
             case 19:    // cntrmask
             case 20:    // hintmask
+            case 11:    // return
                 if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
+                    return true;
                 }
                 break;
             case 4:     // vmoveto
             case 22:    // hmoveto
                 if (this.stack.size() > 1) {
                     this.setWidth(this.stack.get(0));
+                    return true;
                 }
                 break;
             case 21:    // rmoveto
                 if (this.stack.size() > 2) {
                     this.setWidth(this.stack.get(0));
+                    return true;
                 }
                 break;
             case 1:     // hstem
@@ -53,15 +66,38 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 23:    // vstemhm
                 if (this.stack.size() % 2 == 1) {
                     this.setWidth(this.stack.get(0));
+                    return true;
                 }
                 break;
             case 28:    // actually not an operator but 2-byte number
                 this.stack.push(readNextNumber(nextByte));
-                return false;
+                break;
+            case 10:    // subrcall
+                int subrNum = (int) this.stack.pop().getInteger();
+                if(this.stack.empty()) {
+                    this.setWidth(getWidthFromSubroutine(localSubrs.get(subrNum + bias)));
+                } else {
+                    this.setWidth(this.stack.get(0));
+                }
+                return true;
+            case 29:    // callgsubr
+                subrNum = (int) this.stack.pop().getInteger();
+                if(this.stack.empty()) {
+                    this.setWidth(getWidthFromSubroutine(globalSubrs.get(subrNum + bias)));
+                } else {
+                    this.setWidth(this.stack.get(0));
+                }return true;
             default:
                 break;
         }
-        return true;
+        return false;
+    }
+
+    private CFFNumber getWidthFromSubroutine(byte[] subr) throws IOException {
+        ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
+        Type2CharStringParser parser = new Type2CharStringParser(subrStream,
+                this.localSubrs, this.bias, this.globalSubrs);
+        return parser.getWidth();
     }
 
     @Override

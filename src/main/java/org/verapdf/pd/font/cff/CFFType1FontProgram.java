@@ -32,13 +32,14 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     private Map<Integer, String> inverseCharSet;    // mappings gid -> glyph name
     private String[] encodingStrings;
 
-    CFFType1FontProgram(SeekableStream stream, CFFIndex definedNames,
+    CFFType1FontProgram(SeekableStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                         long topDictBeginOffset, long topDictEndOffset,
                         Encoding pdEncoding, CMap externalCMap) {
         super(stream);
         encodingOffset = 0;
         encoding = new int[256];
         this.definedNames = definedNames;
+        this.globalSubrs = globalSubrs;
         this.topDictBeginOffset = topDictBeginOffset;
         this.topDictEndOffset = topDictEndOffset;
         this.pdEncoding = pdEncoding;
@@ -60,6 +61,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         while (this.source.getOffset() < this.privateDictOffset + this.privateDictSize) {
             this.readPrivateDictUnit();
         }
+        this.readLocalSubrsAndBias();
 
         this.source.seek(charStringsOffset);
         this.readCharStrings();

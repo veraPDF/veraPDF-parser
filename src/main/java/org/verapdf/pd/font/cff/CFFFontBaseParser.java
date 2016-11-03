@@ -18,6 +18,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected static final float[] DEFAULT_FONT_MATRIX =
             {(float) 0.001, 0, 0, (float) 0.001, 0, 0};
     protected ArrayList<CFFNumber> stack;
+    protected CFFIndex globalSubrs;
 
     //Top DICT
     protected long privateDictOffset;
@@ -37,6 +38,11 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     //Private DICT
     protected int defaultWidthX;
     protected int nominalWidthX;
+
+    //Subrs
+    protected long subrsOffset = -1;
+    private int bias;
+    protected CFFIndex localSubrIndex;
 
     public CFFFontBaseParser(SeekableStream source) {
         super(source);
@@ -133,9 +139,32 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                                 this.stack.get(stack.size() - 1).getInteger();
                         this.stack.clear();
                         break;
+                    case 19:    // Subrs
+                        this.subrsOffset = this.stack.get(stack.size() - 1).getInteger()
+                                + privateDictOffset;
+                        this.stack.clear();
                     default:
                         this.stack.clear();
                 }
+            }
+        }
+    }
+
+    protected void readLocalSubrsAndBias() throws IOException {
+        if (this.subrsOffset != -1) {
+            long startOffset = this.source.getOffset();
+            this.source.seek(this.subrsOffset);
+            this.localSubrIndex = this.readIndex();
+            this.source.seek(startOffset);
+            int nSubrs = localSubrIndex.size();
+            if (this.charStringType == 1) {
+                this.bias = 0;
+            } else if (nSubrs < 1240) {
+                bias = 107;
+            } else if (nSubrs < 33900) {
+                bias = 1131;
+            } else {
+                bias = 32768;
             }
         }
     }
@@ -147,7 +176,8 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
             return parser.getWidth();
         } else if (this.charStringType == 2) {
             Type2CharStringParser parser = new Type2CharStringParser(
-                    new ASMemoryInStream(charString));
+                    new ASMemoryInStream(charString), localSubrIndex, bias,
+                    globalSubrs);
             return parser.getWidth();
         } else {
             throw new IOException("Can't process CharString of type " + this.charStringType);

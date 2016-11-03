@@ -2,6 +2,7 @@ package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.pd.font.CFFNumber;
+import org.verapdf.pd.font.cff.CFFIndex;
 
 import java.io.IOException;
 import java.util.Stack;
@@ -17,9 +18,13 @@ public abstract class BaseCharStringParser {
     protected Stack<CFFNumber> stack;
     private CFFNumber width;
 
+    protected CFFIndex globalSubrs;
+    protected CFFIndex localSubrs;
+    protected int bias;
+
     /**
      * Constructor that calls method parse(), so width is extracted right after
-     * object is created.
+     * object is created. Subroutines are ignored in this case.
      *
      * @param stream is stream with decoded CharString.
      * @throws IOException if parsing fails.
@@ -28,6 +33,27 @@ public abstract class BaseCharStringParser {
         this.stream = stream;
         this.stack = new Stack<>();
         this.width = new CFFNumber(-1);
+        parse();
+    }
+
+    /**
+     * Constructor that calls method parse(), so width is extracted right after
+     * object is created.
+     *
+     * @param stream     is stream with decoded CharString.
+     * @param localSubrs is local subroutines for this CharString.
+     * @param bias       is bias value as it is described in The Compact Font
+     *                   Format specification.
+     * @throws IOException if parsing fails.
+     */
+    protected BaseCharStringParser(ASInputStream stream, CFFIndex localSubrs,
+                                   int bias, CFFIndex globalSubrs) throws IOException {
+        this.stream = stream;
+        this.stack = new Stack<>();
+        this.width = new CFFNumber(-1);
+        this.globalSubrs = globalSubrs;
+        this.localSubrs = localSubrs;
+        this.bias = bias;
         parse();
     }
 
