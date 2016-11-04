@@ -155,6 +155,6 @@ public class InternalInputStream extends SeekableStream {
 
 	@Override
 	public ASInputStream getStream(long startOffset, long length) {
-		return new ASFileInStream(this.source, startOffset, startOffset + length);
+		return new ASFileInStream(this.source, startOffset, length);
 	}
 }

@@ -1,14 +1,5 @@
 package org.verapdf.pd.font.type1;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSDictionary;
@@ -21,6 +12,11 @@ import org.verapdf.pd.font.PDSimpleFont;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Sergey Shemyakov
@@ -163,7 +159,7 @@ public class PDType1Font extends PDSimpleFont {
     }
 
     private boolean isEmbedded() {
-        return this.getFontProgram() == null;
+        return this.getFontProgram() != null;
     }
 
     private boolean isNameStandard() {

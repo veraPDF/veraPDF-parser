@@ -245,7 +245,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         try {
             return this.getWidth(getGlyphName(charCode));
         } catch (ArrayIndexOutOfBoundsException e) {
-            return this.widths[0];
+            return -1;
         }
     }
 

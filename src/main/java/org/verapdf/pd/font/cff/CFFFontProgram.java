@@ -50,7 +50,8 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             if (isCIDFont(top.get(0))) {
                 font = new CFFCIDFontProgram(this.source, this.definedNames, globalSubrs,
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
-                        topOffset + top.getOffset(1) - 1 + top.getOffsetShift());
+                        topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
+                        this.externalCMap);
                 font.parseFont();
             } else {
                 font = new CFFType1FontProgram(this.source, this.definedNames, globalSubrs,

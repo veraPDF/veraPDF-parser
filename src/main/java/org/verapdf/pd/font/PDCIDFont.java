@@ -53,7 +53,7 @@ public class PDCIDFont extends PDFont {
             }
             this.widths = new CIDWArray((COSArray) w.getDirectBase());
         }
-        Double res = widths.getWidth(code);
+        Double res = widths.getWidth(this.cMap.toCID(code));
         if (res == null) {
             COSObject dw = this.dictionary.getKey(ASAtom.DW);
             if (!dw.empty()) {
