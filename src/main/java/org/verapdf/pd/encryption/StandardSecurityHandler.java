@@ -1,24 +1,20 @@
 package org.verapdf.pd.encryption;
 
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.*;
+import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
+import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
+import org.verapdf.tools.EncryptionTools;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
-import org.verapdf.as.io.ASInputStream;
-import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
-import org.verapdf.cos.COSString;
-import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
-import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
-import org.verapdf.tools.EncryptionTools;
 
 /**
  * Class represents standard security handler. It authenticates user password
@@ -125,7 +121,7 @@ public class StandardSecurityHandler {
                     this.encryptionKey);
         } else {
             filter = new COSFilterAESDecryptionDefault(stream, stringKey,
-                    this.encryptionKey);
+                    this.encryptionKey, false);
         }
         byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
         byte[] res = new byte[0];
@@ -153,7 +149,7 @@ public class StandardSecurityHandler {
                     this.encryptionKey);
         } else {
             filter = new COSFilterAESDecryptionDefault(encStream, key,
-                    this.encryptionKey);
+                    this.encryptionKey, true);
         }
         stream.setData(filter);
     }

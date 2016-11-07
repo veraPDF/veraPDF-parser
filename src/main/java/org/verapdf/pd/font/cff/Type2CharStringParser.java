@@ -53,12 +53,14 @@ class Type2CharStringParser extends BaseCharStringParser {
                     this.setWidth(this.stack.get(0));
                     return true;
                 }
+                this.stack.pop();
                 break;
             case 21:    // rmoveto
                 if (this.stack.size() > 2) {
                     this.setWidth(this.stack.get(0));
                     return true;
                 }
+                this.popStack(2);
                 break;
             case 1:     // hstem
             case 3:     // vstem
@@ -68,6 +70,7 @@ class Type2CharStringParser extends BaseCharStringParser {
                     this.setWidth(this.stack.get(0));
                     return true;
                 }
+                this.stack.clear();
                 break;
             case 28:    // actually not an operator but 2-byte number
                 this.stack.push(readNextNumber(nextByte));
@@ -87,7 +90,20 @@ class Type2CharStringParser extends BaseCharStringParser {
                 } else {
                     this.setWidth(this.stack.get(0));
                 }return true;
+            case 5:     // rlineto
+            case 6:     // hlineto
+            case 7:     // vlineto
+            case 8:     // rrcurveto
+            case 27:    // hhcurveto
+            case 24:    // rcurveline
+            case 25:    // rlinecurve
+            case 26:    // vvcurveto
+            case 30:    // vhcurveto
+            case 31:    // hvcurveto
+                this.stack.clear();     // this is perfectly correct handling of stack in case of these ops
+                break;
             default:
+                this.stack.clear();     // this is more of a hack. May not be fully correct, but correct enough
                 break;
         }
         return false;
