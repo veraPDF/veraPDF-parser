@@ -13,7 +13,7 @@ public class Type1StringConstants {
     static final String READONLY_STRING = "readonly";
     static final String EEXEC_STRING = "eexec";
     static final String CHAR_STRINGS_STRING = "CharStrings";
-    static final String LEN_IV_STRING = "LenIV";
+    static final String LEN_IV_STRING = "lenIV";
     static final String CLEARTOMARK_STRING = "cleartomark";
     static final String CLOSEFILE = "closefile";
     static final String SUBRS = "Subrs";

@@ -1,6 +1,7 @@
 package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
 
@@ -111,7 +112,9 @@ class Type1PrivateParser extends BaseParser {
         this.source.skip((int) charstringLength);
         ASBufferingInFilter charString = new ASBufferingInFilter(
                 this.source.getStream(beginOffset, charstringLength));
-        Type1CharStringParser parser = new Type1CharStringParser(charString);
+        ASInputStream decodedCharString = new EexecFilterDecode(
+                charString, true, this.getLenIV());
+        Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
         if (!isDefaultFontMatrix) {
             glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getInteger()));
         } else {
