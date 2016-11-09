@@ -58,7 +58,12 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
                 return position == 0 ? -1 : position;
             }
             if (position + nextChunk.length > actualSize) {
-                this.leftoverData = nextChunk;
+                int toWrite = actualSize - position;
+                byte[] newLeftover = new byte[nextChunk.length - toWrite];
+                System.arraycopy(nextChunk, 0, buffer, position, toWrite);
+                position += toWrite;
+                System.arraycopy(nextChunk, toWrite, newLeftover, 0, nextChunk.length - toWrite);
+                this.leftoverData = newLeftover;
                 return position;
             }
             System.arraycopy(nextChunk, 0, buffer, position, nextChunk.length);
@@ -67,10 +72,22 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
     }
 
     @Override
+    public int skip(int size) throws IOException {
+        byte[] buf = new byte[BF_BUFFER_SIZE];
+        int read = this.read(buf, size);
+        while (read != size) {
+            read += this.read(buf, size - read);
+        }
+        return read;
+    }
+
+    @Override
     public void reset() throws IOException {
         super.reset();
-        this.bitStream.reset();
+        this.bitStream = new MemoryCacheImageInputStream(this.getInputStream());
         this.codeLengthBits = 9;
+        this.leftoverData = null;
+        this.previousWord = -1;
         initLZWTable();
     }
 
@@ -113,7 +130,7 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
             }
             return res;
         } else {
-            if(previousWord == -1) {
+            if (previousWord == -1) {
                 throw new IOException("Error in decoding LZW: first symbol in message can't be decoded.");
             }
             byte[] previous = lzwTable.get((int) previousWord);
@@ -127,12 +144,12 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
     }
 
     private int calculateCodeLength() {
-        if (lzwTable.size() > 511 - earlyChange) {
-            return 10;
-        } else if (lzwTable.size() > 1023 - earlyChange) {
-            return 11;
-        } else if (lzwTable.size() > 2047 - earlyChange) {
+        if (lzwTable.size() >= 2048 - earlyChange) {
             return 12;
+        } else if (lzwTable.size() >= 1024 - earlyChange) {
+            return 11;
+        } else if (lzwTable.size() >= 512 - earlyChange) {
+            return 10;
         }
         return 9;
     }
