@@ -11,6 +11,7 @@ import org.verapdf.pd.images.PDXObject;
 import org.verapdf.pd.patterns.PDPattern;
 import org.verapdf.pd.patterns.PDShading;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -149,15 +150,15 @@ public class PDResources extends PDObject {
 		if (dict != null) {
 			return dict.getKeySet();
 		}
-		return null;
+		return Collections.emptySet();
 	}
 
 	private COSObject getResource(ASAtom type, ASAtom name) {
 		COSObject dict = getKey(type);
-		if (dict == null) {
-			return null;
+		if (dict != null) {
+			return dict.getKey(name);
 		}
-		return dict.getKey(name);
+		return null;
 	}
 
 
