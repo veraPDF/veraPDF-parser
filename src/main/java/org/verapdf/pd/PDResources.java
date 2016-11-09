@@ -2,6 +2,7 @@ package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSName;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.factory.fonts.PDFontFactory;
@@ -147,7 +148,7 @@ public class PDResources extends PDObject {
 
 	private Set<ASAtom> getNames(ASAtom type) {
 		COSObject dict = getKey(type);
-		if (dict != null) {
+		if (dict != null && dict.getType() == COSObjType.COS_DICT) {
 			return dict.getKeySet();
 		}
 		return Collections.emptySet();
