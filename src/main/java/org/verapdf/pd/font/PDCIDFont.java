@@ -68,7 +68,7 @@ public class PDCIDFont extends PDFont {
     @Override
     public Double getDefaultWidth() {
         COSObject dw = this.dictionary.getKey(ASAtom.DW);
-        if (!dw.empty()) {
+        if (dw.getType().isNumber()) {
             return dw.getReal();
         } else {
             return DEFAULT_CID_FONT_WIDTH;

@@ -50,13 +50,12 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
     public boolean containsCode(int code) {
         if (this.cMap.containsCode(code)) {
             int cid = this.cMap.toCID(code);
-            if(this.cidToGID.contains(cid) && cid != 0) {
+            if (this.cidToGID.contains(cid) && cid != 0) {
                 int gid = this.cidToGID.getGID(cid);
-                if(parser.getMaxpParser() != null) {
-                    if (gid < parser.getMaxpParser().getNumGlyphs() && gid != 0) {
-                        return true;
-                    }
-                }
+                TrueTypeMaxpTable maxpParser = parser.getMaxpParser();
+                return maxpParser != null &&
+                        gid != 0 &&
+                        gid < maxpParser.getNumGlyphs();
             }
         }
         return false;

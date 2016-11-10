@@ -62,10 +62,8 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             }
             AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyph);
             TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
-            if (cmap31 != null) {
-                if (cmap31.getGlyph(unicode.getSymbolCode()) != 0) {
-                    return true;
-                }
+            if (cmap31 != null && cmap31.getGlyph(unicode.getSymbolCode()) != 0) {
+                return true;
             }
             TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
             if (cmap10 != null) {

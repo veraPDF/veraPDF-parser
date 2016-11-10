@@ -28,6 +28,15 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
     private static final int INITIAL_LZW_TABLE_SIZE = 4096;
     private static final int MAX_LZW_TABLE_SIZE = 4096;
 
+    private static final int BITS_12 = 12;
+    private static final int BITS_11 = 11;
+    private static final int BITS_10 = 10;
+    private static final int BITS_9 = 9;
+
+    private static final int SIZE_THRESHOLD_10_BITS = 512;
+    private static final int SIZE_THRESHOLD_11_BITS = 1024;
+    private static final int SIZE_THRESHOLD_12_BITS = 2048;
+
     private MemoryCacheImageInputStream bitStream;
     private List<byte[]> lzwTable;
     private byte[] leftoverData;
@@ -38,10 +47,14 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
 
     public COSFilterLZWDecode(ASInputStream stream, COSDictionary decodeParams) throws IOException {
         super(stream);
-        Long earlyChange = decodeParams.getIntegerKey(ASAtom.EARLY_CHANGE);
-        this.earlyChange = earlyChange == null ? 1 : earlyChange.intValue();
-        if (this.earlyChange != 0 && this.earlyChange != 1) {
-            this.earlyChange = 1;   // 0 and 1 are only possible values.
+        Long earlyChangeFromDecodeParams = decodeParams.getIntegerKey(ASAtom.EARLY_CHANGE);
+        // 0 and 1 are only possible values.
+        // In other cases we use default value 1.
+        if (earlyChangeFromDecodeParams == null ||
+                earlyChangeFromDecodeParams.intValue() != 0) {
+            this.earlyChange = 1;
+        } else {
+            this.earlyChange = 0;
         }
         this.bitStream = new MemoryCacheImageInputStream(stream);
         initLZWTable();
@@ -144,14 +157,15 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
     }
 
     private int calculateCodeLength() {
-        if (lzwTable.size() >= 2048 - earlyChange) {
-            return 12;
-        } else if (lzwTable.size() >= 1024 - earlyChange) {
-            return 11;
-        } else if (lzwTable.size() >= 512 - earlyChange) {
-            return 10;
+        int size = lzwTable.size() + earlyChange;
+        if (size >= SIZE_THRESHOLD_12_BITS) {
+            return BITS_12;
+        } else if (size >= SIZE_THRESHOLD_11_BITS) {
+            return BITS_11;
+        } else if (size >= SIZE_THRESHOLD_10_BITS ) {
+            return BITS_10;
         }
-        return 9;
+        return BITS_9;
     }
 
     private void initLZWTable() {
