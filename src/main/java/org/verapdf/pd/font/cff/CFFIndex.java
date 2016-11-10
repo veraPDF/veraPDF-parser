@@ -8,7 +8,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-class CFFIndex {
+public class CFFIndex {
 
     private int count;
     private int offsetShift;
@@ -31,7 +31,7 @@ class CFFIndex {
             throw new ArrayIndexOutOfBoundsException("Can't get object with number "
                     + n + " from INDEX with " + count + " elements.");
         }
-        return Arrays.copyOfRange(data, offsets[n] - 1, offsets[n + 1]);
+        return Arrays.copyOfRange(data, offsets[n] - 1, offsets[n + 1] - 1);
     }
 
     int getOffset(int i) {

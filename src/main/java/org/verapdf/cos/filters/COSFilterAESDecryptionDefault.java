@@ -25,6 +25,8 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
     private Cipher aes;
     private int decryptedPointer;
     private byte[] decryptedBytes;
+    private boolean decryptingCOSStream;
+    private boolean haveReadStream;
 
     /**
      * Constructor.
@@ -38,18 +40,24 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
      *                      password and encryption dictionary.
      */
     public COSFilterAESDecryptionDefault(ASInputStream stream, COSKey objectKey,
-                                         byte[] encryptionKey)
+                                         byte[] encryptionKey, boolean decryptingCOSStream)
             throws IOException, GeneralSecurityException {
         super(stream);
         initAES(objectKey, encryptionKey);
         decryptedBytes = new byte[0];
         decryptedPointer = 0;
+        this.decryptingCOSStream = decryptingCOSStream;
+        this.haveReadStream = false;
     }
 
     @Override
     public int read(byte[] buffer, int size) throws IOException {
-            int readDecrypted = this.readFromDecryptedBytes(buffer, size);
-        if(readDecrypted != -1) {
+        if(decryptingCOSStream && !haveReadStream) {
+            this.getInputStream().skip(16);
+            this.haveReadStream = true;
+        }
+        int readDecrypted = this.readFromDecryptedBytes(buffer, size);
+        if (readDecrypted != -1) {
             return readDecrypted;
         }
 
@@ -102,7 +110,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
     }
 
     private int readFromDecryptedBytes(byte[] buffer, int size) {
-        if(decryptedBytes.length == decryptedPointer) {
+        if (decryptedBytes.length == decryptedPointer) {
             return -1;
         }
         int actualRead = Math.min(size, decryptedBytes.length - decryptedPointer);

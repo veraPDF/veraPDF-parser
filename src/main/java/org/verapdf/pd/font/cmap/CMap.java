@@ -2,12 +2,7 @@ package org.verapdf.pd.font.cmap;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -93,7 +88,7 @@ public class CMap {
      * @param stream is stream from which character codes will be read.
      * @return CID of read code.
      */
-    public int getCIDFromStream(InputStream stream) throws IOException {
+    public int getCodeFromStream(InputStream stream) throws IOException {
         byte[] charCode = new byte[4];
         byte[] temp = new byte[1];
         int previousShortestMatchingCodeSpaceLength = this.shortestCodeSpaceLength;
@@ -104,7 +99,7 @@ public class CMap {
             byte[] currentCode = Arrays.copyOf(charCode, i + 1);
             for (CodeSpace codeSpace : codeSpaces) {     // Looking for complete match
                 if (codeSpace.contains(currentCode)) {
-                    int res = toCID((int) CMapParser.numberFromBytes(currentCode));
+                    int res = (int) CMapParser.numberFromBytes(currentCode);
                     if (res != -1) {
                         return res;
                     }

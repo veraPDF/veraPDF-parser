@@ -1,21 +1,16 @@
 package org.verapdf.pd.font;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.truetype.CIDFontType2Program;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Sergey Shemyakov
@@ -51,7 +46,6 @@ public class PDCIDFont extends PDFont {
 
     @Override
     public Double getWidth(int code) {
-        cMap.toCID(code);
         if (this.widths == null) {
             COSObject w = this.dictionary.getKey(ASAtom.W);
             if (w.empty() || w.getType() != COSObjType.COS_ARRAY) {
@@ -59,7 +53,7 @@ public class PDCIDFont extends PDFont {
             }
             this.widths = new CIDWArray((COSArray) w.getDirectBase());
         }
-        Double res = widths.getWidth(code);
+        Double res = widths.getWidth(this.cMap.toCID(code));
         if (res == null) {
             COSObject dw = this.dictionary.getKey(ASAtom.DW);
             if (!dw.empty()) {
@@ -72,9 +66,19 @@ public class PDCIDFont extends PDFont {
     }
 
     @Override
+    public Double getDefaultWidth() {
+        COSObject dw = this.dictionary.getKey(ASAtom.DW);
+        if (dw.getType().isNumber()) {
+            return dw.getReal();
+        } else {
+            return DEFAULT_CID_FONT_WIDTH;
+        }
+    }
+
+    @Override
     public int readCode(InputStream stream) throws IOException {
         if (cMap != null) {
-            return cMap.getCIDFromStream(stream);
+            return cMap.getCodeFromStream(stream);
         }
         throw new IOException("No CMap for Type 0 font " +
                 (this.getName() == null ? "" : this.getName()));

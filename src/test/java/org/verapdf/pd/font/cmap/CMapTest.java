@@ -52,10 +52,10 @@ public class CMapTest {
             CMap cMap = parser.getCMap();   //Testing defined characters
             byte[] bytes = {0x01, (byte) 0x81, 0x40, (byte) 0xFE, (byte) 0xE6, (byte) 0x4A};
             ASInputStream stream = new ASMemoryInStream(bytes);
-            assertTrue(cMap.getCIDFromStream(stream) == 1);
-            assertTrue(cMap.getCIDFromStream(stream) == 633);
-            assertTrue(cMap.getCIDFromStream(stream) == 228);
-            assertTrue(cMap.getCIDFromStream(stream) == 6638);
+            assertTrue(cMap.toCID(cMap.getCodeFromStream(stream)) == 1);
+            assertTrue(cMap.toCID(cMap.getCodeFromStream(stream)) == 633);
+            assertTrue(cMap.toCID(cMap.getCodeFromStream(stream)) == 228);
+            assertTrue(cMap.toCID(cMap.getCodeFromStream(stream)) == 6638);
 
             CMap cMap1 = new CMap();    //Testing undefined characters
             List<CodeSpace> list = new ArrayList<>(3);
@@ -69,16 +69,16 @@ public class CMapTest {
                     0x41, 0x41, (byte) 0x90, (byte) 0xFF, /*that should be read thirdly*/
                     (byte) 0x82, (byte) 0xFF /*that should be read fourthly*/};
             ASMemoryInStream stream1 = new ASMemoryInStream(bytes1);
-            assertTrue(cMap1.getCIDFromStream(stream1) == 0);
+            assertTrue(cMap1.getCodeFromStream(stream1) == 0);
             assertTrue(stream1.available() == 9);
 
-            assertTrue(cMap1.getCIDFromStream(stream1) == 0);
+            assertTrue(cMap1.getCodeFromStream(stream1) == 0);
             assertTrue(stream1.available() == 6);
 
-            assertTrue(cMap1.getCIDFromStream(stream1) == 0);
+            assertTrue(cMap1.getCodeFromStream(stream1) == 0);
             assertTrue(stream1.available() == 2);
 
-            assertTrue(cMap1.getCIDFromStream(stream1) == 0);
+            assertTrue(cMap1.getCodeFromStream(stream1) == 0);
             assertTrue(stream1.available() == 0);
         } catch (FileNotFoundException ex) {
             System.out.println("File " + cMapPath + " not found.");

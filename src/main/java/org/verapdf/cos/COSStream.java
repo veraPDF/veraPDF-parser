@@ -1,16 +1,15 @@
 package org.verapdf.cos;
 
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.visitor.ICOSVisitor;
+import org.verapdf.cos.visitor.IVisitor;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASInputStream;
-import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
-import org.verapdf.cos.visitor.ICOSVisitor;
-import org.verapdf.cos.visitor.IVisitor;
 
 /**
  * @author Timur Kamalov
@@ -123,9 +122,7 @@ public class COSStream extends COSDictionary {
 				return this.stream;
 			}
 			ASInputStream result = getFilters().getInputStream(stream, this.getKey(ASAtom.DECODE_PARMS));
-			if(!(result instanceof COSFilterAESDecryptionDefault)) {
-				result.reset();
-			}
+			result.reset();
 			return result;
 		} catch (IOException e) {
 			LOGGER.log(Level.FINE, "Can't get stream data", e);

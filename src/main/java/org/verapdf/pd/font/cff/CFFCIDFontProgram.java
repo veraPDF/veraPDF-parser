@@ -3,6 +3,7 @@ package org.verapdf.pd.font.cff;
 import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,12 +29,16 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private String ordering;
     private boolean fontParsed = false;
 
-    CFFCIDFontProgram(SeekableStream stream, CFFIndex definedNames,
-                      long topDictBeginOffset, long topDictEndOffset) {
+    private CMap externalCMap;
+
+    CFFCIDFontProgram(SeekableStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
+                      long topDictBeginOffset, long topDictEndOffset, CMap externalCMap) {
         super(stream);
         this.definedNames = definedNames;
+        this.globalSubrs = globalSubrs;
         this.topDictBeginOffset = topDictBeginOffset;
         this.topDictEndOffset = topDictEndOffset;
+        this.externalCMap = externalCMap;
     }
 
     /**
@@ -170,6 +175,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
             this.readPrivateDictUnit();
         }
         this.source.seek(startingOffset);
+        this.readLocalSubrsAndBias();
     }
 
     private void readTopDict(long from, long to) throws IOException {
@@ -220,13 +226,9 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
      */
     @Override
     public float getWidth(int code) {
-        Integer gid;
-        if (isDefaultCharSet) {
-            gid = code;
-        } else {
-            gid = charSet.get(code);
-        }
-        return gid == null ? widths[0] : widths[gid];
+        int cid = this.externalCMap.toCID(code);
+        Integer gid = getGid(cid);
+        return (gid == null || gid == 0) ? -1 : widths[gid];
     }
 
     /**
@@ -242,7 +244,10 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
      */
     @Override
     public boolean containsCode(int code) {
-        return this.charSet.containsKey(code);
+        int cid = externalCMap.toCID(code);
+        return this.externalCMap.containsCode(code) &&
+                this.charSet.get(cid) != null &&
+                this.charSet.get(cid) != 0;
     }
 
     public int getSupplement() {

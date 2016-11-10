@@ -147,7 +147,8 @@ public abstract class PDFont extends PDResource {
     }
 
     public String getName() {
-        return this.dictionary.getStringKey(ASAtom.BASE_FONT);
+        String res = this.dictionary.getStringKey(ASAtom.BASE_FONT);
+        return res == null ? this.dictionary.getStringKey(ASAtom.NAME) : res;
     }
 
     public COSObject getEncoding() {

@@ -50,10 +50,34 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      */
     @Override
     public boolean containsCode(int code) {
-        for (TrueTypeCmapSubtable cMap : getCmapEncodingPlatform()) {
-            if (cMap.containsCID(code)) {
-                return cMap.getGlyph(code) <
-                        parser.getMaxpParser().getNumGlyphs();
+        if (!isSymbolic) {
+            String glyph;
+            if (this.encodingMappingArray != null && code < this.encodingMappingArray.length) {
+                glyph = this.encodingMappingArray[code];
+            } else {
+                glyph = TrueTypePredefined.NOTDEF_STRING;
+            }
+            if (TrueTypePredefined.NOTDEF_STRING.equals(glyph)) {
+                return false;
+            }
+            AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyph);
+            TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
+            if (cmap31 != null && cmap31.getGlyph(unicode.getSymbolCode()) != 0) {
+                return true;
+            }
+            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+            if (cmap10 != null) {
+                int charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyph);
+                return cmap10.getGlyph(charCode) != 0;
+            }
+        } else {
+            int gid = getGIDFrom30(code);
+            if (gid != 0) {
+                return true;
+            }
+            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+            if (cmap10 != null) {
+                return cmap10.getGlyph(code) != 0;
             }
         }
         return false;
@@ -67,7 +91,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         if (isSymbolic) {
             return getWidthSymbolic(code);
         } else {
-            if(encodingMappingArray == null) {  // no external encoding
+            if (encodingMappingArray == null) {  // no external encoding
                 int gid = this.parser.getCmapParser().getGID(code);
                 return getWidthWithCheck(gid);
             }
@@ -96,16 +120,17 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         if (cmap31 != null) {
             AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
             int gid = cmap31.getGlyph(unicode.getSymbolCode());
+            if (gid != 0) {
+                return getWidthWithCheck(gid);
+            }
+        }
+        TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+        if (cmap10 != null) {
+            Integer charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyphName);
+            int gid = charCode == null ? 0 : cmap10.getGlyph(charCode);
             return getWidthWithCheck(gid);
         } else {
-            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
-            if (cmap10 != null) {
-                int charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyphName);
-                int gid = cmap10.getGlyph(charCode);
-                return getWidthWithCheck(gid);
-            } else {
-                return -1;  //case when no cmap (3,1) and no (1,0) is found
-            }
+            return -1;  //case when no cmap (3,1) and no (1,0) is found
         }
     }
 
@@ -117,6 +142,20 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
     }
 
     private float getWidthSymbolic(int code) {
+        int gid = getGIDFrom30(code);
+        if (gid != 0) {
+            return getWidthWithCheck(gid);
+        }
+
+        TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
+        if (cmap10 != null) {
+            gid = cmap10.getGlyph(code);
+            return getWidthWithCheck(gid);
+        }
+        return -1;
+    }
+
+    private int getGIDFrom30(int code) {
         TrueTypeCmapSubtable cmap30 = this.parser.getCmapTable(3, 0);
         int gid;
         if (cmap30 != null) {
@@ -126,17 +165,10 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             if (highByteMask == 0x00000000 || highByteMask == 0x0000F000 ||
                     highByteMask == 0x0000F100 || highByteMask == 0x0000F200) { // should we check this at all?
                 gid = cmap30.getGlyph(highByteMask & code);     // we suppose that code is in fact 1-byte value
-                if (gid != 0) {
-                    return getWidthWithCheck(gid);
-                }
+                return gid;
             }
         }
-            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
-            if (cmap10 != null) {
-                gid = cmap10.getGlyph(code);
-                return getWidthWithCheck(gid);
-            }
-        return -1;
+        return 0;
     }
 
     private void createCIDToNameTable() throws IOException {

@@ -4,6 +4,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
+import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
 
@@ -12,6 +13,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class does parsing of Type 1 font files.
@@ -20,7 +23,10 @@ import java.util.Set;
  */
 public class Type1FontProgram extends COSParser implements FontProgram {
 
+    public static final Logger LOGGER =
+            Logger.getLogger(Type1FontProgram.class.getCanonicalName());
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
+    private Encoding pdfEncoding;
 
     private double[] fontMatrix = DEFAULT_FONT_MATRIX;
     private String[] encoding;
@@ -40,9 +46,11 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     /**
      * {@inheritDoc}
      */
-    public Type1FontProgram(InputStream fileStream) throws IOException {
+    public Type1FontProgram(InputStream fileStream, Encoding pdfEncoding)
+            throws IOException {
         super(fileStream);
         encoding = new String[256];
+        this.pdfEncoding = pdfEncoding;
     }
 
     /**
@@ -113,7 +121,12 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                             this.readNumber();
                             long key = this.getToken().integer;
                             this.nextToken();
-                            encoding[(int) key] = this.getToken().getValue();
+                            if(key < 256) {
+                                encoding[(int) key] = this.getToken().getValue();
+                            } else {
+                                LOGGER.log(Level.FINE, "Found glyph with encoding "
+                                        + key + " in Type 1 font, value less than 256 expected.");
+                            }
                             this.nextToken();
                         }
                         break;
@@ -163,7 +176,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     public float getWidth(int charCode) {
         try {
             if (this.glyphWidths != null) {
-                Integer res = this.glyphWidths.get(encoding[charCode]);
+                Integer res = this.glyphWidths.get(getGlyph(charCode));
                 if (res != null) {
                     return res;
                 }
@@ -182,7 +195,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
 
     @Override
     public boolean containsCode(int code) {
-        String glyphName = encoding[code];
+        String glyphName = getGlyph(code);
         return this.glyphWidths != null &&
                 this.glyphWidths.keySet().contains(glyphName);
     }
@@ -212,5 +225,13 @@ public class Type1FontProgram extends COSParser implements FontProgram {
         }
         this.source.seek(startOffset);
         return false;
+    }
+
+    private String getGlyph(int code) {
+        if(this.pdfEncoding == null) {
+            return encoding[code];
+        } else {
+            return this.pdfEncoding.getName(code);
+        }
     }
 }
