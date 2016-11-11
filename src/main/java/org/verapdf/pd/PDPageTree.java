@@ -42,8 +42,7 @@ public class PDPageTree {
 	public PDPage getPage(final int index) {
 		if (index < this.getPageCount()) {
 			final int totalIndex = index;
-			final PDPageTreeBranch term = this.getRoot().findTerminal(index);
-			final PDPage page = (PDPage) term.getChild(index);
+			final PDPage page = this.getRoot().findTerminalPDPage(index);
 			if (page != null) {
 				page.pageNumber = index;
 				page.pagesTotal = totalIndex;
