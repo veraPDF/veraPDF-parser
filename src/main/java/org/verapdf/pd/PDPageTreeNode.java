@@ -41,6 +41,15 @@ public class PDPageTreeNode extends PDObject {
 		return parent;
 	}
 
+	public PDPage findTerminalPDPage(int index) {
+		if(parent == null) {
+			return null;
+		}
+
+		index += this.parent.getIndex(this);
+		return (PDPage) parent.getChild(index);
+	}
+
 	protected COSObject getInheritableResources() {
 		COSObject value = getObject().getKey(ASAtom.RESOURCES);
 		if (value != null && !value.empty()) {

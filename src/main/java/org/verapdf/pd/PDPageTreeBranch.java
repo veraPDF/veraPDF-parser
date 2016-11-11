@@ -64,6 +64,24 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return children.indexOf(node);
 	}
 
+	public PDPage findTerminalPDPage(int index) {
+		if (isTerminal) {
+			index = Math.min(index, (int) getLeafCount());
+			return (PDPage) this.getChild(index);
+		}
+
+		for (PDPageTreeNode branch : this.children) {
+			if (index >= branch.getLeafCount()) {
+				index -= branch.getLeafCount();
+			} else {
+				return branch.findTerminalPDPage(index);
+			}
+		}
+
+		int lastIndex = this.children.size() - 1;
+		return this.children.get(lastIndex).findTerminalPDPage(index);
+	}
+
 	public PDPageTreeBranch findTerminal(int index) {
 		if (isTerminal) {
 			index = Math.min(index, (int) getLeafCount());
