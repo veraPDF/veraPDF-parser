@@ -64,6 +64,9 @@ public class ASBufferingInFilter extends ASInFilter {
      * @return amount of bytes actually placed into buffer.
      */
     public long feedBuffer(int bytesToRead) throws IOException {
+        if (this.getInputStream() == null) {
+            return -1;
+        }
         bytesToRead = Math.min(bytesToRead, bufferCapacity);
         long actuallyRead = this.getInputStream().read(internalBuffer, bytesToRead);
         bufferBegin = 0;
@@ -79,6 +82,9 @@ public class ASBufferingInFilter extends ASInFilter {
      * @return amount of bytes actually appended to buffer.
      */
     public long addToBuffer(int bytesToAdd) throws IOException {
+        if (this.getInputStream() == null) {
+            return -1;
+        }
         bytesToAdd = Math.min(bytesToAdd, bufferCapacity - bufferEnd);
         byte[] toAdd = new byte[bytesToAdd];
         long actuallyRead = this.getInputStream().read(toAdd, bytesToAdd);
