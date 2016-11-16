@@ -8,7 +8,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class CFFIndex {
+class CFFIndex {
 
     private int count;
     private int offsetShift;
@@ -40,5 +40,9 @@ public class CFFIndex {
 
     int getOffsetShift() {
         return offsetShift;
+    }
+
+    int getDataLength() {
+        return this.data.length;
     }
 }
