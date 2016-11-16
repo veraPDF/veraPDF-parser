@@ -1,9 +1,10 @@
 package org.verapdf.parser;
 
-import static org.verapdf.as.CharTable.ASCII_CR;
-import static org.verapdf.as.CharTable.ASCII_LF;
-import static org.verapdf.as.CharTable.ASCII_SPACE;
-import static org.verapdf.as.CharTable.isSpace;
+import org.verapdf.as.CharTable;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
+import org.verapdf.io.InternalInputStream;
+import org.verapdf.io.SeekableStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,11 +12,7 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.verapdf.as.CharTable;
-import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
-import org.verapdf.io.InternalInputStream;
-import org.verapdf.io.SeekableStream;
+import static org.verapdf.as.CharTable.*;
 
 /**
  * @author Timur Kamalov
@@ -563,7 +560,7 @@ public class BaseParser {
 	}
 
 	private void appendToToken(final byte ch) {
-		this.token.append((char) ch);
+		this.token.append((char) (ch & 0xff));
 	}
 
 	private void appendToToken(final int ch) {
