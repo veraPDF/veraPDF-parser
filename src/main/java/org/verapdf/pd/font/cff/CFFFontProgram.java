@@ -54,13 +54,13 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
                 font = new CFFCIDFontProgram(this.source, this.definedNames, globalSubrs,
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                         topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
-                        this.externalCMap);
+                        this.externalCMap, this.isSubset);
                 font.parseFont();
             } else {
                 font = new CFFType1FontProgram(this.source, this.definedNames, globalSubrs,
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                         topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
-                        this.pdEncoding, this.externalCMap);
+                        this.pdEncoding, this.externalCMap, this.isSubset);
                 font.parseFont();
             }
         }

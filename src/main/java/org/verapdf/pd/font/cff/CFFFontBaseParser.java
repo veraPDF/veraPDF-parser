@@ -1,9 +1,7 @@
 package org.verapdf.pd.font.cff;
 
-import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.font.CFFNumber;
-import org.verapdf.pd.font.type1.Type1CharStringParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +17,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
             {(float) 0.001, 0, 0, (float) 0.001, 0, 0};
     protected ArrayList<CFFNumber> stack;
     protected CFFIndex globalSubrs;
+    protected boolean isSubset;
 
     //Top DICT
     protected long privateDictOffset;
@@ -33,15 +32,15 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     //CharStrings
     protected int nGlyphs;
     protected CFFIndex charStrings;
-    protected float[] widths;
+    protected CharStringsWidths widths;
 
     //Private DICT
     protected int defaultWidthX;
     protected int nominalWidthX;
 
     //Subrs
-    protected long subrsOffset = -1;
-    private int bias;
+    private long subrsOffset = -1;
+    protected int bias;
     protected CFFIndex localSubrIndex;
 
     public CFFFontBaseParser(SeekableStream source) {
@@ -118,7 +117,6 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected void readCharStrings() throws IOException {
         this.charStrings = this.readIndex();
         this.nGlyphs = this.charStrings.size();
-        widths = new float[nGlyphs];
     }
 
     protected void readPrivateDictUnit() throws IOException {
@@ -166,21 +164,6 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
             } else {
                 bias = 32768;
             }
-        }
-    }
-
-    protected CFFNumber getWidthFromCharString(byte[] charString) throws IOException {
-        if (this.charStringType == 1) {
-            Type1CharStringParser parser = new Type1CharStringParser(
-                    new ASMemoryInStream(charString));
-            return parser.getWidth();
-        } else if (this.charStringType == 2) {
-            Type2CharStringParser parser = new Type2CharStringParser(
-                    new ASMemoryInStream(charString), localSubrIndex, bias,
-                    globalSubrs);
-            return parser.getWidth();
-        } else {
-            throw new IOException("Can't process CharString of type " + this.charStringType);
         }
     }
 

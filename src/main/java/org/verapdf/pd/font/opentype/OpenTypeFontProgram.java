@@ -22,6 +22,7 @@ public class OpenTypeFontProgram implements FontProgram {
 
     private boolean isCFF;
     private boolean isSymbolic;
+    private boolean isSubset;
     private COSObject encoding;
     private ASInputStream source;
     private FontProgram font;
@@ -37,12 +38,13 @@ public class OpenTypeFontProgram implements FontProgram {
      * @param encoding   is value of /Encoding in font dictionary.
      */
     public OpenTypeFontProgram(ASInputStream source, boolean isCFF, boolean isSymbolic,
-                               COSObject encoding, CMap externalCMap) {
+                               COSObject encoding, CMap externalCMap, boolean isSubset) {
         this.source = source;
         this.isCFF = isCFF;
         this.isSymbolic = isSymbolic;
         this.encoding = encoding;
         this.externalCMap = externalCMap;
+        this.isSubset = isSubset;
     }
 
     /**
@@ -81,7 +83,8 @@ public class OpenTypeFontProgram implements FontProgram {
                 this.font.parseFont();
             } else {
                 this.font = new CFFFontProgram(getCFFTable(),
-                        PDFont.getEncodingMappingFromCOSObject(encoding), externalCMap);
+                        PDFont.getEncodingMappingFromCOSObject(encoding),
+                        externalCMap, isSubset);
                 this.font.parseFont();
             }
         }
