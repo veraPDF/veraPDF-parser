@@ -52,6 +52,9 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
 
     @Override
     public int read(byte[] buffer, int size) throws IOException {
+        if (this.getInputStream() == null) {
+            return -1;
+        }
         if(decryptingCOSStream && !haveReadStream) {
             this.getInputStream().skip(16);
             this.haveReadStream = true;
@@ -102,7 +105,8 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
 
     private byte[] getAESInitializingVector() throws IOException {
         byte[] initVector = new byte[16];
-        if (this.getInputStream().read(initVector, 16) != 16) {
+        if (this.getInputStream() == null ||
+                this.getInputStream().read(initVector, 16) != 16) {
             throw new IOException("Can't initialize AES cipher: AES initializing" +
                     " vector is not fully read.");
         }

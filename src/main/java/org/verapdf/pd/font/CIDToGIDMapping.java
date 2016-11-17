@@ -7,6 +7,10 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides interface for working with CIDToGID mapping in Type 2 CID fonts.
@@ -15,6 +19,7 @@ import java.io.IOException;
  */
 public class CIDToGIDMapping {
 
+    private static final Logger LOGGER = Logger.getLogger(CIDToGIDMapping.class.getCanonicalName());
     private int[] mapping;
     private boolean isIdentity;
 
@@ -87,6 +92,34 @@ public class CIDToGIDMapping {
             } else {
                 mapping[i++] = res;
             }
+            if(i == mapping.length) {
+                LOGGER.log(Level.FINE, "CIDToGID mapping has more items than specified in dict");
+                List<Integer> endOfMapping = readEndOfMapping(stream, b);
+                int[] newMapping = new int[mapping.length + endOfMapping.size()];
+                System.arraycopy(mapping, 0, newMapping, 0, mapping.length);
+                for(int j = mapping.length; j < newMapping.length; ++j) {
+                    newMapping[j] = endOfMapping.get(j - mapping.length);
+                }
+                this.mapping = newMapping;
+                break;
+            }
         }
+    }
+
+    private List<Integer> readEndOfMapping(ASInputStream stream, int b) throws IOException {
+        List<Integer> res = new ArrayList<>();
+        while (b != -1) {
+            int num = b;
+            num <<= 8;
+            b = stream.read();
+            if (b != -1) {
+                num += b;
+                res.add(num);
+                b = stream.read();
+            } else {
+                res.add(num);
+            }
+        }
+        return res;
     }
 }
