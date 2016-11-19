@@ -74,7 +74,7 @@ class Type2CharStringParser extends BaseCharStringParser {
                 break;
             case 28:    // actually not an operator but 2-byte number
                 this.stack.push(readNextNumber(nextByte));
-                break;
+                return false;
             case 10:    // subrcall
                 int subrNum = (int) this.stack.pop().getInteger();
                 if(this.stack.empty()) {
@@ -106,7 +106,7 @@ class Type2CharStringParser extends BaseCharStringParser {
                 this.stack.clear();     // this is more of a hack. May not be fully correct, but correct enough
                 break;
         }
-        return false;
+        return true;    // We can set width only by first operator.
     }
 
     private CFFNumber getWidthFromSubroutine(byte[] subr) throws IOException {
