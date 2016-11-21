@@ -41,4 +41,8 @@ public class CFFIndex {
     int getOffsetShift() {
         return offsetShift;
     }
+
+    int getDataLength() {
+        return this.data.length;
+    }
 }

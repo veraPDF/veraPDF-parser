@@ -1,15 +1,5 @@
 package org.verapdf.pd.font.cmap;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
@@ -17,6 +7,11 @@ import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
+
+import java.io.*;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents CMap on PD layer.
@@ -72,29 +67,20 @@ public class PDCMap {
     public CMap getCMapFile() {
         if (!parsedCMap) {
             parsedCMap = true;
-            try {
-                if (this.cMap.getType() == COSObjType.COS_STREAM) {
-                    CMapParser parser =
-                            new CMapParser(this.cMap.getData(COSStream.FilterFlags.DECODE));
-                    parser.parse();
-                    this.cMapFile = parser.getCMap();
-                    return this.cMapFile;
-                } else if (this.cMap.getType() == COSObjType.COS_NAME) {
-                    String name = this.cMap.getString();
-                    String cMapPath = "/font/cmap/" + name;
-                    CMapParser parser = new CMapParser(loadCMap(cMapPath));
-                    parser.parse();
-                    this.cMapFile = parser.getCMap();
-                    return this.cMapFile;
-                } else {
-                    return null;
-                }
-            } catch (IOException e) {
-            	LOGGER.log(Level.FINE, "IO Exception parsing CMAP", e);
+            if (this.cMap.getType() == COSObjType.COS_STREAM) {
+                this.cMapFile = CMapFactory.getCMap(getCMapName(),
+                        this.cMap.getData(COSStream.FilterFlags.DECODE));
+                return this.cMapFile;
+            } else if (this.cMap.getType() == COSObjType.COS_NAME) {
+                String name = this.cMap.getString();
+                String cMapPath = "/font/cmap/" + name;
+                this.cMapFile = CMapFactory.getCMap(getCMapName(), loadCMap(cMapPath));
+                return this.cMapFile;
+            } else {
                 return null;
             }
         }
-		return this.cMapFile;
+        return this.cMapFile;
     }
 
     /**
@@ -104,7 +90,7 @@ public class PDCMap {
         if (this.getCIDSystemInfo() == null) {
             return null;
         }
-		return this.getCIDSystemInfo().getStringKey(ASAtom.REGISTRY);
+        return this.getCIDSystemInfo().getStringKey(ASAtom.REGISTRY);
     }
 
     /**
@@ -114,7 +100,7 @@ public class PDCMap {
         if (this.getCIDSystemInfo() == null) {
             return null;
         }
-		return this.getCIDSystemInfo().getStringKey(ASAtom.ORDERING);
+        return this.getCIDSystemInfo().getStringKey(ASAtom.ORDERING);
     }
 
     /**
@@ -124,7 +110,7 @@ public class PDCMap {
         if (this.getCIDSystemInfo() == null) {
             return null;
         }
-		return this.getCIDSystemInfo().getIntegerKey(ASAtom.SUPPLEMENT);
+        return this.getCIDSystemInfo().getIntegerKey(ASAtom.SUPPLEMENT);
     }
 
     public COSObject getUseCMap() {
@@ -150,14 +136,14 @@ public class PDCMap {
                     this.cMap.getKey(ASAtom.CID_SYSTEM_INFO).getDirectBase();
             return this.cidSystemInfo;
         }
-		return this.cidSystemInfo;
+        return this.cidSystemInfo;
     }
 
     private static ASInputStream loadCMap(String cMapName) {
         try {
             File cMapFile;
             URL res = PDCMap.class.getResource(cMapName);
-            if(res == null) {
+            if (res == null) {
                 throw new IOException("CMap " + cMapName + " can't be found.");
             }
             if (res.toString().startsWith("jar:")) {

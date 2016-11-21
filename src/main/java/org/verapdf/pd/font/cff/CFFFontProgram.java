@@ -19,6 +19,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
     private CMap externalCMap;
     private boolean isCIDFont = false;
     private boolean isFontParsed = false;
+    private boolean isSubset;
 
     /**
      * Constructor from stream.
@@ -27,11 +28,13 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
      * @param pdEncoding is encoding object specified in font dictionary.
      * @throws IOException if creation of @{link SeekableStream} fails.
      */
-    public CFFFontProgram(ASInputStream stream, Encoding pdEncoding, CMap cMap)
+    public CFFFontProgram(ASInputStream stream, Encoding pdEncoding, CMap cMap,
+                          boolean isSubset)
             throws IOException {
         super(stream);
         this.pdEncoding = pdEncoding;
         this.externalCMap = cMap;
+        this.isSubset = isSubset;
     }
 
     /**
@@ -51,13 +54,13 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
                 font = new CFFCIDFontProgram(this.source, this.definedNames, globalSubrs,
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                         topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
-                        this.externalCMap);
+                        this.externalCMap, this.isSubset);
                 font.parseFont();
             } else {
                 font = new CFFType1FontProgram(this.source, this.definedNames, globalSubrs,
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                         topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
-                        this.pdEncoding, this.externalCMap);
+                        this.pdEncoding, this.externalCMap, this.isSubset);
                 font.parseFont();
             }
         }

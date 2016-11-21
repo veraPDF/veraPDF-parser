@@ -1,12 +1,10 @@
 package org.verapdf.pd.font.cff;
 
 import org.verapdf.io.SeekableStream;
-import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,13 +30,15 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private CMap externalCMap;
 
     CFFCIDFontProgram(SeekableStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
-                      long topDictBeginOffset, long topDictEndOffset, CMap externalCMap) {
+                      long topDictBeginOffset, long topDictEndOffset, CMap externalCMap,
+                      boolean isSubset) {
         super(stream);
         this.definedNames = definedNames;
         this.globalSubrs = globalSubrs;
         this.topDictBeginOffset = topDictBeginOffset;
         this.topDictEndOffset = topDictEndOffset;
         this.externalCMap = externalCMap;
+        this.isSubset = isSubset;
     }
 
     /**
@@ -190,22 +190,11 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     }
 
     private void readWidths() throws IOException {
-        for (int i = 0; i < nGlyphs; ++i) {
-            CFFNumber width = getWidthFromCharString(this.charStrings.get(i));
-            float res = width.isInteger() ? width.getInteger() :
-                    width.getReal();
-            if (res == -1.) {
-                res = this.defaultWidths[this.fdSelect[i]];
-            } else {
-                res += this.nominalWidths[this.fdSelect[i]];
-            }
-            this.widths[i] = res;
-        }
-        if (!Arrays.equals(this.fontMatrix, DEFAULT_FONT_MATRIX)) {
-            for (int i = 0; i < widths.length; ++i) {
-                widths[i] = widths[i] * (fontMatrix[0] * 1000);
-            }
-        }
+        CFFCharStringsHandler charStrings = new CFFCharStringsHandler(
+                this.charStrings, this.charStringsOffset, this.source);
+        this.widths = new CharStringsWidths(this.isSubset, this.charStringType,
+                charStrings, this.fontMatrix, this.localSubrIndex, this.globalSubrs,
+                this.bias, this.defaultWidths, this.nominalWidths, this.fdSelect);
     }
 
     /**
@@ -228,7 +217,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     public float getWidth(int code) {
         int cid = this.externalCMap.toCID(code);
         Integer gid = getGid(cid);
-        return (gid == null || gid == 0) ? -1 : widths[gid];
+        return (gid == null || gid == 0) ? -1 : widths.getWidth(gid);
     }
 
     /**

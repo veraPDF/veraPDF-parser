@@ -37,10 +37,9 @@ public class CMapFile {
      */
     public int getWMode() throws IOException {
         if (cMap == null) {
-            CMapParser parser = new CMapParser(this.parentStream.getData(
-                    COSStream.FilterFlags.DECODE)); // TODO: maybe add option "parse only WMode" to CMapParser
-            parser.parse();
-            cMap = parser.getCMap();
+            String cMapName = parentStream.getStringKey(ASAtom.CMAPNAME);
+            cMap = CMapFactory.getCMap(cMapName == null ? "" : cMapName,
+                    this.parentStream.getData(COSStream.FilterFlags.DECODE));
         }
         return cMap.getwMode();
     }

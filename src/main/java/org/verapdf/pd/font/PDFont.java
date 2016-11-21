@@ -1,24 +1,19 @@
 package org.verapdf.pd.font;
 
+import org.verapdf.as.ASAtom;
+import org.verapdf.cos.*;
+import org.verapdf.pd.PDResource;
+import org.verapdf.pd.font.cmap.PDCMap;
+import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
+import org.verapdf.pd.font.stdmetrics.StandardFontMetricsFactory;
+import org.verapdf.pd.font.type1.PDType1Font;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSBase;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
-import org.verapdf.pd.PDResource;
-import org.verapdf.pd.font.cmap.PDCMap;
-import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
-import org.verapdf.pd.font.stdmetrics.StandardFontMetricsFactory;
-import org.verapdf.pd.font.type1.PDType1Font;
 
 /**
  * This is PD representation of font.
@@ -287,5 +282,10 @@ public abstract class PDFont extends PDResource {
 
     public void setSuccessfullyParsed(boolean successfullyParsed) {
         this.successfullyParsed = successfullyParsed;
+    }
+
+    protected boolean isSubset() {
+        String[] nameSplitting = this.getName().split("\\+");
+        return nameSplitting[0].length() == 6;
     }
 }

@@ -24,7 +24,7 @@ public class OpenTypeCFFTest {
         COSObject encoding = COSName.construct(ASAtom.WIN_ANSI_ENCODING);
         ASInputStream stream = new InternalInputStream(fontFilePath);
         OpenTypeFontProgram font = new OpenTypeFontProgram(stream, true, false,
-                encoding, null);
+                encoding, null, true);
         font.parseFont();
         assertTrue(font.getFont() instanceof CFFFontProgram);
         assertTrue(!((CFFFontProgram) font.getFont()).isCIDFont());
