@@ -205,7 +205,7 @@ public class PDPage extends PDPageTreeNode {
 
     public List<PDAnnotation> getAnnotations() {
         COSObject annots = getKey(ASAtom.ANNOTS);
-        if (annots != null && annots.getType() == COSObjType.COS_ARRAY) {
+        if (!annots.empty() && annots.getType() == COSObjType.COS_ARRAY) {
             List<PDAnnotation> res = new ArrayList<>();
             if (annots.isIndirect()) {
                 annots = annots.getDirect();
@@ -216,6 +216,9 @@ public class PDPage extends PDPageTreeNode {
                 }
             }
             return Collections.unmodifiableList(res);
+        } else if (annots.empty()) {
+            annots = COSArray.construct();
+            this.setKey(ASAtom.ANNOTS, annots);
         }
         return Collections.emptyList();
     }
