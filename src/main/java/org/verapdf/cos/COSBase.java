@@ -6,6 +6,7 @@ import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -116,4 +117,8 @@ public abstract class COSBase {
 	public abstract boolean setDirect(final COSObject value);
 
 	public abstract void mark();
+
+	boolean equals(Object obj, List<COSBasePair> checkedObjects) {
+		return this.equals(obj);
+	}
 }
