@@ -1,26 +1,16 @@
 package org.verapdf.factory.colors;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResources;
-import org.verapdf.pd.colors.PDCalGray;
-import org.verapdf.pd.colors.PDCalRGB;
-import org.verapdf.pd.colors.PDColorSpace;
-import org.verapdf.pd.colors.PDDeviceCMYK;
-import org.verapdf.pd.colors.PDDeviceGray;
-import org.verapdf.pd.colors.PDDeviceN;
-import org.verapdf.pd.colors.PDDeviceRGB;
-import org.verapdf.pd.colors.PDICCBased;
-import org.verapdf.pd.colors.PDIndexed;
-import org.verapdf.pd.colors.PDLab;
-import org.verapdf.pd.colors.PDSeparation;
+import org.verapdf.pd.colors.*;
 import org.verapdf.pd.patterns.PDPattern;
 import org.verapdf.pd.patterns.PDShadingPattern;
 import org.verapdf.pd.patterns.PDTilingPattern;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Maksim Bezrukov
@@ -111,6 +101,8 @@ public class ColorSpaceFactory {
             return new PDDeviceN(base);
         } else if (ASAtom.INDEXED.equals(name)) {
             return new PDIndexed(base);
+        } else if (ASAtom.PATTERN == name) {
+            return PDPattern.INSTANCE;
         } else {
             LOGGER.log(Level.FINE, "Unknown ColorSpace name");
             return null;
