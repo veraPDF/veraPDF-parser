@@ -24,6 +24,18 @@ public class PDAnnotation extends PDObject {
 		return getObject().getIntegerKey(ASAtom.F);
 	}
 
+	public String getContents() {
+		return getStringKey(ASAtom.CONTENTS);
+	}
+
+	public String getAnnotationName() {
+		return getStringKey(ASAtom.NM);
+	}
+
+	public String getModDate() {
+		return getStringKey(ASAtom.M);
+	}
+
 	public Double getCA() {
 		return getObject().getRealKey(ASAtom.CA);
 	}
