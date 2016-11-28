@@ -91,7 +91,7 @@ public class PDFStreamParser extends COSParser {
 	public Object parseNextToken() throws IOException {
 		Object result = null;
 
-		skipSpaces();
+		skipSpaces(true);
 		byte nextByte = (byte) source.peek();
 		if (nextByte == -1) {
 			return null;
@@ -150,6 +150,7 @@ public class PDFStreamParser extends COSParser {
 				}
 				break;
 			}
+			case '.':
 			case '0':
 			case '1':
 			case '2':
