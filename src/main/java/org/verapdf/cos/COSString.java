@@ -106,6 +106,16 @@ public class COSString extends COSDirect {
         return isHex;
     }
 
+    public String getHexString() {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < this.value.length(); i++) {
+            final char c = this.value.charAt(i);
+            result.append(COSFilterASCIIHexEncode.asciiHexBig[c]);
+            result.append(COSFilterASCIIHexEncode.asciiHexLittle[c]);
+        }
+        return result.toString();
+    }
+
     @Override
     public String toString() {
         return this.isHex ? toHexString() : toLitString();
