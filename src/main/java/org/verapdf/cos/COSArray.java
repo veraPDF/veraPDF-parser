@@ -3,10 +3,7 @@ package org.verapdf.cos;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Timur Kamalov
@@ -137,13 +134,52 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof COSArray)) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if(obj instanceof COSObject) {
+            return this.equals(((COSObject) obj).get());
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        List<COSBasePair> checkedObjects = new LinkedList<COSBasePair>();
+        return this.equals(obj, checkedObjects);
 
-        COSArray that = (COSArray) o;
+    }
 
-        return entries != null ? entries.equals(that.entries) : that.entries == null;
-
+    boolean equals(Object obj, List<COSBasePair> checkedObjects) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if(obj instanceof COSObject) {
+            return this.equals(((COSObject) obj).get());
+        }
+        if (COSBasePair.listContainsPair(checkedObjects, this, (COSBase) obj)) {
+            return true;    // Not necessary true, but we should behave as it is
+        }
+        COSBasePair.addPairToList(checkedObjects, this, (COSBase) obj);
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        COSArray that = (COSArray) obj;
+        if (!that.size().equals(this.size())) {
+            return false;
+        }
+        for (int i = 0; i < this.size(); ++i) {
+            COSBase cosBase1 = this.at(i).getDirectBase();
+            COSBase cosBase2 = that.at(i).getDirectBase();
+            if (!cosBase1.equals(cosBase2, checkedObjects)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
