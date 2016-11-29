@@ -401,6 +401,7 @@ public class ASAtom {
     public static final ASAtom PG = new ASAtom("Pg");
     public static final ASAtom PI = new ASAtom("PI");
     public static final ASAtom PO = new ASAtom("PO");
+    public static final ASAtom POPUP = new ASAtom("Popup");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");
     public static final ASAtom PREDICTOR = new ASAtom("Predictor");
     public static final ASAtom PRES_STEPS = new ASAtom("PresSteps");
