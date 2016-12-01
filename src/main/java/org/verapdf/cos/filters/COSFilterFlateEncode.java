@@ -26,6 +26,15 @@ public class COSFilterFlateEncode extends ASBufferingOutFilter {
         Deflater deflater = new Deflater();
         deflater.setInput(buffer);
         deflater.finish();
-        return deflater.deflate(internalBuffer);
+        int res = 0;
+        int deflated = -1;
+        while (deflated != 0) {
+            deflated = deflater.deflate(this.internalBuffer, 0,
+                    this.internalBuffer.length);
+            this.getStoredOutputStream().write(this.internalBuffer, 0, deflated);
+            res += deflated;
+        }
+        deflater.finish();
+        return res;
     }
 }
