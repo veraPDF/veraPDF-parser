@@ -77,7 +77,7 @@ public class PDType1Font extends PDSimpleFont {
         }
         this.isFontParsed = true;
         try {
-            if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
+            if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE)) {
                 COSStream type1FontFile = fontDescriptor.getFontFile();
                 this.fontProgram = new Type1FontProgram(
                         type1FontFile.getData(COSStream.FilterFlags.DECODE),
