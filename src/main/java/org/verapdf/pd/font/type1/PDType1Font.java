@@ -47,8 +47,7 @@ public class PDType1Font extends PDSimpleFont {
     }
 
     public Set<String> getDescriptorCharSet() {
-        String descriptorCharSetString =
-                this.fontDescriptor.getStringKey(ASAtom.CHAR_SET);
+        String descriptorCharSetString = this.fontDescriptor.getCharSet();
         if (descriptorCharSetString != null) {
             try {
                 ASMemoryInStream stream =
@@ -78,16 +77,14 @@ public class PDType1Font extends PDSimpleFont {
         }
         this.isFontParsed = true;
         try {
-            if (fontDescriptor.knownKey(ASAtom.FONT_FILE).booleanValue()) {
-                COSStream type1FontFile =
-                        getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE));
+            if (fontDescriptor.knownKey(ASAtom.FONT_FILE)) {
+                COSStream type1FontFile = fontDescriptor.getFontFile();
                 this.fontProgram = new Type1FontProgram(
                         type1FontFile.getData(COSStream.FilterFlags.DECODE),
                         this.getEncodingMapping());
                 return this.fontProgram;
-            } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3).booleanValue()) {
-                COSStream type1FontFile =
-                        getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE3));
+            } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+                COSStream type1FontFile = fontDescriptor.getFontFile3();
                 ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
                 if (subtype == ASAtom.TYPE1C) {
 

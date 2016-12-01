@@ -1,5 +1,14 @@
 package org.verapdf.cos;
 
+import org.verapdf.as.ASAtom;
+import org.verapdf.cos.visitor.Writer;
+import org.verapdf.cos.xref.COSXRefTable;
+import org.verapdf.io.IReader;
+import org.verapdf.io.Reader;
+import org.verapdf.io.SeekableStream;
+import org.verapdf.pd.PDDocument;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -8,14 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.cos.visitor.Writer;
-import org.verapdf.cos.xref.COSXRefTable;
-import org.verapdf.io.IReader;
-import org.verapdf.io.Reader;
-import org.verapdf.io.SeekableStream;
-import org.verapdf.pd.PDDocument;
-import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 /**
  * @author Timur Kamalov
@@ -264,4 +265,13 @@ public class COSDocument {
 		return this.standardSecurityHandler != null;
 	}
 
+	public COSArray getID() {
+		if (trailer != null) {
+			COSObject res = trailer.getKey(ASAtom.ID);
+			if (res.getType() == COSObjType.COS_ARRAY) {
+				return (COSArray) res.get();
+			}
+		}
+		return null;
+	}
 }

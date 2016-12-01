@@ -25,7 +25,7 @@ public abstract class PDFont extends PDResource {
     private static final Logger LOGGER = Logger.getLogger(PDFont.class.getCanonicalName());
 
     protected COSDictionary dictionary;
-    protected COSDictionary fontDescriptor;
+    protected PDFontDescriptor fontDescriptor;
     protected PDCMap toUnicodeCMap;
     protected boolean isFontParsed = false;
     protected FontProgram fontProgram;
@@ -44,9 +44,9 @@ public abstract class PDFont extends PDResource {
         this.dictionary = dictionary;
         COSObject fd = dictionary.getKey(ASAtom.FONT_DESC);
         if (fd != null && fd.getType() == COSObjType.COS_DICT) {
-            fontDescriptor = (COSDictionary) fd.getDirectBase();
+            fontDescriptor = new PDFontDescriptor(fd);
         } else {
-            fontDescriptor = (COSDictionary) COSDictionary.construct().get();
+            fontDescriptor = new PDFontDescriptor(COSDictionary.construct());
         }
     }
 
@@ -60,7 +60,7 @@ public abstract class PDFont extends PDResource {
     /**
      * @return font descriptor COSDictionary.
      */
-    public COSDictionary getFontDescriptor() {
+    public PDFontDescriptor getFontDescriptor() {
         return fontDescriptor;
     }
 
@@ -87,9 +87,8 @@ public abstract class PDFont extends PDResource {
      */
     public ASAtom getFontName() {
         ASAtom type = this.dictionary.getNameKey(ASAtom.BASE_FONT);
-        if (this.fontDescriptor != null && type != null) {
-            ASAtom typeFromDescriptor =
-                    this.fontDescriptor.getNameKey(ASAtom.FONT_NAME);
+        if (type != null) {
+            ASAtom typeFromDescriptor = fontDescriptor.getFontName();
             if (type != typeFromDescriptor) {
                 LOGGER.log(Level.FINE, "Font names in font descriptor dictionary and in font dictionary are different for "
                         + type.getValue());
@@ -105,17 +104,7 @@ public abstract class PDFont extends PDResource {
      * descriptor is null.
      */
     public boolean isSymbolic() {
-        if (this.fontDescriptor == null) {
-            LOGGER.log(Level.FINE, "Font descriptor is null");
-            return false;
-        }
-        Long flagsLong = this.fontDescriptor.getIntegerKey(ASAtom.FLAGS);
-        if (flagsLong == null) {
-            LOGGER.log(Level.FINE, "Font descriptor doesn't contain /Flags entry");
-            return false;
-        }
-        int flags = flagsLong.intValue();
-        return (flags & 0b00100100) == 4;
+        return this.fontDescriptor.isSymbolic();
     }
 
     public Encoding getEncodingMapping() {
@@ -150,8 +139,7 @@ public abstract class PDFont extends PDResource {
     }
 
     public COSStream getFontFile2() {
-        return (COSStream)
-                this.fontDescriptor.getKey(ASAtom.FONT_FILE2).getDirectBase();
+        return this.fontDescriptor.getFontFile2();
     }
 
     public Map<Integer, String> getDifferences() {
@@ -186,13 +174,6 @@ public abstract class PDFont extends PDResource {
 
     public Long getLastChar() {
         return this.dictionary.getIntegerKey(ASAtom.LAST_CHAR);
-    }
-
-    protected static COSStream getStreamFromObject(COSObject obj) throws IOException {
-        if (obj == null || obj.getDirectBase().getType() != COSObjType.COS_STREAM) {
-            throw new IOException("Can't get COSStream from COSObject");
-        }
-		return (COSStream) obj.getDirectBase();
     }
 
     /**
@@ -242,10 +223,8 @@ public abstract class PDFont extends PDResource {
             }
         }
 
-        if (fontDescriptor.knownKey(ASAtom.MISSING_WIDTH).booleanValue()) {
-            if (this.fontDescriptor != null) {
-                return fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
-            }
+        if (fontDescriptor.knownKey(ASAtom.MISSING_WIDTH)) {
+            return fontDescriptor.getMissingWidth();
         }
 
         if (this instanceof PDType3Font) {
@@ -268,11 +247,7 @@ public abstract class PDFont extends PDResource {
     }
 
     public Double getDefaultWidth() {
-        if (fontDescriptor.knownKey(ASAtom.MISSING_WIDTH) &&
-                this.fontDescriptor != null) {
-                return fontDescriptor.getRealKey(ASAtom.MISSING_WIDTH);
-        }
-        return null;
+        return fontDescriptor.getMissingWidth();
     }
 
     public boolean isSuccessfullyParsed() {

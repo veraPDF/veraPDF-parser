@@ -22,6 +22,7 @@ public class PDCIDFont extends PDFont {
 
     protected CMap cMap;
     private CIDWArray widths;
+    private PDCIDSystemInfo cidSystemInfo;
 
     public PDCIDFont(COSDictionary dictionary, CMap cMap) {
         super(dictionary);
@@ -91,11 +92,10 @@ public class PDCIDFont extends PDFont {
         }
         this.isFontParsed = true;
 
-        if (fontDescriptor.knownKey(ASAtom.FONT_FILE2).booleanValue() &&
+        if (fontDescriptor.knownKey(ASAtom.FONT_FILE2) &&
                 this.getSubtype() == ASAtom.CID_FONT_TYPE2) {
             try {
-                COSStream trueTypeFontFile =
-                        getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE2));
+                COSStream trueTypeFontFile = fontDescriptor.getFontFile2();
                 this.fontProgram = new CIDFontType2Program(
                         trueTypeFontFile.getData(COSStream.FilterFlags.DECODE),
                         this.cMap, this.getCIDToGIDMap());
@@ -103,10 +103,9 @@ public class PDCIDFont extends PDFont {
             } catch (IOException e) {
                 LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
             }
-        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3).booleanValue()) {
+        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
             try {
-                COSStream fontFile =
-                        getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE3));
+                COSStream fontFile = fontDescriptor.getFontFile3();
                 COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).getDirectBase();
                 if (ASAtom.CID_FONT_TYPE0C == subtype.get()) {
                     this.fontProgram = new CFFFontProgram(
@@ -134,5 +133,15 @@ public class PDCIDFont extends PDFont {
         }
         this.fontProgram = null;
         return null;
+    }
+
+    public PDCIDSystemInfo getCIDSystemInfo() {
+        if (this.cidSystemInfo != null) {
+            return this.cidSystemInfo;
+        } else {
+            this.cidSystemInfo =
+                    new PDCIDSystemInfo(this.dictionary.getKey(ASAtom.CID_SYSTEM_INFO));
+            return this.cidSystemInfo;
+        }
     }
 }
