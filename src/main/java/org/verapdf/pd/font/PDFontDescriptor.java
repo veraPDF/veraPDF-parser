@@ -302,6 +302,10 @@ public class PDFontDescriptor extends PDObject {
         return getCOSStreamWithCheck(ASAtom.FONT_FILE3);
     }
 
+    public boolean canParseFontFile(ASAtom key) {
+        return this.knownKey(key) && getCOSStreamWithCheck(key) != null;
+    }
+
     private COSStream getCOSStreamWithCheck(ASAtom key) {
         COSObject res = getKey(key);
         if (res.getType() == COSObjType.COS_STREAM) {
