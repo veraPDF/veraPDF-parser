@@ -72,6 +72,68 @@ public class PDAnnotation extends PDObject {
 		return null;
 	}
 
+	public PDAnnotation getPopup() {
+		COSObject popup = getKey(ASAtom.POPUP);
+		if (popup != null && popup.getType().isDictionaryBased()) {
+			return new PDAnnotation(popup);
+		}
+		return null;
+	}
+
+	public double[] getColor() {
+		return TypeConverter.getRealArray(getKey(ASAtom.C), "Color");
+	}
+
+	public boolean isInvisible() {
+		return getFlagValue(0);
+	}
+
+	public boolean isHidden() {
+		return getFlagValue(1);
+	}
+
+	public boolean isPrinted() {
+		return getFlagValue(2);
+	}
+
+	public boolean isNoZoom() {
+		return getFlagValue(3);
+	}
+
+	public boolean isNoRotate() {
+		return getFlagValue(4);
+	}
+
+	public boolean isNoView() {
+		return getFlagValue(5);
+	}
+
+	public boolean isReadOnly() {
+		return getFlagValue(6);
+	}
+
+	public boolean isLocked() {
+		return getFlagValue(7);
+	}
+
+	public boolean isToggleNoView() {
+		return getFlagValue(8);
+	}
+
+	public boolean isLockedContents() {
+		return getFlagValue(9);
+	}
+
+	private boolean getFlagValue(int index) {
+		Long flag = getIntegerKey(ASAtom.F);
+		if (flag != null) {
+			long f = flag.longValue();
+			int bitFlag = 1 << index;
+			return (f & bitFlag) == bitFlag;
+		}
+		return false;
+	}
+
 	public PDAppearanceEntry getNormalAppearance() {
 		return getAppearanceEntry(ASAtom.N);
 	}

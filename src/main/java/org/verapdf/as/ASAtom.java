@@ -91,6 +91,7 @@ public class ASAtom {
     public static final ASAtom CENTER_WINDOW = new ASAtom("CenterWindow");
     public static final ASAtom CF = new ASAtom("CF");
     public static final ASAtom CFM = new ASAtom("CFM");
+    public static final ASAtom CHECKSUM = new ASAtom("CheckSum");
     //** Acro form field type for choice fields.
     public static final ASAtom CH = new ASAtom("Ch");
     public static final ASAtom CHAR_PROCS = new ASAtom("CharProcs");
@@ -401,6 +402,7 @@ public class ASAtom {
     public static final ASAtom PG = new ASAtom("Pg");
     public static final ASAtom PI = new ASAtom("PI");
     public static final ASAtom PO = new ASAtom("PO");
+    public static final ASAtom POPUP = new ASAtom("Popup");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");
     public static final ASAtom PREDICTOR = new ASAtom("Predictor");
     public static final ASAtom PRES_STEPS = new ASAtom("PresSteps");
@@ -416,6 +418,7 @@ public class ASAtom {
     public static final ASAtom PS = new ASAtom("PS");
     public static final ASAtom PUB_SEC = new ASAtom("PubSec");
     public static final ASAtom PV = new ASAtom("PV");
+    public static final ASAtom PZ = new ASAtom("PZ");
     // Q
     public static final ASAtom Q = new ASAtom("Q");
     public static final ASAtom QUADPOINTS = new ASAtom("QuadPoints");

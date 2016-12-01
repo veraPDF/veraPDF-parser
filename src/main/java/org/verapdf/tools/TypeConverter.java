@@ -1,13 +1,13 @@
 package org.verapdf.tools;
 
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
 
 /**
  * @author Maksim Bezrukov
@@ -141,6 +141,14 @@ public class TypeConverter {
 	}
 
 	public static double[] getRealArray(COSObject array, int estimatedSize, String arrayName) {
+		return getRealArray(array, estimatedSize, arrayName, true);
+	}
+
+	public static double[] getRealArray(COSObject array, String arrayName) {
+		return getRealArray(array, 0, arrayName, false);
+	}
+
+	private static double[] getRealArray(COSObject array, int estimatedSize, String arrayName, boolean checkSize) {
 		if (arrayName == null) {
 			throw new IllegalArgumentException("Array object can not be null");
 		}
@@ -148,7 +156,7 @@ public class TypeConverter {
 		if (array != null && array.getType() == COSObjType.COS_ARRAY) {
 			int size = array.size().intValue();
 
-			if (size != estimatedSize) {
+			if (checkSize && size != estimatedSize) {
 				LOGGER.log(Level.FINE, arrayName + " array doesn't consist of " + estimatedSize + " elements");
 			}
 
