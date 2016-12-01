@@ -5,6 +5,9 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSString;
+import org.verapdf.tools.TypeConverter;
+
+import java.util.Calendar;
 
 /**
  * Represents digital signature on pd level.
@@ -76,8 +79,8 @@ public class PDSignature extends PDObject {
     /**
      * @return the time of signing.
      */
-    public String getSignDate() {
-        return this.getStringKey(ASAtom.M);
+    public Calendar getSignDate() {
+        return TypeConverter.parseDate(this.getStringKey(ASAtom.M));
     }
 
     /**

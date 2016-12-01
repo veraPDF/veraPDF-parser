@@ -269,7 +269,7 @@ public class COSDocument {
 		if (trailer != null) {
 			COSObject res = trailer.getKey(ASAtom.ID);
 			if (res.getType() == COSObjType.COS_ARRAY) {
-				return (COSArray) res.get();
+				return (COSArray) res.getDirectBase();
 			}
 		}
 		return null;

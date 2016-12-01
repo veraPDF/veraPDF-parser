@@ -1,11 +1,11 @@
 package org.verapdf.pd.font;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSBase;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResources;
+import org.verapdf.tools.TypeConverter;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,7 +63,7 @@ public class PDType3Font extends PDSimpleFont {
      * specify the font bounding box.
      */
     public double[] getFontBoundingBox() {
-        COSBase bbox = this.getObject().getKey(ASAtom.FONT_BBOX).get();
+        COSObject bbox = getKey(ASAtom.FONT_BBOX);
         if (bbox.getType() == COSObjType.COS_ARRAY || bbox.size() == 4) {
             double[] res = new double[4];
             for (int i = 0; i < 4; ++i) {
@@ -87,19 +87,7 @@ public class PDType3Font extends PDSimpleFont {
     }
 
     public double[] getFontMatrix() {
-        COSObject fontMatrix = this.dictionary.getKey(ASAtom.FONT_MATRIX);
-        if (fontMatrix.getType() == COSObjType.COS_ARRAY && fontMatrix.size() == 6) {
-            double[] res = new double[6];
-            for (int i = 0; i < res.length; ++i) {
-                 if (fontMatrix.at(i).getType().isNumber()) {
-                     res[i] = fontMatrix.at(i).getReal();
-                 } else {
-                     return null;
-                 }
-            }
-            return res;
-        }
-        return null;
+        return TypeConverter.getRealArray(getKey(ASAtom.FONT_MATRIX), 6, "Font matrix");
     }
 
     private COSDictionary getCharProcs() {

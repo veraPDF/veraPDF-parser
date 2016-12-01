@@ -152,11 +152,7 @@ public class PDFontDescriptor extends PDObject {
     }
 
     private boolean isFlagBitOn(int bit) {
-        if (flags != null) {
-            return (flags.intValue() & (1 << (bit - 1))) != 0;
-        } else {
-            return false;
-        }
+        return flags != null && (flags.intValue() & (1 << (bit - 1))) != 0;
     }
 
     /**
@@ -309,7 +305,7 @@ public class PDFontDescriptor extends PDObject {
     private COSStream getCOSStreamWithCheck(ASAtom key) {
         COSObject res = getKey(key);
         if (res.getType() == COSObjType.COS_STREAM) {
-            return (COSStream) res.get();
+            return (COSStream) res.getDirectBase();
         } else {
             return null;
         }
