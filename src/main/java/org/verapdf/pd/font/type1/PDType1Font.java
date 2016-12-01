@@ -83,7 +83,7 @@ public class PDType1Font extends PDSimpleFont {
                         type1FontFile.getData(COSStream.FilterFlags.DECODE),
                         this.getEncodingMapping());
                 return this.fontProgram;
-            } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+            } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
                 COSStream type1FontFile = fontDescriptor.getFontFile3();
                 ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
                 if (subtype == ASAtom.TYPE1C) {
