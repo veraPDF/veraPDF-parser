@@ -158,9 +158,9 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         this.defaultWidths = new int[fontDictIndex.size()];
         for (int i = 0; i < fontDictIndex.size(); ++i) {
             this.readTopDict(fontDictIndex.getOffset(i) + fdArrayOffset +
-                    fontDictIndex.getOffsetShift(),
+                    fontDictIndex.getOffsetShift() - 1,
                     fontDictIndex.getOffset(i + 1) + fdArrayOffset +
-                            fontDictIndex.getOffsetShift());
+                            fontDictIndex.getOffsetShift() - 1);
             this.readPrivateDict(this.privateDictOffset, this.privateDictSize);
             this.nominalWidths[i] = this.nominalWidthX;
             this.defaultWidths[i] = this.defaultWidthX;
