@@ -73,6 +73,10 @@ public class PDObject {
 		return object.getIntegerKey(key);
 	}
 
+	public Double getRealKey(final ASAtom key) {
+		return object.getRealKey(key);
+	}
+
 	public void setIntegerKey(final ASAtom key, final Long value) {
 		object.setIntegerKey(key, value);
 	}

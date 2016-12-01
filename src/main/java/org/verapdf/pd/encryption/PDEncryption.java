@@ -44,6 +44,19 @@ public class PDEncryption extends PDObject {
     }
 
     /**
+     * @return a name that completely specifies the format and interpretation
+     * of the contents of the encryption dictionary.
+     */
+    public ASAtom getSubFilter() {
+        return getNameKey(ASAtom.SUB_FILTER);
+    }
+
+    public AccessPermissions getUserPermissions() {
+        Long p = getP();
+        return p == null ? null : AccessPermissions.getUserPermissions(p.intValue());
+    }
+
+    /**
      * @return a code specifying the algorithm to be used in encrypting and
      * decrypting the document.
      */

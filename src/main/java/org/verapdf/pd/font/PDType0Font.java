@@ -1,8 +1,5 @@
 package org.verapdf.pd.font;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
@@ -10,6 +7,9 @@ import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.cmap.PDCMap;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents Type0 font on pd level.
@@ -30,7 +30,6 @@ public class PDType0Font extends PDCIDFont {
 
     private PDCMap pdcMap;
     private PDCMap ucsCMap;
-    private COSDictionary cidSystemInfo;
     private COSDictionary type0FontDict;
 
     public PDType0Font(COSDictionary dictionary) {
@@ -39,24 +38,6 @@ public class PDType0Font extends PDCIDFont {
                 (COSDictionary) COSDictionary.construct().get() : dictionary;
 
         this.cMap = getCMap().getCMapFile();
-    }
-
-    public COSDictionary getCIDSystemInfo() {
-        if (this.cidSystemInfo == null) {
-            COSObject cidFontDictObj =
-                    this.type0FontDict.getKey(ASAtom.DESCENDANT_FONTS).at(0);
-            if (!cidFontDictObj.empty()) {
-                COSDictionary cidFontDict = (COSDictionary) cidFontDictObj.getDirectBase();
-                if (cidFontDict != null) {
-                    COSDictionary cidSystemInfo = (COSDictionary)
-                            cidFontDict.getKey(ASAtom.CID_SYSTEM_INFO).getDirectBase();
-                    this.cidSystemInfo = cidSystemInfo;
-                    return cidSystemInfo;
-                }
-            }
-            return null;
-        }
-		return this.cidSystemInfo;
     }
 
     public org.verapdf.pd.font.cmap.PDCMap getCMap() {
@@ -139,11 +120,11 @@ public class PDType0Font extends PDCIDFont {
 		return null;
     }
 
-    private void setUcsCMapFromIdentity(COSDictionary cidSystemInfo) {
+    private void setUcsCMapFromIdentity(PDCIDSystemInfo cidSystemInfo) {
         if (cidSystemInfo != null) {
-            String registry = cidSystemInfo.getStringKey(ASAtom.REGISTRY);
+            String registry = cidSystemInfo.getRegistry();
             if (ADOBE.equals(registry)) {
-                String  ordering = cidSystemInfo.getStringKey(ASAtom.ORDERING);
+                String  ordering = cidSystemInfo.getOrdering();
                 if(JAPAN_1.equals(ordering) || CNS_1.equals(ordering) ||
                         KOREA_1.equals(ordering) || GB_1.equals(ordering)) {
                     String ucsName = "Adobe-" + ordering + "-" + UCS2;
