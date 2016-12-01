@@ -1,13 +1,12 @@
 package org.verapdf.pd;
 
-import java.awt.Color;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.actions.PDAction;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Maksim Bezrukov
@@ -40,7 +39,7 @@ public class PDOutlineItem extends PDOutlineDictionary {
 		return null;
 	}
 
-	public Color getColor() {
+	public double[] getColor() {
 		COSObject arr = getKey(ASAtom.C);
 		if (arr != null && arr.getType() == COSObjType.COS_ARRAY) {
 			if (arr.size().intValue() == 3) {
@@ -58,7 +57,7 @@ public class PDOutlineItem extends PDOutlineDictionary {
 					LOGGER.log(Level.FINE, "Outline's color contains wrong value");
 					return null;
 				}
-				return new Color(red, green, blue);
+				return new double[]{red, green, blue};
 			}
 			LOGGER.log(Level.FINE, "Outline's color contains not three elements");
 			return null;
