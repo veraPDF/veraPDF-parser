@@ -92,7 +92,7 @@ public class PDCIDFont extends PDFont {
         }
         this.isFontParsed = true;
 
-        if (fontDescriptor.knownKey(ASAtom.FONT_FILE2) &&
+        if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE2) &&
                 this.getSubtype() == ASAtom.CID_FONT_TYPE2) {
             try {
                 COSStream trueTypeFontFile = fontDescriptor.getFontFile2();
@@ -103,7 +103,7 @@ public class PDCIDFont extends PDFont {
             } catch (IOException e) {
                 LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
             }
-        } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+        } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
             try {
                 COSStream fontFile = fontDescriptor.getFontFile3();
                 COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).getDirectBase();
