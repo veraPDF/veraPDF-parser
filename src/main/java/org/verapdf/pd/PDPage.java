@@ -64,33 +64,65 @@ public class PDPage extends PDPageTreeNode {
         }
     }
 
-    public void setBBox(final double[] bbox, final ASAtom boxType) {
-        this.getObject().setArrayKey(boxType, 4, bbox);
+    public double[] getMediaBox() {
+        COSArray array = getInheritedCOSBBox(ASAtom.MEDIA_BOX);
+        if (array != null) {
+            return getDoubleArray(array);
+        }
+        return null;
     }
 
-    public boolean getBBox(final double[] bbox, final ASAtom boxType) {
-        COSObject object = this.getKey(boxType);
-        if (!object.empty() && object.size() >= 4) {
-            for (int i = 0; i < 4; i++) {
-                bbox[i] = object.at(i).getReal();
-            }
-            return true;
+    public double[] getCropBox() {
+        COSArray array = getInheritedCOSBBox(ASAtom.CROP_BOX);
+        if (array != null) {
+            return getDoubleArray(array);
         } else {
-            if (boxType == ASAtom.MEDIA_BOX) {
-                // if we are here this means that page media box is missing. Return then the default one
-                for (int i = 0; i < 4; i++) {
-                    bbox[i] = PDPage.PAGE_SIZE_LETTER[i];
-                }
-            } else if (boxType == ASAtom.CROP_BOX) {
-                this.getBBox(bbox, ASAtom.MEDIA_BOX);
-            } else if (boxType == ASAtom.BLEED_BOX || boxType == ASAtom.TRIM_BOX || boxType == ASAtom.ART_BOX) {
-                this.getBBox(bbox, ASAtom.CROP_BOX);
-            } else {
-                this.getBBox(bbox, ASAtom.MEDIA_BOX);
-            }
-
-            return false;
+            return getMediaBox();
         }
+    }
+
+    public double[] getBleedBox() {
+        COSArray array = getCOSBBox(ASAtom.BLEED_BOX);
+        if (array != null) {
+            return getDoubleArray(array);
+        } else {
+            return getCropBox();
+        }
+    }
+
+    public double[] getTrimBox() {
+        COSArray array = getCOSBBox(ASAtom.TRIM_BOX);
+        if (array != null) {
+            return getDoubleArray(array);
+        } else {
+            return getCropBox();
+        }
+    }
+
+    public double[] getArtBox() {
+        COSArray array = getCOSBBox(ASAtom.ART_BOX);
+        if (array != null) {
+            return getDoubleArray(array);
+        } else {
+            return getCropBox();
+        }
+    }
+
+    private double[] getDoubleArray(COSArray array) {
+        if (array == null) {
+            return null;
+        }
+        Integer size = array.size();
+        double[] res = new double[size];
+        for (int i = 0; i < size; ++i) {
+            COSObject obj = array.at(i);
+            if (obj.getType().isNumber()) {
+                res[i] = obj.getReal().doubleValue();
+            } else {
+                res[i] = 0;
+            }
+        }
+        return res;
     }
 
     public PDDocument getPDDocument() {
@@ -235,10 +267,32 @@ public class PDPage extends PDPageTreeNode {
         return pagesTotal;
     }
 
-    //TODO : implement this
-    /*
-    public String getLabel() {
-        return this.getPDDoc().getCatalog().getPageLabels().getLabel(getPageNumber());
+    public Long getRotation() {
+        COSObject current = getObject();
+        while (current != null && current.getType().isDictionaryBased()) {
+            COSObject object = current.getKey(ASAtom.ROTATE);
+            if (object != null && !object.empty()) {
+                if (object.getType() == COSObjType.COS_INTEGER) {
+                    return object.getInteger();
+                } else {
+                    return null;
+                }
+            } else {
+                current = current.getKey(ASAtom.PARENT);
+            }
+        }
+        return null;
     }
-    */
+
+    public Double getScaling() {
+        return getObject().getRealKey(ASAtom.PZ);
+    }
+
+    public PDMetadata getMetadata() {
+        COSObject obj = getKey(ASAtom.METADATA);
+        if (obj.getType() == COSObjType.COS_STREAM) {
+            return new PDMetadata(obj);
+        }
+        return null;
+    }
 }
