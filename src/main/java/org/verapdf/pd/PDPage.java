@@ -242,7 +242,7 @@ public class PDPage extends PDPageTreeNode {
             if (annots.isIndirect()) {
                 annots = annots.getDirect();
             }
-            for (COSObject annot : (COSArray) annots.get()) {
+            for (COSObject annot : (COSArray) annots.getDirectBase()) {
                 if (annot != null && annot.getType() == COSObjType.COS_DICT) {
                     res.add(new PDAnnotation(annot));
                 }

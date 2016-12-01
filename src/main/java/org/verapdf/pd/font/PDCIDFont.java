@@ -108,12 +108,12 @@ public class PDCIDFont extends PDFont {
                 COSStream fontFile =
                         getStreamFromObject(fontDescriptor.getKey(ASAtom.FONT_FILE3));
                 COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).getDirectBase();
-                if (ASAtom.CID_FONT_TYPE0C == subtype.get()) {
+                if (ASAtom.CID_FONT_TYPE0C == subtype.getName()) {
                     this.fontProgram = new CFFFontProgram(
                             fontFile.getData(COSStream.FilterFlags.DECODE),
                             this.getEncodingMapping(), this.cMap, this.isSubset());
                     return this.fontProgram;
-                } else if (ASAtom.OPEN_TYPE == subtype.get()) {
+                } else if (ASAtom.OPEN_TYPE == subtype.getName()) {
                     ASAtom fontName = this.getFontName();
                     if (fontName == ASAtom.TRUE_TYPE || fontName == ASAtom.CID_FONT_TYPE2) {
                         this.fontProgram = new OpenTypeFontProgram(

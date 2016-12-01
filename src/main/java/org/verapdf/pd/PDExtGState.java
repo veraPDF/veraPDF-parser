@@ -63,7 +63,7 @@ public class PDExtGState extends PDResource {
     public COSName getCOSRenderingIntentName() {
         COSObject name = getKey(ASAtom.RI);
         if (name != null && name.getType() == COSObjType.COS_NAME) {
-            return (COSName) name.get();
+            return (COSName) name.getDirectBase();
         }
         return null;
     }
@@ -73,7 +73,7 @@ public class PDExtGState extends PDResource {
         if (fontArray != null && fontArray.getType() == COSObjType.COS_ARRAY) {
             COSObject res = fontArray.at(1);
             if (res != null && res.getType().isNumber()) {
-                return (COSNumber) res.get();
+                return (COSNumber) res.getDirectBase();
             }
         }
         return null;
