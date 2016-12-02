@@ -146,6 +146,10 @@ public class PDResources extends PDObject {
 		return getNames(ASAtom.FONT);
 	}
 
+	public Set<ASAtom> getPropertiesNames() {
+		return getNames(ASAtom.PROPERTIES);
+	}
+
 	private Set<ASAtom> getNames(ASAtom type) {
 		COSObject dict = getKey(type);
 		if (dict != null && dict.getType() == COSObjType.COS_DICT) {

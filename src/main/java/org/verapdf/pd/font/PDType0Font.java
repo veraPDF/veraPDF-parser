@@ -64,6 +64,16 @@ public class PDType0Font extends PDCIDFont {
         return null;
     }
 
+    public COSObject getDescendantFontObject() {
+        if (this.type0FontDict != null) {
+            COSArray array = (COSArray) this.type0FontDict.getKey(ASAtom.DESCENDANT_FONTS).getDirectBase();
+            if (array != null) {
+                return array.at(0);
+            }
+        }
+        return null;
+    }
+
     public COSDictionary getDescendantFont() {
         return getDedcendantCOSDictionary(this.type0FontDict);
     }
