@@ -47,7 +47,7 @@ class XrefStreamParser {
     void parseStreamAndTrailer() throws IOException {
 
         xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
-        fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).get();
+        fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).getDirectBase();
         if (fieldSizes.size() != 3) {
             throw new IOException("W array in xref should have 3 elements.");
         }
@@ -64,13 +64,13 @@ class XrefStreamParser {
      */
     private void initializeIndex()
             throws IOException {
-        index = (COSArray) xrefCOSStream.getKey(ASAtom.INDEX).get();
+        index = (COSArray) xrefCOSStream.getKey(ASAtom.INDEX).getDirectBase();
 
         if (index == null) {
             COSObject[] defaultIndex = new COSObject[2];
             defaultIndex[0] = COSInteger.construct(0);
             defaultIndex[1] = xrefCOSStream.getKey(ASAtom.SIZE);
-            index = (COSArray) COSArray.construct(2, defaultIndex).get();
+            index = (COSArray) COSArray.construct(2, defaultIndex).getDirectBase();
         } else if (index.size() % 2 != 0) {
             throw new IOException("Index array in xref stream has odd amount of elements.");
         }
@@ -83,8 +83,8 @@ class XrefStreamParser {
     private void initializeObjIDs() {
         objIDs = new ArrayList<>();
         for (int i = 0; i < index.size() / 2; ++i) {
-            COSInteger firstID = (COSInteger) index.at(2 * i).get();
-            COSInteger lengthOfSubsection = (COSInteger) index.at(2 * i + 1).get();
+            COSInteger firstID = (COSInteger) index.at(2 * i).getDirectBase();
+            COSInteger lengthOfSubsection = (COSInteger) index.at(2 * i + 1).getDirectBase();
             for (int j = 0; j < lengthOfSubsection.get(); ++j) {
                 objIDs.add(firstID.get() + j);
             }

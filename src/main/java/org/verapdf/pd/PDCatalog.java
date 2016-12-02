@@ -62,7 +62,7 @@ public class PDCatalog extends PDObject {
 				base = base.getDirect();
 			}
 			List<PDOutputIntent> result = new ArrayList<>(base.size());
-			for (COSObject obj : (COSArray) base.get()) {
+			for (COSObject obj : (COSArray) base.getDirectBase()) {
 				if (obj != null && obj.getType().isDictionaryBased()) {
 					result.add(new PDOutputIntent(obj));
 				}

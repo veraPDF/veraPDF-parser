@@ -1,11 +1,5 @@
 package org.verapdf.pd.images;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSName;
@@ -15,6 +9,12 @@ import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDResource;
 import org.verapdf.pd.PDResources;
 import org.verapdf.pd.colors.PDColorSpace;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Maksim Bezrukov
@@ -105,11 +105,11 @@ public class PDInlineImage extends PDResource {
 	}
 
 	private static void replaceAbbreviation(final COSName abbreviation) {
-		if (abbreviation.get().equals(ASAtom.CMYK)) {
+		if (abbreviation.getName() == ASAtom.CMYK) {
 			abbreviation.set(ASAtom.DEVICECMYK);
-		} else if (abbreviation.get().equals(ASAtom.RGB)) {
+		} else if (abbreviation.getName() == ASAtom.RGB) {
 			abbreviation.set(ASAtom.DEVICERGB);
-		} else if (abbreviation.get().equals(ASAtom.G)) {
+		} else if (abbreviation.getName() == ASAtom.G) {
 			abbreviation.set(ASAtom.DEVICEGRAY);
 		}
 	}

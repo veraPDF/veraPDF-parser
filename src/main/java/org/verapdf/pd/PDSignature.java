@@ -1,10 +1,7 @@
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSString;
+import org.verapdf.cos.*;
 import org.verapdf.tools.TypeConverter;
 
 import java.util.Calendar;
@@ -25,8 +22,8 @@ public class PDSignature extends PDObject {
      */
     public int[] getByteRange() {
         COSObject cosByteRange = this.getKey(ASAtom.BYTERANGE);
-        if (cosByteRange != null) {
-            COSArray array = (COSArray) cosByteRange.get();
+        if (cosByteRange.getType() == COSObjType.COS_ARRAY) {
+            COSArray array = (COSArray) cosByteRange.getDirectBase();
             if (array.size() >= 4) {
                 int[] res = new int[4];
                 for (int i = 0; i < 4; ++i) {
@@ -42,15 +39,22 @@ public class PDSignature extends PDObject {
      * @return array of signature reference dictionaries.
      */
     public COSArray getReference() {
-        return (COSArray) this.getKey(ASAtom.REFERENCE).get();
+        COSObject res = this.getKey(ASAtom.REFERENCE);
+        if (res.getType() == COSObjType.COS_ARRAY) {
+            return (COSArray) res.getDirectBase();
+        }
+        return null;
     }
 
     /**
      * @return COSString that contains Contents of PDSignature.
      */
     public COSString getContents() {
-        COSString contents = (COSString) this.getKey(ASAtom.CONTENTS).get();
-        return contents;
+        COSObject res = this.getKey(ASAtom.CONTENTS);
+        if (res.getType() == COSObjType.COS_STRING) {
+            return (COSString) res.getDirectBase();
+        }
+        return null;
     }
 
     /**
@@ -59,6 +63,21 @@ public class PDSignature extends PDObject {
      */
     public ASAtom getFilter() {
         return this.getNameKey(ASAtom.FILTER);
+    }
+
+    /**
+     * @return the time of signing.
+     */
+    public Calendar getSignDate() {
+        return TypeConverter.parseDate(this.getStringKey(ASAtom.M));
+    }
+
+    /**
+     * @return information provided by the signer to enable a recipient to
+     * contact the signer to verify the signature.
+     */
+    public String getContactInfo() {
+        return this.getStringKey(ASAtom.CONTACT_INFO);
     }
 
     /**
@@ -77,13 +96,6 @@ public class PDSignature extends PDObject {
     }
 
     /**
-     * @return the time of signing.
-     */
-    public Calendar getSignDate() {
-        return TypeConverter.parseDate(this.getStringKey(ASAtom.M));
-    }
-
-    /**
      * @return the CPU host name or physical location of the signing.
      */
     public String getLocation() {
@@ -95,13 +107,5 @@ public class PDSignature extends PDObject {
      */
     public String getReason() {
         return this.getStringKey(ASAtom.REASON);
-    }
-
-    /**
-     * @return information provided by the signer to enable a recipient to
-     * contact the signer to verify the signature.
-     */
-    public String getContactInfo() {
-        return this.getStringKey(ASAtom.CONTACT_INFO);
     }
 }

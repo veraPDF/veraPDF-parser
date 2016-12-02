@@ -33,14 +33,14 @@ public class COSFilters extends PDObject {
 		if(!decodeParams.equals(COSObject.getEmpty())) {
 			if(decodeParams.getType().equals(COSObjType.COS_DICT)) {
 				decodeParameters = new ArrayList<>(1);
-				decodeParameters.add((COSDictionary) decodeParams.get());
+				decodeParameters.add((COSDictionary) decodeParams.getDirectBase());
 			} else if (decodeParams.getType().equals(COSObjType.COS_ARRAY)) {
 				decodeParameters = new ArrayList<>(decodeParams.size());
 				for(int i = 0; i < decodeParams.size(); ++i) {
 					if(!decodeParams.at(i).getType().equals(COSObjType.COS_DICT)) {
 						throw new IOException("DecodeParams shall be a dictionary or array of dictionaries.");
 					}
-					decodeParameters.add((COSDictionary) decodeParams.at(i).get());
+					decodeParameters.add((COSDictionary) decodeParams.at(i).getDirectBase());
 				}
 			}
 		}

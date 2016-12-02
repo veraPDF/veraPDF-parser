@@ -174,10 +174,10 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
     private void createCIDToNameTable() throws IOException {
         this.encodingMappingArray = new String[256];
         if (this.encoding.getType() == COSObjType.COS_NAME) {
-            if (ASAtom.MAC_ROMAN_ENCODING.getValue().equals(this.encoding.get().getString())) {
+            if (ASAtom.MAC_ROMAN_ENCODING.getValue().equals(this.encoding.getString())) {
                 System.arraycopy(TrueTypePredefined.MAC_ROMAN_ENCODING, 0,
                         encodingMappingArray, 0, 256);
-            } else if (ASAtom.WIN_ANSI_ENCODING.getValue().equals(this.encoding.get().getString())) {
+            } else if (ASAtom.WIN_ANSI_ENCODING.getValue().equals(this.encoding.getString())) {
                 System.arraycopy(TrueTypePredefined.WIN_ANSI_ENCODING, 0,
                         encodingMappingArray, 0, 256);
             } else {

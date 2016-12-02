@@ -31,7 +31,7 @@ public class PDAction extends PDObject {
 			if (type == COSObjType.COS_DICT) {
 				actions.add(new PDAction(next));
 			} else if (type == COSObjType.COS_ARRAY) {
-				for (COSObject obj : (COSArray) next.get()) {
+				for (COSObject obj : (COSArray) next.getDirectBase()) {
 					if (obj != null && obj.getType() == COSObjType.COS_DICT) {
 						actions.add(new PDAction(obj));
 					}
@@ -46,9 +46,9 @@ public class PDAction extends PDObject {
 		COSObject d = getKey(ASAtom.D);
 		if (d != null && d.getType() == COSObjType.COS_ARRAY) {
 			List<COSNumber> numbers = new ArrayList<>();
-			for (COSObject obj : (COSArray) d.get()) {
+			for (COSObject obj : (COSArray) d.getDirectBase()) {
 				if (obj != null && obj.getType().isNumber()) {
-					numbers.add((COSNumber) obj.get());
+					numbers.add((COSNumber) obj.getDirectBase());
 				}
 			}
 			return Collections.unmodifiableList(numbers);

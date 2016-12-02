@@ -29,13 +29,13 @@ public class PDTrueTypeFont extends PDSimpleFont {
         }
         this.isFontParsed = true;
         try {
-            if (fontDescriptor.knownKey(ASAtom.FONT_FILE2)) {
+            if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE2)) {
                 COSStream trueTypeFontFile = fontDescriptor.getFontFile2();
                 this.fontProgram = new TrueTypeFontProgram(trueTypeFontFile.getData(
                         COSStream.FilterFlags.DECODE), this.isSymbolic(),
                         this.getEncoding());
                 return this.fontProgram;
-            } else if (fontDescriptor.knownKey(ASAtom.FONT_FILE3)) {
+            } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
                 COSStream trueTypeFontFile = fontDescriptor.getFontFile3();
                 ASAtom subtype = trueTypeFontFile.getNameKey(ASAtom.SUBTYPE);
                 if (subtype == ASAtom.OPEN_TYPE) {
