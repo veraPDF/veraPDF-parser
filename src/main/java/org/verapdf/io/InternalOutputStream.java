@@ -39,6 +39,12 @@ public class InternalOutputStream implements ASOutputStream {
 		return getOffset() - oldPos;
 	}
 
+	public long write(final byte[] buffer, final int offset, final int size) throws IOException {
+		long oldPos = this.os.getFilePointer();
+		this.os.write(buffer, offset, size);
+		return getOffset() - oldPos;
+	}
+
 	public void close() throws IOException {
 		this.os.close();
 	}

@@ -26,6 +26,7 @@ public class ASBufferingOutFilter extends ASOutFilter {
 
     @Override
     public void close() {
+        this.internalBuffer = null;
         super.close();
     }
 
