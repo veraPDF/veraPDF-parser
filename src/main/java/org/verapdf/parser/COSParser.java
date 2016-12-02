@@ -1,5 +1,12 @@
 package org.verapdf.parser;
 
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.exceptions.StringExceptions;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.*;
+import org.verapdf.io.SeekableStream;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
@@ -7,25 +14,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.as.ASAtom;
-import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSBoolean;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSDocument;
-import org.verapdf.cos.COSIndirect;
-import org.verapdf.cos.COSInteger;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSNull;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSReal;
-import org.verapdf.cos.COSStream;
-import org.verapdf.cos.COSString;
-import org.verapdf.io.SeekableStream;
-import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 /**
  * @author Timur Kamalov
@@ -408,7 +396,7 @@ public class COSParser extends BaseParser {
 		StandardSecurityHandler ssh =
 				this.document.getStandardSecurityHandler();
         try {
-            ssh.decryptString((COSString) string.get(), this.keyOfCurrentObject);
+            ssh.decryptString((COSString) string.getDirectBase(), this.keyOfCurrentObject);
             return string;
         } catch (IOException | GeneralSecurityException e) {
             LOG.log(Level.WARNING, "Can't decrypt string in object " + this.keyOfCurrentObject);

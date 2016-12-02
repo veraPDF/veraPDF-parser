@@ -29,7 +29,7 @@ public class PDStructElem extends PDStructTreeNode {
 	public COSName getCOSStructureType() {
 		COSObject object = getKey(ASAtom.S);
 		if (object != null && object.getType() == COSObjType.COS_NAME) {
-			return (COSName) object.get();
+			return (COSName) object.getDirectBase();
 		}
 		return null;
 	}
@@ -37,7 +37,7 @@ public class PDStructElem extends PDStructTreeNode {
 	public COSString getLang() {
 		COSObject object = getKey(ASAtom.LANG);
 		if (object != null && object.getType() == COSObjType.COS_STRING) {
-			return (COSString) object.get();
+			return (COSString) object.getDirectBase();
 		}
 		return null;
 	}

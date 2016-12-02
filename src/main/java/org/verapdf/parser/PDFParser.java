@@ -1,25 +1,19 @@
 package org.verapdf.parser;
 
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.CharTable;
+import org.verapdf.as.exceptions.StringExceptions;
+import org.verapdf.cos.*;
+import org.verapdf.cos.xref.COSXRefEntry;
+import org.verapdf.cos.xref.COSXRefInfo;
+import org.verapdf.cos.xref.COSXRefSection;
+import org.verapdf.io.SeekableStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.as.ASAtom;
-import org.verapdf.as.CharTable;
-import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.cos.COSDocument;
-import org.verapdf.cos.COSHeader;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
-import org.verapdf.cos.COSTrailer;
-import org.verapdf.cos.xref.COSXRefEntry;
-import org.verapdf.cos.xref.COSXRefInfo;
-import org.verapdf.cos.xref.COSXRefSection;
-import org.verapdf.io.SeekableStream;
 
 /**
  * @author Timur Kamalov
@@ -432,10 +426,10 @@ public class PDFParser extends COSParser {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         COSObject xrefCOSStream = getDictionary();
-        if(!(xrefCOSStream.get().getType().equals(COSObjType.COS_STREAM))) {
+        if(!(xrefCOSStream.getType() == COSObjType.COS_STREAM)) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
-        XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.get());
+        XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.getDirectBase());
         xrefStreamParser.parseStreamAndTrailer();
         if (section.getTrailer().knownKey(ASAtom.ENCRYPT)) {
             this.isEncrypted = true;

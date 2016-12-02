@@ -1,5 +1,16 @@
 package org.verapdf.io;
 
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.exceptions.StringExceptions;
+import org.verapdf.cos.*;
+import org.verapdf.cos.xref.COSXRefInfo;
+import org.verapdf.exceptions.InvalidPasswordException;
+import org.verapdf.parser.DecodedObjectStreamParser;
+import org.verapdf.parser.PDFParser;
+import org.verapdf.parser.XRefReader;
+import org.verapdf.pd.encryption.PDEncryption;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -8,22 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.as.ASAtom;
-import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.cos.COSDocument;
-import org.verapdf.cos.COSHeader;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
-import org.verapdf.cos.xref.COSXRefInfo;
-import org.verapdf.exceptions.InvalidPasswordException;
-import org.verapdf.parser.DecodedObjectStreamParser;
-import org.verapdf.parser.PDFParser;
-import org.verapdf.parser.XRefReader;
-import org.verapdf.pd.encryption.PDEncryption;
-import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 /**
  * @author Timur Kamalov
@@ -84,7 +79,7 @@ public class Reader extends XRefReader {
 					" be object stream, but in fact it is " +
 					(object == null ? "null" : object.getType()));
 		}
-		COSStream objectStream = (COSStream) object.get();
+		COSStream objectStream = (COSStream) object.getDirectBase();
 		parser = new DecodedObjectStreamParser(
 				objectStream.getData(COSStream.FilterFlags.DECODE),
 				objectStream, new COSKey((int) -offset, 0),

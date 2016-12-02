@@ -184,11 +184,11 @@ public class StandardSecurityHandler {
             return null;
         }
         try {
-            return s.get().getBytes("ISO-8859-1");
+            return s.getString().getBytes("ISO-8859-1");
         } catch (UnsupportedEncodingException e) {
             // should not get here, ISO-8859 should be present
             LOGGER.log(Level.SEVERE, "ISO-8859-1 Charset can't be found, can't get bytes of string.", e);
-            return s.get().getBytes();
+            return s.getString().getBytes();
         }
     }
 

@@ -43,8 +43,8 @@ public class DecodedObjectStreamParser extends COSParser {
     }
 
     private void calculateInternalOffsets() throws IOException {
-        int n = (int) ((COSInteger) this.objectStream.getKey(ASAtom.N).get()).get();
-        long first = ((COSInteger) this.objectStream.getKey(ASAtom.FIRST).get()).get();
+        int n = (int) ((COSInteger) this.objectStream.getKey(ASAtom.N).getDirectBase()).get();
+        long first = ((COSInteger) this.objectStream.getKey(ASAtom.FIRST).getDirectBase()).get();
         for (int i = 0; i < n; ++i) {
             Long objNum, objOffset;
             skipSpaces(false);
