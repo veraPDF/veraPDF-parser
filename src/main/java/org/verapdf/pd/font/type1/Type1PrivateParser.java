@@ -115,10 +115,12 @@ class Type1PrivateParser extends BaseParser {
         ASInputStream decodedCharString = new EexecFilterDecode(
                 charString, true, this.getLenIV());
         Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
-        if (!isDefaultFontMatrix) {
-            glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getInteger()));
-        } else {
-            glyphWidths.put(glyphName, (int) parser.getWidth().getInteger());
+        if (parser.getWidth() != null) {
+            if (!isDefaultFontMatrix) {
+                glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getInteger()));
+            } else {
+                glyphWidths.put(glyphName, (int) parser.getWidth().getInteger());
+            }
         }
         this.nextToken();
     }

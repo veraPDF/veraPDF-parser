@@ -32,7 +32,7 @@ public abstract class BaseCharStringParser {
     protected BaseCharStringParser(ASInputStream stream) throws IOException {
         this.stream = stream;
         this.stack = new Stack<>();
-        this.width = new CFFNumber(-1);
+        this.width = null;
         parse();
     }
 
@@ -58,7 +58,7 @@ public abstract class BaseCharStringParser {
     }
 
     /**
-     * @return width of glyph or -1 if it can't be found in given CharString.
+     * @return width of glyph or null if it can't be found in given CharString.
      */
     public CFFNumber getWidth() {
         return this.width;

@@ -41,7 +41,7 @@ public class COSXRefTableReader {
 
 		if (infos == null || infos.isEmpty()) {
 			return;
-		}
+			}
 
 		COSXRefInfo lastInfo = infos.get(infos.size()-1);
 		this.startXRef = lastInfo.getStartXRef();
