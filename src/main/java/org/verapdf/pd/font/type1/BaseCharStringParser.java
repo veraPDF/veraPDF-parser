@@ -50,7 +50,7 @@ public abstract class BaseCharStringParser {
                                    int bias, CFFIndex globalSubrs) throws IOException {
         this.stream = stream;
         this.stack = new Stack<>();
-        this.width = new CFFNumber(-1);
+        this.width = null;
         this.globalSubrs = globalSubrs;
         this.localSubrs = localSubrs;
         this.bias = bias;
