@@ -11,6 +11,7 @@ import org.verapdf.pd.form.PDAcroForm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -155,6 +156,12 @@ public class PDDocument {
 
 		document.saveAs(out);
 		out.close();
+	}
+
+	public void saveTo(final OutputStream stream) {
+		if (this.document != null) {
+			document.saveTo(stream);
+		}
 	}
 
 	public PDStructTreeRoot getStructTreeRoot() throws IOException {
