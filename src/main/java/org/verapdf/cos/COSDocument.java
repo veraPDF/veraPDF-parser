@@ -1,16 +1,20 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.io.IReader;
+import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.Reader;
 import org.verapdf.io.SeekableStream;
 import org.verapdf.pd.PDDocument;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,6 +118,37 @@ public class COSDocument {
 			}
 		}
 		return result;
+	}
+
+	public List<COSObject> getObjectsByType(ASAtom type) {
+		List<COSObject> result = new ArrayList<>();
+		for (COSKey key : this.xref.getAllKeys()) {
+			COSObject obj = this.body.get(key);
+			if (!obj.empty()) {
+				addObjectWithTypeKeyCheck(result, obj, type);
+			} else {
+				try {
+					COSObject newObj = this.reader.getObject(key);
+
+					this.body.set(key, newObj);
+					addObjectWithTypeKeyCheck(result, obj, type);
+				} catch (IOException e) {
+					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
+							" " + key.getGeneration(), e);
+				}
+			}
+		}
+		return result;
+	}
+
+	private static void addObjectWithTypeKeyCheck(List<COSObject> objects,
+												  COSObject obj, ASAtom type) {
+		if (obj != null && !obj.empty() && obj.getType().isDictionaryBased()) {
+			ASAtom actualType = obj.getNameKey(ASAtom.TYPE);
+			if (actualType == type) {
+				objects.add(obj);
+			}
+		}
 	}
 
 	public Map<COSKey, COSObject> getObjectsMap() {
@@ -251,6 +286,26 @@ public class COSDocument {
 		writer.writeXRefInfo();
 
 		writer.clear();
+	}
+
+	public void saveTo(final OutputStream stream) {
+		try {
+			File temp = File.createTempFile("tmp_pdf_file", ".pdf");
+			temp.deleteOnExit();
+			Writer pdfWriter = new Writer(this, temp.getAbsolutePath());
+			this.saveAs(pdfWriter);
+			pdfWriter.close();
+			InternalInputStream pdf = new InternalInputStream(temp.getAbsolutePath());
+			byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+			int read = pdf.read(buf, buf.length);
+			while (read != -1) {
+				stream.write(buf, 0, read);
+				read = pdf.read(buf, buf.length);
+			}
+			pdf.close();
+		} catch (IOException e) {
+			LOGGER.log(Level.FINE, "Can't write COSDocument to stream", e);
+		}
 	}
 
 	public void setStandardSecurityHandler(StandardSecurityHandler standardSecurityHandler) {
