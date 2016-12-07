@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.cff;
 
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 
@@ -29,7 +29,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
 
     private CMap externalCMap;
 
-    CFFCIDFontProgram(SeekableStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
+    CFFCIDFontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                       long topDictBeginOffset, long topDictEndOffset, CMap externalCMap,
                       boolean isSubset) {
         super(stream);

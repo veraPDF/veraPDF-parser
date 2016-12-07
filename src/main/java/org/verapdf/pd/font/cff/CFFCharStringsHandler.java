@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.cff;
 
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -20,11 +20,11 @@ class CFFCharStringsHandler {
 
     private int amount;
     private CFFIndex memoryInCharStirngs;
-    private SeekableStream fontStream;
+    private SeekableInputStream fontStream;
     private long[] charStringsOffsets;
 
     CFFCharStringsHandler(CFFIndex charStrings, long charStringsOffset,
-                          SeekableStream fontStream) {
+                          SeekableInputStream fontStream) {
         this.amount = charStrings.size();
         if (charStrings.getDataLength() < MAX_BUFFER_SIZE) {
             this.memoryInCharStirngs = charStrings;

@@ -6,7 +6,7 @@ import org.verapdf.cos.COSIndirect;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.form.PDAcroForm;
 
 import java.io.IOException;
@@ -184,7 +184,7 @@ public class PDDocument {
 		return getCatalog().getAcroForm();
 	}
 
-	public SeekableStream getPDFSource() {
+	public SeekableInputStream getPDFSource() {
 		return this.document.getPDFSource();
 	}
 }

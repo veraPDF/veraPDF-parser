@@ -4,7 +4,7 @@ import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.io.InternalInputStream;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,10 +24,10 @@ public class BaseParser {
 	private static final byte ASCII_ZERO = 48;
 	private static final byte ASCII_NINE = 57;
 
-	protected SeekableStream source;
+	protected SeekableInputStream source;
 	private Token token;
 
-	public BaseParser(SeekableStream stream) throws IOException {
+	public BaseParser(SeekableInputStream stream) throws IOException {
 		if(stream == null) {
 			throw new IOException("Can't create SeekableStream, passed seekableeStream is null");
 		}
@@ -45,7 +45,7 @@ public class BaseParser {
 		if (fileStream == null) {
 			throw new IOException("Can't create SeekableStream, fileStream is null");
 		}
-		this.source = SeekableStream.getSeekableStream(fileStream);
+		this.source = SeekableInputStream.getSeekableStream(fileStream);
 	}
 
 	public void closeInputStream() throws IOException {

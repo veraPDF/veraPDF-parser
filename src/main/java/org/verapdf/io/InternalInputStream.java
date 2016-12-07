@@ -9,27 +9,36 @@ import java.io.*;
 /**
  * @author Timur Kamalov
  */
-public class InternalInputStream extends SeekableStream {
+public class InternalInputStream extends SeekableInputStream {
 
 	private final static String READ_ONLY_MODE = "r";
 
+	private String fileName;
 	private RandomAccessFile source;
 
-	/**
-	 * Constructor that does not perform file copy.
-	 *
-	 * @param source is random access file
-     */
-	public InternalInputStream(final RandomAccessFile source) {
-		this.source = source;
+//	/**
+//	 * Constructor that does not perform file copy.
+//	 *
+//	 * @param source is random access file
+//     */
+//	public InternalInputStream(final RandomAccessFile source) {
+//		this.fileName = null;
+//		this.source = source;
+//	}
+
+	public InternalInputStream(final File file) throws FileNotFoundException {
+		this.source = new RandomAccessFile(file, READ_ONLY_MODE);
 	}
 
 	public InternalInputStream(final String fileName) throws FileNotFoundException {
+		this.fileName = fileName;
 		this.source = new RandomAccessFile(fileName, READ_ONLY_MODE);
 	}
 
 	public InternalInputStream(final InputStream fileStream) throws IOException {
-		this.source = new RandomAccessFile(createTempFile(fileStream), READ_ONLY_MODE);
+		File tempFile = createTempFile(fileStream);
+		this.fileName = tempFile.getAbsolutePath();
+		this.source = new RandomAccessFile(tempFile, READ_ONLY_MODE);
 	}
 
 	/**
@@ -98,6 +107,10 @@ public class InternalInputStream extends SeekableStream {
     @Override
 	public long getStreamLength() throws IOException {
 		return this.source.length();
+	}
+
+	public String getFileName() {
+		return fileName;
 	}
 
 	public RandomAccessFile getStream() {

@@ -3,9 +3,14 @@ package org.verapdf.cos;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
+import org.verapdf.io.InternalInputStream;
+import org.verapdf.io.InternalOutputStream;
+import org.verapdf.io.SeekableInputStream;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -182,8 +187,16 @@ public class COSStream extends COSDictionary {
 		return new COSFilters(getKey(ASAtom.FILTER));
 	}
 
-	public void setFilters(final COSFilters filters) {
+	public void setFilters(final COSFilters filters) throws IOException {
+		SeekableInputStream unfilteredData =
+				SeekableInputStream.getSeekableStream(this.getData(COSStream.FilterFlags.DECODE));
+		InternalOutputStream fileWithData = InternalOutputStream.getInternalOutputStream();
 		setKey(ASAtom.FILTER, filters.getObject());
+		ASOutputStream encoder = filters.getOutputStream(fileWithData);
+		encoder.write(unfilteredData);
+		File encodedDataFile = fileWithData.getFile();
+		fileWithData.close();
+		this.setData(new InternalInputStream(encodedDataFile));
 	}
 
 	public FilterFlags getFilterFlags() {

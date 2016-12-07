@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.truetype;
 
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ abstract class TrueTypeTable extends TrueTypeBaseParser {
 
     protected long offset;
 
-    protected TrueTypeTable(SeekableStream source, long offset) {
+    protected TrueTypeTable(SeekableInputStream source, long offset) {
         super(source);
         this.offset = offset;
     }
