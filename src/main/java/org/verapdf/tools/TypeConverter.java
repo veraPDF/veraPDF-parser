@@ -144,7 +144,7 @@ public class TypeConverter {
 		SimpleDateFormat sdf = new SimpleDateFormat("Z");
 		sdf.setTimeZone(date.getTimeZone());
 		String tz = sdf.format(new Date());
-		return String.format("(D:%04d%02d%02d%02d%02d%02d%s'%s')", year, month, day, hour, min, sec, tz.substring(0, 3), tz.substring(3, 5));
+		return String.format("(D:%04d%02d%02d%02d%02d%02d%s'%s)", year, month, day, hour, min, sec, tz.substring(0, 3), tz.substring(3, 5));
 	}
 
 	private static boolean isDigits(String toCheck, int offset, int length) {
