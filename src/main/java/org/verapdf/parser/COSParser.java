@@ -4,7 +4,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class COSParser extends BaseParser {
 
-	private static final Logger LOG = Logger.getLogger(COSParser.class.getCanonicalName());
+	private static final Logger LOGGER = Logger.getLogger(COSParser.class.getCanonicalName());
 
 	/**
 	 * Linearization dictionary must be in first 1024 bytes of document
@@ -34,8 +34,8 @@ public class COSParser extends BaseParser {
 
 	protected boolean flag = true;
 
-	public COSParser(final SeekableStream seekableStream) throws IOException {
-		super(seekableStream);
+	public COSParser(final SeekableInputStream seekableInputStream) throws IOException {
+		super(seekableInputStream);
 	}
 
 	public COSParser(final String filename) throws IOException {
@@ -332,7 +332,7 @@ public class COSParser extends BaseParser {
 				source.unread();
 			}
 		} else if (whiteSpace != 10) {
-			LOG.log(Level.WARNING, "Stream at " + source.getOffset() + " offset has no EOL marker.");
+			LOGGER.log(Level.WARNING, "Stream at " + source.getOffset() + " offset has no EOL marker.");
 			stream.setStreamKeywordCRLFCompliant(false);
 			source.unread();
 		}
@@ -344,7 +344,7 @@ public class COSParser extends BaseParser {
 		long expectedEndstreamOffset = start + streamLength;
 		if (expectedEndstreamOffset > source.getStreamLength()) {
 			validLength = false;
-			LOG.log(Level.WARNING, "Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
+			LOGGER.log(Level.WARNING, "Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
 		} else {
 			source.seek(expectedEndstreamOffset);
 
@@ -353,7 +353,7 @@ public class COSParser extends BaseParser {
 			if (token.type != Token.Type.TT_KEYWORD ||
 					token.keyword != Token.Keyword.KW_ENDSTREAM) {
 				validLength = false;
-				LOG.log(Level.WARNING, "Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
+				LOGGER.log(Level.WARNING, "Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
 			}
 
 			source.seek(start);
@@ -380,7 +380,7 @@ public class COSParser extends BaseParser {
 		} else if (secondSymbol == 13) {
 			eolCount = 1;
 		} else {
-			LOG.log(Level.WARNING, "End of stream at " + source.getOffset() + " offset doesn't contain EOL marker.");
+			LOGGER.log(Level.WARNING, "End of stream at " + source.getOffset() + " offset doesn't contain EOL marker.");
 			stream.setEndstreamKeywordCRLFCompliant(false);
 		}
 
@@ -399,7 +399,7 @@ public class COSParser extends BaseParser {
             ssh.decryptString((COSString) string.getDirectBase(), this.keyOfCurrentObject);
             return string;
         } catch (IOException | GeneralSecurityException e) {
-            LOG.log(Level.WARNING, "Can't decrypt string in object " + this.keyOfCurrentObject);
+            LOGGER.log(Level.WARNING, "Can't decrypt string in object " + this.keyOfCurrentObject);
             return string;
         }
 	}

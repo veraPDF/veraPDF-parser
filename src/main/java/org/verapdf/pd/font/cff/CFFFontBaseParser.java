@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.cff;
 
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.CFFNumber;
 
 import java.io.IOException;
@@ -43,7 +43,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected int bias;
     protected CFFIndex localSubrIndex;
 
-    public CFFFontBaseParser(SeekableStream source) {
+    public CFFFontBaseParser(SeekableInputStream source) {
         super(source);
         stack = new ArrayList<>(48);
         System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,

@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.truetype;
 
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ class TrueTypeCmapTable extends TrueTypeTable {
 
     private TrueTypeCmapSubtable[] cmapInfos;
 
-    TrueTypeCmapTable(SeekableStream source, long offset) {
+    TrueTypeCmapTable(SeekableInputStream source, long offset) {
         super(source, offset);
     }
 

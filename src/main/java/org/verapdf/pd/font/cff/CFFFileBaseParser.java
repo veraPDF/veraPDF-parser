@@ -1,7 +1,7 @@
 package org.verapdf.pd.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.CFFNumber;
 
 import java.io.IOException;
@@ -14,14 +14,14 @@ import java.io.IOException;
 class CFFFileBaseParser {
 
     private int offSize;
-    protected SeekableStream source;
+    protected SeekableInputStream source;
     protected CFFIndex definedNames;
 
     CFFFileBaseParser(ASInputStream source) throws IOException {
-        this.source = SeekableStream.getSeekableStream(source);
+        this.source = SeekableInputStream.getSeekableStream(source);
     }
 
-    CFFFileBaseParser(SeekableStream source) {
+    CFFFileBaseParser(SeekableInputStream source) {
         this.source = source;
     }
 

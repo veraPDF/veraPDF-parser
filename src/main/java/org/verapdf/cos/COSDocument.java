@@ -7,7 +7,7 @@ import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.io.IReader;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.Reader;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.PDDocument;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
 
@@ -271,7 +271,7 @@ public class COSDocument {
 		//TODO : implement this
 	}
 
-	public SeekableStream getPDFSource() {
+	public SeekableInputStream getPDFSource() {
 		return this.reader.getPDFSource();
 	}
 

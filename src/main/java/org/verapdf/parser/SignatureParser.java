@@ -1,16 +1,16 @@
 package org.verapdf.parser;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class is extension of BaseParser for parsing of digital signature dictionaries.
@@ -33,7 +33,7 @@ public class SignatureParser extends COSParser {
      * @param stream The stream to read the data from.
      * @throws IOException If there is an error reading the input stream.
      */
-    public SignatureParser(SeekableStream stream, COSDocument document) throws IOException {
+    public SignatureParser(SeekableInputStream stream, COSDocument document) throws IOException {
         super(stream);
         this.document = document;
     }

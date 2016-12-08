@@ -7,7 +7,7 @@ import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class PDFParser extends COSParser {
 
-    private static final Logger LOG = Logger.getLogger(PDFParser.class.getCanonicalName());
+    private static final Logger LOGGER = Logger.getLogger(PDFParser.class.getCanonicalName());
 
     private static final String HEADER_PATTERN = "%PDF-";
     private static final String PDF_DEFAULT_VERSION = "1.4";
@@ -53,7 +53,7 @@ public class PDFParser extends COSParser {
         return parseHeader();
     }
 
-    public SeekableStream getPDFSource() {
+    public SeekableInputStream getPDFSource() {
         return this.source;
     }
 
@@ -95,7 +95,7 @@ public class PDFParser extends COSParser {
             if (header.length() < HEADER_PATTERN.length() + 3) {
                 // No version number at all, set to 1.4 as default
                 header = HEADER_PATTERN + PDF_DEFAULT_VERSION;
-                LOG.log(Level.WARNING, "No version found, set to " + PDF_DEFAULT_VERSION + " as default.");
+                LOGGER.log(Level.WARNING, "No version found, set to " + PDF_DEFAULT_VERSION + " as default.");
             } else {
                 // trying to parse header version if it has some garbage
                 Integer pos = null;
@@ -117,7 +117,7 @@ public class PDFParser extends COSParser {
                 headerVersion = Float.parseFloat(headerParts[1]);
             }
         } catch (NumberFormatException e) {
-            LOG.log(Level.WARNING, "Can't parse the header version.", e);
+            LOGGER.log(Level.WARNING, "Can't parse the header version.", e);
         }
 
         result.setVersion(headerVersion);
@@ -141,7 +141,7 @@ public class PDFParser extends COSParser {
                 }
             }
         } catch (IOException e) {
-            LOG.log(Level.WARNING, "IO error while trying to find first document dictionary", e);
+            LOGGER.log(Level.WARNING, "IO error while trying to find first document dictionary", e);
         }
 
         return false;

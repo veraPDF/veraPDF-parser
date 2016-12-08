@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Sergey Shemyakov
  */
-public class SeekableStreamTest {
+public class SeekableInputStreamTest {
 
     @Test
     public void test() throws IOException {
@@ -24,9 +24,9 @@ public class SeekableStreamTest {
         InputStream streamOne = new ByteArrayInputStream(one);
         InputStream streamTwo = new ByteArrayInputStream(two);
         InputStream streamThree = new ByteArrayInputStream(three);
-        SeekableStream ssOne = SeekableStream.getSeekableStream(streamOne);
-        SeekableStream ssTwo = SeekableStream.getSeekableStream(streamTwo);
-        SeekableStream ssThree = SeekableStream.getSeekableStream(streamThree);
+        SeekableInputStream ssOne = SeekableInputStream.getSeekableStream(streamOne);
+        SeekableInputStream ssTwo = SeekableInputStream.getSeekableStream(streamTwo);
+        SeekableInputStream ssThree = SeekableInputStream.getSeekableStream(streamThree);
         assertTrue(ssOne instanceof ASMemoryInStream);
         assertTrue(ssTwo instanceof ASMemoryInStream);
         assertTrue(ssThree instanceof InternalInputStream);
