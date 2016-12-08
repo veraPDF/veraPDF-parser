@@ -24,7 +24,6 @@ public class COSStreamTest {
         COSObject cosStream = COSStream.construct(asciiHexStream);
         cosStream.setKey(ASAtom.FILTER, COSName.construct(ASAtom.ASCII_HEX_DECODE));
         ((COSStream) cosStream.get()).setFilters(new COSFilters(COSName.construct(ASAtom.FLATE_DECODE)));
-        System.out.println();
         byte[] buf = new byte[100];
         int read = cosStream.getData(COSStream.FilterFlags.DECODE).read(buf, 100);
         String message = new String(Arrays.copyOf(buf, read));
