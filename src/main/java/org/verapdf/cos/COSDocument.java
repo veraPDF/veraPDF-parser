@@ -40,6 +40,8 @@ public class COSDocument {
 	private boolean linearized;
 	private boolean isNew;
 	private StandardSecurityHandler standardSecurityHandler;
+	private List<COSObject> changedObjects;
+	private List<COSObject> addedObjects;
 
 	private byte postEOFDataSize;
 
@@ -56,6 +58,8 @@ public class COSDocument {
 		this.lastTrailer = new COSTrailer();
 		this.linearized = false;
 		this.isNew = true;
+		this.changedObjects = new ArrayList<>();
+		this.addedObjects = new ArrayList<>();
 	}
 
 	public COSDocument(final String fileName, final PDDocument document) throws IOException {
@@ -81,6 +85,8 @@ public class COSDocument {
 		this.firstTrailer = reader.getFirstTrailer();
 		this.lastTrailer = reader.getLastTrailer();
 		this.linearized = reader.isLinearized();
+		this.changedObjects = new ArrayList<>();
+		this.addedObjects = new ArrayList<>();
 	}
 
 	private void initReader(final InputStream fileStream) throws IOException {
@@ -205,9 +211,9 @@ public class COSDocument {
 		COSKey key = obj.getKey();
 
 		//TODO : fix this method for document save
-		if (key.getNumber() == 0 && key.getGeneration() == 0) {
+		if (key == null) {
 			key = this.xref.next();
-			this.body.set(key, obj.getDirect());
+			this.body.set(key, obj.isIndirect() ? obj.getDirect() : obj);
 			obj = COSIndirect.construct(key, this);
 		}
 
@@ -292,19 +298,26 @@ public class COSDocument {
 		try {
 			File temp = File.createTempFile("tmp_pdf_file", ".pdf");
 			temp.deleteOnExit();
-			Writer pdfWriter = new Writer(this, temp.getAbsolutePath());
-			this.saveAs(pdfWriter);
+			Writer pdfWriter = new Writer(this, temp.getAbsolutePath(),
+					this.getPDFSource().getStreamLength());
+			pdfWriter.writeIncrementalUpdate(changedObjects, addedObjects);
 			pdfWriter.close();
+			this.getPDFSource().reset();
+			writeInputIntoOutput(this.getPDFSource(), stream);
 			InternalInputStream pdf = new InternalInputStream(temp.getAbsolutePath());
-			byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
-			int read = pdf.read(buf, buf.length);
-			while (read != -1) {
-				stream.write(buf, 0, read);
-				read = pdf.read(buf, buf.length);
-			}
+			writeInputIntoOutput(pdf, stream);
 			pdf.close();
 		} catch (IOException e) {
 			LOGGER.log(Level.FINE, "Can't write COSDocument to stream", e);
+		}
+	}
+
+	private static void writeInputIntoOutput(InputStream input, OutputStream output) throws IOException {
+		byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+		int read = input.read(buf, 0, buf.length);
+		while (read != -1) {
+			output.write(buf, 0, read);
+			read = input.read(buf, 0, buf.length);
 		}
 	}
 
@@ -328,5 +341,39 @@ public class COSDocument {
 			}
 		}
 		return null;
+	}
+
+	public void addObject(COSObject obj) {
+		if (obj != null && !obj.empty()) {
+			this.addedObjects.add(obj);
+		}
+	}
+
+	public void addChangedObject(COSObject obj) {
+		if (obj != null && !obj.empty() && !isObjectChanged(obj)) {
+			this.changedObjects.add(obj);
+		}
+	}
+
+	public boolean isObjectChanged(COSObject obj) {
+		return listContainsObject(changedObjects, obj) ||
+				listContainsObject(addedObjects, obj);
+	}
+
+	private static boolean listContainsObject(List<COSObject> list, COSObject obj) {
+		for (COSObject listObject : list) {
+			if (listObject == obj) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public long getLastTrailerOffset() {
+		return this.reader.getLastTrailerOffset();
+	}
+
+	public int getLastKeyNumber() {
+		return this.body.getLastKeyNumber();
 	}
 }

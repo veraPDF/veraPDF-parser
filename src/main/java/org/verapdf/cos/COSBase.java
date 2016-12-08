@@ -15,17 +15,8 @@ import java.util.Set;
 public abstract class COSBase {
 
 	private COSKey indirectKey;
-	private boolean needToBeUpdated;
 
 	public COSBase() {
-	}
-
-	public boolean isNeedToBeUpdated() {
-		return needToBeUpdated;
-	}
-
-	public void setNeedToBeUpdated(boolean needToBeUpdated) {
-		this.needToBeUpdated = needToBeUpdated;
 	}
 
 	// Returns object type

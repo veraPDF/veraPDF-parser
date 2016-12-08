@@ -60,8 +60,8 @@ public class Reader extends XRefReader {
 		}
 		long offset = getOffset(key).longValue();
 		if(offset > 0) {
-			if (getHeader().getHeaderOffset() > 0) {
-				offset += getHeader().getHeaderOffset();
+			if (header.getHeaderOffset() > 0) {
+				offset += header.getHeaderOffset();
 			}
 			COSObject result = getObject(offset);
 			result.setObjectKey(key);
@@ -101,6 +101,15 @@ public class Reader extends XRefReader {
 	@Override
 	public SeekableInputStream getPDFSource() {
 		return this.parser.getPDFSource();
+	}
+
+	@Override
+	public long getLastTrailerOffset() {
+		long res = this.parser.getLastTrailerOffset();
+		if (res == 0) {
+			LOGGER.log(Level.FINE, "Offset of last trailer can not be determined");
+		}
+		return res;
 	}
 
 	// PRIVATE METHODS

@@ -36,4 +36,26 @@ public class COSBody {
 		table.put(key, object);
 	}
 
+	public COSKey getKeyForObject(COSObject obj) {
+		if (obj.isIndirect()) {
+			return obj.getObjectKey();
+		} else {
+			for (COSKey key : this.table.keySet()) {
+				if (this.table.get(key) == obj) {
+                    return key;
+                }
+			}
+			return null;
+		}
+	}
+
+	public int getLastKeyNumber() {
+        int res = 1;
+        for (COSKey key : this.table.keySet()) {
+            if (key.getNumber() > res) {
+                res = key.getNumber();
+            }
+        }
+        return res;
+    }
 }

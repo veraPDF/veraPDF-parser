@@ -35,4 +35,6 @@ public interface IReader {
 
 	COSTrailer getLastTrailer();
 
+	long getLastTrailerOffset();
+
 }
