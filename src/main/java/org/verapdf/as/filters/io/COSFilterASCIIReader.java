@@ -37,7 +37,6 @@ public class COSFilterASCIIReader {
         this.stream = stream;
         this.isASCIIHex = isASCIIHex;
         this.buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
-//        this.stream.read(buf, buf.length);
         bufPointer = 0;
         if(buf[0] == '<' && buf[1] == '~') {    //Skipping leading <~
             bufPointer += 2;

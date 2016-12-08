@@ -16,16 +16,6 @@ public class InternalInputStream extends SeekableInputStream {
 	private String fileName;
 	private RandomAccessFile source;
 
-//	/**
-//	 * Constructor that does not perform file copy.
-//	 *
-//	 * @param source is random access file
-//     */
-//	public InternalInputStream(final RandomAccessFile source) {
-//		this.fileName = null;
-//		this.source = source;
-//	}
-
 	public InternalInputStream(final File file) throws FileNotFoundException {
 		this.source = new RandomAccessFile(file, READ_ONLY_MODE);
 	}
