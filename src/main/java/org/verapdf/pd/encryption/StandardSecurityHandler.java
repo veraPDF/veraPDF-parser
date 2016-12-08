@@ -151,7 +151,7 @@ public class StandardSecurityHandler {
             filter = new COSFilterAESDecryptionDefault(encStream, key,
                     this.encryptionKey, true);
         }
-        stream.setData(filter);
+        stream.setData(filter, COSStream.FilterFlags.RAW_DATA);
     }
 
     /**

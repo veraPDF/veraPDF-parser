@@ -140,7 +140,19 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public boolean setData(final ASInputStream stream) {
-		return setData(stream, FilterFlags.RAW_DATA);
+		COSFilters filters = getFilters();
+		if (filters.empty()) {
+			return setData(stream, FilterFlags.RAW_DATA);
+		}
+		try (InternalOutputStream fileWithData = InternalOutputStream.getInternalOutputStream()) {
+			ASOutputStream encoder = filters.getOutputStream(fileWithData);
+			encoder.write(stream);
+			File encodedDataFile = fileWithData.getFile();
+			return setData(new InternalInputStream(encodedDataFile), FilterFlags.RAW_DATA);
+		} catch (IOException e) {
+			LOGGER.log(Level.FINE, "Can not set data", e);
+			return false;
+		}
 	}
 
 	@Override
@@ -196,7 +208,7 @@ public class COSStream extends COSDictionary {
 		encoder.write(unfilteredData);
 		File encodedDataFile = fileWithData.getFile();
 		fileWithData.close();
-		this.setData(new InternalInputStream(encodedDataFile));
+		this.setData(new InternalInputStream(encodedDataFile), FilterFlags.RAW_DATA);
 	}
 
 	public FilterFlags getFilterFlags() {

@@ -4,15 +4,12 @@ import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 
 /**
  * @author Timur Kamalov
  */
-public class InternalOutputStream implements ASOutputStream {
+public class InternalOutputStream implements ASOutputStream, Closeable {
 
 	private final static String READ_WRITE_MODE = "rw";
 
