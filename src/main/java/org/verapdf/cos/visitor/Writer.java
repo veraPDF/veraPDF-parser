@@ -65,7 +65,8 @@ public class Writer implements IVisitor {
 									   List<COSObject> addedObjects) {
 		List<COSKey> objectsToWrite = new ArrayList<>();
 		for (COSObject obj : changedObjects) {
-			if (obj.isIndirect()) {
+			COSKey key = obj.getObjectKey();
+			if (key != null) {
 				objectsToWrite.add(obj.getObjectKey());
 			}
 		}
