@@ -126,6 +126,7 @@ public class TypeConverter {
 				}
 				Calendar res = new GregorianCalendar(zone);
 				res.set(year, month, day, hour, minutes, seconds);
+				res.set(Calendar.MILLISECOND, 0);
 				return res;
 			}
 		}

@@ -143,7 +143,7 @@ public class PDDocument {
 	}
 
 	public void saveAs(final String fileName) throws IOException {
-		final Writer out = new IndirectWriter(this.document, fileName, false);
+		final Writer out = new IndirectWriter(this.document, fileName, false, 0);
 		this.saveAs(out, fileName);
 	}
 
