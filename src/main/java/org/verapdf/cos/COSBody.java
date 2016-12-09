@@ -48,14 +48,4 @@ public class COSBody {
 			return null;
 		}
 	}
-
-	public int getLastKeyNumber() {
-        int res = 1;
-        for (COSKey key : this.table.keySet()) {
-            if (key.getNumber() > res) {
-                res = key.getNumber();
-            }
-        }
-        return res;
-    }
 }

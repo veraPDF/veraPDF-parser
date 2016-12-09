@@ -349,10 +349,18 @@ public class COSDocument {
 		}
 	}
 
+	public void removeAddedObject(COSObject obj) {
+		this.addedObjects.remove(obj);
+	}
+
 	public void addChangedObject(COSObject obj) {
 		if (obj != null && !obj.empty() && !isObjectChanged(obj)) {
 			this.changedObjects.add(obj);
 		}
+	}
+
+	public void removeChangedObject(COSObject obj) {
+		this.changedObjects.remove(obj);
 	}
 
 	public boolean isObjectChanged(COSObject obj) {
@@ -374,6 +382,6 @@ public class COSDocument {
 	}
 
 	public int getLastKeyNumber() {
-		return this.body.getLastKeyNumber();
+		return this.reader.getLastXrefKeyNumber();
 	}
 }
