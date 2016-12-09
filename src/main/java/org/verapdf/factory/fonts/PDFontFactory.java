@@ -1,8 +1,5 @@
 package org.verapdf.factory.fonts;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
@@ -12,6 +9,9 @@ import org.verapdf.pd.font.PDType0Font;
 import org.verapdf.pd.font.PDType3Font;
 import org.verapdf.pd.font.truetype.PDTrueTypeFont;
 import org.verapdf.pd.font.type1.PDType1Font;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Creates PDFont from COSObject that is font dictionary.
@@ -30,7 +30,7 @@ public class PDFontFactory {
      * @return PDFont that corresponds to this dictionary.
      */
     public static PDFont getPDFont(COSObject fontDictionary) {
-        if (fontDictionary.getType() == COSObjType.COS_DICT) {
+        if (fontDictionary != null && fontDictionary.getType() == COSObjType.COS_DICT) {
             COSDictionary dict = (COSDictionary) fontDictionary.getDirectBase();
             ASAtom subtype = fontDictionary.getNameKey(ASAtom.SUBTYPE);
             if (subtype == ASAtom.TYPE1 ||
