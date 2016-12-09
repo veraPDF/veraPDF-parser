@@ -46,7 +46,7 @@ public class COSFilterASCII85Decode extends ASBufferingInFilter {
             pointer += decoded;
             fiveBytes = reader.getNextBytes();
         }
-        return pointer;
+        return pointer == 0 ? -1 : pointer;
     }
 
     private int decodeFiveBytes(byte[] fiveBytes, byte[] fourBytes) {

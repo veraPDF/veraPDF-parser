@@ -66,6 +66,9 @@ public class COSFilterASCIIHexDecode extends ASBufferingInFilter {
             buffer[pointer++] = res;
             twoBytes = reader.getNextBytes();
         }
+        if (pointer == 0) {
+            return -1;
+        }
         res = (byte) (decodeLoHex(twoBytes[0]) << 4);
         res += decodeLoHex(twoBytes[1]);
         buffer[pointer++] = res;
