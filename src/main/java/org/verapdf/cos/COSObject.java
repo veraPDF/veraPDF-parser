@@ -32,16 +32,6 @@ public class COSObject {
 		set(object.base);
 	}
 
-	public boolean isNeedToBeUpdated() {
-		return this.base != null && this.base.isNeedToBeUpdated();
-	}
-
-	public void setNeedToBeUpdated(boolean needToBeUpdated) {
-		if (this.base != null) {
-			this.base.setNeedToBeUpdated(needToBeUpdated);
-		}
-	}
-
 	// Access to base underlying object
 	public COSBase get() {
 		return this.base;

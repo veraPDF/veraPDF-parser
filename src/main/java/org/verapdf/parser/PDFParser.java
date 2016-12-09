@@ -32,6 +32,7 @@ public class PDFParser extends COSParser {
     private boolean isEncrypted;
     private COSObject encryption;
     private COSObject id;
+    private Long lastTrailerOffset = 0L;
 
     public PDFParser(final String filename) throws IOException {
         super(filename);
@@ -473,6 +474,9 @@ public class PDFParser extends COSParser {
 
 	private void getTrailer(final COSTrailer trailer) throws IOException {
 		if (findKeyword(Token.Keyword.KW_TRAILER)) {
+            if (this.lastTrailerOffset == 0) {
+                this.lastTrailerOffset = this.source.getOffset();
+            }
 			COSObject obj = nextObject();
 			trailer.setObject(obj);
 		}
@@ -494,5 +498,9 @@ public class PDFParser extends COSParser {
 
     public COSObject getId() {
         return id;
+    }
+
+    public Long getLastTrailerOffset() {
+        return lastTrailerOffset;
     }
 }
