@@ -37,5 +37,5 @@ public interface IReader {
 
 	long getLastTrailerOffset();
 
-	int getLastXrefKeyNumber();
+	int getGreatestKeyNumberFromXref();
 }

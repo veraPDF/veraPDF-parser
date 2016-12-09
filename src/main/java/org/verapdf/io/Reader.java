@@ -151,7 +151,7 @@ public class Reader extends XRefReader {
 	}
 
 	@Override
-	public int getLastXrefKeyNumber() {
+	public int getGreatestKeyNumberFromXref() {
 		int res = 1;
 		for (COSKey key : this.getKeys()) {
 			if (key.getNumber() > res) {

@@ -382,6 +382,6 @@ public class COSDocument {
 	}
 
 	public int getLastKeyNumber() {
-		return this.reader.getLastXrefKeyNumber();
+		return this.reader.getGreatestKeyNumberFromXref();
 	}
 }
