@@ -179,7 +179,7 @@ public class Writer implements IVisitor {
 			//TODO : Decode
 		}
 		try {
-			obj.setIntegerKey(ASAtom.SIZE, getASInputStreamLength(in));
+			obj.setIntegerKey(ASAtom.LENGTH, getASInputStreamLength(in));
 		} catch (IOException e) {
 			LOGGER.log(Level.FINE, "Can't calculate length of ASInputStream", e);
 		}
