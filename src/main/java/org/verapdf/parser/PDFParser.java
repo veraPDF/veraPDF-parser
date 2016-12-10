@@ -356,6 +356,9 @@ public class PDFParser extends COSParser {
     }
 
     private void getXRefSectionAndTrailer(final COSXRefInfo section) throws IOException {
+        if (this.lastTrailerOffset == 0) {
+            this.lastTrailerOffset = this.source.getOffset();
+        }
         nextToken();
         if ((getToken().type != Token.Type.TT_KEYWORD ||
                 getToken().keyword != Token.Keyword.KW_XREF) &&
@@ -474,9 +477,6 @@ public class PDFParser extends COSParser {
 
 	private void getTrailer(final COSTrailer trailer) throws IOException {
 		if (findKeyword(Token.Keyword.KW_TRAILER)) {
-            if (this.lastTrailerOffset == 0) {
-                this.lastTrailerOffset = this.source.getOffset();
-            }
 			COSObject obj = nextObject();
 			trailer.setObject(obj);
 		}
