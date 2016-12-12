@@ -72,6 +72,10 @@ public class PDDocument {
 		}
 
 		COSObject root = document.getTrailer().getRoot();
+		if (root == COSObject.getEmpty()) {
+			root = new COSObject();
+			document.getTrailer().setRoot(root);
+		}
 
 		if (!root.empty()) {
 			catalog.setObject(root);

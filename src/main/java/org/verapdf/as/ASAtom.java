@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author Timur Kamalov
  */
-public class ASAtom {
+public class ASAtom implements Comparable<ASAtom> {
 
     private static Map<String, ASAtom> predefinedPDFNames = new HashMap<>();
     private static Map<String, ASAtom> cachedPDFNames = new HashMap<>();
@@ -644,4 +644,9 @@ public class ASAtom {
         return value != null ? value.hashCode() : 0;
     }
 
+
+    @Override
+    public int compareTo(ASAtom o) {
+        return this.value.compareTo(o.value);
+    }
 }

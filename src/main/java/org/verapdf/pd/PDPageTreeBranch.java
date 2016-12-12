@@ -110,27 +110,32 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		clear();
 
 		COSObject kids = getObject().getKey(ASAtom.KIDS);
-		for (int i = 0; i < kids.size(); i++) {
-			COSObject obj = kids.at(i);
+		if (!kids.empty()) {
+			for (int i = 0; i < kids.size(); i++) {
+				COSObject obj = kids.at(i);
 
-			PDPageTreeNode kid_i;
+				PDPageTreeNode kid_i;
 
-			if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGE)) {
-				kid_i = new PDPage(obj);
-			} else if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGES)) {
-				kid_i = new PDPageTreeBranch(obj);
-				isTerminal = false;
-			} else {
-				//TODO : ASException
-				throw new RuntimeException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
+				if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGE)) {
+					kid_i = new PDPage(obj);
+				} else if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGES)) {
+					kid_i = new PDPageTreeBranch(obj);
+					isTerminal = false;
+				} else {
+					//TODO : ASException
+					throw new RuntimeException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
+				}
+
+				kid_i.setParent(this);
+
+				this.children.add(kid_i);
 			}
-
-			kid_i.setParent(this);
-
-			this.children.add(kid_i);
 		}
 
-		this.leafCount = getObject().getIntegerKey(ASAtom.COUNT).intValue();
+		Long leafCount = getObject().getIntegerKey(ASAtom.COUNT);
+		if (leafCount != null) {
+			this.leafCount = leafCount.intValue();
+		}
 	}
 
 	protected void updateToObject() {

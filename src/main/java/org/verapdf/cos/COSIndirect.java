@@ -41,6 +41,7 @@ public class COSIndirect extends COSBase {
             this.child = value;
         } else {
             this.key = this.document.setObject(value);
+            this.child = value;
         }
     }
 
