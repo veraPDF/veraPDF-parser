@@ -187,7 +187,7 @@ public class COSDocument {
 
 			COSObject newObj = this.reader.getObject(key);
 			if (newObj == null) {
-				return COSObject.getEmpty();
+				return new COSObject();
 			}
 			this.body.set(key, newObj);
 			return this.body.get(key);
