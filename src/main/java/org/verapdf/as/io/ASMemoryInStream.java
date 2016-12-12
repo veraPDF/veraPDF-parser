@@ -168,9 +168,9 @@ public class ASMemoryInStream extends SeekableInputStream {
      */
     @Override
     public void close() throws IOException {
-        bufferSize = 0;
-        currentPosition = 0;
-        buffer = null;
+//        bufferSize = 0;   TODO: fix in nice way
+//        currentPosition = 0;
+//        buffer = null;
     }
 
     /**
