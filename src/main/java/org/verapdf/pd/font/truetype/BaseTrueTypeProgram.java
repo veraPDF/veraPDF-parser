@@ -16,7 +16,8 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
 
     protected TrueTypeFontParser parser;
     protected String[] encodingMappingArray;
-    protected boolean isFontParsed = false;
+    private boolean attemptedParsing = false;
+    private boolean successfullyParsed = false;
 
     /**
      * Constructor from stream containing font data, and encoding details.
@@ -36,8 +37,8 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
      */
     @Override
     public void parseFont() throws IOException {
-        if (!isFontParsed) {
-            isFontParsed = true;
+        if (!attemptedParsing) {
+            attemptedParsing = true;
             this.parser.readHeader();
             this.parser.readTableDirectory();
             this.parser.readTables();
@@ -48,6 +49,7 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
             for (int i = 0; i < unconvertedWidths.length; ++i) {
                 widths[i] = unconvertedWidths[i] * quotient;
             }
+            this.successfullyParsed = true;
         }
     }
 
@@ -92,5 +94,15 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
                 return widths[0];
             }
         }
+    }
+
+    @Override
+    public boolean isAttemptedParsing() {
+        return this.attemptedParsing;
+    }
+
+    @Override
+    public boolean isSuccessfulParsing() {
+        return this.successfullyParsed;
     }
 }

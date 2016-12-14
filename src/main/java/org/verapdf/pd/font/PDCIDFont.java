@@ -29,6 +29,13 @@ public class PDCIDFont extends PDFont {
         this.cMap = cMap;
     }
 
+    public PDCIDFont(COSDictionary dictionary, CMap cMap, FontProgram fontProgram,
+                     boolean isFontParsed) {
+        this(dictionary, cMap);
+        this.fontProgram = fontProgram;
+        this.isFontParsed = isFontParsed;
+    }
+
     /*
     Do not forget to set cMap!!!
      */

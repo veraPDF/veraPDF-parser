@@ -38,6 +38,7 @@ public abstract class PDFont extends PDResource {
      * @param dictionary is font dictionary.
      */
     public PDFont(COSDictionary dictionary) {
+        super(new COSObject(dictionary));
         if (dictionary == null) {
             dictionary = (COSDictionary) COSDictionary.construct().get();
         }

@@ -114,11 +114,12 @@ public class CharStringsWidths {
     }
 
     private float getActualWidth(CFFNumber charStringWidth, int gid) {
-        float res = charStringWidth.isInteger() ? charStringWidth.getInteger() :
-                charStringWidth.getReal();
-        if (res == -1.) {
+        float res;
+        if (charStringWidth == null) {
             res = getDefaultWidth(gid);
         } else {
+            res = charStringWidth.isInteger() ? charStringWidth.getInteger() :
+                    charStringWidth.getReal();
             res += getNominalWidth(gid);
         }
         if (!isDefaultFontMatrix) {
