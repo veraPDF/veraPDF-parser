@@ -50,28 +50,32 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
      */
     @Override
     public void parseFont() throws IOException {
-        this.source.seek(topDictBeginOffset);
-        while (this.source.getOffset() < topDictEndOffset) {
-            readTopDictUnit();
+        if (!attemptedParsing) {
+            attemptedParsing = true;
+            this.source.seek(topDictBeginOffset);
+            while (this.source.getOffset() < topDictEndOffset) {
+                readTopDictUnit();
+            }
+            this.stack.clear();
+
+            this.source.seek(this.privateDictOffset);
+            while (this.source.getOffset() < this.privateDictOffset + this.privateDictSize) {
+                this.readPrivateDictUnit();
+            }
+            this.readLocalSubrsAndBias();
+
+            this.source.seek(charStringsOffset);
+            this.readCharStrings();
+
+            this.source.seek(encodingOffset);
+            this.readEncoding();
+
+            this.source.seek(charSetOffset);
+            this.readCharSet();
+
+            this.readWidths();
+            this.successfullyParsed = true;
         }
-        this.stack.clear();
-
-        this.source.seek(this.privateDictOffset);
-        while (this.source.getOffset() < this.privateDictOffset + this.privateDictSize) {
-            this.readPrivateDictUnit();
-        }
-        this.readLocalSubrsAndBias();
-
-        this.source.seek(charStringsOffset);
-        this.readCharStrings();
-
-        this.source.seek(encodingOffset);
-        this.readEncoding();
-
-        this.source.seek(charSetOffset);
-        this.readCharSet();
-
-        this.readWidths();
     }
 
     @Override
@@ -285,5 +289,16 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     public String[] getCharSet() {
         Set<String> set = this.charSet.keySet();
         return set.toArray(new String[set.size()]);
+    }
+
+
+    @Override
+    public boolean isAttemptedParsing() {
+        return this.attemptedParsing;
+    }
+
+    @Override
+    public boolean isSuccessfulParsing() {
+        return this.successfullyParsed;
     }
 }

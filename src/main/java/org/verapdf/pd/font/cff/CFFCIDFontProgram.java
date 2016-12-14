@@ -25,7 +25,6 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private int supplement;
     private String registry;
     private String ordering;
-    private boolean fontParsed = false;
 
     private CMap externalCMap;
 
@@ -46,8 +45,8 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
      */
     @Override
     public void parseFont() throws IOException {
-        if (!fontParsed) {
-            fontParsed = true;
+        if (!attemptedParsing) {
+            attemptedParsing = true;
             this.source.seek(topDictBeginOffset);
             while (this.source.getOffset() < topDictEndOffset) {
                 readTopDictUnit();
@@ -67,6 +66,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
             this.readFontDicts();
 
             this.readWidths();
+            this.successfullyParsed = true;
         }
     }
 
@@ -249,5 +249,15 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
 
     public String getOrdering() {
         return ordering;
+    }
+
+    @Override
+    public boolean isAttemptedParsing() {
+        return this.attemptedParsing;
+    }
+
+    @Override
+    public boolean isSuccessfulParsing() {
+        return this.successfullyParsed;
     }
 }

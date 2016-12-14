@@ -33,7 +33,8 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     private Map<String, Integer> glyphWidths;
     private static final byte[] CLEAR_TO_MARK_BYTES =
             Type1StringConstants.CLEARTOMARK_STRING.getBytes();
-    private boolean isFontParsed = false;
+    private boolean attemptedParsing = false;
+    private boolean successfullyParsed = false;
 
     /**
      * {@inheritDoc}
@@ -60,8 +61,8 @@ public class Type1FontProgram extends COSParser implements FontProgram {
      */
     @Override
     public void parseFont() throws IOException {
-        if (!isFontParsed) {
-            isFontParsed = true;
+        if (!attemptedParsing) {
+            attemptedParsing = true;
             initializeToken();
 
             skipSpaces(true);
@@ -73,6 +74,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
             if(glyphWidths == null) {
                 throw new IOException("Type 1 font doesn't contain charstrings.");
             }
+            this.successfullyParsed = true;
         }
     }
 
@@ -198,6 +200,16 @@ public class Type1FontProgram extends COSParser implements FontProgram {
         String glyphName = getGlyph(code);
         return this.glyphWidths != null &&
                 this.glyphWidths.keySet().contains(glyphName);
+    }
+
+    @Override
+    public boolean isAttemptedParsing() {
+        return this.attemptedParsing;
+    }
+
+    @Override
+    public boolean isSuccessfulParsing() {
+        return this.successfullyParsed;
     }
 
     public String[] getEncoding() {

@@ -13,6 +13,9 @@ import java.util.ArrayList;
  */
 abstract class CFFFontBaseParser extends CFFFileBaseParser {
 
+    protected boolean attemptedParsing = false;
+    protected boolean successfullyParsed = false;
+
     protected static final float[] DEFAULT_FONT_MATRIX =
             {(float) 0.001, 0, 0, (float) 0.001, 0, 0};
     protected ArrayList<CFFNumber> stack;

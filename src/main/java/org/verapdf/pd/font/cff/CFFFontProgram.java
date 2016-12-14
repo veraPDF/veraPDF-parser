@@ -123,6 +123,16 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         return font.containsCode(code);
     }
 
+    @Override
+    public boolean isAttemptedParsing() {
+        return this.font.isAttemptedParsing();
+    }
+
+    @Override
+    public boolean isSuccessfulParsing() {
+        return this.font.isSuccessfulParsing();
+    }
+
     /**
      * @return CID font or Type1 font that is presented by CFF program.
      */

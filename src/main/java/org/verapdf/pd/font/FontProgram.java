@@ -39,4 +39,14 @@ public interface FontProgram {
      * @return true if font contains character with given ID.
      */
     boolean containsCode(int code);
+
+    /**
+     * @return true if font parsing has been attempted.
+     */
+    boolean isAttemptedParsing();
+
+    /**
+     * @return true if font was successfully parsed.
+     */
+    boolean isSuccessfulParsing();
 }

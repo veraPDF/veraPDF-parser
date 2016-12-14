@@ -27,7 +27,8 @@ public class OpenTypeFontProgram implements FontProgram {
     private ASInputStream source;
     private FontProgram font;
     private int numTables;
-    private boolean isFontParsed = false;
+    private boolean attemptedParsing = false;
+    private boolean successfullyParsed = false;
     private CMap externalCMap;
 
     /**
@@ -71,13 +72,23 @@ public class OpenTypeFontProgram implements FontProgram {
         return this.font.containsCode(code);
     }
 
+    @Override
+    public boolean isAttemptedParsing() {
+        return this.attemptedParsing;
+    }
+
+    @Override
+    public boolean isSuccessfulParsing() {
+        return this.successfullyParsed;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void parseFont() throws IOException {
-        if (!isFontParsed) {
-            isFontParsed = true;
+        if (!attemptedParsing) {
+            attemptedParsing = true;
             if (!isCFF) {
                 this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
                 this.font.parseFont();
@@ -87,6 +98,7 @@ public class OpenTypeFontProgram implements FontProgram {
                         externalCMap, isSubset);
                 this.font.parseFont();
             }
+            this.successfullyParsed = true;
         }
     }
 
