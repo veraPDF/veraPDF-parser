@@ -3,6 +3,7 @@ package org.verapdf.cos.visitor;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.ASCharsets;
 import org.verapdf.as.exceptions.StringExceptions;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
@@ -10,6 +11,7 @@ import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefRange;
 import org.verapdf.cos.xref.COSXRefSection;
 import org.verapdf.io.InternalOutputStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -20,14 +22,18 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class Writer implements IVisitor {
 
-	protected InternalOutputStream os;
+	private static final Logger LOGGER = Logger.getLogger(Writer.class.getCanonicalName());
 
+	protected InternalOutputStream os;
+	private long incrementalOffset;
 	protected COSXRefInfo info;
 
 	protected COSDocument document;
@@ -40,11 +46,13 @@ public class Writer implements IVisitor {
 
 	public static final String EOL = "\r\n";
 
-	public Writer(final COSDocument document, final String filename) throws IOException {
-		this(document, filename, true);
+	public Writer(final COSDocument document, final String filename,
+				  long incrementalOffset) throws IOException {
+		this(document, filename, true, incrementalOffset);
 	}
 
-	public Writer(final COSDocument document, final String filename, final boolean append) throws IOException {
+	public Writer(final COSDocument document, final String filename,
+				  final boolean append, long incrementalOffset) throws IOException {
 		this.document = document;
 		this.os = new InternalOutputStream(filename);
 		this.info = new COSXRefInfo();
@@ -52,9 +60,45 @@ public class Writer implements IVisitor {
 		this.toWrite = new ArrayList<COSKey>();
 		this.written = new ArrayList<COSKey>();
 
+		this.incrementalOffset = incrementalOffset;
+
 		if (append) {
 			this.os.seekEnd();
 		}
+	}
+
+	public void writeIncrementalUpdate(List<COSObject> changedObjects,
+									   List<COSObject> addedObjects) {
+		List<COSKey> objectsToWrite = new ArrayList<>();
+		for (COSObject obj : changedObjects) {
+			COSKey key = obj.getObjectKey();
+			if (key != null) {
+				objectsToWrite.add(obj.getObjectKey());
+			}
+		}
+		changedObjects.clear();
+		objectsToWrite.addAll(prepareAddedObjects(addedObjects));
+		this.addToWrite(objectsToWrite);
+		this.writeBody();
+		COSTrailer trailer = document.getTrailer();
+		this.setTrailer(trailer, document.getLastTrailerOffset());
+		this.writeXRefInfo();
+		this.clear();
+	}
+
+	private List<COSKey> prepareAddedObjects(List<COSObject> addedObjects) {
+		int cosKeyNumber = this.document.getLastKeyNumber() + 1;
+		List<COSKey> res = new ArrayList<>();
+		for (COSObject obj : addedObjects) {
+			if (!obj.isIndirect()) {
+				COSObject indirect = COSIndirect.construct(obj, this.document);
+				res.add(indirect.getObjectKey());
+			} else {
+				res.add(obj.getObjectKey());
+			}
+		}
+		addedObjects.clear();
+		return res;
 	}
 
 	public void visitFromBoolean(COSBoolean obj) {
@@ -134,6 +178,11 @@ public class Writer implements IVisitor {
 				obj.getFilterFlags() == COSStream.FilterFlags.DECRYPT_AND_DECODE) {
 			//TODO : Decode
 		}
+		try {
+			obj.setIntegerKey(ASAtom.LENGTH, getASInputStreamLength(in));
+		} catch (IOException e) {
+			LOGGER.log(Level.FINE, "Can't calculate length of ASInputStream", e);
+		}
 
 		visitFromDictionary(obj);
 
@@ -164,6 +213,25 @@ public class Writer implements IVisitor {
 			this.write("endstream");
 		} catch (IOException e) {
 			throw new RuntimeException(StringExceptions.WRITE_ERROR);
+		}
+	}
+
+	private static long getASInputStreamLength(ASInputStream stream) throws IOException {
+		if (stream instanceof SeekableInputStream) {
+			// That is the case of unfiltered stream
+			return ((SeekableInputStream) stream).getStreamLength();
+		} else {
+			// That is the case of fitered stream. Optimization can be reached
+			// if decoded data is stored in memory and not thrown away.
+			stream.reset();
+			byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+			long res = 0;
+			int read = stream.read(buf);
+			while (read != -1) {
+				res += read;
+				read = stream.read(buf);
+			}
+			return res;
 		}
 	}
 
@@ -255,11 +323,9 @@ public class Writer implements IVisitor {
 
 	public void writeXRefInfo() {
 		try {
-			this.info.setStartXRef(getOffset());
+			this.info.setStartXRef(getOffset() + incrementalOffset);
 
 			this.info.getTrailer().setSize(this.info.getXRefSection().next());
-
-			generateID();
 
 			this.write("xref"); this.write(EOL); this.write(info.getXRefSection());
 			this.write("trailer"); this.write(EOL); this.write(this.info.getTrailer().getObject()); this.write(EOL);
@@ -341,7 +407,7 @@ public class Writer implements IVisitor {
 	}
 
 	public void addXRef(final COSKey key) throws IOException {
-		addXRef(key, getOffset(), 'n');
+		addXRef(key, getOffset() + incrementalOffset, 'n');
 	}
 
 	protected void write(final boolean value) throws IOException {

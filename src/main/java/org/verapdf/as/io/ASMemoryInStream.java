@@ -1,7 +1,7 @@
 package org.verapdf.as.io;
 
 import org.verapdf.as.filters.io.ASBufferingInFilter;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +12,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class ASMemoryInStream extends SeekableStream {
+public class ASMemoryInStream extends SeekableInputStream {
 
     private int bufferSize;
     private int currentPosition;
@@ -168,9 +168,9 @@ public class ASMemoryInStream extends SeekableStream {
      */
     @Override
     public void close() throws IOException {
-        bufferSize = 0;
-        currentPosition = 0;
-        buffer = null;
+//        bufferSize = 0;   TODO: fix in nice way
+//        currentPosition = 0;
+//        buffer = null;
     }
 
     /**

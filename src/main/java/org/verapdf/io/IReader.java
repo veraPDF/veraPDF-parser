@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface IReader {
 
-	SeekableStream getPDFSource();
+	SeekableInputStream getPDFSource();
 
 	COSHeader getHeader();
 
@@ -35,4 +35,7 @@ public interface IReader {
 
 	COSTrailer getLastTrailer();
 
+	long getLastTrailerOffset();
+
+	int getGreatestKeyNumberFromXref();
 }

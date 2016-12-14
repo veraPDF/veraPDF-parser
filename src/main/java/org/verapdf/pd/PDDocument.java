@@ -6,11 +6,12 @@ import org.verapdf.cos.COSIndirect;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.form.PDAcroForm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +72,10 @@ public class PDDocument {
 		}
 
 		COSObject root = document.getTrailer().getRoot();
+		if (root == COSObject.getEmpty()) {
+			root = new COSObject();
+			document.getTrailer().setRoot(root);
+		}
 
 		if (!root.empty()) {
 			catalog.setObject(root);
@@ -142,7 +147,7 @@ public class PDDocument {
 	}
 
 	public void saveAs(final String fileName) throws IOException {
-		final Writer out = new IndirectWriter(this.document, fileName, false);
+		final Writer out = new IndirectWriter(this.document, fileName, false, 0);
 		this.saveAs(out, fileName);
 	}
 
@@ -155,6 +160,12 @@ public class PDDocument {
 
 		document.saveAs(out);
 		out.close();
+	}
+
+	public void saveTo(final OutputStream stream) {
+		if (this.document != null) {
+			document.saveTo(stream);
+		}
 	}
 
 	public PDStructTreeRoot getStructTreeRoot() throws IOException {
@@ -177,7 +188,7 @@ public class PDDocument {
 		return getCatalog().getAcroForm();
 	}
 
-	public SeekableStream getPDFSource() {
+	public SeekableInputStream getPDFSource() {
 		return this.document.getPDFSource();
 	}
 }

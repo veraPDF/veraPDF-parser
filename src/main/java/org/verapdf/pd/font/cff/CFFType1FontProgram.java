@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.cff;
 
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
@@ -30,7 +30,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     private Map<Integer, String> inverseCharSet;    // mappings gid -> glyph name
     private String[] encodingStrings;
 
-    CFFType1FontProgram(SeekableStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
+    CFFType1FontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                         long topDictBeginOffset, long topDictEndOffset,
                         Encoding pdEncoding, CMap externalCMap, boolean isSubset) {
         super(stream);

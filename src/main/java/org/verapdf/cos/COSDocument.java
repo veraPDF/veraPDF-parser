@@ -1,16 +1,20 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.io.IReader;
+import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.Reader;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.PDDocument;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +40,8 @@ public class COSDocument {
 	private boolean linearized;
 	private boolean isNew;
 	private StandardSecurityHandler standardSecurityHandler;
+	private List<COSObject> changedObjects;
+	private List<COSObject> addedObjects;
 
 	private byte postEOFDataSize;
 
@@ -52,6 +58,8 @@ public class COSDocument {
 		this.lastTrailer = new COSTrailer();
 		this.linearized = false;
 		this.isNew = true;
+		this.changedObjects = new ArrayList<>();
+		this.addedObjects = new ArrayList<>();
 	}
 
 	public COSDocument(final String fileName, final PDDocument document) throws IOException {
@@ -77,6 +85,8 @@ public class COSDocument {
 		this.firstTrailer = reader.getFirstTrailer();
 		this.lastTrailer = reader.getLastTrailer();
 		this.linearized = reader.isLinearized();
+		this.changedObjects = new ArrayList<>();
+		this.addedObjects = new ArrayList<>();
 	}
 
 	private void initReader(final InputStream fileStream) throws IOException {
@@ -116,6 +126,37 @@ public class COSDocument {
 		return result;
 	}
 
+	public List<COSObject> getObjectsByType(ASAtom type) {
+		List<COSObject> result = new ArrayList<>();
+		for (COSKey key : this.xref.getAllKeys()) {
+			COSObject obj = this.body.get(key);
+			if (!obj.empty()) {
+				addObjectWithTypeKeyCheck(result, obj, type);
+			} else {
+				try {
+					COSObject newObj = this.reader.getObject(key);
+
+					this.body.set(key, newObj);
+					addObjectWithTypeKeyCheck(result, obj, type);
+				} catch (IOException e) {
+					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
+							" " + key.getGeneration(), e);
+				}
+			}
+		}
+		return result;
+	}
+
+	private static void addObjectWithTypeKeyCheck(List<COSObject> objects,
+												  COSObject obj, ASAtom type) {
+		if (obj != null && !obj.empty() && obj.getType().isDictionaryBased()) {
+			ASAtom actualType = obj.getNameKey(ASAtom.TYPE);
+			if (actualType == type) {
+				objects.add(obj);
+			}
+		}
+	}
+
 	public Map<COSKey, COSObject> getObjectsMap() {
 		Map<COSKey, COSObject> result = new HashMap<>();
 		for (COSKey key : this.xref.getAllKeys()) {
@@ -146,7 +187,7 @@ public class COSDocument {
 
 			COSObject newObj = this.reader.getObject(key);
 			if (newObj == null) {
-				return null;
+				return new COSObject();
 			}
 			this.body.set(key, newObj);
 			return this.body.get(key);
@@ -170,9 +211,9 @@ public class COSDocument {
 		COSKey key = obj.getKey();
 
 		//TODO : fix this method for document save
-		if (key.getNumber() == 0 && key.getGeneration() == 0) {
+		if (key == null) {
 			key = this.xref.next();
-			this.body.set(key, obj.getDirect());
+			this.body.set(key, obj.isIndirect() ? obj.getDirect() : obj);
 			obj = COSIndirect.construct(key, this);
 		}
 
@@ -236,7 +277,7 @@ public class COSDocument {
 		//TODO : implement this
 	}
 
-	public SeekableStream getPDFSource() {
+	public SeekableInputStream getPDFSource() {
 		return this.reader.getPDFSource();
 	}
 
@@ -251,6 +292,33 @@ public class COSDocument {
 		writer.writeXRefInfo();
 
 		writer.clear();
+	}
+
+	public void saveTo(final OutputStream stream) {
+		try {
+			File temp = File.createTempFile("tmp_pdf_file", ".pdf");
+			temp.deleteOnExit();
+			Writer pdfWriter = new Writer(this, temp.getAbsolutePath(),
+					this.getPDFSource().getStreamLength());
+			pdfWriter.writeIncrementalUpdate(changedObjects, addedObjects);
+			pdfWriter.close();
+			this.getPDFSource().reset();
+			writeInputIntoOutput(this.getPDFSource(), stream);
+			InternalInputStream pdf = new InternalInputStream(temp.getAbsolutePath());
+			writeInputIntoOutput(pdf, stream);
+			pdf.close();
+		} catch (IOException e) {
+			LOGGER.log(Level.FINE, "Can't write COSDocument to stream", e);
+		}
+	}
+
+	private static void writeInputIntoOutput(InputStream input, OutputStream output) throws IOException {
+		byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+		int read = input.read(buf, 0, buf.length);
+		while (read != -1) {
+			output.write(buf, 0, read);
+			read = input.read(buf, 0, buf.length);
+		}
 	}
 
 	public void setStandardSecurityHandler(StandardSecurityHandler standardSecurityHandler) {
@@ -273,5 +341,47 @@ public class COSDocument {
 			}
 		}
 		return null;
+	}
+
+	public void addObject(COSObject obj) {
+		if (obj != null && !obj.empty()) {
+			this.addedObjects.add(obj);
+		}
+	}
+
+	public void removeAddedObject(COSObject obj) {
+		this.addedObjects.remove(obj);
+	}
+
+	public void addChangedObject(COSObject obj) {
+		if (obj != null && !obj.empty() && !isObjectChanged(obj)) {
+			this.changedObjects.add(obj);
+		}
+	}
+
+	public void removeChangedObject(COSObject obj) {
+		this.changedObjects.remove(obj);
+	}
+
+	public boolean isObjectChanged(COSObject obj) {
+		return listContainsObject(changedObjects, obj) ||
+				listContainsObject(addedObjects, obj);
+	}
+
+	private static boolean listContainsObject(List<COSObject> list, COSObject obj) {
+		for (COSObject listObject : list) {
+			if (listObject == obj) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public long getLastTrailerOffset() {
+		return this.reader.getLastTrailerOffset();
+	}
+
+	public int getLastKeyNumber() {
+		return this.reader.getGreatestKeyNumberFromXref();
 	}
 }

@@ -3,7 +3,9 @@ package org.verapdf.tools;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.logging.Level;
@@ -34,7 +36,7 @@ public class TypeConverter {
 
 			if (length > 6) {
 				if (isDigits(toParse, 6, 2)) {
-					month = Integer.parseInt(toParse.substring(6, 8));
+					month = Integer.parseInt(toParse.substring(6, 8)) - 1;
 				} else {
 					isCorrect = false;
 				}
@@ -113,21 +115,37 @@ public class TypeConverter {
 			}
 
 			if (isCorrect) {
-				Calendar res = new GregorianCalendar(year, month - 1, day, hour, minutes, seconds);
+				TimeZone zone;
 				if (!sign.equals("Z")) {
 					String timeZoneMinsString =
 							timeZoneMins < 10 ? "0" + Integer.toString(timeZoneMins)
 									: Integer.toString(timeZoneMins);
-					res.setTimeZone(TimeZone.getTimeZone("GMT" + sign + timeZoneHours + ":" + timeZoneMinsString));
+					zone = TimeZone.getTimeZone("GMT" + sign + timeZoneHours + ":" + timeZoneMinsString);
 				} else {
-					res.setTimeZone(TimeZone.getTimeZone("GMT"));
+					zone = TimeZone.getTimeZone("GMT");
 				}
+				Calendar res = new GregorianCalendar(zone);
+				res.set(year, month, day, hour, minutes, seconds);
+				res.set(Calendar.MILLISECOND, 0);
 				return res;
 			}
 		}
 
 		LOGGER.log(Level.FINE, "Parsed string is not complies pdf date format");
 		return null;
+	}
+
+	public static String getPDFDate(Calendar date) {
+		int year = date.get(Calendar.YEAR);
+		int month = date.get(Calendar.MONTH) + 1;
+		int day = date.get(Calendar.DAY_OF_MONTH);
+		int hour = date.get(Calendar.HOUR_OF_DAY);
+		int min = date.get(Calendar.MINUTE);
+		int sec = date.get(Calendar.SECOND);
+		SimpleDateFormat sdf = new SimpleDateFormat("Z");
+		sdf.setTimeZone(date.getTimeZone());
+		String tz = sdf.format(new Date());
+		return String.format("D:%04d%02d%02d%02d%02d%02d%s'%s", year, month, day, hour, min, sec, tz.substring(0, 3), tz.substring(3, 5));
 	}
 
 	private static boolean isDigits(String toCheck, int offset, int length) {

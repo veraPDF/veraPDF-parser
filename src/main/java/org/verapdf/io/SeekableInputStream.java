@@ -14,7 +14,7 @@ import java.io.InputStream;
  *
  * @author Sergey Shemyakov
  */
-public abstract class SeekableStream extends ASInputStream {
+public abstract class SeekableInputStream extends ASInputStream {
 
     public static final int MAX_BUFFER_SIZE = 10240;
 
@@ -95,7 +95,7 @@ public abstract class SeekableStream extends ASInputStream {
      * @param stream is stream to turn into seekable stream.
      * @return SeekableStream that contains data of passed stream.
      */
-    public static SeekableStream getSeekableStream(InputStream stream) throws IOException {
+    public static SeekableInputStream getSeekableStream(InputStream stream) throws IOException {
         int totalRead = 0;
         byte[] buffer = new byte[0];
         byte[] temp = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];

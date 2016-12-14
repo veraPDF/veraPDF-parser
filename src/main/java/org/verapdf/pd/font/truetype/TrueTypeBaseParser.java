@@ -1,7 +1,7 @@
 package org.verapdf.pd.font.truetype;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 
@@ -14,13 +14,13 @@ class TrueTypeBaseParser {
 
     private static final int TWO_POWER_16 = 65536;
 
-    protected SeekableStream source;
+    protected SeekableInputStream source;
 
     protected TrueTypeBaseParser(ASInputStream stream) throws IOException {
-        this.source = SeekableStream.getSeekableStream(stream);
+        this.source = SeekableInputStream.getSeekableStream(stream);
     }
 
-    protected TrueTypeBaseParser(SeekableStream source) {
+    protected TrueTypeBaseParser(SeekableInputStream source) {
         this.source = source;
     }
 

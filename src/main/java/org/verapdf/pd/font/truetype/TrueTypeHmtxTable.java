@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.truetype;
 
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 
@@ -15,7 +15,7 @@ class TrueTypeHmtxTable extends TrueTypeTable {
     private int[] longHorMetrics;
     private int numberOfHMetrics;
 
-    TrueTypeHmtxTable(SeekableStream source, long offset) {
+    TrueTypeHmtxTable(SeekableInputStream source, long offset) {
         super(source, offset);
     }
 

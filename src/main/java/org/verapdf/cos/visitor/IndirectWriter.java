@@ -14,8 +14,9 @@ public class IndirectWriter extends Writer {
 
 	private Map<COSKey, COSKey> renum;
 
-	public IndirectWriter(COSDocument document, String filename, boolean append) throws IOException {
-		super(document, filename, append);
+	public IndirectWriter(COSDocument document, String filename, boolean append,
+						  long indirectOffset) throws IOException {
+		super(document, filename, append, indirectOffset);
 		this.renum = new HashMap<>();
 		renum.put(new COSKey(0, 65535), new COSKey(0, 65535));
 	}

@@ -1,6 +1,6 @@
 package org.verapdf.pd.font.truetype;
 
-import org.verapdf.io.SeekableStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ class TrueTypeMaxpTable extends TrueTypeTable {
 
     private int numGlyphs;
 
-    TrueTypeMaxpTable(SeekableStream source, long offset) {
+    TrueTypeMaxpTable(SeekableInputStream source, long offset) {
         super(source, offset);
     }
 

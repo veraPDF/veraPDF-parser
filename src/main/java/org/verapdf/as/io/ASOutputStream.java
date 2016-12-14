@@ -11,5 +11,7 @@ public interface ASOutputStream {
 
 	long write(final byte[] buffer, int offset, int size) throws IOException;
 
+	long write(ASInputStream stream) throws IOException;
+
 	void close() throws IOException;
 }

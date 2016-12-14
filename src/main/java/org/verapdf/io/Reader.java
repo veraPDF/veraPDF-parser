@@ -60,8 +60,8 @@ public class Reader extends XRefReader {
 		}
 		long offset = getOffset(key).longValue();
 		if(offset > 0) {
-			if (getHeader().getHeaderOffset() > 0) {
-				offset += getHeader().getHeaderOffset();
+			if (header.getHeaderOffset() > 0) {
+				offset += header.getHeaderOffset();
 			}
 			COSObject result = getObject(offset);
 			result.setObjectKey(key);
@@ -99,8 +99,17 @@ public class Reader extends XRefReader {
 	}
 
 	@Override
-	public SeekableStream getPDFSource() {
+	public SeekableInputStream getPDFSource() {
 		return this.parser.getPDFSource();
+	}
+
+	@Override
+	public long getLastTrailerOffset() {
+		long res = this.parser.getLastTrailerOffset();
+		if (res == 0) {
+			LOGGER.log(Level.FINE, "Offset of last trailer can not be determined");
+		}
+		return res;
 	}
 
 	// PRIVATE METHODS
@@ -139,6 +148,17 @@ public class Reader extends XRefReader {
 			LOGGER.log(Level.FINE, "Cannot read object " + this.parser.getEncryption().getKey(), e);
 			return false;
 		}
+	}
+
+	@Override
+	public int getGreatestKeyNumberFromXref() {
+		int res = 1;
+		for (COSKey key : this.getKeys()) {
+			if (key.getNumber() > res) {
+				res = key.getNumber();
+			}
+		}
+		return res;
 	}
 
 }
