@@ -145,7 +145,7 @@ public class COSString extends COSDirect {
     public String getHexString() {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < this.value.length; i++) {
-            final byte c = this.value[i];
+            final int c = this.value[i] & 0xFF;
             result.append(COSFilterASCIIHexEncode.asciiHexBig[c]);
             result.append(COSFilterASCIIHexEncode.asciiHexLittle[c]);
         }
@@ -154,7 +154,7 @@ public class COSString extends COSDirect {
 
     @Override
     public String toString() {
-        return this.isHex ? toHexString() : toLitString();
+        return this.isHex ? toHexString() : getString();
     }
 
     protected String toHexString() {
@@ -162,7 +162,7 @@ public class COSString extends COSDirect {
 
         result.append('<');
         for (int i = 0; i < this.value.length; i++) {
-            final byte c = this.value[i];
+            final int c = this.value[i] & 0xFF;
             result.append(COSFilterASCIIHexEncode.asciiHexBig[c]);
             result.append(COSFilterASCIIHexEncode.asciiHexLittle[c]);
         }
