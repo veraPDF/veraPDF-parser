@@ -4,12 +4,19 @@ import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * @author Timur Kamalov
  */
 public class COSString extends COSDirect {
 
-    private String value;
+    private static final Logger LOGGER = Logger.getLogger(COSString.class.getCanonicalName());
+
+    private byte[] value;
     private boolean isHex;
 
     //fields specific for pdf/a validation of strings
@@ -18,35 +25,35 @@ public class COSString extends COSDirect {
 
     public COSString() {
         super();
-        this.value = new String();
+        this.value = new byte[0];
         this.isHex = false;
     }
 
-    public COSString(String value) {
+    public COSString(byte[] value) {
         this(value, false);
     }
 
-    public COSString(String value, boolean isHex) {
+    public COSString(byte[] value, boolean isHex) {
         super();
         this.value = value;
         this.isHex = isHex;
     }
 
-    public COSString(String value, boolean isHex, long hexCount, boolean containsOnlyHex) {
+    public COSString(byte[] value, boolean isHex, long hexCount, boolean containsOnlyHex) {
         this(value, isHex);
         this.hexCount = hexCount;
         this.containsOnlyHex = containsOnlyHex;
     }
 
-    public static COSObject construct(final String initValue) {
+    public static COSObject construct(final byte[] initValue) {
         return construct(initValue, false);
     }
 
-    public static COSObject construct(final String initValue, final boolean isHex) {
+    public static COSObject construct(final byte[] initValue, final boolean isHex) {
         return new COSObject(new COSString(initValue, isHex));
     }
 
-    public static COSObject construct(final String initValue, final boolean isHex, final long hexCount, final boolean containsOnlyHex) {
+    public static COSObject construct(final byte[] initValue, final boolean isHex, final long hexCount, final boolean containsOnlyHex) {
         return new COSObject(new COSString(initValue, isHex, hexCount, containsOnlyHex));
     }
 
@@ -64,19 +71,48 @@ public class COSString extends COSDirect {
 
     //! Returns the size of the string
     public Long getInteger() {
-        return (long) this.value.length();
+        return (long) this.value.length;
     }
 
     public Double getReal() {
-        return (double) this.value.length();
+        return (double) this.value.length;
     }
 
     public String getString() {
-        return get();
+        if (value.length > 2) {
+            if ((value[0] & 0xff) == 0xFE && (value[1] & 0xff) == 0xFF) {
+                return new String(value, 2, value.length - 2, Charset.forName("UTF-16BE"));
+            }
+        }
+        return new String(value);
     }
 
     public boolean setString(final String value) {
-        setString(value, false);
+        this.value = new byte[value.length()];
+        boolean utf16 = false;
+        for (int i = 0; i < value.length(); ++i) {
+            char c = value.charAt(i);
+            if (c <= 255) {
+                this.value[i] = (byte) (c & 0xFF);
+            } else {
+                utf16 = true;
+                break;
+            }
+        }
+        if (utf16) {
+            try {
+                byte[] utfValue = value.getBytes("UTF-16BE");
+                this.value = new byte[utfValue.length + 2];
+                this.value[0] = (byte) 0xFE;
+                this.value[1] = (byte) 0xFF;
+                for(int i = 0; i < utfValue.length; ++i) {
+                    this.value[i + 2] = utfValue[i];
+                }
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.log(Level.FINE, "Can't find encoding UTF-16BE", e);
+                return false;
+            }
+        }
         return true;
     }
 
@@ -84,17 +120,17 @@ public class COSString extends COSDirect {
         isHex = hex;
     }
 
-    public boolean setString(final String value, final boolean isHex) {
+    public boolean setString(final byte[] value, final boolean isHex) {
         this.value = value;
         this.isHex = isHex;
         return true;
     }
 
-    public String get() {
+    public byte[] get() {
         return this.value;
     }
 
-    public void set(final String value) {
+    public void set(final byte[] value) {
         this.value = value;
     }
 
@@ -108,8 +144,8 @@ public class COSString extends COSDirect {
 
     public String getHexString() {
         StringBuilder result = new StringBuilder();
-        for (int i = 0; i < this.value.length(); i++) {
-            final char c = this.value.charAt(i);
+        for (int i = 0; i < this.value.length; i++) {
+            final byte c = this.value[i];
             result.append(COSFilterASCIIHexEncode.asciiHexBig[c]);
             result.append(COSFilterASCIIHexEncode.asciiHexLittle[c]);
         }
@@ -125,8 +161,8 @@ public class COSString extends COSDirect {
         StringBuilder result = new StringBuilder();
 
         result.append('<');
-        for (int i = 0; i < this.value.length(); i++) {
-            final char c = this.value.charAt(i);
+        for (int i = 0; i < this.value.length; i++) {
+            final byte c = this.value[i];
             result.append(COSFilterASCIIHexEncode.asciiHexBig[c]);
             result.append(COSFilterASCIIHexEncode.asciiHexLittle[c]);
         }
@@ -138,8 +174,8 @@ public class COSString extends COSDirect {
     protected String toLitString() {
         StringBuilder result = new StringBuilder();
         result.append('(');
-        for (int i = 0; i < this.value.length(); i++) {
-            final char ch = this.value.charAt(i);
+        for (int i = 0; i < this.value.length; i++) {
+            final byte ch = this.value[i];
             switch (ch) {
                 case '(':
                     result.append("\\(");

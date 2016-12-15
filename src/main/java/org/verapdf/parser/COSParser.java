@@ -138,9 +138,9 @@ public class COSParser extends BaseParser {
 			case TT_REAL:
 				return COSReal.construct(token.real);
 			case TT_LITSTRING:
-				return COSString.construct(token.getValue());
+				return COSString.construct(token.getByteValue());
 			case TT_HEXSTRING:
-				COSObject res = COSString.construct(token.getValue(), true,
+				COSObject res = COSString.construct(token.getByteValue(), true,
 						token.getHexCount().longValue(), token.isContainsOnlyHex());
 				if(this.document == null || !this.document.isEncrypted()) {
 					return res;

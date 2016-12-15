@@ -111,7 +111,7 @@ public class PDFStreamParser extends COSParser {
 				} else {
 					nextToken();
 					Token token = getToken();
-					result = COSString.construct(token.getValue(), true, token.getHexCount(), token.isContainsOnlyHex());
+					result = COSString.construct(token.getByteValue(), true, token.getHexCount(), token.isContainsOnlyHex());
 				}
 				break;
 			}
@@ -121,7 +121,7 @@ public class PDFStreamParser extends COSParser {
 			}
 			case '(':
 				nextToken();
-				result = COSString.construct(getToken().getValue());
+				result = COSString.construct(getToken().getByteValue());
 				break;
 			case '/':
 				// name
