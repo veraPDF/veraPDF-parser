@@ -30,7 +30,7 @@ public class COSFilters extends PDObject {
 	public ASInputStream getInputStream(ASInputStream inputStream,
 										COSObject decodeParams) throws IOException {
 		List<COSDictionary> decodeParameters = null;
-		if(!decodeParams.equals(COSObject.getEmpty())) {
+		if(!decodeParams.empty()) {
 			if(decodeParams.getType().equals(COSObjType.COS_DICT)) {
 				decodeParameters = new ArrayList<>(1);
 				decodeParameters.add((COSDictionary) decodeParams.getDirectBase());

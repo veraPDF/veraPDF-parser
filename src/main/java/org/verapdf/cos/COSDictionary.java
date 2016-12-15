@@ -126,7 +126,7 @@ public class COSDictionary extends COSDirect {
 
     public COSObject getKey(final ASAtom key) {
         COSObject value = this.entries.get(key);
-        return value != null ? value : COSObject.getEmpty();
+        return value != null ? value : new COSObject();
     }
 
     public boolean setKey(final ASAtom key, final COSObject value) {

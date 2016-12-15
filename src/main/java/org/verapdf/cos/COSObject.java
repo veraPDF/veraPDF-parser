@@ -129,7 +129,8 @@ public class COSObject {
 
 	public void setString(final String value, final boolean isHex) {
 		if (this.base == null || !this.base.setString(value, isHex)) {
-			this.base = new COSString(value, isHex);
+			this.base = new COSString();
+			this.base.setString(value);
 		}
 	}
 

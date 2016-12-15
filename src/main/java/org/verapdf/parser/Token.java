@@ -33,6 +33,14 @@ public class Token {
 		return this.token.toString();
 	}
 
+	public byte[] getByteValue() {
+		byte[] res = new byte[this.token.length()];
+		for (int i = 0; i < token.length(); i++) {
+			res[i] = (byte) token.charAt(i);
+		}
+		return res;
+	}
+
 	public void clearValue() {
 		this.token.setLength(0);
 	}

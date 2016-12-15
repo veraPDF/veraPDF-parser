@@ -10,7 +10,6 @@ import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
 import org.verapdf.tools.EncryptionTools;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -131,7 +130,7 @@ public class StandardSecurityHandler {
             read = filter.read(buf, buf.length);
         }
         filter.close();
-        string.set(new String(res, "ISO-8859-1"));
+        string.set(res);
     }
 
     /**
@@ -183,13 +182,7 @@ public class StandardSecurityHandler {
         if (s == null) {
             return null;
         }
-        try {
-            return s.getString().getBytes("ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            // should not get here, ISO-8859 should be present
-            LOGGER.log(Level.SEVERE, "ISO-8859-1 Charset can't be found, can't get bytes of string.", e);
-            return s.getString().getBytes();
-        }
+        return s.get();
     }
 
     private boolean isRC4Decryption() {

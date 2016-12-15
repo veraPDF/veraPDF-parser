@@ -77,7 +77,7 @@ public class DecodedObjectStreamParser extends COSParser {
 
     public COSObject getObject(int objNum) throws IOException {
         if (!this.internalOffsets.containsKey(objNum)) {
-            return COSObject.getEmpty();
+            return new COSObject();
         }
         this.source.seek(internalOffsets.get(objNum));
         this.flag = true;

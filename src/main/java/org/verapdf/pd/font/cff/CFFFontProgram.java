@@ -125,12 +125,20 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
     @Override
     public boolean isAttemptedParsing() {
-        return this.font.isAttemptedParsing();
+        if (font != null) {
+            return this.font.isAttemptedParsing();
+        } else {
+            return false;
+        }
     }
 
     @Override
     public boolean isSuccessfulParsing() {
-        return this.font.isSuccessfulParsing();
+        if (font != null) {
+            return this.font.isSuccessfulParsing();
+        } else {
+            return false;
+        }
     }
 
     /**

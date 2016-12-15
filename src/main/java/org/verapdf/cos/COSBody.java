@@ -29,7 +29,7 @@ public class COSBody {
 
 	public COSObject get(final COSKey key) {
 		COSObject value = this.table.get(key);
-		return value != null ? value : COSObject.getEmpty();
+		return value != null ? value : new COSObject();
 	}
 
 	public void set(final COSKey key, final COSObject object) {

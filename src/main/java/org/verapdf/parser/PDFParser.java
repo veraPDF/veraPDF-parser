@@ -11,6 +11,7 @@ import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,6 +25,7 @@ public class PDFParser extends COSParser {
 
     private static final String HEADER_PATTERN = "%PDF-";
     private static final String PDF_DEFAULT_VERSION = "1.4";
+    private static final byte[] STARTXREF = "startxref".getBytes();
 
     //%%EOF marker byte representation
     private static final byte[] EOF_MARKER = new byte[]{37, 37, 69, 79, 70};
@@ -290,12 +292,16 @@ public class PDFParser extends COSParser {
     }
 
     private Long findLastXRef() throws IOException {
-        source.seekFromEnd(64);
-        if (findKeyword(Token.Keyword.KW_STARTXREF)) {
-            nextToken();
-            if (getToken().type == Token.Type.TT_INTEGER) {
-                return Long.valueOf(getToken().integer);
+        source.seekFromEnd(STARTXREF.length);
+        byte[] buf = new byte[STARTXREF.length];
+        while (source.getStreamLength() - source.getOffset() < 64) {
+            long res = source.getOffset();
+            source.read(buf);
+            if (Arrays.equals(buf, STARTXREF)) {
+                nextToken();
+                return this.getToken().integer;
             }
+            source.seekFromCurrentPosition(-STARTXREF.length - 1);
         }
         return Long.valueOf(0L);
     }
