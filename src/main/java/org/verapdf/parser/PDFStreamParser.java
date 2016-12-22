@@ -10,11 +10,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class PDFStreamParser extends COSParser {
+
+	private static final Logger LOGGER = Logger.getLogger(PDFStreamParser.class.getCanonicalName());
 
 	private final List<Object> tokens = new ArrayList<>();
 
@@ -187,13 +191,17 @@ public class PDFStreamParser extends COSParser {
 						if (value instanceof COSObject) {
 							imageParameters.setKey(((COSObject) nextToken).getName(), (COSObject) value);
 						} else {
-							//TODO : log some warning?
+							LOGGER.log(Level.FINE, "Unexpected token in BI operator parsing: " + value.toString());
 						}
 						nextToken = parseNextToken();
 					}
 
-					//TODO : check for errors
-					imageOperator.setImageData(((InlineImageOperator) nextToken).getImageData());
+					if (nextToken instanceof InlineImageOperator) {
+						imageOperator.setImageData(((InlineImageOperator) nextToken).getImageData());
+					} else {
+						throw new IOException("Unexpected token instead of " +
+								"operator in operator parsing: " + nextToken.toString());
+					}
 				}
 				break;
 			}
