@@ -164,7 +164,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
 
             if (highByteMask == 0x00000000 || highByteMask == 0x0000F000 ||
                     highByteMask == 0x0000F100 || highByteMask == 0x0000F200) { // should we check this at all?
-                gid = cmap30.getGlyph(highByteMask & code);     // we suppose that code is in fact 1-byte value
+                gid = cmap30.getGlyph(highByteMask + code);     // we suppose that code is in fact 1-byte value
                 return gid;
             }
         }
