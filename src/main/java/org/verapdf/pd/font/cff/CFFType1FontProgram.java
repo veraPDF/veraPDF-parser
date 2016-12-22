@@ -217,7 +217,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
             }
             return NOTDEF_STRING;
         } else {
-            return inverseCharSet.get(encoding[code]);
+            return inverseCharSet.get(encoding[code] + 1);
         }
     }
 

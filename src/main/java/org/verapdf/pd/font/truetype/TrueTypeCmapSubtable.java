@@ -53,7 +53,7 @@ public class TrueTypeCmapSubtable {
      * @param value is GID.
      */
     public void put(Integer key, Integer value) {
-        if (sampleCode != -1) {
+        if (sampleCode == -1) {
             sampleCode = key;
         }
         this.mapping.put(key, value);
