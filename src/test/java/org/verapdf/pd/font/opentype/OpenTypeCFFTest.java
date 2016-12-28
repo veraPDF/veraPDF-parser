@@ -22,7 +22,7 @@ public class OpenTypeCFFTest {
     @Test
     public void test() throws IOException {
         COSObject encoding = COSName.construct(ASAtom.WIN_ANSI_ENCODING);
-        ASInputStream stream = new InternalInputStream(fontFilePath);
+        ASInputStream stream = new InternalInputStream(fontFilePath, 2);
         OpenTypeFontProgram font = new OpenTypeFontProgram(stream, true, false,
                 encoding, null, true);
         font.parseFont();

@@ -1,7 +1,10 @@
 package org.verapdf.as.io;
 
 
+import org.verapdf.tools.IntReference;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -14,12 +17,18 @@ public class ASFileInStream extends ASInputStream {
 	private long offset;
 	private long size;
 	private long curPos;
+	private IntReference numOfFileUsers;
+	private String filePath;
 
-	public ASFileInStream(RandomAccessFile stream, final long offset, final long size) {
+	public ASFileInStream(RandomAccessFile stream, final long offset, final long size,
+						  IntReference numOfFileUsers, String filePath) {
 		this.stream = stream;
 		this.offset = offset;
 		this.size = size;
 		this.curPos = 0;
+		this.numOfFileUsers = numOfFileUsers;
+		this.numOfFileUsers.increment();
+		this.filePath = filePath;
 	}
 
 	@Override
@@ -88,7 +97,13 @@ public class ASFileInStream extends ASInputStream {
 	}
 
 	@Override
-	public void close() {
+	public void close() throws IOException {
+		this.numOfFileUsers.decrement();
+		if(this.numOfFileUsers.equals(0)) {
+			this.stream.close();
+			File tmp = new File(filePath);
+			tmp.delete();
+		}
 	}
 
 	@Override

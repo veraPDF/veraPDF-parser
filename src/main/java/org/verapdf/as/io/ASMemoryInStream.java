@@ -2,6 +2,7 @@ package org.verapdf.as.io;
 
 import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.io.SeekableInputStream;
+import org.verapdf.tools.IntReference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +20,7 @@ public class ASMemoryInStream extends SeekableInputStream {
     private byte[] buffer;
     private boolean copiedBuffer;
     private int resetPosition = 0;
+    private IntReference numOfBufferUsers;
 
     /**
      * Constructor from byte array. Buffer is copied while initializing
@@ -45,6 +47,7 @@ public class ASMemoryInStream extends SeekableInputStream {
             buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
             read = stream.read(temp);
         }
+        this.numOfBufferUsers = new IntReference(1);
     }
 
     /**
@@ -65,6 +68,8 @@ public class ASMemoryInStream extends SeekableInputStream {
         }
         this.resetPosition = this.currentPosition;
         this.bufferSize = Math.min(stream.bufferSize, offset + length);
+        this.numOfBufferUsers = stream.numOfBufferUsers;
+        this.numOfBufferUsers.increment();
     }
 
     /**
@@ -94,8 +99,10 @@ public class ASMemoryInStream extends SeekableInputStream {
         this.copiedBuffer = copyBuffer;
         if (copyBuffer) {
             this.buffer = Arrays.copyOf(buffer, bufferSize);
+            this.numOfBufferUsers = new IntReference(1);
         } else {
             this.buffer = buffer;
+            this.numOfBufferUsers = new IntReference(2);    // buffer is used somewhere else
         }
     }
 
@@ -168,9 +175,10 @@ public class ASMemoryInStream extends SeekableInputStream {
      */
     @Override
     public void close() throws IOException {
-//        bufferSize = 0;   TODO: fix in nice way
-//        currentPosition = 0;
-//        buffer = null;
+        this.numOfBufferUsers.decrement();
+        if (numOfBufferUsers.equals(0)) {
+            buffer = null;
+        }
     }
 
     /**

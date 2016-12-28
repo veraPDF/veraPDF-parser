@@ -23,7 +23,7 @@ public class TrueTypeParserTest {
     @Test
     public void testMonospaced() throws IOException {
 
-        TrueTypeFontProgram font = new TrueTypeFontProgram(new InternalInputStream(MONO_FONT_PATH),
+        TrueTypeFontProgram font = new TrueTypeFontProgram(new InternalInputStream(MONO_FONT_PATH, 2),
                 IS_SYMBOLIC, ENCODING);
         font.parseFont();
         assertTrue(font.getWidth("z") == 600f);
@@ -32,7 +32,7 @@ public class TrueTypeParserTest {
 
     @Test
     public void testRegular() throws IOException {
-        TrueTypeFontProgram font = new TrueTypeFontProgram(new InternalInputStream(REGULAR_FONT_PATH),
+        TrueTypeFontProgram font = new TrueTypeFontProgram(new InternalInputStream(REGULAR_FONT_PATH, 2),
                 IS_SYMBOLIC, ENCODING);
         font.parseFont();
         assertTrue((int) font.getWidth("z") == 500);

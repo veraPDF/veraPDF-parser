@@ -32,7 +32,7 @@ public class COSFilterFlateEncodeTest {
 
     private byte[] getDataToEncode() throws IOException {
         byte[] file = new byte[20000];
-        InternalInputStream stream = new InternalInputStream(FILE_PATH);
+        InternalInputStream stream = new InternalInputStream(FILE_PATH, 2);
         int length = stream.read(file, 20000);
         stream.close();
         return Arrays.copyOf(file, length);

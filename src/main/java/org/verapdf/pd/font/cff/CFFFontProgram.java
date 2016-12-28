@@ -43,25 +43,29 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
     @Override
     public void parseFont() throws IOException {
         if (!isFontParsed) {
-            isFontParsed = true;
-            this.readHeader();
-            this.readIndex();   // name
-            long topOffset = this.source.getOffset();
-            CFFIndex top = this.readIndex();
-            this.definedNames = this.readIndex();
-            CFFIndex globalSubrs = this.readIndex();
-            if (isCIDFont(top.get(0))) {
-                font = new CFFCIDFontProgram(this.source, this.definedNames, globalSubrs,
-                        topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
-                        topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
-                        this.externalCMap, this.isSubset);
-                font.parseFont();
-            } else {
-                font = new CFFType1FontProgram(this.source, this.definedNames, globalSubrs,
-                        topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
-                        topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
-                        this.pdEncoding, this.externalCMap, this.isSubset);
-                font.parseFont();
+            try {
+                isFontParsed = true;
+                this.readHeader();
+                this.readIndex();   // name
+                long topOffset = this.source.getOffset();
+                CFFIndex top = this.readIndex();
+                this.definedNames = this.readIndex();
+                CFFIndex globalSubrs = this.readIndex();
+                if (isCIDFont(top.get(0))) {
+                    font = new CFFCIDFontProgram(this.source, this.definedNames, globalSubrs,
+                            topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
+                            topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
+                            this.externalCMap, this.isSubset);
+                    font.parseFont();
+                } else {
+                    font = new CFFType1FontProgram(this.source, this.definedNames, globalSubrs,
+                            topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
+                            topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
+                            this.pdEncoding, this.externalCMap, this.isSubset);
+                    font.parseFont();
+                }
+            } finally {
+                this.source.close();    // We close stream after first reading attempt
             }
         }
     }

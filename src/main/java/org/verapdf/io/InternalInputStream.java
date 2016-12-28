@@ -3,6 +3,7 @@ package org.verapdf.io;
 import org.verapdf.as.filters.io.ASBufferingInFilter;
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.tools.IntReference;
 
 import java.io.*;
 
@@ -13,16 +14,28 @@ public class InternalInputStream extends SeekableInputStream {
 
 	private final static String READ_ONLY_MODE = "r";
 
+	private IntReference numOfFileUsers;
 	private String fileName;
 	private RandomAccessFile source;
 
 	public InternalInputStream(final File file) throws FileNotFoundException {
+		this(file, 1);
+	}
+
+	public InternalInputStream(final File file, int numOfFileUsers) throws FileNotFoundException {
+		this.fileName = file.getAbsolutePath();
 		this.source = new RandomAccessFile(file, READ_ONLY_MODE);
+		this.numOfFileUsers = new IntReference(numOfFileUsers);
 	}
 
 	public InternalInputStream(final String fileName) throws FileNotFoundException {
+		this(fileName, 1);
+	}
+
+	public InternalInputStream(final String fileName, int numOfFileUsers) throws FileNotFoundException {
 		this.fileName = fileName;
 		this.source = new RandomAccessFile(fileName, READ_ONLY_MODE);
+		this.numOfFileUsers = new IntReference(numOfFileUsers);
 	}
 
 	public InternalInputStream(final InputStream fileStream) throws IOException {
@@ -41,8 +54,10 @@ public class InternalInputStream extends SeekableInputStream {
      */
 	public InternalInputStream(byte[] alreadyRead, final InputStream stream)
 			throws IOException {
-		this.source = new RandomAccessFile(createTempFile(alreadyRead, stream),
-				READ_ONLY_MODE);
+		File temp = createTempFile(alreadyRead, stream);
+		this.fileName = temp.getAbsolutePath();
+		this.source = new RandomAccessFile(temp, READ_ONLY_MODE);
+		this.numOfFileUsers = new IntReference(1);
 	}
 
 	@Override
@@ -62,7 +77,12 @@ public class InternalInputStream extends SeekableInputStream {
 
     @Override
     public void close() throws IOException {
-		this.source.close();
+		this.numOfFileUsers.decrement();
+		if(this.numOfFileUsers.equals(0)) {
+			this.source.close();
+			File tmp = new File(fileName);
+			tmp.delete();
+		}
 	}
 
     @Override
@@ -158,6 +178,7 @@ public class InternalInputStream extends SeekableInputStream {
 
 	@Override
 	public ASInputStream getStream(long startOffset, long length) {
-		return new ASFileInStream(this.source, startOffset, length);
+		return new ASFileInStream(this.source, startOffset, length,
+				numOfFileUsers, this.fileName);
 	}
 }

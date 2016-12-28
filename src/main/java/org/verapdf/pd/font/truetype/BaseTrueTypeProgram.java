@@ -38,18 +38,22 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
     @Override
     public void parseFont() throws IOException {
         if (!attemptedParsing) {
-            attemptedParsing = true;
-            this.parser.readHeader();
-            this.parser.readTableDirectory();
-            this.parser.readTables();
+            try {
+                attemptedParsing = true;
+                this.parser.readHeader();
+                this.parser.readTableDirectory();
+                this.parser.readTables();
 
-            float quotient = 1000f / this.parser.getHeadParser().getUnitsPerEm();
-            int[] unconvertedWidths = this.parser.getHmtxParser().getLongHorMetrics();
-            widths = new float[unconvertedWidths.length];
-            for (int i = 0; i < unconvertedWidths.length; ++i) {
-                widths[i] = unconvertedWidths[i] * quotient;
+                float quotient = 1000f / this.parser.getHeadParser().getUnitsPerEm();
+                int[] unconvertedWidths = this.parser.getHmtxParser().getLongHorMetrics();
+                widths = new float[unconvertedWidths.length];
+                for (int i = 0; i < unconvertedWidths.length; ++i) {
+                    widths[i] = unconvertedWidths[i] * quotient;
+                }
+                this.successfullyParsed = true;
+            } finally {
+                this.parser.source.close();    // We close stream after first reading attempt
             }
-            this.successfullyParsed = true;
         }
     }
 

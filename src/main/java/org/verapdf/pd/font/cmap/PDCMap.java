@@ -7,6 +7,7 @@ import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
+import org.verapdf.tools.IntReference;
 
 import java.io.*;
 import java.net.URL;
@@ -166,7 +167,8 @@ public class PDCMap {
                 throw new IOException("Error: File " + cMapFile + " not found!");
             }
             return new ASFileInStream(
-                    new RandomAccessFile(cMapFile, "r"), 0, cMapFile.length());
+                    new RandomAccessFile(cMapFile, "r"), 0, cMapFile.length(),
+                    new IntReference(), cMapFile.getAbsolutePath());
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Error in opening predefined CMap " + cMapName, e);
             return null;

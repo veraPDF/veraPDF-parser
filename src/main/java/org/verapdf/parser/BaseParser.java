@@ -45,7 +45,11 @@ public class BaseParser {
 		if (fileStream == null) {
 			throw new IOException("Can't create SeekableStream, fileStream is null");
 		}
-		this.source = SeekableInputStream.getSeekableStream(fileStream);
+		if (fileStream instanceof SeekableInputStream) {
+			this.source = (SeekableInputStream) fileStream;
+		} else {
+			this.source = SeekableInputStream.getSeekableStream(fileStream);
+		}
 	}
 
 	public void closeInputStream() throws IOException {
