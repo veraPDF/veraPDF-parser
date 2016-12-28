@@ -65,7 +65,7 @@ public class StandardFontMetricsFactory {
             }
             return new ASFileInStream(
                     new RandomAccessFile(afmFile, "r"), 0, afmFile.length(),
-                    new IntReference(), afmFile.getAbsolutePath());
+                    new IntReference(), afmFile.getAbsolutePath(), false);
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Error in opening predefined font metrics file " + fileName, e);
             return null;

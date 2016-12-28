@@ -18,16 +18,18 @@ public class ASFileInStream extends ASInputStream {
 	private long size;
 	private long curPos;
 	private IntReference numOfFileUsers;
+	boolean isTempFile;
 	private String filePath;
 
 	public ASFileInStream(RandomAccessFile stream, final long offset, final long size,
-						  IntReference numOfFileUsers, String filePath) {
+						  IntReference numOfFileUsers, String filePath, boolean isTempFile) {
 		this.stream = stream;
 		this.offset = offset;
 		this.size = size;
 		this.curPos = 0;
 		this.numOfFileUsers = numOfFileUsers;
 		this.numOfFileUsers.increment();
+		this.isTempFile = isTempFile;
 		this.filePath = filePath;
 	}
 
@@ -101,8 +103,10 @@ public class ASFileInStream extends ASInputStream {
 		this.numOfFileUsers.decrement();
 		if(this.numOfFileUsers.equals(0)) {
 			this.stream.close();
-			File tmp = new File(filePath);
-			tmp.delete();
+			if (isTempFile) {
+				File tmp = new File(filePath);
+				tmp.delete();
+			}
 		}
 	}
 

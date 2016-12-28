@@ -14,6 +14,7 @@ public class InternalInputStream extends SeekableInputStream {
 
 	private final static String READ_ONLY_MODE = "r";
 
+	private boolean isTempFile;
 	private IntReference numOfFileUsers;
 	private String fileName;
 	private RandomAccessFile source;
@@ -23,6 +24,7 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	public InternalInputStream(final File file, int numOfFileUsers) throws FileNotFoundException {
+		this.isTempFile = false;
 		this.fileName = file.getAbsolutePath();
 		this.source = new RandomAccessFile(file, READ_ONLY_MODE);
 		this.numOfFileUsers = new IntReference(numOfFileUsers);
@@ -33,12 +35,14 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	public InternalInputStream(final String fileName, int numOfFileUsers) throws FileNotFoundException {
+		this.isTempFile = false;
 		this.fileName = fileName;
 		this.source = new RandomAccessFile(fileName, READ_ONLY_MODE);
 		this.numOfFileUsers = new IntReference(numOfFileUsers);
 	}
 
 	public InternalInputStream(final InputStream fileStream) throws IOException {
+		this.isTempFile = true;
 		File tempFile = createTempFile(fileStream);
 		this.fileName = tempFile.getAbsolutePath();
 		this.source = new RandomAccessFile(tempFile, READ_ONLY_MODE);
@@ -54,6 +58,7 @@ public class InternalInputStream extends SeekableInputStream {
      */
 	public InternalInputStream(byte[] alreadyRead, final InputStream stream)
 			throws IOException {
+		this.isTempFile = true;
 		File temp = createTempFile(alreadyRead, stream);
 		this.fileName = temp.getAbsolutePath();
 		this.source = new RandomAccessFile(temp, READ_ONLY_MODE);
@@ -80,8 +85,10 @@ public class InternalInputStream extends SeekableInputStream {
 		this.numOfFileUsers.decrement();
 		if(this.numOfFileUsers.equals(0)) {
 			this.source.close();
-			File tmp = new File(fileName);
-			tmp.delete();
+			if (isTempFile) {
+				File tmp = new File(fileName);
+				tmp.delete();
+			}
 		}
 	}
 
@@ -144,7 +151,6 @@ public class InternalInputStream extends SeekableInputStream {
 			return tmpFile;
 		}
 		finally {
-			input.close();
 			if (output != null) {
 				output.close();
 			}
@@ -169,7 +175,6 @@ public class InternalInputStream extends SeekableInputStream {
 			return tmpFile;
 		}
 		finally {
-			input.close();
 			if (output != null) {
 				output.close();
 			}
@@ -179,6 +184,6 @@ public class InternalInputStream extends SeekableInputStream {
 	@Override
 	public ASInputStream getStream(long startOffset, long length) {
 		return new ASFileInStream(this.source, startOffset, length,
-				numOfFileUsers, this.fileName);
+				numOfFileUsers, this.fileName, this.isTempFile);
 	}
 }

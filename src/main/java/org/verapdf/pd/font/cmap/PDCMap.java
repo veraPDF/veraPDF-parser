@@ -168,7 +168,7 @@ public class PDCMap {
             }
             return new ASFileInStream(
                     new RandomAccessFile(cMapFile, "r"), 0, cMapFile.length(),
-                    new IntReference(), cMapFile.getAbsolutePath());
+                    new IntReference(), cMapFile.getAbsolutePath(), false);
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Error in opening predefined CMap " + cMapName, e);
             return null;
