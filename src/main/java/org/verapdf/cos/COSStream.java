@@ -9,6 +9,7 @@ import org.verapdf.cos.visitor.IVisitor;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
+import org.verapdf.tools.resource.ClosableASInputStreamWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -129,7 +130,9 @@ public class COSStream extends COSDictionary {
 				this.stream.reset();
 				return this.stream;
 			}
-			ASInputStream result = getFilters().getInputStream(stream, this.getKey(ASAtom.DECODE_PARMS));
+			ASInputStream result = getFilters().getInputStream(
+					new ClosableASInputStreamWrapper(stream),
+					this.getKey(ASAtom.DECODE_PARMS));
 			result.reset();
 			return result;
 		} catch (IOException e) {

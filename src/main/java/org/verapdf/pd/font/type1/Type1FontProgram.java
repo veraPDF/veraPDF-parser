@@ -1,12 +1,14 @@
 package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -248,6 +250,14 @@ public class Type1FontProgram extends COSParser implements FontProgram {
             return encoding[code];
         } else {
             return this.pdfEncoding.getName(code);
+        }
+    }
+
+    public ASFileStreamCloser getFontProgramResource() {
+        if (this.source instanceof ASMemoryInStream) {
+            return null;
+        } else {
+            return new ASFileStreamCloser(this.source);
         }
     }
 }

@@ -18,7 +18,8 @@ public class ASFileInStream extends ASInputStream {
 	private long size;
 	private long curPos;
 	private IntReference numOfFileUsers;
-	boolean isTempFile;
+	private boolean isTempFile;
+	private boolean isClosed = false;
 	private String filePath;
 
 	public ASFileInStream(RandomAccessFile stream, final long offset, final long size,
@@ -35,6 +36,7 @@ public class ASFileInStream extends ASInputStream {
 
 	@Override
 	public int read() throws IOException {
+		checkClosed("Reading");
 		if (this.curPos < this.size) {
 			long prev = stream.getFilePointer();
 
@@ -52,6 +54,7 @@ public class ASFileInStream extends ASInputStream {
 
 	@Override
 	public int read(byte[] buffer, int sizeToRead) throws IOException {
+		checkClosed("Reading");
 		if (sizeToRead == 0 || this.size != nPos && this.curPos >= this.size) {
 			return -1;
 		}
@@ -85,6 +88,7 @@ public class ASFileInStream extends ASInputStream {
 
 	@Override
 	public int skip(int size) throws IOException {
+		checkClosed("Skipping");
 		if (size == 0 || this.size != nPos && this.size <= this.curPos) {
 			return 0;
 		}
@@ -100,13 +104,22 @@ public class ASFileInStream extends ASInputStream {
 
 	@Override
 	public void close() throws IOException {
-		this.numOfFileUsers.decrement();
-		if(this.numOfFileUsers.equals(0)) {
-			this.stream.close();
-			if (isTempFile) {
-				File tmp = new File(filePath);
-				tmp.delete();
+		if (!isClosed) {
+			isClosed = true;
+			this.numOfFileUsers.decrement();
+			if (this.numOfFileUsers.equals(0)) {
+				this.stream.close();
+				if (isTempFile) {
+					File tmp = new File(filePath);
+					tmp.delete();
+				}
 			}
+		}
+	}
+
+	private void checkClosed(String streamUsage) throws IOException {
+		if (isClosed) {
+			throw new IOException(streamUsage + " can't be performed; stream is closed");
 		}
 	}
 

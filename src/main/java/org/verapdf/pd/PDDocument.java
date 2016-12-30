@@ -14,12 +14,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class PDDocument {
 
+    private static final Logger LOGGER = Logger.getLogger(PDDocument.class.getCanonicalName());
 	public static final String PDF_HEADER_DEFAULT = "%PDF-1.4";
 
 	private PDCatalog catalog;
@@ -60,7 +63,17 @@ public class PDDocument {
 	}
 
 	public void close() {
-		document = null;
+		if (document != null) {
+			try {
+				if (document.getPDFSource() != null) {
+					document.getPDFSource().close();
+				}
+				document.getResourceHandler().close();
+			} catch (IOException e) {
+				LOGGER.log(Level.FINE, "Error in closing stream", e);
+			}
+			document = null;
+		}
 
 		catalog.clear();
 		//this.info.clear;

@@ -1,5 +1,7 @@
 package org.verapdf.pd.font;
 
+import org.verapdf.tools.resource.ASFileStreamCloser;
+
 import java.io.IOException;
 
 /**
@@ -49,4 +51,10 @@ public interface FontProgram {
      * @return true if font was successfully parsed.
      */
     boolean isSuccessfulParsing();
+
+    /**
+     * @return file stream closer that handles the closing of font program
+     * stream or null if stream is memory stream.
+     */
+    ASFileStreamCloser getFontProgramResource();
 }

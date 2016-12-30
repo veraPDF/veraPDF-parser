@@ -14,6 +14,7 @@ public class InternalInputStream extends SeekableInputStream {
 
 	private final static String READ_ONLY_MODE = "r";
 
+	private boolean isClosed = false;
 	private boolean isTempFile;
 	private IntReference numOfFileUsers;
 	private String fileName;
@@ -67,27 +68,33 @@ public class InternalInputStream extends SeekableInputStream {
 
 	@Override
 	public int read() throws IOException {
+		checkClosed("Reading");
 		return this.source.read();
 	}
 
 	@Override
 	public int read(byte[] buffer, int size) throws IOException {
+		checkClosed("Reading");
 		return this.source.read(buffer, 0, size);
 	}
 
     @Override
     public int skip(int size) throws IOException {
+		checkClosed("Skipping");
 		return this.source.skipBytes(size);
 	}
 
     @Override
     public void close() throws IOException {
-		this.numOfFileUsers.decrement();
-		if(this.numOfFileUsers.equals(0)) {
-			this.source.close();
-			if (isTempFile) {
-				File tmp = new File(fileName);
-				tmp.delete();
+		if (!isClosed) {
+			isClosed = true;
+			this.numOfFileUsers.decrement();
+			if (this.numOfFileUsers.equals(0)) {
+				this.source.close();
+				if (isTempFile) {
+					File tmp = new File(fileName);
+					tmp.delete();
+				}
 			}
 		}
 	}
@@ -103,16 +110,19 @@ public class InternalInputStream extends SeekableInputStream {
 
     @Override
     public long getOffset() throws IOException {
+		checkClosed("Offset obtaining");
 		return this.source.getFilePointer();
 	}
 
     @Override
     public void seek(final long pos) throws IOException {
+		checkClosed("Seeking");
 		this.source.seek(pos);
 	}
 
     @Override
 	public int peek() throws IOException {
+		checkClosed("Peeking");
 		if (!this.isEOF()) {
 			byte result = this.source.readByte();
 			unread();
@@ -123,6 +133,7 @@ public class InternalInputStream extends SeekableInputStream {
 
     @Override
 	public long getStreamLength() throws IOException {
+		checkClosed("Stream length obtaining");
 		return this.source.length();
 	}
 
@@ -185,5 +196,15 @@ public class InternalInputStream extends SeekableInputStream {
 	public ASInputStream getStream(long startOffset, long length) {
 		return new ASFileInStream(this.source, startOffset, length,
 				numOfFileUsers, this.fileName, this.isTempFile);
+	}
+
+	private void checkClosed(String streamUsage) throws IOException {
+		if (isClosed) {
+			throw new IOException(streamUsage + " can't be performed; stream is closed");
+		}
+	}
+
+	public boolean isClosed() {
+		return isClosed;
 	}
 }

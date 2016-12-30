@@ -8,6 +8,7 @@ import org.verapdf.pd.font.PDFont;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 
@@ -139,5 +140,10 @@ public class OpenTypeFontProgram implements FontProgram {
         long res = readUShort();
         res = res << 16;
         return res | readUShort();
+    }
+
+    @Override
+    public ASFileStreamCloser getFontProgramResource() {
+        return this.font.getFontProgramResource();
     }
 }

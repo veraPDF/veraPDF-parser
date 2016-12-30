@@ -1,7 +1,9 @@
 package org.verapdf.pd.font.cff;
 
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.CFFNumber;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -175,5 +177,13 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
      */
     public int getNGlyphs() {
         return this.nGlyphs;
+    }
+
+    public ASFileStreamCloser getFontProgramResource() {
+        if (this.source instanceof ASMemoryInStream) {
+            return null;
+        } else {
+            return new ASFileStreamCloser(this.source);
+        }
     }
 }

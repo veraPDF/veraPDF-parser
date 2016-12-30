@@ -1,7 +1,9 @@
 package org.verapdf.pd.font.truetype;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 
@@ -108,5 +110,14 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
     @Override
     public boolean isSuccessfulParsing() {
         return this.successfullyParsed;
+    }
+
+    @Override
+    public ASFileStreamCloser getFontProgramResource() {
+        if (this.parser.source instanceof ASMemoryInStream) {
+            return null;
+        } else {
+            return new ASFileStreamCloser(this.parser.source);
+        }
     }
 }
