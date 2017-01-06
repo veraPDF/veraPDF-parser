@@ -62,7 +62,7 @@ public class PDOutlineItem extends PDOutlineDictionary {
 			LOGGER.log(Level.FINE, "Outline's color contains not three elements");
 			return null;
 		}
-		return null;
+		return new double[]{0.0, 0.0, 0.0};
 	}
 
 	public boolean isItalic() {

@@ -1,15 +1,5 @@
 package org.verapdf.external;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObjType;
@@ -19,6 +9,12 @@ import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDMetadata;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.colors.PDColorSpace;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Maksim Bezrukov
@@ -154,13 +150,14 @@ public class ICCProfile extends PDObject {
 	 *         is too small
 	 */
 	public String getRenderingIntent() {
-		String str = getSubArrayFromHeader(RENDERING_INTENT_OFFSET, REQUIRED_LENGTH);
-		if (str == null) {
+		if (RENDERING_INTENT_OFFSET + REQUIRED_LENGTH > this.profileHeader.length) {
 			return null;
 		}
+		String str = getSubArrayFromHeader(RENDERING_INTENT_OFFSET, REQUIRED_LENGTH);
+		if (str == null) {
+			return "Perceptual";
+		}
 		switch (str) {
-			case "\u0000\u0000\u0000\u0000":
-				return "Perceptual";
 			case "\u0000\u0000\u0000\u0001":
 				return "Media-Relative Colorimetric";
 			case "\u0000\u0000\u0000\u0002":
@@ -203,10 +200,23 @@ public class ICCProfile extends PDObject {
 	private static String getSubArray(byte[] bytes, int start, int length) {
 		if (start + length <= bytes.length) {
 			byte[] buffer = Arrays.copyOfRange(bytes, start, start + length);
-			return new String(buffer);
+			if (isNotAllZero(buffer)) {
+				return new String(buffer);
+			} else {
+				return null;
+			}
 		}
 		LOGGER.log(Level.FINE, "Length of given byte array less than " + (start + length));
 		return null;
+	}
+
+	private static boolean isNotAllZero(byte[] buffer) {
+		for (byte b : buffer) {
+			if (b != 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
