@@ -67,7 +67,7 @@ public class PDPage extends PDPageTreeNode {
     public double[] getMediaBox() {
         COSArray array = getInheritedCOSBBox(ASAtom.MEDIA_BOX);
         if (array != null) {
-            return getDoubleArray(array);
+            return getDoubleArrayForBox(array);
         }
         return null;
     }
@@ -75,7 +75,7 @@ public class PDPage extends PDPageTreeNode {
     public double[] getCropBox() {
         COSArray array = getInheritedCOSBBox(ASAtom.CROP_BOX);
         if (array != null) {
-            return getDoubleArray(array);
+            return clipToMediaBox(getDoubleArrayForBox(array));
         } else {
             return getMediaBox();
         }
@@ -84,7 +84,7 @@ public class PDPage extends PDPageTreeNode {
     public double[] getBleedBox() {
         COSArray array = getCOSBBox(ASAtom.BLEED_BOX);
         if (array != null) {
-            return getDoubleArray(array);
+            return clipToMediaBox(getDoubleArrayForBox(array));
         } else {
             return getCropBox();
         }
@@ -93,7 +93,7 @@ public class PDPage extends PDPageTreeNode {
     public double[] getTrimBox() {
         COSArray array = getCOSBBox(ASAtom.TRIM_BOX);
         if (array != null) {
-            return getDoubleArray(array);
+            return clipToMediaBox(getDoubleArrayForBox(array));
         } else {
             return getCropBox();
         }
@@ -102,19 +102,28 @@ public class PDPage extends PDPageTreeNode {
     public double[] getArtBox() {
         COSArray array = getCOSBBox(ASAtom.ART_BOX);
         if (array != null) {
-            return getDoubleArray(array);
+            return clipToMediaBox(getDoubleArrayForBox(array));
         } else {
             return getCropBox();
         }
     }
 
-    private double[] getDoubleArray(COSArray array) {
+    private double[] clipToMediaBox(double[] box) {
+        double[] res = new double[4];
+        double[] mediaBox = getMediaBox();
+        res[0] = Math.max(box[0], mediaBox[0]);
+        res[1] = Math.max(box[1], mediaBox[1]);
+        res[2] = Math.min(box[2], mediaBox[2]);
+        res[3] = Math.min(box[3], mediaBox[3]);
+        return res;
+    }
+
+    private double[] getDoubleArrayForBox(COSArray array) {
         if (array == null) {
             return null;
         }
-        Integer size = array.size();
-        double[] res = new double[size];
-        for (int i = 0; i < size; ++i) {
+        double[] res = new double[4];
+        for (int i = 0; i < array.size(); ++i) {
             COSObject obj = array.at(i);
             if (obj.getType().isNumber()) {
                 res[i] = obj.getReal().doubleValue();
