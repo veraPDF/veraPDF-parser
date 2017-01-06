@@ -27,9 +27,9 @@ public class StandardFontMetricsFactory {
     public static StandardFontMetrics getFontMetrics(String fontName) {
         StandardFontMetrics res = FONT_METRICS_MAP.get(fontName);
         if (res == null) {
-            try {
-                String afmPath = DIR_PATH + fontName + EXTENSION;
-                AFMParser parser = new AFMParser(load(afmPath), fontName);
+            String afmPath = DIR_PATH + fontName + EXTENSION;
+            try (ASInputStream afmStream = load(afmPath)) {
+                AFMParser parser = new AFMParser(afmStream, fontName);
                 res = parser.parse();
                 FONT_METRICS_MAP.put(fontName, res);
             } catch (IOException e) {

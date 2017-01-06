@@ -85,7 +85,7 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
     @Override
-    public void close() throws IOException {
+    public void closeResource() throws IOException {
 		if (!isClosed) {
 			isClosed = true;
 			this.numOfFileUsers.decrement();
@@ -194,8 +194,8 @@ public class InternalInputStream extends SeekableInputStream {
 
 	@Override
 	public ASInputStream getStream(long startOffset, long length) {
-		return new ASFileInStream(this.source, startOffset, length,
-				numOfFileUsers, this.fileName, this.isTempFile);
+		return new ASFileInStream(this.source,
+				startOffset, length, numOfFileUsers, this.fileName, this.isTempFile);
 	}
 
 	private void checkClosed(String streamUsage) throws IOException {

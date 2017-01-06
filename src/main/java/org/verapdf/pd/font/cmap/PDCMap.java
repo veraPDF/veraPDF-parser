@@ -69,9 +69,12 @@ public class PDCMap {
         if (!parsedCMap) {
             parsedCMap = true;
             if (this.cMap.getType() == COSObjType.COS_STREAM) {
-                this.cMapFile = CMapFactory.getCMap(getCMapName(),
-                        this.cMap.getData(COSStream.FilterFlags.DECODE));
-                return this.cMapFile;
+                try (ASInputStream cMapStream = this.cMap.getData(COSStream.FilterFlags.DECODE)) {
+                    this.cMapFile = CMapFactory.getCMap(getCMapName(), cMapStream);
+                    return this.cMapFile;
+                } catch (IOException e) {
+                    LOGGER.log(Level.FINE, "Can't close stream", e);
+                }
             } else if (this.cMap.getType() == COSObjType.COS_NAME) {
                 String name = this.cMap.getString();
                 String cMapPath = "/font/cmap/" + name;

@@ -23,6 +23,12 @@ public class FileResourceHandler implements Closeable {
         }
     }
 
+    public void addResource(Closeable res) {
+        if (res != null && !resources.contains(res)) {
+            resources.add(res);
+        }
+    }
+
     @Override
     public void close() throws IOException {
         for (Closeable obj : resources) {

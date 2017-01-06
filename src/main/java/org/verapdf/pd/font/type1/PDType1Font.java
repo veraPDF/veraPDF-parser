@@ -1,6 +1,7 @@
 package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
@@ -76,46 +77,47 @@ public class PDType1Font extends PDSimpleFont {
             return this.fontProgram;
         }
         this.isFontParsed = true;
-        try {
-            if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE)) {
-                COSStream type1FontFile = fontDescriptor.getFontFile();
+        if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE)) {
+            COSStream type1FontFile = fontDescriptor.getFontFile();
+            try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
                 this.fontProgram = new Type1FontProgram(
-                        type1FontFile.getData(COSStream.FilterFlags.DECODE),
-                        this.getEncodingMapping());
+                        fontData, this.getEncodingMapping());
                 return this.fontProgram;
-            } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
-                COSStream type1FontFile = fontDescriptor.getFontFile3();
-                ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
+            } catch (IOException e) {
+                LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
+            }
+        } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
+            COSStream type1FontFile = fontDescriptor.getFontFile3();
+            ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
+            try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
                 if (subtype == ASAtom.TYPE1C) {
 
-                    this.fontProgram = new CFFFontProgram(type1FontFile.getData(
-                            COSStream.FilterFlags.DECODE), this.getEncodingMapping(),
+                    this.fontProgram = new CFFFontProgram(fontData, this.getEncodingMapping(),
                             null, this.isSubset());
                     return this.fontProgram;
                 } else if (subtype == ASAtom.OPEN_TYPE) {
-                    this.fontProgram = new OpenTypeFontProgram(type1FontFile.getData(
-                            COSStream.FilterFlags.DECODE), true, this.isSymbolic(),
+                    this.fontProgram = new OpenTypeFontProgram(fontData, true, this.isSymbolic(),
                             this.getEncoding(), null, this.isSubset());
                     return this.fontProgram;
                 }
+            } catch (IOException e) {
+                LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
             }
-        } catch (IOException e) {
-            LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
         }
         this.fontProgram = null;
         return null;
     }
 
     public Boolean isStandard() {
-        if(this.isStandard == null) {
+        if (this.isStandard == null) {
             if (!containsDiffs() && !isEmbedded() && isNameStandard()) {
                 isStandard = Boolean.valueOf(true);
                 return isStandard;
             }
-			isStandard = Boolean.valueOf(false);
-			return isStandard;
+            isStandard = Boolean.valueOf(false);
+            return isStandard;
         }
-		return this.isStandard;
+        return this.isStandard;
     }
 
     private boolean containsDiffs() {

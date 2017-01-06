@@ -46,15 +46,19 @@ class XrefStreamParser {
      */
     void parseStreamAndTrailer() throws IOException {
 
-        xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
-        fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).getDirectBase();
-        if (fieldSizes.size() != 3) {
-            throw new IOException("W array in xref should have 3 elements.");
+        try {
+            xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
+            fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).getDirectBase();
+            if (fieldSizes.size() != 3) {
+                throw new IOException("W array in xref should have 3 elements.");
+            }
+            initializeIndex();
+            initializeObjIDs();
+            parseStream();
+            setTrailer();
+        } finally {
+            xrefInputStream.close();
         }
-        initializeIndex();
-        initializeObjIDs();
-        parseStream();
-        setTrailer();
     }
 
     /**

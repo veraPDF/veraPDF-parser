@@ -9,7 +9,6 @@ import org.verapdf.cos.visitor.IVisitor;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
-import org.verapdf.tools.resource.ClosableASInputStreamWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -131,7 +130,7 @@ public class COSStream extends COSDictionary {
 				return this.stream;
 			}
 			ASInputStream result = getFilters().getInputStream(
-					new ClosableASInputStreamWrapper(stream),
+					ASInputStream.createStreamFromStream(stream),
 					this.getKey(ASAtom.DECODE_PARMS));
 			result.reset();
 			return result;
@@ -203,15 +202,17 @@ public class COSStream extends COSDictionary {
 	}
 
 	public void setFilters(final COSFilters filters) throws IOException {
-		SeekableInputStream unfilteredData =
-				SeekableInputStream.getSeekableStream(this.getData(COSStream.FilterFlags.DECODE));
-		InternalOutputStream fileWithData = InternalOutputStream.getInternalOutputStream();
-		setKey(ASAtom.FILTER, filters.getObject());
-		ASOutputStream encoder = filters.getOutputStream(fileWithData);
-		encoder.write(unfilteredData);
-		File encodedDataFile = fileWithData.getFile();
-		fileWithData.close();
-		this.setData(new InternalInputStream(encodedDataFile), FilterFlags.RAW_DATA);
+		try (ASInputStream decoded = this.getData(COSStream.FilterFlags.DECODE)) {
+			SeekableInputStream unfilteredData =
+					SeekableInputStream.getSeekableStream(decoded);
+			InternalOutputStream fileWithData = InternalOutputStream.getInternalOutputStream();
+			setKey(ASAtom.FILTER, filters.getObject());
+			ASOutputStream encoder = filters.getOutputStream(fileWithData);
+			encoder.write(unfilteredData);
+			File encodedDataFile = fileWithData.getFile();
+			fileWithData.close();
+			this.setData(new InternalInputStream(encodedDataFile), FilterFlags.RAW_DATA);
+		}
 	}
 
 	public FilterFlags getFilterFlags() {

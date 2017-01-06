@@ -98,10 +98,12 @@ public class COSDocument {
 
 	private void initReader(final InputStream fileStream) throws IOException {
 		this.reader = new Reader(this, fileStream);
+		this.resourceHandler.addResource(this.reader);
 	}
 
 	private void initReader(final String fileName) throws IOException {
 		this.reader = new Reader(this, fileName);
+		this.resourceHandler.addResource(this.reader);
 	}
 
 	public boolean isNew() {

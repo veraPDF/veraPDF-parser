@@ -1,6 +1,7 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.operator.InlineImageOperator;
 import org.verapdf.operator.Operator;
@@ -18,8 +19,8 @@ public class PDFStreamParser extends COSParser {
 
 	private final List<Object> tokens = new ArrayList<>();
 
-	public PDFStreamParser(COSStream stream) throws IOException {
-		super(stream.getData(COSStream.FilterFlags.DECODE));
+	public PDFStreamParser(ASInputStream stream) throws IOException {
+		super(stream);
 		initializeToken();
 	}
 

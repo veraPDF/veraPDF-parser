@@ -35,6 +35,7 @@ class CMapFactory {
             LOGGER.log(Level.FINE, "Can't parse CMap " + name + ", using default", e);
             res = new CMap();
         }
+
         cMapCache.put(name, res);
         return res;
     }
