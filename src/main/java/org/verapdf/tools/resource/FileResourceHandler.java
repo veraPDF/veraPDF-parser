@@ -17,9 +17,11 @@ public class FileResourceHandler implements Closeable {
     }
 
     public void addResource(ASFileStreamCloser obj) {
-        Closeable resource = obj.getStream();
-        if (resource != null && !resources.contains(resource)) {
-            resources.add(obj);
+        if (obj != null) {
+            Closeable resource = obj.getStream();
+            if (resource != null && !resources.contains(resource)) {
+                resources.add(obj);
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package org.verapdf.pd.font.opentype;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.FontProgram;
@@ -144,6 +145,10 @@ public class OpenTypeFontProgram implements FontProgram {
 
     @Override
     public ASFileStreamCloser getFontProgramResource() {
-        return this.font.getFontProgramResource();
+        if (this.source instanceof ASMemoryInStream) {
+            return null;
+        } else {
+            return new ASFileStreamCloser(this.source);
+        }
     }
 }
