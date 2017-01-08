@@ -108,6 +108,9 @@ public class COSParser extends BaseParser {
 			case TT_NONE:
 				break;
 			case TT_KEYWORD: {
+				if (token.keyword == null) {
+					break;
+				}
 				switch (token.keyword) {
 					case KW_NONE:
 						break;
@@ -384,7 +387,7 @@ public class COSParser extends BaseParser {
 		} else if (secondSymbol == 13) {
 			eolCount = 1;
 		} else {
-			LOGGER.log(Level.WARNING, "End of stream at " + source.getOffset() + " offset doesn't contain EOL marker.");
+			LOGGER.log(Level.FINE, "End of stream at " + source.getOffset() + " offset doesn't contain EOL marker.");
 			stream.setEndstreamKeywordCRLFCompliant(false);
 		}
 
