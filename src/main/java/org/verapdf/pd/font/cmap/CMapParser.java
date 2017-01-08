@@ -1,15 +1,15 @@
 package org.verapdf.pd.font.cmap;
 
+import org.verapdf.cos.COSName;
+import org.verapdf.cos.COSObject;
+import org.verapdf.parser.BaseParser;
+import org.verapdf.parser.Token;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSObject;
-import org.verapdf.parser.BaseParser;
-import org.verapdf.parser.Token;
 
 /**
  * This class parses CMap files and constructs CMap objects.
@@ -50,12 +50,16 @@ public class CMapParser extends BaseParser {
      * Method parses CMap from given source.
      */
     public void parse() throws IOException {
-        initializeToken();
-        //Skipping starting comments
-        skipSpaces(true);
-        while (getToken().type != Token.Type.TT_EOF) {
-            nextToken();
-            processToken();
+        try {
+            initializeToken();
+            //Skipping starting comments
+            skipSpaces(true);
+            while (getToken().type != Token.Type.TT_EOF) {
+                nextToken();
+                processToken();
+            }
+        } finally {
+            this.source.close();    // We close stream after first reading attempt
         }
     }
 

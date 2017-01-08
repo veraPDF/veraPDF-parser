@@ -161,4 +161,12 @@ public class Reader extends XRefReader {
 		return res;
 	}
 
+	@Override
+	public void close() throws IOException {
+		if (objectStreams != null) {
+			for (Map.Entry<Long, DecodedObjectStreamParser> entry : this.objectStreams.entrySet()) {
+				entry.getValue().closeInputStream();
+			}
+		}
+	}
 }

@@ -1,12 +1,14 @@
 package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,19 +64,23 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     @Override
     public void parseFont() throws IOException {
         if (!attemptedParsing) {
-            attemptedParsing = true;
-            initializeToken();
+            try {
+                attemptedParsing = true;
+                initializeToken();
 
-            skipSpaces(true);
+                skipSpaces(true);
 
-            while (getToken().type != Token.Type.TT_EOF) {
-                nextToken();
-                processToken();
+                while (getToken().type != Token.Type.TT_EOF) {
+                    nextToken();
+                    processToken();
+                }
+                if (glyphWidths == null) {
+                    throw new IOException("Type 1 font doesn't contain charstrings.");
+                }
+                this.successfullyParsed = true;
+            } finally {
+                this.source.close();    // We close stream after first reading attempt
             }
-            if(glyphWidths == null) {
-                throw new IOException("Type 1 font doesn't contain charstrings.");
-            }
-            this.successfullyParsed = true;
         }
     }
 
@@ -123,7 +129,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                             this.readNumber();
                             long key = this.getToken().integer;
                             this.nextToken();
-                            if(key < 256) {
+                            if (key < 256) {
                                 encoding[(int) key] = this.getToken().getValue();
                             } else {
                                 LOGGER.log(Level.FINE, "Found glyph with encoding "
@@ -245,10 +251,18 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     private String getGlyph(int code) {
-        if(this.pdfEncoding == null) {
+        if (this.pdfEncoding == null) {
             return encoding[code];
         } else {
             return this.pdfEncoding.getName(code);
+        }
+    }
+
+    public ASFileStreamCloser getFontProgramResource() {
+        if (this.source instanceof ASMemoryInStream) {
+            return null;
+        } else {
+            return new ASFileStreamCloser(this.source);
         }
     }
 }

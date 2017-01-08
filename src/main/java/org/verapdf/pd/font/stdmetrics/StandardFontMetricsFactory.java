@@ -1,19 +1,15 @@
 package org.verapdf.pd.font.stdmetrics;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
+import org.verapdf.as.io.ASFileInStream;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.tools.IntReference;
+
+import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.as.io.ASFileInStream;
-import org.verapdf.as.io.ASInputStream;
 
 /**
  * @author Sergey Shemyakov
@@ -31,9 +27,9 @@ public class StandardFontMetricsFactory {
     public static StandardFontMetrics getFontMetrics(String fontName) {
         StandardFontMetrics res = FONT_METRICS_MAP.get(fontName);
         if (res == null) {
-            try {
-                String afmPath = DIR_PATH + fontName + EXTENSION;
-                AFMParser parser = new AFMParser(load(afmPath), fontName);
+            String afmPath = DIR_PATH + fontName + EXTENSION;
+            try (ASInputStream afmStream = load(afmPath)) {
+                AFMParser parser = new AFMParser(afmStream, fontName);
                 res = parser.parse();
                 FONT_METRICS_MAP.put(fontName, res);
             } catch (IOException e) {
@@ -68,7 +64,8 @@ public class StandardFontMetricsFactory {
                 throw new IOException("Error: File " + afmFile + " not found!");
             }
             return new ASFileInStream(
-                    new RandomAccessFile(afmFile, "r"), 0, afmFile.length());
+                    new RandomAccessFile(afmFile, "r"), 0, afmFile.length(),
+                    new IntReference(), afmFile.getAbsolutePath(), false);
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Error in opening predefined font metrics file " + fileName, e);
             return null;

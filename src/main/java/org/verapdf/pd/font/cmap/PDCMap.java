@@ -7,6 +7,7 @@ import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
+import org.verapdf.tools.IntReference;
 
 import java.io.*;
 import java.net.URL;
@@ -68,9 +69,12 @@ public class PDCMap {
         if (!parsedCMap) {
             parsedCMap = true;
             if (this.cMap.getType() == COSObjType.COS_STREAM) {
-                this.cMapFile = CMapFactory.getCMap(getCMapName(),
-                        this.cMap.getData(COSStream.FilterFlags.DECODE));
-                return this.cMapFile;
+                try (ASInputStream cMapStream = this.cMap.getData(COSStream.FilterFlags.DECODE)) {
+                    this.cMapFile = CMapFactory.getCMap(getCMapName(), cMapStream);
+                    return this.cMapFile;
+                } catch (IOException e) {
+                    LOGGER.log(Level.FINE, "Can't close stream", e);
+                }
             } else if (this.cMap.getType() == COSObjType.COS_NAME) {
                 String name = this.cMap.getString();
                 String cMapPath = "/font/cmap/" + name;
@@ -166,7 +170,8 @@ public class PDCMap {
                 throw new IOException("Error: File " + cMapFile + " not found!");
             }
             return new ASFileInStream(
-                    new RandomAccessFile(cMapFile, "r"), 0, cMapFile.length());
+                    new RandomAccessFile(cMapFile, "r"), 0, cMapFile.length(),
+                    new IntReference(), cMapFile.getAbsolutePath(), false);
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Error in opening predefined CMap " + cMapName, e);
             return null;

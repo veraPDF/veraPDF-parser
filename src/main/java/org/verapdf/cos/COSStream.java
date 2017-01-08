@@ -129,7 +129,9 @@ public class COSStream extends COSDictionary {
 				this.stream.reset();
 				return this.stream;
 			}
-			ASInputStream result = getFilters().getInputStream(stream, this.getKey(ASAtom.DECODE_PARMS));
+			ASInputStream result = getFilters().getInputStream(
+					ASInputStream.createStreamFromStream(stream),
+					this.getKey(ASAtom.DECODE_PARMS));
 			result.reset();
 			return result;
 		} catch (IOException e) {
@@ -200,15 +202,17 @@ public class COSStream extends COSDictionary {
 	}
 
 	public void setFilters(final COSFilters filters) throws IOException {
-		SeekableInputStream unfilteredData =
-				SeekableInputStream.getSeekableStream(this.getData(COSStream.FilterFlags.DECODE));
-		InternalOutputStream fileWithData = InternalOutputStream.getInternalOutputStream();
-		setKey(ASAtom.FILTER, filters.getObject());
-		ASOutputStream encoder = filters.getOutputStream(fileWithData);
-		encoder.write(unfilteredData);
-		File encodedDataFile = fileWithData.getFile();
-		fileWithData.close();
-		this.setData(new InternalInputStream(encodedDataFile), FilterFlags.RAW_DATA);
+		try (ASInputStream decoded = this.getData(COSStream.FilterFlags.DECODE)) {
+			SeekableInputStream unfilteredData =
+					SeekableInputStream.getSeekableStream(decoded);
+			InternalOutputStream fileWithData = InternalOutputStream.getInternalOutputStream();
+			setKey(ASAtom.FILTER, filters.getObject());
+			ASOutputStream encoder = filters.getOutputStream(fileWithData);
+			encoder.write(unfilteredData);
+			File encodedDataFile = fileWithData.getFile();
+			fileWithData.close();
+			this.setData(new InternalInputStream(encodedDataFile), FilterFlags.RAW_DATA);
+		}
 	}
 
 	public FilterFlags getFilterFlags() {

@@ -21,19 +21,24 @@ public class AFMParser extends BaseParser {
     }
 
     public StandardFontMetrics parse() throws IOException {
+
         StandardFontMetrics res = new StandardFontMetrics();
-        this.initializeToken();
-        this.findStartCharMetrics();
-        this.nextToken();
-        if (getToken().type == Token.Type.TT_INTEGER) {
-            nGlyphs = (int) this.getToken().integer;
-            for (int i = 0; i < nGlyphs; ++i) {
-                readMetricsLine(res);
+        try {
+            this.initializeToken();
+            this.findStartCharMetrics();
+            this.nextToken();
+            if (getToken().type == Token.Type.TT_INTEGER) {
+                nGlyphs = (int) this.getToken().integer;
+                for (int i = 0; i < nGlyphs; ++i) {
+                    readMetricsLine(res);
+                }
+            } else {    // Actually in this case we can try read until
+                // EndCharMetrics, but we are sure that files are perfect.
+                throw new IOException("Can't parse font metrics for predefined font "
+                        + fontName);
             }
-        } else {    // Actually in this case we can try read until
-            // EndCharMetrics, but we are sure that files are perfect.
-            throw new IOException("Can't parse font metrics for predefined font "
-                    + fontName);
+        } finally {
+            this.source.close();    // We close stream after first reading attempt
         }
         return res;
     }

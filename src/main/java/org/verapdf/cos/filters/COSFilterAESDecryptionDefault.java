@@ -64,7 +64,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
             return readDecrypted;
         }
 
-        if (this.bufferSize() == 0) {
+        if (this.bufferSize() <= 0) {
             int bytesFed = (int) this.feedBuffer(getBufferCapacity());
             if (bytesFed == -1) {
                 return -1;

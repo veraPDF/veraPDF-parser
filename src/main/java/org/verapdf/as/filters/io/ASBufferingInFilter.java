@@ -157,8 +157,8 @@ public class ASBufferingInFilter extends ASInFilter {
      * {@inheritDoc}
      */
     @Override
-    public void close() throws IOException {
-        super.close();
+    public void closeResource() throws IOException {
+        super.closeResource();
         bufferEnd = bufferBegin = 0;
     }
 

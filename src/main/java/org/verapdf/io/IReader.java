@@ -5,13 +5,14 @@ import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSTrailer;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 
 /**
  * @author Timur Kamalov
  */
-public interface IReader {
+public interface IReader extends Closeable {
 
 	SeekableInputStream getPDFSource();
 

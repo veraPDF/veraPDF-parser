@@ -2,10 +2,12 @@ package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
+import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,10 +46,6 @@ public class COSParser extends BaseParser {
 
 	public COSParser(final InputStream fileStream) throws IOException {
 		super(fileStream);
-	}
-
-	public COSParser(ASInputStream asInputStream) throws IOException {
-		super(asInputStream);
 	}
 
 	public COSParser(final COSDocument document, final String filename) throws IOException { //tmp ??
@@ -278,6 +276,9 @@ public class COSParser extends BaseParser {
 			dict.setRealStreamSize(size);
 			ASInputStream stm = super.getRandomAccess(size);
 			dict.setData(stm);
+			if (stm instanceof ASFileInStream) {
+				this.document.addFileResource(new ASFileStreamCloser(stm));
+			}
 		} else {
 			//trying to find endstream keyword
 			long realStreamSize = -1;
@@ -298,6 +299,9 @@ public class COSParser extends BaseParser {
 							ASInputStream stm = super.getRandomAccess(realStreamSize);
 							dict.setData(stm);
 							source.seek(possibleEndstreamOffset);
+							if (stm instanceof ASFileInStream) {
+								this.document.addFileResource(new ASFileStreamCloser(stm));
+							}
 							break;
 						}
 						source.seek(reset);

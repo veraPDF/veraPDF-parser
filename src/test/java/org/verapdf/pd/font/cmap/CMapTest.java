@@ -3,6 +3,7 @@ package org.verapdf.pd.font.cmap;
 import org.junit.Test;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.io.InternalInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,7 +21,8 @@ public class CMapTest {
     @Test
     public void testParser() {
         try {
-            CMapParser parser = new CMapParser(cMapPath);
+            InternalInputStream stream = new InternalInputStream(cMapPath, 2);
+            CMapParser parser = new CMapParser(stream);
             parser.parse();
             CMap cMap = parser.getCMap();
             assertTrue(cMap.getRegistry().equals("Adobe"));
@@ -47,7 +49,8 @@ public class CMapTest {
     @Test
     public void testCMap() {
         try {
-            CMapParser parser = new CMapParser(cMapPath);
+            InternalInputStream internalInputStream = new InternalInputStream(cMapPath, 2);
+            CMapParser parser = new CMapParser(internalInputStream);
             parser.parse();
             CMap cMap = parser.getCMap();   //Testing defined characters
             byte[] bytes = {0x01, (byte) 0x81, 0x40, (byte) 0xFE, (byte) 0xE6, (byte) 0x4A};

@@ -10,6 +10,8 @@ import org.verapdf.io.Reader;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.PDDocument;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
+import org.verapdf.tools.resource.ASFileStreamCloser;
+import org.verapdf.tools.resource.FileResourceHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +44,7 @@ public class COSDocument {
 	private StandardSecurityHandler standardSecurityHandler;
 	private List<COSObject> changedObjects;
 	private List<COSObject> addedObjects;
+	private FileResourceHandler resourceHandler;
 
 	private byte postEOFDataSize;
 
@@ -60,15 +63,18 @@ public class COSDocument {
 		this.isNew = true;
 		this.changedObjects = new ArrayList<>();
 		this.addedObjects = new ArrayList<>();
+		this.resourceHandler = new FileResourceHandler();
 	}
 
 	public COSDocument(final String fileName, final PDDocument document) throws IOException {
+		this.resourceHandler = new FileResourceHandler();
 		initReader(fileName);
 
 		initCOSDocument(document);
 	}
 
 	public COSDocument(final InputStream fileStream, final PDDocument document) throws IOException {
+		this.resourceHandler = new FileResourceHandler();
 		initReader(fileStream);
 
 		initCOSDocument(document);
@@ -87,14 +93,17 @@ public class COSDocument {
 		this.linearized = reader.isLinearized();
 		this.changedObjects = new ArrayList<>();
 		this.addedObjects = new ArrayList<>();
+		this.resourceHandler = new FileResourceHandler();
 	}
 
 	private void initReader(final InputStream fileStream) throws IOException {
 		this.reader = new Reader(this, fileStream);
+		this.resourceHandler.addResource(this.reader);
 	}
 
 	private void initReader(final String fileName) throws IOException {
 		this.reader = new Reader(this, fileName);
+		this.resourceHandler.addResource(this.reader);
 	}
 
 	public boolean isNew() {
@@ -383,5 +392,13 @@ public class COSDocument {
 
 	public int getLastKeyNumber() {
 		return this.reader.getGreatestKeyNumberFromXref();
+	}
+
+	public void addFileResource(ASFileStreamCloser resource) {
+		this.resourceHandler.addResource(resource);
+	}
+
+	public FileResourceHandler getResourceHandler() {
+		return resourceHandler;
 	}
 }
