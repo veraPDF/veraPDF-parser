@@ -165,9 +165,14 @@ public class Type1FontProgram extends COSParser implements FontProgram {
         this.source.seek(this.source.getStreamLength() - length);
         byte[] buf = new byte[length];
         this.source.read(buf, length);
-        while (!Arrays.equals(buf, CLEAR_TO_MARK_BYTES)) {
+        while (!Arrays.equals(buf, CLEAR_TO_MARK_BYTES) && this.source.getOffset() > length) {
             this.source.unread(length + 1);
             this.source.read(buf, length);
+        }
+        if (this.source.getOffset() == length) {
+            LOGGER.log(Level.FINE, "cleartomark keyword can't be found while parsing Type1 font.");
+            this.source.seek(startingOffset);
+            return source.getStreamLength();
         }
         long res = this.source.getOffset() - length;
         this.source.seek(startingOffset);

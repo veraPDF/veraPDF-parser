@@ -115,6 +115,7 @@ public class COSFilterLZWDecode extends ASBufferingInFilter {
             if (thisWord == CLEAR_TABLE_MARKER) {
                 this.codeLengthBits = 9;
                 initLZWTable();
+                this.previousWord = -1;
                 return getNextChunk();
             } else if (thisWord == EOD) {
                 return null;

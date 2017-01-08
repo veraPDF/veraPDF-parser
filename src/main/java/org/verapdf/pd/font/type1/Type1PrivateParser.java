@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class parses private data in font Type 1 files after it was
@@ -18,6 +20,8 @@ import java.util.Map;
  * @author Sergey Shemyakov
  */
 class Type1PrivateParser extends BaseParser {
+
+    private static final Logger LOGGER = Logger.getLogger(Type1PrivateParser.class.getCanonicalName());
 
     private int lenIV;
     private Map<String, Integer> glyphWidths;
@@ -76,7 +80,7 @@ class Type1PrivateParser extends BaseParser {
                             nextToken();    // reading number
                             nextToken();
                             long toSkip = this.getToken().integer;
-                            nextToken();    // reading "RD"
+                            skipRD();
                             this.skipSpaces();
                             this.source.skip(toSkip);
                             this.nextToken();   // reading "NP"
@@ -101,12 +105,23 @@ class Type1PrivateParser extends BaseParser {
             this.glyphWidths = new HashMap<>();
         }
         this.nextToken();
-        checkTokenType(Token.Type.TT_NAME);
+        try {
+            checkTokenType(Token.Type.TT_NAME);
+        } catch (IOException e) {
+            // There are files with wrong charstring amount specified. Actual
+            // amount can be determined from "end" keyword.
+            if (getToken().type == Token.Type.TT_KEYWORD && getToken().getValue().equals("end")) {
+                LOGGER.log(Level.FINE, "Error in parsing private data in Type 1 font: incorrect amount of charstings specified.");
+                return;
+            } else {
+                throw e;
+            }
+        }
         String glyphName = this.getToken().getValue();
         this.nextToken();
         checkTokenType(Token.Type.TT_INTEGER);
         long charstringLength = this.getToken().integer;
-        this.nextToken();
+        this.skipRD();
         this.skipSpaces();
         long beginOffset = this.source.getOffset();
         this.source.skip((int) charstringLength);
@@ -138,5 +153,16 @@ class Type1PrivateParser extends BaseParser {
 
     Map<String, Integer> getGlyphWidths() {
         return glyphWidths;
+    }
+
+    private void skipRD() throws IOException {
+        this.skipSpaces();
+        nextToken();    // reading "RD"
+        if (getToken().type == Token.Type.TT_INTEGER) { // we read "-" of "-|"
+            int next = this.source.read();
+            if (next != 124) {
+                LOGGER.log(Level.FINE, "Error in Type1 private parser in parsing RD in Subrs.");
+            }
+        }
     }
 }
