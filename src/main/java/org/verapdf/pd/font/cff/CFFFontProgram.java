@@ -1,6 +1,7 @@
 package org.verapdf.pd.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
@@ -151,6 +152,10 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
     @Override
     public ASFileStreamCloser getFontProgramResource() {
-        return this.font.getFontProgramResource();
+        if (this.source instanceof ASMemoryInStream) {
+            return null;
+        } else {
+            return new ASFileStreamCloser(this.source);
+        }
     }
 }

@@ -148,16 +148,22 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                     case Type1StringConstants.EEXEC_STRING:
                         this.skipSpaces();
                         long clearToMarkOffset = this.findOffsetCleartomark();
-                        ASInputStream eexecEncoded = this.source.getStream(this.source.getOffset(),
-                                clearToMarkOffset - this.source.getOffset());
-                        ASInputStream eexecDecoded = new EexecFilterDecode(
-                                eexecEncoded, false);
-                        Type1PrivateParser parser = new Type1PrivateParser(
-                                eexecDecoded, fontMatrix);
-                        parser.parse();
-                        this.glyphWidths = parser.getGlyphWidths();
-                        this.source.seek(clearToMarkOffset);
-                        break;
+                        try (ASInputStream eexecEncoded = this.source.getStream(
+                                this.source.getOffset(),
+                                clearToMarkOffset - this.source.getOffset())) {
+                            ASInputStream eexecDecoded = new EexecFilterDecode(
+                                    eexecEncoded, false);
+                            Type1PrivateParser parser = new Type1PrivateParser(
+                                    eexecDecoded, fontMatrix);
+                            try {
+                                parser.parse();
+                            } finally {
+                                parser.closeInputStream();
+                            }
+                            this.glyphWidths = parser.getGlyphWidths();
+                            this.source.seek(clearToMarkOffset);
+                            break;
+                        }
                 }
                 break;
             default:

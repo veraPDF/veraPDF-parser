@@ -125,19 +125,20 @@ class Type1PrivateParser extends BaseParser {
         this.skipSpaces();
         long beginOffset = this.source.getOffset();
         this.source.skip((int) charstringLength);
-        ASBufferingInFilter charString = new ASBufferingInFilter(
-                this.source.getStream(beginOffset, charstringLength));
-        ASInputStream decodedCharString = new EexecFilterDecode(
-                charString, true, this.getLenIV());
-        Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
-        if (parser.getWidth() != null) {
-            if (!isDefaultFontMatrix) {
-                glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getInteger()));
-            } else {
-                glyphWidths.put(glyphName, (int) parser.getWidth().getInteger());
+        try (ASInputStream chunk = this.source.getStream(beginOffset, charstringLength)) {
+            ASBufferingInFilter charString = new ASBufferingInFilter(chunk);
+            ASInputStream decodedCharString = new EexecFilterDecode(
+                    charString, true, this.getLenIV());
+            Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
+            if (parser.getWidth() != null) {
+                if (!isDefaultFontMatrix) {
+                    glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getInteger()));
+                } else {
+                    glyphWidths.put(glyphName, (int) parser.getWidth().getInteger());
+                }
             }
+            this.nextToken();
         }
-        this.nextToken();
     }
 
     private void checkTokenType(Token.Type expectedType) throws IOException {
