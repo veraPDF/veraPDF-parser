@@ -161,7 +161,7 @@ public class PDFontDescriptor extends PDObject {
      */
     public double[] getFontBoundingBox() {
         COSBase bbox = this.getObject().getKey(ASAtom.FONT_BBOX).get();
-        if (bbox.getType() == COSObjType.COS_ARRAY || bbox.size() == 4) {
+        if (bbox != null && bbox.getType() == COSObjType.COS_ARRAY && bbox.size() == 4) {
             double[] res = new double[4];
             for (int i = 0; i < 4; ++i) {
                 COSObject obj = bbox.at(i);
