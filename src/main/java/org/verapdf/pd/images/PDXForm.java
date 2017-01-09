@@ -68,7 +68,11 @@ public class PDXForm extends PDXObject implements PDContentStream {
 	}
 
 	public double[] getMatrix() {
-		return TypeConverter.getRealArray(getKey(ASAtom.MATRIX), 6, "Matrix");
+		double[] matrix = TypeConverter.getRealArray(getKey(ASAtom.MATRIX), 6, "Matrix");
+		if (matrix == null) {
+			matrix = new double[]{1, 0, 0, 1, 0, 0};
+		}
+		return matrix;
 	}
 
 	public PDResources getResources() {
