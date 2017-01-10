@@ -6,6 +6,7 @@ import org.verapdf.cos.*;
 import org.verapdf.operator.InlineImageOperator;
 import org.verapdf.operator.Operator;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,6 +23,7 @@ public class PDFStreamParser extends COSParser {
 	private static final Logger LOGGER = Logger.getLogger(PDFStreamParser.class.getCanonicalName());
 
 	private final List<Object> tokens = new ArrayList<>();
+	private List<Closeable> imageDataStreams = new ArrayList<>();
 
 	public PDFStreamParser(ASInputStream stream) throws IOException {
 		super(stream);
@@ -226,8 +228,10 @@ public class PDFStreamParser extends COSParser {
 					imageStreamLength++;
 				}
 				result = Operator.getOperator("ID");
-				((InlineImageOperator) result).setImageData(
-						source.getStream(startOffset, imageStreamLength));
+				ASInputStream imageDataStream =
+						source.getStream(startOffset, imageStreamLength);
+				this.imageDataStreams.add(imageDataStream);
+				((InlineImageOperator) result).setImageData(imageDataStream);
 				break;
 			}
 			default: {
@@ -270,4 +274,7 @@ public class PDFStreamParser extends COSParser {
 		return buffer.toString();
 	}
 
+	public List<Closeable> getImageDataStreams() {
+		return imageDataStreams;
+	}
 }

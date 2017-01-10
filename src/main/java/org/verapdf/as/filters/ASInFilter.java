@@ -57,6 +57,13 @@ public abstract class ASInFilter extends ASInputStream {
 		}
 	}
 
+	@Override
+	public void close() throws IOException {
+		if (this.storedInStream != null) {
+			this.storedInStream.close();
+		}
+	}
+
 	protected ASInputStream getInputStream() {
 		return this.storedInStream;
 	}

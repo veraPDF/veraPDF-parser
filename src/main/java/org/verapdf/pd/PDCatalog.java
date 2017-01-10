@@ -74,7 +74,7 @@ public class PDCatalog extends PDObject {
 
 	public PDOptionalContentProperties getOCProperties() {
 		COSObject object = getKey(ASAtom.OCPROPERTIES);
-		if (!object.empty() && object.getType() == COSObjType.COS_DICT) {
+		if (object != null && !object.empty() && object.getType() == COSObjType.COS_DICT) {
 			return new PDOptionalContentProperties(object);
 		}
 		return null;

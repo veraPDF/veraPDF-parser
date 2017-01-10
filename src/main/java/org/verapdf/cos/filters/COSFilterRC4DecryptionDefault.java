@@ -49,8 +49,10 @@ public class COSFilterRC4DecryptionDefault extends ASBufferingInFilter {
         }
         byte[] encData = new byte[BF_BUFFER_SIZE];
         int encDataLength = this.bufferPopArray(encData, size);
-        byte[] res = rc4.process(encData, 0, encDataLength);
-        System.arraycopy(res, 0, buffer, 0, encDataLength);
+        if (encDataLength >= 0) {
+            byte[] res = rc4.process(encData, 0, encDataLength);
+            System.arraycopy(res, 0, buffer, 0, encDataLength);
+        }
         return encDataLength;
     }
 
@@ -64,8 +66,10 @@ public class COSFilterRC4DecryptionDefault extends ASBufferingInFilter {
         }
         byte[] encData = new byte[BF_BUFFER_SIZE];
         int encDataLength = this.bufferPopArray(encData, size - off);
-        byte[] res = rc4.process(encData, 0, encDataLength);
-        System.arraycopy(res, 0, buffer, off, encDataLength);
+        if (encDataLength >= 0) {
+            byte[] res = rc4.process(encData, 0, encDataLength);
+            System.arraycopy(res, 0, buffer, off, encDataLength);
+        }
         return encDataLength;
     }
 

@@ -93,7 +93,6 @@ public class COSDocument {
 		this.linearized = reader.isLinearized();
 		this.changedObjects = new ArrayList<>();
 		this.addedObjects = new ArrayList<>();
-		this.resourceHandler = new FileResourceHandler();
 	}
 
 	private void initReader(final InputStream fileStream) throws IOException {

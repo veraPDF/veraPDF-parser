@@ -115,4 +115,7 @@ public class ASFileInStream extends ASInputStream {
 		this.curPos = 0;
 	}
 
+	public String getFilePath() {
+		return filePath;
+	}
 }

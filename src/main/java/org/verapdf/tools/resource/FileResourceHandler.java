@@ -37,4 +37,8 @@ public class FileResourceHandler implements Closeable {
             obj.close();
         }
     }
+
+    public void addAll(List<Closeable> resources) {
+        this.resources.addAll(resources);
+    }
 }
