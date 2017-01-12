@@ -3,6 +3,7 @@ package org.verapdf.cos;
 import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
+import org.verapdf.tools.PDFDocEncoding;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -84,7 +85,7 @@ public class COSString extends COSDirect {
                 return new String(value, 2, value.length - 2, Charset.forName("UTF-16BE"));
             }
         }
-        return new String(value);
+        return PDFDocEncoding.getStringFromBytes(value);
     }
 
     public boolean setString(final String value) {
