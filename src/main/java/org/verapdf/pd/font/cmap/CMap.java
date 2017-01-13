@@ -249,7 +249,7 @@ public class CMap {
                 }
             }
         }
-        return null;
+        return res;
     }
 
     /**
