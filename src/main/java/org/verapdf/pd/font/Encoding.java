@@ -79,22 +79,26 @@ public class Encoding {
      * @return glyph name for given character code.
      */
     public String getName(int code) {
-        if (differences == null) {
-            if (code < predefinedEncoding.length) {
-                return predefinedEncoding[code];
+        if (code >= 0) {
+            if (differences == null) {
+                if (code < predefinedEncoding.length) {
+                    return predefinedEncoding[code];
+                } else {
+                    return predefinedEncoding[0];   //  .notdef
+                }
             } else {
-                return predefinedEncoding[0];   //  .notdef
+                String diffRes = this.differences.get(code);
+                if (diffRes == null) {
+                    if (code < predefinedEncoding.length) {
+                        diffRes = predefinedEncoding[code];
+                    } else {
+                        diffRes = NOTDEF;   //  .notdef
+                    }
+                }
+                return diffRes;
             }
         } else {
-            String diffRes = this.differences.get(code);
-            if (diffRes == null) {
-                if (code < predefinedEncoding.length) {
-                    diffRes = predefinedEncoding[code];
-                } else {
-                    diffRes = NOTDEF;   //  .notdef
-                }
-            }
-            return diffRes;
+            return NOTDEF;   // .notdef
         }
     }
 
