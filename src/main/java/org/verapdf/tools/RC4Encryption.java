@@ -66,12 +66,16 @@ public class RC4Encryption {
      * @return processed data.
      */
     public byte[] process(byte[] data, int offset, int size) {
-        int actualSize = Math.min(size, data.length - offset);
-        byte[] res = new byte[actualSize];
-        for (int k = offset; k < actualSize; k++) {
-            res[k] = (byte) (data[k] ^ getNextPseudoRandomByte());
+        if (size >= 0 && data.length >= offset) {
+            int actualSize = Math.min(size, data.length - offset);
+            byte[] res = new byte[actualSize];
+            for (int k = offset; k < actualSize; k++) {
+                res[k] = (byte) (data[k] ^ getNextPseudoRandomByte());
+            }
+            return res;
+        } else {
+            return new byte[]{};
         }
-        return res;
     }
 
     /**
