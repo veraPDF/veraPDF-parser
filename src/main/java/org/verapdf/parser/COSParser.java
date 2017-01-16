@@ -205,7 +205,6 @@ public class COSParser extends BaseParser {
 		}
 
 		if (token.type != Token.Type.TT_CLOSEARRAY) {
-			closeInputStream();
 			// TODO : replace with ASException
 			throw new IOException("PDFParser::GetArray()" + StringExceptions.INVALID_PDF_ARRAY);
 		}
@@ -247,7 +246,6 @@ public class COSParser extends BaseParser {
 		}
 
 		if (token.type != Token.Type.TT_CLOSEDICT) {
-			closeInputStream();
 			// TODO : replace with ASException
 			throw new IOException("PDFParser::GetDictionary()" + StringExceptions.INVALID_PDF_DICTONARY);
 		}

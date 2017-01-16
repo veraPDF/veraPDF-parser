@@ -21,12 +21,7 @@
 package org.verapdf.pd.font.truetype;
 
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,18 +45,21 @@ public class AdobeGlyphList {
     static {
         try {
             File aglFile;
+            boolean isTempFile = false;
             URL res = AdobeGlyphList.class.getResource(AGL_FILE);
             if (res.toString().startsWith("jar:")) {
-                InputStream input = AdobeGlyphList.class.getResourceAsStream(AGL_FILE);
-                aglFile = File.createTempFile("tempfile", ".tmp");
-                OutputStream out = new FileOutputStream(aglFile);
-                int read;
-                byte[] bytes = new byte[1024];
+                try (InputStream input = AdobeGlyphList.class.getResourceAsStream(AGL_FILE)) {
+                    aglFile = File.createTempFile("tempfile", ".tmp");
+                    isTempFile = true;
+                    OutputStream out = new FileOutputStream(aglFile);
+                    int read;
+                    byte[] bytes = new byte[1024];
 
-                while ((read = input.read(bytes)) != -1) {
-                    out.write(bytes, 0, read);
+                    while ((read = input.read(bytes)) != -1) {
+                        out.write(bytes, 0, read);
+                    }
+                    aglFile.deleteOnExit();
                 }
-                aglFile.deleteOnExit();
             } else {
                 aglFile = new File(res.getFile());
             }
@@ -70,25 +68,29 @@ public class AdobeGlyphList {
                 throw new IOException("Error: File " + aglFile + " not found!");
             }
 
-            RandomAccessFile stream = new RandomAccessFile(aglFile, "r");
-            String line;
-            line = stream.readLine();
-            do {
-                String[] words = line.split(" ");
-                int symbolCode = Integer.parseInt(words[1], 16);
-                if (words.length == 2) {
-                    MAPPING.put(words[0], new AGLUnicode(symbolCode));
-                    line = stream.readLine();
-                    continue;
-                } else {
-                    int[] diacritic = new int[words.length - 2];
-                    for (int i = 0; i < diacritic.length; ++i) {
-                        diacritic[i] = Integer.parseInt(words[i + 2], 16);
-                    }
-                    MAPPING.put(words[0], new AGLUnicode(symbolCode, diacritic));
-                }
+            try (RandomAccessFile stream = new RandomAccessFile(aglFile, "r")) {
+                String line;
                 line = stream.readLine();
-            } while (line != null);
+                do {
+                    String[] words = line.split(" ");
+                    int symbolCode = Integer.parseInt(words[1], 16);
+                    if (words.length == 2) {
+                        MAPPING.put(words[0], new AGLUnicode(symbolCode));
+                        line = stream.readLine();
+                        continue;
+                    } else {
+                        int[] diacritic = new int[words.length - 2];
+                        for (int i = 0; i < diacritic.length; ++i) {
+                            diacritic[i] = Integer.parseInt(words[i + 2], 16);
+                        }
+                        MAPPING.put(words[0], new AGLUnicode(symbolCode, diacritic));
+                    }
+                    line = stream.readLine();
+                } while (line != null);
+            }
+            if (aglFile != null && isTempFile) {
+                aglFile.delete();
+            }
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Error in opening Adobe Glyph List file", e);
         }

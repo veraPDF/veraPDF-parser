@@ -87,8 +87,8 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             }
             TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
             if (cmap10 != null) {
-                int charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyph);
-                return cmap10.getGlyph(charCode) != 0;
+                Integer charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyph);
+                return charCode != null && cmap10.getGlyph(charCode) != 0;
             }
         } else {
             int gid = getGIDFrom30(code);

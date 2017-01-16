@@ -79,7 +79,7 @@ public class Reader extends XRefReader {
 			return null;
 		}
 		long offset = getOffset(key).longValue();
-		if(offset > 0) {
+		if(offset >= 0) {
 			if (header.getHeaderOffset() > 0) {
 				offset += header.getHeaderOffset();
 			}

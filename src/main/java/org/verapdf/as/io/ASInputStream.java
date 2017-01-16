@@ -41,7 +41,9 @@ public abstract class ASInputStream extends InputStream {
 	public abstract int skip(int size) throws IOException;
 
 	public void close() throws IOException {
-		this.resourceUsers.decrement();
+		if (!this.resourceUsers.equals(0)) {
+			this.resourceUsers.decrement();
+		}
 		if(this.resourceUsers.equals(0)) {
 			closeResource();
 		}
