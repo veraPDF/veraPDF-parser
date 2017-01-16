@@ -86,7 +86,7 @@ public class EexecFilterDecode extends ASBufferingInFilter {
     public int read(byte[] buffer, int size) throws IOException {
         int bytesRead = (int) this.feedBuffer(bytesToDiscard + size);
         int res = bytesRead - bytesToDiscard;
-        if (bytesRead == 0) {
+        if (bytesRead <= 0) {
             return -1;
         }
         for (int i = 0; i < bytesRead; ++i) {

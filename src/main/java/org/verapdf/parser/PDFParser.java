@@ -289,7 +289,6 @@ public class PDFParser extends COSParser {
 
         if (token.type != Token.Type.TT_KEYWORD &&
                 token.keyword != Token.Keyword.KW_ENDOBJ) {
-            closeInputStream();
             // TODO : replace with ASException
             throw new IOException("PDFParser::GetObject(...)" + StringExceptions.INVALID_PDF_OBJECT);
         }
@@ -389,7 +388,6 @@ public class PDFParser extends COSParser {
         if ((getToken().type != Token.Type.TT_KEYWORD ||
                 getToken().keyword != Token.Keyword.KW_XREF) &&
                 (getToken().type != Token.Type.TT_INTEGER)) {
-            closeInputStream();
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         if (this.getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
@@ -446,13 +444,11 @@ public class PDFParser extends COSParser {
     private void parseXrefStream(final COSXRefInfo section) throws IOException {
         nextToken();
         if(this.getToken().type != Token.Type.TT_INTEGER) {
-            closeInputStream();
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         nextToken();
         if(this.getToken().type != Token.Type.TT_KEYWORD ||
                 this.getToken().keyword != Token.Keyword.KW_OBJ) {
-            closeInputStream();
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         COSObject xrefCOSStream = getDictionary();
@@ -472,7 +468,6 @@ public class PDFParser extends COSParser {
 		if (offset.longValue() == 0) {
 			offset = findLastXRef();
 			if (offset.longValue() == 0) {
-				closeInputStream();
 				throw new IOException("PDFParser::GetXRefInfo(...)" + StringExceptions.START_XREF_VALIDATION);
 			}
 		}

@@ -546,7 +546,7 @@ public class TrueTypePredefined {
             "uacute",
             "ucircumflex",
             "udieresis",
-            "yakute",
+            "yacute",
             "thorn",
             "ydieresis"
     };

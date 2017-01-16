@@ -47,6 +47,11 @@ public class ASInputStreamWrapper extends ASInputStream {
     }
 
     @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        return this.stream.read(b, off, len);
+    }
+
+    @Override
     public int skip(int size) throws IOException {
         return this.stream.skip(size);
     }
