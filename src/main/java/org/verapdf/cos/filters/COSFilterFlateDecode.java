@@ -84,28 +84,6 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
         }
     }
 
-    /**
-     * Skips given number of decoded bytes in stream.
-     *
-     * @param size is amount of bytes to skip.
-     * @return amount of actually skipped bytes.
-     * @throws IOException if stream-reading error occurs.
-     */
-    @Override
-    public int skip(int size) throws IOException {
-        byte[] temp = new byte[Math.min(BF_BUFFER_SIZE, size)];
-        int skipped = 0;
-        while (skipped != size) {
-            int read = this.read(temp, Math.min(size - skipped, BF_BUFFER_SIZE));
-            if (read == -1) {
-                return skipped;
-            } else {
-                skipped += read;
-            }
-        }
-        return skipped;
-    }
-
     @Override
     public void reset() throws IOException {
         super.reset();
