@@ -223,7 +223,7 @@ public class COSString extends COSDirect {
                     result.append('\\');
                     break;
                 default:
-                    result.append(ch);
+                    result.append((char) ch);
                     break;
             }
         }
@@ -234,6 +234,10 @@ public class COSString extends COSDirect {
 
     public String getLitString() {
         return toLitString();
+    }
+
+    public String getPrintableString() {
+        return this.isHex ? toHexString() : toLitString();
     }
 
     public boolean isContainsOnlyHex() {

@@ -147,7 +147,7 @@ public class Writer implements IVisitor {
 
 	public void visitFromString(COSString obj) {
 		try {
-			this.write(obj.toString());
+			this.write(obj.getPrintableString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
