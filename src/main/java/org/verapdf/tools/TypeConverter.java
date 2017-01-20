@@ -36,11 +36,16 @@ import java.util.logging.Logger;
  */
 public class TypeConverter {
 	private static final Logger LOGGER = Logger.getLogger(TypeConverter.class.getCanonicalName());
+	private static final String INVALID_DATE_LOG_BASE =
+			"Parsed string is not complies pdf date format. ";
 
 	public static Calendar parseDate(String toParse) {
 		if (toParse != null
-				&& toParse.startsWith("D:")
-				&& isDigits(toParse, 2, 4)) {
+				&& toParse.startsWith("D:")) {
+
+			if (!isDigits(toParse, 2, 4)) {
+				return getErrorDateFormat("Incorrect year data.");
+			}
 			int year = Integer.parseInt(toParse.substring(2, 6));
 			int month = 1;
 			int day = 1;
@@ -50,7 +55,6 @@ public class TypeConverter {
 			String sign = "Z";
 			int timeZoneHours = 0;
 			int timeZoneMins = 0;
-			boolean isCorrect = true;
 
 			int length = toParse.length();
 
@@ -58,7 +62,7 @@ public class TypeConverter {
 				if (isDigits(toParse, 6, 2)) {
 					month = Integer.parseInt(toParse.substring(6, 8)) - 1;
 				} else {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect month data.");
 				}
 			}
 
@@ -66,38 +70,38 @@ public class TypeConverter {
 				if (isDigits(toParse, 8, 2)) {
 					day = Integer.parseInt(toParse.substring(8, 10));
 				} else {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect day data.");
 				}
 			}
 			if (length > 10) {
 				if (isDigits(toParse, 10, 2)) {
 					hour = Integer.parseInt(toParse.substring(10, 12));
 				} else {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect hour data.");
 				}
 			}
 			if (length > 12) {
 				if (isDigits(toParse, 12, 2)) {
 					minutes = Integer.parseInt(toParse.substring(12, 14));
 				} else {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect minutes data.");
 				}
 			}
 			if (length > 14) {
 				if (isDigits(toParse, 14, 2)) {
 					seconds = Integer.parseInt(toParse.substring(14, 16));
 				} else {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect seconds data.");
 				}
 			}
 
 			if (length > 16) {
 				sign = toParse.substring(16, 17);
 				if (!sign.matches("^[Z+-]$")) {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect time zone beginning.");
 				}
 				if ("Z".equals(sign) && length > 17) {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect ending with Z time zone.");
 				}
 			}
 
@@ -105,13 +109,13 @@ public class TypeConverter {
 				if (isDigits(toParse, 17, 2)) {
 					timeZoneHours = Integer.parseInt(toParse.substring(17, 19));
 				} else {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect time zone hours data.");
 				}
 			}
 
 			if (length > 19) {
 				if (!"'".equals(toParse.substring(19, 20))) {
-					isCorrect = false;
+					return getErrorDateFormat("Missing apostroph delimiter.");
 				}
 			}
 
@@ -119,39 +123,39 @@ public class TypeConverter {
 				if (isDigits(toParse, 20, 2)) {
 					timeZoneMins = Integer.parseInt(toParse.substring(20, 22));
 				} else {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect time zone minutes data.");
 				}
 			}
 
 			// date format from PDF 1.4 spec
 			if (length > 22) {
 				if (!"'".equals(toParse.substring(22, 23))) {
-					isCorrect = false;
+					return getErrorDateFormat("Incorrect ending.");
 				}
 			}
 
 			if (length > 23) {
-				isCorrect = false;
+				return getErrorDateFormat("Incorrect ending.");
 			}
 
-			if (isCorrect) {
-				TimeZone zone;
-				if (!sign.equals("Z")) {
-					String timeZoneMinsString =
-							timeZoneMins < 10 ? "0" + Integer.toString(timeZoneMins)
-									: Integer.toString(timeZoneMins);
-					zone = TimeZone.getTimeZone("GMT" + sign + timeZoneHours + ":" + timeZoneMinsString);
-				} else {
-					zone = TimeZone.getTimeZone("GMT");
-				}
-				Calendar res = new GregorianCalendar(zone);
-				res.set(year, month, day, hour, minutes, seconds);
-				res.set(Calendar.MILLISECOND, 0);
-				return res;
+			TimeZone zone;
+			if (!sign.equals("Z")) {
+				zone = TimeZone.getTimeZone(String.format(
+						"GMT%s%d:%02d", sign, timeZoneHours, timeZoneMins));
+			} else {
+				zone = TimeZone.getTimeZone("GMT");
 			}
+			Calendar res = new GregorianCalendar(zone);
+			res.set(year, month, day, hour, minutes, seconds);
+			res.set(Calendar.MILLISECOND, 0);
+			return res;
 		}
 
-		LOGGER.log(Level.FINE, "Parsed string is not complies pdf date format");
+		return getErrorDateFormat("String is null or has incorrect beginning.");
+	}
+
+	private static Calendar getErrorDateFormat(String logMessageEnd) {
+		LOGGER.log(Level.FINE, INVALID_DATE_LOG_BASE + logMessageEnd);
 		return null;
 	}
 
@@ -169,8 +173,11 @@ public class TypeConverter {
 	}
 
 	private static boolean isDigits(String toCheck, int offset, int length) {
-		int maxOffset = Math.min(offset + length, toCheck.length());
-		for (int i = offset; i < maxOffset; ++i) {
+		int end = offset + length;
+		if (end > toCheck.length()) {
+			return false;
+		}
+		for (int i = offset; i < end; ++i) {
 			if (!Character.isDigit(toCheck.charAt(i))) {
 				return false;
 			}

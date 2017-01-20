@@ -30,6 +30,7 @@ import org.verapdf.parser.PDFParser;
 import org.verapdf.parser.XRefReader;
 import org.verapdf.pd.encryption.PDEncryption;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
+import org.verapdf.tools.resource.FileResourceHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +80,9 @@ public class Reader extends XRefReader {
 			return null;
 		}
 		long offset = getOffset(key).longValue();
-		if(offset >= 0) {
+		if (offset == 0) {
+			return new COSObject();
+		} else if(offset > 0) {
 			if (header.getHeaderOffset() > 0) {
 				offset += header.getHeaderOffset();
 			}
@@ -142,6 +145,14 @@ public class Reader extends XRefReader {
 
 		if(this.parser.isEncrypted()) {
 			if(!docCanBeDecrypted()) {
+				this.getPDFSource().close();
+				if (this.parser.getDocument() != null) {
+					FileResourceHandler handler =
+							this.parser.getDocument().getResourceHandler();
+					if (handler != null) {
+						handler.close();
+					}
+				}
 				throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 			}
 		}

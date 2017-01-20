@@ -336,14 +336,6 @@ public class COSParser extends BaseParser {
 
 		checkEndstreamSpacings(dict, streamStartOffset, size);
 
-		try {
-			if (this.document.isEncrypted()) {
-				this.document.getStandardSecurityHandler().decryptStream(
-						(COSStream) dict.getDirectBase(), this.keyOfCurrentObject);
-			}
-		} catch (GeneralSecurityException e) {
-			throw new IOException("Stream " + this.keyOfCurrentObject + " cannot be decrypted", e);
-		}
 		return dict;
 	}
 

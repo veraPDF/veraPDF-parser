@@ -31,6 +31,7 @@ import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -268,6 +269,10 @@ public class PDFParser extends COSParser {
         }
 
         this.keyOfCurrentObject = new COSKey((int) number, (int) generation);
+        if (this.document.isReaderInitialized() &&
+                this.document.getOffset(keyOfCurrentObject) == 0) {
+            return new COSObject();
+        }
 
         if (!isNextByteEOL()) {
             // eol marker shall follow the "obj" keyword
@@ -276,12 +281,28 @@ public class PDFParser extends COSParser {
 
         COSObject obj = nextObject();
 
+        if (obj.getType() == COSObjType.COS_STREAM) {
+            try {
+                if (this.document.isEncrypted()) {
+                    this.document.getStandardSecurityHandler().decryptStream(
+                            (COSStream) obj.getDirectBase(), new COSKey((int) number,
+                                    (int) generation));
+                }
+            } catch (GeneralSecurityException e) {
+                throw new IOException("Stream " + this.keyOfCurrentObject + " cannot be decrypted", e);
+            }
+        }
+
+        long beforeSkip = this.source.getOffset();
         skipSpaces();
-        this.source.unread();
+        if (this.source.getOffset() != beforeSkip) {
+            this.source.unread();
+        }
         if (!isNextByteEOL()) {
             endOfObjectComplyPDFA = false;
         }
 
+        long offsetBeforeEndobj = this.source.getOffset();
         if (this.flag) {
             nextToken();
         }
@@ -290,7 +311,8 @@ public class PDFParser extends COSParser {
         if (token.type != Token.Type.TT_KEYWORD &&
                 token.keyword != Token.Keyword.KW_ENDOBJ) {
             // TODO : replace with ASException
-            throw new IOException("PDFParser::GetObject(...)" + StringExceptions.INVALID_PDF_OBJECT);
+            LOGGER.log(Level.WARNING, "No endobj keyword at offset " + offsetBeforeEndobj);
+            this.source.seek(offsetBeforeEndobj);
         }
 
         if (!isNextByteEOL()) {
@@ -313,7 +335,7 @@ public class PDFParser extends COSParser {
     private Long findLastXRef() throws IOException {
         source.seekFromEnd(STARTXREF.length);
         byte[] buf = new byte[STARTXREF.length];
-        while (source.getStreamLength() - source.getOffset() < 64) {
+        while (source.getStreamLength() - source.getOffset() < 256) {
             long res = source.getOffset();
             source.read(buf);
             if (Arrays.equals(buf, STARTXREF)) {
@@ -326,7 +348,7 @@ public class PDFParser extends COSParser {
     }
 
     private void calculatePostEOFDataSize() throws IOException {
-        final byte lookupSize = 64;
+        final int lookupSize = 256;
 
         source.seekFromEnd(lookupSize);
         byte[] buffer = new byte[lookupSize];
@@ -338,7 +360,7 @@ public class PDFParser extends COSParser {
         byte currentMarkerOffset = (byte) (patternSize - 1);
         byte lookupByte = EOF_MARKER[currentMarkerOffset];
 
-        byte currentBufferOffset = lookupSize - 1;
+        int currentBufferOffset = lookupSize - 1;
 
         while (currentBufferOffset >= 0) {
             if (buffer[currentBufferOffset] == lookupByte) {
@@ -360,6 +382,9 @@ public class PDFParser extends COSParser {
                             postEOFDataSize -= 1;
                             document.setPostEOFDataSize(postEOFDataSize);
                             return;
+                        } else {
+                            document.setPostEOFDataSize(postEOFDataSize);
+                            return;
                         }
                     } else {
                         document.setPostEOFDataSize(postEOFDataSize);
@@ -371,7 +396,7 @@ public class PDFParser extends COSParser {
                 lookupByte = EOF_MARKER[currentMarkerOffset];
             } else if (currentMarkerOffset < patternSize - 1) {
                 //reset marker
-                currentMarkerOffset = patternSize;
+                currentMarkerOffset = (byte) (patternSize - 1);
                 lookupByte = EOF_MARKER[currentMarkerOffset];
             }
             currentBufferOffset--;

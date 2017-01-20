@@ -190,9 +190,9 @@ public class InternalInputStream extends SeekableInputStream {
 
 	private File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
 		FileOutputStream output = null;
+		File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
+		tmpFile.deleteOnExit();
 		try {
-			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
-			tmpFile.deleteOnExit();
 			output = new FileOutputStream(tmpFile);
 			output.write(alreadyRead);
 
@@ -204,6 +204,9 @@ public class InternalInputStream extends SeekableInputStream {
 			}
 
 			return tmpFile;
+		} catch (IOException e) {
+			tmpFile.delete();
+			throw e;
 		}
 		finally {
 			if (output != null) {

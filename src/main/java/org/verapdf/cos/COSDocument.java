@@ -413,6 +413,10 @@ public class COSDocument {
 		return this.reader.getGreatestKeyNumberFromXref();
 	}
 
+	public boolean isReaderInitialized() {
+		return this.reader != null;
+	}
+
 	public void addFileResource(ASFileStreamCloser resource) {
 		this.resourceHandler.addResource(resource);
 	}
