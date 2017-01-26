@@ -1,8 +1,29 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.cos;
 
 import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
+import org.verapdf.tools.PDFDocEncoding;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -84,7 +105,7 @@ public class COSString extends COSDirect {
                 return new String(value, 2, value.length - 2, Charset.forName("UTF-16BE"));
             }
         }
-        return new String(value);
+        return PDFDocEncoding.getStringFromBytes(value);
     }
 
     public boolean setString(final String value) {
@@ -202,7 +223,7 @@ public class COSString extends COSDirect {
                     result.append('\\');
                     break;
                 default:
-                    result.append(ch);
+                    result.append((char) ch);
                     break;
             }
         }
@@ -213,6 +234,10 @@ public class COSString extends COSDirect {
 
     public String getLitString() {
         return toLitString();
+    }
+
+    public String getPrintableString() {
+        return this.isHex ? toHexString() : toLitString();
     }
 
     public boolean isContainsOnlyHex() {
