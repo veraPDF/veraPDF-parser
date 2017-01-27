@@ -78,8 +78,11 @@ class TrueTypePostTable extends TrueTypeTable {
                 if (glyphNameIndexInt[i] < TrueTypePredefined.MAC_INDEX_TO_GLYPH_NAME.length) {
                     stringToGid.put(TrueTypePredefined.MAC_INDEX_TO_GLYPH_NAME[glyphNameIndexInt[i]], i);
                 } else {
-                    stringToGid.put(strings.get(glyphNameIndexInt[i] -
-                            TrueTypePredefined.MAC_INDEX_TO_GLYPH_NAME.length), i);
+                    int index = glyphNameIndexInt[i] -
+                            TrueTypePredefined.MAC_INDEX_TO_GLYPH_NAME.length;
+                    if (index >= 0 && index < strings.size()) {
+                        stringToGid.put(strings.get(index), i);
+                    }
                 }
             }
         } else if (format == 2.5f) {

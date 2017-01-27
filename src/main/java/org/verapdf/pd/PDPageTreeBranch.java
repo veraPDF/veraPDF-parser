@@ -43,6 +43,8 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		this.isTerminal = true;
 		this.leafCount = 0;
 		this.children = new ArrayList<PDPageTreeNode>();
+
+		super.setObject(new COSObject());
 	}
 
 	public PDPageTreeBranch(final COSObject obj) {
@@ -130,15 +132,15 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		clear();
 
 		COSObject kids = getObject().getKey(ASAtom.KIDS);
-		if (!kids.empty()) {
+		if (kids != null && !kids.empty()) {
 			for (int i = 0; i < kids.size(); i++) {
 				COSObject obj = kids.at(i);
 
 				PDPageTreeNode kid_i;
 
-				if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGE)) {
+				if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGE) {
 					kid_i = new PDPage(obj);
-				} else if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGES)) {
+				} else if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGES) {
 					kid_i = new PDPageTreeBranch(obj);
 					isTerminal = false;
 				} else {

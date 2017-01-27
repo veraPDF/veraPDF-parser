@@ -20,11 +20,11 @@
  */
 package org.verapdf.pd.font.truetype;
 
+import org.verapdf.as.io.ASInputStream;
+
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.as.io.ASInputStream;
 
 /**
  * This class does high-level parsing of True Type Font file.
@@ -146,10 +146,12 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
     }
 
     TrueTypeCmapSubtable getCmapTable(int platformID, int encodingID) {
-        for (TrueTypeCmapSubtable ttci : cmapParser.getCmapInfos()) {
-            if (ttci.getPlatformID() == platformID &&
-                    ttci.getEncodingID() == encodingID) {
-                return ttci;
+        if (cmapParser != null) {
+            for (TrueTypeCmapSubtable ttci : cmapParser.getCmapInfos()) {
+                if (ttci.getPlatformID() == platformID &&
+                        ttci.getEncodingID() == encodingID) {
+                    return ttci;
+                }
             }
         }
         return null;

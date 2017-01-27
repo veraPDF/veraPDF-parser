@@ -106,7 +106,8 @@ public class COSFilterRC4DecryptionDefault extends ASBufferingInFilter {
         md5.update(ASBufferingInFilter.concatenate(encryptionKey,
                 encryptionKey.length, objectKeyDigest, objectKeyDigest.length));
         byte[] resultEncryptionKey = md5.digest();
-        int keyLength = Math.min(MAXIMAL_KEY_LENGTH, resultEncryptionKey.length);
+        int keyLength = Math.min(MAXIMAL_KEY_LENGTH, encryptionKey.length +
+                objectKeyDigest.length);
         rc4 = new RC4Encryption(Arrays.copyOf(resultEncryptionKey, keyLength));
     }
 

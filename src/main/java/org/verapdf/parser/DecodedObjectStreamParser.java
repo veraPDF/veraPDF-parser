@@ -101,6 +101,8 @@ public class DecodedObjectStreamParser extends COSParser {
         }
         this.source.seek(internalOffsets.get(objNum));
         this.flag = true;
+        this.objects.clear();   // In case if some COSInteger was read before.
+        this.integers.clear();
         return nextObject();
     }
 }
