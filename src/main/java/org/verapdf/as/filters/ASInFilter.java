@@ -91,4 +91,9 @@ public abstract class ASInFilter extends ASInputStream {
 	protected void setInputStream(ASInputStream inputStream) {
 		this.storedInStream = inputStream;
 	}
+
+	@Override
+	public void incrementResourceUsers() {
+		this.storedInStream.incrementResourceUsers();
+	}
 }

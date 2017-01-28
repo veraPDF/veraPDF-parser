@@ -75,6 +75,11 @@ public abstract class SeekableInputStream extends ASInputStream {
      */
     public abstract ASInputStream getStream(long startOffset, long length) throws IOException;
 
+    @Override
+    public void incrementResourceUsers() {
+        this.resourceUsers.increment();
+    }
+
     /**
      * @return true if end of stream is reached.
      */

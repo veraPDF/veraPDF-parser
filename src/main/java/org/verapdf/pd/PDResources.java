@@ -61,9 +61,9 @@ public class PDResources extends PDObject {
 		PDColorSpace colorSpace;
 		COSObject rawColorSpace = getResource(ASAtom.COLORSPACE, name);
 		if (rawColorSpace != null && !rawColorSpace.empty()) {
-			colorSpace = ColorSpaceFactory.getColorSpace(rawColorSpace);
+			colorSpace = ColorSpaceFactory.getColorSpace(rawColorSpace, this);
 		} else {
-			colorSpace = ColorSpaceFactory.getColorSpace(COSName.construct(name));
+			colorSpace = ColorSpaceFactory.getColorSpace(COSName.construct(name), this);
 		}
 		colorSpaceMap.put(name, colorSpace);
 		return colorSpace;
@@ -116,7 +116,7 @@ public class PDResources extends PDObject {
 			return xObjectMap.get(name);
 		}
 		COSObject rawXObject = getResource(ASAtom.XOBJECT, name);
-		PDXObject pdxObject = PDXObject.getTypedPDXObject(rawXObject);
+		PDXObject pdxObject = PDXObject.getTypedPDXObject(rawXObject, this);
 		xObjectMap.put(name, pdxObject);
 		return pdxObject;
 	}

@@ -53,8 +53,10 @@ public abstract class ASInputStream extends InputStream {
 
 	public abstract void closeResource() throws IOException;
 
+	public abstract void incrementResourceUsers();
+
 	public static ASInputStream createStreamFromStream(ASInputStream stream) {
-		stream.resourceUsers.increment();
+		stream.incrementResourceUsers();
 		return new ASInputStreamWrapper(stream);
 	}
 }
