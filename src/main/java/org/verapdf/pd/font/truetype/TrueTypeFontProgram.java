@@ -132,10 +132,6 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         if (isSymbolic) {
             return -1;
         }
-        if (TrueTypePredefined.NOTDEF_STRING.equals(glyphName)) {
-            int gid = this.parser.getPostParser().getGID(glyphName);
-            return getWidthWithCheck(gid);
-        }
         TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
         if (cmap31 != null) {
             AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
