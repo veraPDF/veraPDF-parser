@@ -23,6 +23,7 @@ package org.verapdf.pd.colors;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 import org.verapdf.factory.colors.ColorSpaceFactory;
+import org.verapdf.pd.PDResources;
 
 /**
  * @author Maksim Bezrukov
@@ -30,7 +31,12 @@ import org.verapdf.factory.colors.ColorSpaceFactory;
 public class PDSeparation extends PDColorSpace {
 
     public PDSeparation(COSObject obj) {
+        this(obj, null);
+    }
+
+    public PDSeparation(COSObject obj, PDResources resources) {
         super(obj);
+        this.resources = resources;
     }
 
     public COSObject getColorantName() {
@@ -38,7 +44,7 @@ public class PDSeparation extends PDColorSpace {
     }
 
     public PDColorSpace getAlternate() {
-        return ColorSpaceFactory.getColorSpace(getObject().at(2));
+        return ColorSpaceFactory.getColorSpace(getObject().at(2), this.resources);
     }
 
     public COSObject getTintTransform() {

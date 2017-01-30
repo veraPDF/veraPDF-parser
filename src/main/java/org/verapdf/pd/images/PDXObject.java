@@ -25,6 +25,7 @@ import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResource;
+import org.verapdf.pd.PDResources;
 
 /**
  * @author Maksim Bezrukov
@@ -52,15 +53,17 @@ public abstract class PDXObject extends PDResource {
 	public PDXImage getSMask() {
 		COSObject smask = getKey(ASAtom.SMASK);
 		if (smask != null && smask.getType() == COSObjType.COS_STREAM) {
-			return new PDXImage(smask);
+			return new PDXImage(smask, null);
+			// TODO: see pdfbox PBoxPDXObject getSMask() and getXObject(COSBase smaskDictionary) methods.
+			// Implement everything nicely.
 		}
 		return null;
 	}
 
-	public static PDXObject getTypedPDXObject(COSObject object) {
+	public static PDXObject getTypedPDXObject(COSObject object, PDResources resources) {
 		ASAtom type = object.getNameKey(ASAtom.SUBTYPE);
 		if (ASAtom.IMAGE.equals(type)) {
-			return new PDXImage(object);
+			return new PDXImage(object, resources);
 		} else if (ASAtom.FORM.equals(type)) {
 			return new PDXForm(object);
 		} else if (ASAtom.PS.equals(type)) {

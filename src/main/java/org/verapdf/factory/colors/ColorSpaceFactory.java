@@ -43,18 +43,19 @@ public class ColorSpaceFactory {
     }
 
     public static ASAtom getDefaultValue(PDResources resources, ASAtom name) {
-        if (name.equals(ASAtom.DEVICECMYK) &&
-                resources.hasColorSpace(ASAtom.DEFAULT_CMYK)) {
-            return ASAtom.DEFAULT_CMYK;
-        } else if (name.equals(ASAtom.DEVICERGB) &&
-                resources.hasColorSpace(ASAtom.DEFAULT_RGB)) {
-            return ASAtom.DEFAULT_RGB;
-        } else if (name.equals(ASAtom.DEVICEGRAY) &&
-                resources.hasColorSpace(ASAtom.DEFAULT_GRAY)) {
-            return ASAtom.DEFAULT_GRAY;
-        } else {
-            return null;
+        if (resources != null) {
+            if (name.equals(ASAtom.DEVICECMYK) &&
+                    resources.hasColorSpace(ASAtom.DEFAULT_CMYK)) {
+                return ASAtom.DEFAULT_CMYK;
+            } else if (name.equals(ASAtom.DEVICERGB) &&
+                    resources.hasColorSpace(ASAtom.DEFAULT_RGB)) {
+                return ASAtom.DEFAULT_RGB;
+            } else if (name.equals(ASAtom.DEVICEGRAY) &&
+                    resources.hasColorSpace(ASAtom.DEFAULT_GRAY)) {
+                return ASAtom.DEFAULT_GRAY;
+            }
         }
+        return null;
     }
 
     public static PDColorSpace getColorSpace(COSObject base) {
@@ -62,21 +63,25 @@ public class ColorSpaceFactory {
     }
 
     public static PDColorSpace getColorSpace(COSObject base, PDResources resources) {
+        return getColorSpace(base, resources, false);
+    }
+
+    public static PDColorSpace getColorSpace(COSObject base, PDResources resources, boolean wasDefault) {
         if (base == null) {
             return null;
         }
         COSObjType type = base.getType();
         if (type == COSObjType.COS_NAME) {
-            PDColorSpace cs = getColorSpaceFromName(base);
-            if (cs == null) {
-                if (resources != null) {
-                    cs = resources.getColorSpace(base.getName());
-                    return cs;
-                }
+            PDColorSpace cs;
+            ASAtom defaultName = getDefaultValue(resources, base.getName());
+            if (resources != null && resources.hasColorSpace(defaultName) && !wasDefault) {
+                cs = resources.getColorSpace(defaultName, true);
+                return cs;
             }
+            cs = getColorSpaceFromName(base, resources);
             return cs;
         } else if (type == COSObjType.COS_ARRAY) {
-            return getColorSpaceFromArray(base);
+            return getColorSpaceFromArray(base, resources);
         } else if (type != null && type.isDictionaryBased()) {
             return getPattern(base);
         } else {
@@ -85,7 +90,7 @@ public class ColorSpaceFactory {
         }
     }
 
-    private static PDColorSpace getColorSpaceFromName(COSObject base) {
+    private static PDColorSpace getColorSpaceFromName(COSObject base, PDResources resources) {
         ASAtom name = base.getName();
         if (ASAtom.DEVICEGRAY.equals(name)) {
             return PDDeviceGray.INSTANCE;
@@ -96,12 +101,20 @@ public class ColorSpaceFactory {
         } else if (ASAtom.PATTERN.equals(name)) {
             return PDPattern.INSTANCE;
         } else {
+            if (resources != null) {
+                if (resources.hasColorSpace(name)) {
+                    PDColorSpace res = resources.getColorSpace(name);
+                    if (res != null) {
+                        return res;
+                    }
+                }
+            }
             LOGGER.log(Level.FINE, "Unknown ColorSpace name");
             return null;
         }
     }
 
-    private static PDColorSpace getColorSpaceFromArray(COSObject base) {
+    private static PDColorSpace getColorSpaceFromArray(COSObject base, PDResources resources) {
         if (base.size().intValue() < 2) {
             LOGGER.log(Level.FINE, "ColorSpace array can not contain less than two elements");
             return null;
@@ -116,11 +129,11 @@ public class ColorSpaceFactory {
         } else if (ASAtom.ICCBASED.equals(name)) {
             return new PDICCBased(base);
         } else if (ASAtom.SEPARATION.equals(name)) {
-            return new PDSeparation(base);
+            return new PDSeparation(base, resources);
         } else if (ASAtom.DEVICEN.equals(name)) {
-            return new PDDeviceN(base);
+            return new PDDeviceN(base, resources);
         } else if (ASAtom.INDEXED.equals(name)) {
-            return new PDIndexed(base);
+            return new PDIndexed(base, resources);
         } else if (ASAtom.PATTERN == name) {
             return PDPattern.INSTANCE;
         } else {
@@ -143,8 +156,8 @@ public class ColorSpaceFactory {
                     return null;
             }
         }
-		LOGGER.log(Level.FINE, "COSObject doesn't contain PatternType key");
-		return null;
+        LOGGER.log(Level.FINE, "COSObject doesn't contain PatternType key");
+        return null;
     }
 
 }

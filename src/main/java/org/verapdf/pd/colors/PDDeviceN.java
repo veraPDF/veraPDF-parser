@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.factory.colors.ColorSpaceFactory;
+import org.verapdf.pd.PDResources;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +38,12 @@ public class PDDeviceN extends PDColorSpace {
     private final List<COSObject> names;
 
     public PDDeviceN(COSObject obj) {
+        this(obj, null);
+    }
+
+    public PDDeviceN(COSObject obj, PDResources resources) {
         super(obj);
+        this.resources = resources;
         this.names = parseNames(obj.at(1));
     }
 
@@ -46,7 +52,7 @@ public class PDDeviceN extends PDColorSpace {
     }
 
     public PDColorSpace getAlternateSpace() {
-        return ColorSpaceFactory.getColorSpace(getObject().at(2));
+        return ColorSpaceFactory.getColorSpace(getObject().at(2), this.resources);
     }
 
     public COSObject getTintTransform() {
