@@ -87,7 +87,7 @@ public class ColorSpaceFactory {
     private static PDColorSpace getColorSpaceFromName(COSObject base, PDResources
             resources, boolean wasDefault) {
         ASAtom defaultName = getDefaultValue(resources, base.getName());
-        if (resources != null && resources.hasColorSpace(defaultName) && !wasDefault) {
+        if (resources != null && defaultName != null && !wasDefault) {
             return resources.getColorSpace(defaultName, true);
         }
 
