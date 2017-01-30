@@ -26,25 +26,28 @@ import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
-import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDResources;
 
 /**
  * @author Maksim Bezrukov
  */
-public class PDIndexed extends PDColorSpace {
+public class PDIndexed extends PDSpecialColorSpace {
 
     public PDIndexed(COSObject obj) {
         this(obj, null);
     }
 
     public PDIndexed(COSObject obj, PDResources resources) {
-        super(obj);
-        this.resources = resources;
+        super(obj, resources);
     }
 
     public PDColorSpace getBase() {
-        return ColorSpaceFactory.getColorSpace(getObject().at(1), resources);
+        return this.baseColorSpace;
+    }
+
+    @Override
+    protected COSObject getBaseColorSpaceObject() {
+        return getObject().at(1);
     }
 
     public Long getHival() {
