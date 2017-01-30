@@ -43,18 +43,19 @@ public class ColorSpaceFactory {
     }
 
     public static ASAtom getDefaultValue(PDResources resources, ASAtom name) {
-        if (name.equals(ASAtom.DEVICECMYK) &&
-                resources.hasColorSpace(ASAtom.DEFAULT_CMYK)) {
-            return ASAtom.DEFAULT_CMYK;
-        } else if (name.equals(ASAtom.DEVICERGB) &&
-                resources.hasColorSpace(ASAtom.DEFAULT_RGB)) {
-            return ASAtom.DEFAULT_RGB;
-        } else if (name.equals(ASAtom.DEVICEGRAY) &&
-                resources.hasColorSpace(ASAtom.DEFAULT_GRAY)) {
-            return ASAtom.DEFAULT_GRAY;
-        } else {
-            return null;
+        if (resources != null) {
+            if (name.equals(ASAtom.DEVICECMYK) &&
+                    resources.hasColorSpace(ASAtom.DEFAULT_CMYK)) {
+                return ASAtom.DEFAULT_CMYK;
+            } else if (name.equals(ASAtom.DEVICERGB) &&
+                    resources.hasColorSpace(ASAtom.DEFAULT_RGB)) {
+                return ASAtom.DEFAULT_RGB;
+            } else if (name.equals(ASAtom.DEVICEGRAY) &&
+                    resources.hasColorSpace(ASAtom.DEFAULT_GRAY)) {
+                return ASAtom.DEFAULT_GRAY;
+            }
         }
+        return null;
     }
 
     public static PDColorSpace getColorSpace(COSObject base) {
@@ -62,18 +63,22 @@ public class ColorSpaceFactory {
     }
 
     public static PDColorSpace getColorSpace(COSObject base, PDResources resources) {
+        return getColorSpace(base, resources, false);
+    }
+
+    public static PDColorSpace getColorSpace(COSObject base, PDResources resources, boolean wasDefault) {
         if (base == null) {
             return null;
         }
         COSObjType type = base.getType();
         if (type == COSObjType.COS_NAME) {
-            PDColorSpace cs = getColorSpaceFromName(base, resources);
-            if (cs == null) {
-                if (resources != null) {
-                    cs = resources.getColorSpace(base.getName());
-                    return cs;
-                }
+            PDColorSpace cs;
+            ASAtom defaultName = getDefaultValue(resources, base.getName());
+            if (resources != null && resources.hasColorSpace(defaultName) && !wasDefault) {
+                cs = resources.getColorSpace(base.getName(), true);
+                return cs;
             }
+            cs = getColorSpaceFromName(base, resources);
             return cs;
         } else if (type == COSObjType.COS_ARRAY) {
             return getColorSpaceFromArray(base, resources);

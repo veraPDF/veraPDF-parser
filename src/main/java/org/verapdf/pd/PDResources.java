@@ -53,17 +53,21 @@ public class PDResources extends PDObject {
 		super(resourcesDictionary);
 	}
 
-	//TODO : think about error cases
 	public PDColorSpace getColorSpace(ASAtom name) {
+		return this.getColorSpace(name, false);
+	}
+
+	//TODO : think about error cases
+	public PDColorSpace getColorSpace(ASAtom name, boolean isDefault) {
 		if (colorSpaceMap.containsKey(name)) {
 			return colorSpaceMap.get(name);
 		}
 		PDColorSpace colorSpace;
 		COSObject rawColorSpace = getResource(ASAtom.COLORSPACE, name);
 		if (rawColorSpace != null && !rawColorSpace.empty()) {
-			colorSpace = ColorSpaceFactory.getColorSpace(rawColorSpace, this);
+			colorSpace = ColorSpaceFactory.getColorSpace(rawColorSpace, this, isDefault);
 		} else {
-			colorSpace = ColorSpaceFactory.getColorSpace(COSName.construct(name), this);
+			colorSpace = ColorSpaceFactory.getColorSpace(COSName.construct(name), this, isDefault);
 		}
 		colorSpaceMap.put(name, colorSpace);
 		return colorSpace;
