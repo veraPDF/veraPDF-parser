@@ -23,14 +23,11 @@ package org.verapdf.pd.colors;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResource;
-import org.verapdf.pd.PDResources;
 
 /**
  * @author Maksim Bezrukov
  */
 public abstract class PDColorSpace extends PDResource {
-
-    protected PDResources resources;
 
     protected PDColorSpace() {
     }
