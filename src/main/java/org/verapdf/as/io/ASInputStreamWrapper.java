@@ -70,4 +70,9 @@ public class ASInputStreamWrapper extends ASInputStream {
     public void close() throws IOException {
         this.stream.close();
     }
+
+    @Override
+    public void incrementResourceUsers() {
+        this.stream.incrementResourceUsers();
+    }
 }

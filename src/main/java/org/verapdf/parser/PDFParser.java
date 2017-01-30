@@ -239,6 +239,7 @@ public class PDFParser extends COSParser {
         if (!isNextByteEOL()) {
             headerOfObjectComplyPDFA = false;
         }
+        source.skip(1);
 
         nextToken();
         if (token.type != Token.Type.TT_INTEGER) {

@@ -29,11 +29,15 @@ import org.verapdf.pd.PDObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class COSFilters extends PDObject {
+
+	private static final Logger LOGGER = Logger.getLogger(COSFilters.class.getCanonicalName());
 
 	private List<ASAtom> entries;
 
@@ -57,10 +61,14 @@ public class COSFilters extends PDObject {
 			} else if (decodeParams.getType().equals(COSObjType.COS_ARRAY)) {
 				decodeParameters = new ArrayList<>(decodeParams.size());
 				for(int i = 0; i < decodeParams.size(); ++i) {
-					if(!decodeParams.at(i).getType().equals(COSObjType.COS_DICT)) {
+					COSObjType paramsType = decodeParams.at(i).getType();
+					if (decodeParams.at(i).empty() || paramsType == COSObjType.COS_NULL) {
+						decodeParameters.add((COSDictionary) COSDictionary.construct().get());
+					} else if (paramsType != COSObjType.COS_DICT) {
 						throw new IOException("DecodeParams shall be a dictionary or array of dictionaries.");
+					} else {
+						decodeParameters.add((COSDictionary) decodeParams.at(i).getDirectBase());
 					}
-					decodeParameters.add((COSDictionary) decodeParams.at(i).getDirectBase());
 				}
 			}
 		}
@@ -71,7 +79,8 @@ public class COSFilters extends PDObject {
 			}
 		}
 		if(decodeParameters.size() != entries.size()) {
-			throw new IOException("Amount of DecodeParams dictionaries and amount of decode filters in COSStream shall be equal.");
+			LOGGER.log(Level.FINE, "Amount of DecodeParams dictionaries and " +
+					"amount of decode filters in COSStream shall be equal.");
 		}
 		for (int i = 0; i < entries.size(); ++i) {
 			inputStream = COSFilterRegistry.getDecodeFilter(entries.get(i),
