@@ -20,12 +20,6 @@
  */
 package org.verapdf.pd.images;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSName;
@@ -34,7 +28,14 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.external.JPEG2000;
 import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDMetadata;
+import org.verapdf.pd.PDResources;
 import org.verapdf.pd.colors.PDColorSpace;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Maksim Bezrukov
@@ -45,11 +46,13 @@ public class PDXImage extends PDXObject {
 
 	private ASAtom colorSpaceName;
 	private PDColorSpace imageCS;
+	private PDResources resources;
 
 	private JPEG2000 jpxStream;
 
-	public PDXImage(COSObject obj) {
+	public PDXImage(COSObject obj, PDResources resources) {
 		super(obj);
+		this.resources = resources;
 		parseJPXAndColorSpace();
 	}
 
@@ -70,7 +73,7 @@ public class PDXImage extends PDXObject {
 				this.colorSpaceName = rawColorSpace.getName();
 			}
 			if (rawColorSpace.getType() == COSObjType.COS_ARRAY) {
-				this.imageCS = ColorSpaceFactory.getColorSpace(rawColorSpace);
+				this.imageCS = ColorSpaceFactory.getColorSpace(rawColorSpace, resources);
 			}
 		}
 	}
@@ -100,7 +103,7 @@ public class PDXImage extends PDXObject {
 				if (alternate != null && alternate.getType() == COSObjType.COS_DICT) {
 					COSObject image = alternate.getKey(ASAtom.IMAGE);
 					if (image != null && image.getType() == COSObjType.COS_STREAM) {
-						res.add(new PDXImage(image));
+						res.add(new PDXImage(image, resources));
 					} else {
 						LOGGER.log(Level.FINE, "Image key in alternate dictionary contains non stream value");
 						return null;
@@ -142,7 +145,7 @@ public class PDXImage extends PDXObject {
 	public PDXImage getMask() {
 		COSObject object = getKey(ASAtom.MASK);
 		if (object != null && object.getType() == COSObjType.COS_STREAM) {
-			return new PDXImage(object);
+			return new PDXImage(object, resources);
 		}
 		return null;
 	}
