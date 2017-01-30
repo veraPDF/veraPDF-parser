@@ -75,7 +75,7 @@ public class ColorSpaceFactory {
             PDColorSpace cs;
             ASAtom defaultName = getDefaultValue(resources, base.getName());
             if (resources != null && resources.hasColorSpace(defaultName) && !wasDefault) {
-                cs = resources.getColorSpace(base.getName(), true);
+                cs = resources.getColorSpace(defaultName, true);
                 return cs;
             }
             cs = getColorSpaceFromName(base, resources);
@@ -91,12 +91,6 @@ public class ColorSpaceFactory {
     }
 
     private static PDColorSpace getColorSpaceFromName(COSObject base, PDResources resources) {
-        if (resources != null) {
-            PDColorSpace res = resources.getDefaultColorSpace(base.getName());
-            if (res != null) {
-                return res;
-            }
-        }
         ASAtom name = base.getName();
         if (ASAtom.DEVICEGRAY.equals(name)) {
             return PDDeviceGray.INSTANCE;
@@ -107,6 +101,14 @@ public class ColorSpaceFactory {
         } else if (ASAtom.PATTERN.equals(name)) {
             return PDPattern.INSTANCE;
         } else {
+            if (resources != null) {
+                if (resources.hasColorSpace(name)) {
+                    PDColorSpace res = resources.getColorSpace(name);
+                    if (res != null) {
+                        return res;
+                    }
+                }
+            }
             LOGGER.log(Level.FINE, "Unknown ColorSpace name");
             return null;
         }
