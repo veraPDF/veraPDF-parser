@@ -31,6 +31,8 @@ import org.verapdf.tools.TypeConverter;
  */
 public abstract class PDCIEDictionaryBased extends PDColorSpace {
 
+    private static final double[] DEFAULT_BLACK_POINT = new double[] {0,0,0};
+
     protected COSObject dictionary;
 
     protected PDCIEDictionaryBased() {
@@ -51,8 +53,8 @@ public abstract class PDCIEDictionaryBased extends PDColorSpace {
     }
 
     public double[] getBlackPoint() {
-        return getTristimulus(dictionary.getKey(ASAtom.BLACK_POINT));
-
+        double[] res = getTristimulus(dictionary.getKey(ASAtom.BLACK_POINT));
+        return res == null ? DEFAULT_BLACK_POINT : res;
     }
 
     private static double[] getTristimulus(COSObject object) {

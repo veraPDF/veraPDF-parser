@@ -21,6 +21,7 @@
 package org.verapdf.pd.patterns;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.colors.PDColorSpace;
 
@@ -29,7 +30,7 @@ import org.verapdf.pd.colors.PDColorSpace;
  */
 public class PDPattern extends PDColorSpace {
 
-    public static final PDPattern INSTANCE = new PDPattern(null);
+    public static final PDPattern INSTANCE = new PDPattern(COSName.construct(ASAtom.PATTERN));
 
     public static final int TYPE_PATTERN = 0;
     public static final int TYPE_TILING_PATTERN = 1;

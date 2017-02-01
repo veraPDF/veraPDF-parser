@@ -21,6 +21,7 @@
 package org.verapdf.pd.colors;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSName;
 
 /**
  * @author Maksim Bezrukov
@@ -31,6 +32,7 @@ public class PDDeviceGray extends PDColorSpace {
     public static final PDDeviceGray INHERITED_INSTANCE = new PDDeviceGray(true);
 
     private PDDeviceGray(boolean isInherited) {
+        super(COSName.construct(ASAtom.DEVICEGRAY));
         setInherited(isInherited);
     }
 
