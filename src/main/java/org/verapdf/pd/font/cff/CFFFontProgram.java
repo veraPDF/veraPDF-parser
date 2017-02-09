@@ -28,6 +28,8 @@ import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class starts parsing for all inner CFF fonts and contains fonts parsed.
@@ -36,6 +38,7 @@ import java.io.IOException;
  */
 public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
+    private static final Logger LOGGER = Logger.getLogger(CFFFontProgram.class.getCanonicalName());
     private FontProgram font;
     private Encoding pdEncoding;
     private CMap externalCMap;
@@ -70,6 +73,10 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             this.readIndex();   // name
             long topOffset = this.source.getOffset();
             CFFIndex top = this.readIndex();
+            if (top.size() == 0) {
+                LOGGER.log(Level.WARNING, "Error in cff font program parsing: top DICT INDEX is empty.");
+                throw new IOException("Error in cff font program parsing: top DICT INDEX is empty.");
+            }
             this.definedNames = this.readIndex();
             CFFIndex globalSubrs = this.readIndex();
             if (isCIDFont(top.get(0))) {

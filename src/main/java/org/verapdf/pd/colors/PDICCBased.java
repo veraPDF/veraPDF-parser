@@ -28,11 +28,15 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.external.ICCProfile;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * @author Maksim Bezrukov
  */
 public class PDICCBased extends PDColorSpace {
 
+	private static final Logger LOGGER = Logger.getLogger(PDICCBased.class.getCanonicalName());
 	private final ICCProfile iccProfile;
 	private final int numberOfComponents;
 
@@ -83,6 +87,26 @@ public class PDICCBased extends PDColorSpace {
 	}
 
 	public PDColorSpace getAlternate() {
-		return this.iccProfile == null ? null : this.iccProfile.getAlternate();
+		if (this.iccProfile == null) {
+			return null;
+		}
+		PDColorSpace res = this.iccProfile.getAlternate();
+		if (res == null) {
+			switch (this.numberOfComponents) {
+				case 1:
+					res = PDDeviceGray.INSTANCE;
+					break;
+				case 3:
+					res = PDDeviceRGB.INSTANCE;
+					break;
+				case 4:
+					res = PDDeviceCMYK.INSTANCE;
+					break;
+				default:
+					LOGGER.log(Level.FINE, "Unknown amount of components in icc based colorspace (" +
+							this.numberOfComponents + ")");
+			}
+		}
+		return res;
 	}
 }
