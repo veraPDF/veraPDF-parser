@@ -70,6 +70,9 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             this.readIndex();   // name
             long topOffset = this.source.getOffset();
             CFFIndex top = this.readIndex();
+            if (top.size() == 0) {
+                throw new IOException("Error in cff font program parsing: top DICT INDEX is empty.");
+            }
             this.definedNames = this.readIndex();
             CFFIndex globalSubrs = this.readIndex();
             if (isCIDFont(top.get(0))) {
