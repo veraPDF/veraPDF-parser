@@ -81,18 +81,13 @@ public class PDCIDFont extends PDFont {
         if (this.widths == null) {
             COSObject w = this.dictionary.getKey(ASAtom.W);
             if (w.empty() || w.getType() != COSObjType.COS_ARRAY) {
-                return Double.valueOf(0);
+                return getDefaultWidth();
             }
             this.widths = new CIDWArray((COSArray) w.getDirectBase());
         }
         Double res = widths.getWidth(this.cMap.toCID(code));
         if (res == null) {
-            COSObject dw = this.dictionary.getKey(ASAtom.DW);
-            if (!dw.empty()) {
-                res = dw.getReal();
-            } else {
-                res = DEFAULT_CID_FONT_WIDTH;
-            }
+            res = getDefaultWidth();
         }
         return res;
     }
