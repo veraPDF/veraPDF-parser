@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -40,7 +40,6 @@ public class PDFontDescriptor extends PDObject {
     private static final Logger LOGGER =
             Logger.getLogger(PDFontDescriptor.class.getCanonicalName());
     private final Long flags;
-    private final String fontName;
 
     private static final int FIXED_PITCH_BIT = 1;
     private static final int SERIF_BIT = 2;
@@ -55,6 +54,34 @@ public class PDFontDescriptor extends PDObject {
     private static final Double DEFAULT_XHEIGHT = new Double(0);
     private static final Double DEFAULT_STEM_H = new Double(0);
     private static final Double DEFAULT_WIDTH = new Double(0);
+
+    // values
+    private String fontName;
+    private String fontFamily;
+    private ASAtom fontStretch;
+    private Double fontWeight;
+    private Boolean isFixedPitch;
+    private Boolean isSerif;
+    private Boolean isSymbolic;
+    private Boolean isScript;
+    private Boolean isNonSymblic;
+    private Boolean isItalic;
+    private Boolean isAllCap;
+    private Boolean isSmallCup;
+    private Boolean isForceBold;
+    private double[] fontBoundingBox;
+    private Double italicAngle;
+    private Double ascent;
+    private Double descent;
+    private Double leading;
+    private Double capHeight;
+    private Double xHeight;
+    private Double stemV;
+    private Double stemH;
+    private Double avgWidth;
+    private Double maxWidth;
+    private Double missingWidth;
+    private String charSet;
 
     public PDFontDescriptor(COSObject obj) {
         super(obj);
@@ -85,14 +112,20 @@ public class PDFontDescriptor extends PDObject {
      * @return a byte string specifying the preferred font family name.
      */
     public String getFontFamily() {
-        return getStringKey(ASAtom.FONT_FAMILY);
+        if (fontFamily == null) {
+            fontFamily = getStringKey(ASAtom.FONT_FAMILY);
+        }
+        return fontFamily;
     }
 
     /**
      * @return the font stretch value.
      */
     public ASAtom getFontStretch() {
-        return getNameKey(ASAtom.FONT_STRETCH);
+        if (fontStretch == null) {
+            fontStretch = getNameKey(ASAtom.FONT_STRETCH);
+        }
+        return fontStretch;
     }
 
     /**
@@ -100,14 +133,20 @@ public class PDFontDescriptor extends PDObject {
      * or font specifier.
      */
     public Double getFontWeight() {
-        return getRealKey(ASAtom.FONT_WEIGHT);
+        if (fontWeight == null) {
+            fontWeight = getRealKey(ASAtom.FONT_WEIGHT);
+        }
+        return fontWeight;
     }
 
     /**
      * @return true if all glyphs have the same width.
      */
     public boolean isFixedPitch() {
-        return isFlagBitOn(FIXED_PITCH_BIT);
+        if (isFixedPitch == null) {
+            isFixedPitch = isFlagBitOn(FIXED_PITCH_BIT);
+        }
+        return isFixedPitch;
     }
 
     /**
@@ -115,7 +154,10 @@ public class PDFontDescriptor extends PDObject {
      * angle on the top and bottom of glyph stems.
      */
     public boolean isSerif() {
-        return isFlagBitOn(SERIF_BIT);
+        if (isSerif == null) {
+            isSerif = isFlagBitOn(SERIF_BIT);
+        }
+        return isSerif;
     }
 
     /**
@@ -123,14 +165,20 @@ public class PDFontDescriptor extends PDObject {
      * character set.
      */
     public boolean isSymbolic() {
-        return isFlagBitOn(SYMBOLIC_BIT);
+        if (isSymbolic == null) {
+            isSymbolic = isFlagBitOn(SYMBOLIC_BIT);
+        }
+        return isSymbolic;
     }
 
     /**
      * @return true if glyphs resemble cursive handwriting.
      */
     public boolean isScript() {
-        return isFlagBitOn(SCRIPT_BIT);
+        if (isScript == null) {
+            isScript = isFlagBitOn(SCRIPT_BIT);
+        }
+        return isScript;
     }
 
     /**
@@ -138,14 +186,20 @@ public class PDFontDescriptor extends PDObject {
      * subset of it.
      */
     public boolean isNonsymbolic() {
-        return isFlagBitOn(NONSYMBOLIC_BIT);
+        if (isNonSymblic == null) {
+            isNonSymblic = isFlagBitOn(NONSYMBOLIC_BIT);
+        }
+        return isNonSymblic;
     }
 
     /**
      * @return true if glyphs have dominant vertical strokes that are slanted.
      */
     public boolean isItalic() {
-        return isFlagBitOn(ITALIC_BIT);
+        if (isItalic == null) {
+            isItalic = isFlagBitOn(ITALIC_BIT);
+        }
+        return isItalic;
     }
 
     /**
@@ -153,14 +207,20 @@ public class PDFontDescriptor extends PDObject {
      * display purposes, such as for titles or headlines.
      */
     public boolean isAllCap() {
-        return isFlagBitOn(ALL_CAP_BIT);
+        if (isAllCap == null) {
+            isAllCap = isFlagBitOn(ALL_CAP_BIT);
+        }
+        return isAllCap;
     }
 
     /**
      * @return true if font contains both uppercase and lowercase letters.
      */
     public boolean isSmallCap() {
-        return isFlagBitOn(SMALL_CAP_BIT);
+        if (isSmallCup == null) {
+            isSmallCup = isFlagBitOn(SMALL_CAP_BIT);
+        }
+        return isSmallCup;
     }
 
     /**
@@ -168,7 +228,10 @@ public class PDFontDescriptor extends PDObject {
      * very small text sizes by a conforming reader.
      */
     public boolean isForceBold() {
-        return isFlagBitOn(FORCE_BOLD_BIT);
+        if (isForceBold == null) {
+            isForceBold = isFlagBitOn(FORCE_BOLD_BIT);
+        }
+        return isForceBold;
     }
 
     private boolean isFlagBitOn(int bit) {
@@ -180,25 +243,28 @@ public class PDFontDescriptor extends PDObject {
      * specify the font bounding box.
      */
     public double[] getFontBoundingBox() {
-        COSBase bbox = this.getObject().getKey(ASAtom.FONT_BBOX).get();
-        if (bbox != null && bbox.getType() == COSObjType.COS_ARRAY && bbox.size() == 4) {
-            double[] res = new double[4];
-            for (int i = 0; i < 4; ++i) {
-                COSObject obj = bbox.at(i);
-                if (obj.getType().isNumber()) {
-                    res[i] = obj.getReal();
-                } else {
-                    LOGGER.log(Level.FINE, "Font bounding box array for font " + fontName +
-                    " contains " + obj.getType());
-                    return null;
+        if (fontBoundingBox == null) {
+            COSBase bbox = this.getObject().getKey(ASAtom.FONT_BBOX).get();
+            if (bbox != null && bbox.getType() == COSObjType.COS_ARRAY && bbox.size() == 4) {
+                double[] res = new double[4];
+                for (int i = 0; i < 4; ++i) {
+                    COSObject obj = bbox.at(i);
+                    if (obj.getType().isNumber()) {
+                        res[i] = obj.getReal();
+                    } else {
+                        LOGGER.log(Level.FINE, "Font bounding box array for font " + fontName +
+                                " contains " + obj.getType());
+                        return null;
+                    }
                 }
+                fontBoundingBox = res;
+            } else {
+                LOGGER.log(Level.FINE, "Font bounding box array for font " + fontName +
+                        " is not an array of 4 elements");
+                return null;
             }
-            return res;
-        } else {
-            LOGGER.log(Level.FINE, "Font bounding box array for font " + fontName +
-            " is not an array of 4 elements");
-            return null;
         }
+        return fontBoundingBox;
     }
 
     /**
@@ -206,7 +272,10 @@ public class PDFontDescriptor extends PDObject {
      * vertical, of the dominant vertical strokes of the font.
      */
     public Double getItalicAngle() {
-        return getRealKey(ASAtom.ITALIC_ANGLE);
+        if (italicAngle == null) {
+            italicAngle = getRealKey(ASAtom.ITALIC_ANGLE);
+        }
+        return italicAngle;
     }
 
     /**
@@ -214,7 +283,10 @@ public class PDFontDescriptor extends PDObject {
      * font.
      */
     public Double getAscent() {
-        return getRealKey(ASAtom.ASCENT);
+        if (ascent == null) {
+            ascent = getRealKey(ASAtom.ASCENT);
+        }
+        return ascent;
     }
 
     /**
@@ -222,15 +294,21 @@ public class PDFontDescriptor extends PDObject {
      * font.
      */
     public Double getDescent() {
-        return getRealKey(ASAtom.DESCENT);
+        if (descent == null) {
+            descent = getRealKey(ASAtom.DESCENT);
+        }
+        return descent;
     }
 
     /**
      * @return the spacing between baselines of consecutive lines of text.
      */
     public Double getLeading() {
-        Double res = getRealKey(ASAtom.LEADING);
-        return res == null ? DEFAULT_LEADING : res;
+        if (leading == null) {
+            Double res = getRealKey(ASAtom.LEADING);
+            leading = res == null ? DEFAULT_LEADING : res;
+        }
+        return leading;
     }
 
     /**
@@ -238,7 +316,10 @@ public class PDFontDescriptor extends PDObject {
      * measured from the baseline.
      */
     public Double getCapHeight() {
-        return getRealKey(ASAtom.CAP_HEIGHT);
+        if (capHeight == null) {
+            capHeight = getRealKey(ASAtom.CAP_HEIGHT);
+        }
+        return capHeight;
     }
 
     /**
@@ -247,8 +328,11 @@ public class PDFontDescriptor extends PDObject {
      * baseline, in fonts that have Latin characters.
      */
     public Double getXHeight() {
-        Double res = getRealKey(ASAtom.XHEIGHT);
-        return res == null ? DEFAULT_XHEIGHT : res;
+        if (xHeight == null) {
+            Double res = getRealKey(ASAtom.XHEIGHT);
+            xHeight = res == null ? DEFAULT_XHEIGHT : res;
+        }
+        return xHeight;
     }
 
     /**
@@ -256,32 +340,44 @@ public class PDFontDescriptor extends PDObject {
      * stems of glyphs in the font.
      */
     public Double getStemV() {
-        return getRealKey(ASAtom.STEM_V);
+        if (stemV == null) {
+            stemV = getRealKey(ASAtom.STEM_V);
+        }
+        return stemV;
     }
 
     /**
-         * @return the thickness, measured vertically, of the dominant horizontal
-         * stems of glyphs in the font.
+     * @return the thickness, measured vertically, of the dominant horizontal
+     * stems of glyphs in the font.
      */
     public Double getStemH() {
-        Double res = getRealKey(ASAtom.STEM_H);
-        return res == null ? DEFAULT_STEM_H : res;
+        if (stemH == null) {
+            Double res = getRealKey(ASAtom.STEM_H);
+            stemH = res == null ? DEFAULT_STEM_H : res;
+        }
+        return stemH;
     }
 
     /**
      * @return the average width of glyphs in the font.
      */
     public Double getAvgWidth() {
-        Double res = getRealKey(ASAtom.AVG_WIDTH);
-        return res == null ? DEFAULT_WIDTH : res;
+        if (avgWidth == null) {
+            Double res = getRealKey(ASAtom.AVG_WIDTH);
+            avgWidth = res == null ? DEFAULT_WIDTH : res;
+        }
+        return avgWidth;
     }
 
     /**
      * @return the maximum width of glyphs in the font.
      */
     public Double getMaxWidth() {
-        Double res = getRealKey(ASAtom.MAX_WIDTH);
-        return res == null ? DEFAULT_WIDTH : res;
+        if (maxWidth == null) {
+            Double res = getRealKey(ASAtom.MAX_WIDTH);
+            maxWidth = res == null ? DEFAULT_WIDTH : res;
+        }
+        return maxWidth;
     }
 
     /**
@@ -289,15 +385,21 @@ public class PDFontDescriptor extends PDObject {
      * specified in a font dictionary’s Widths array.
      */
     public Double getMissingWidth() {
-        Double res = getRealKey(ASAtom.MISSING_WIDTH);
-        return res == null ? DEFAULT_WIDTH : res;
+        if (missingWidth == null) {
+            Double res = getRealKey(ASAtom.MISSING_WIDTH);
+            missingWidth = res == null ? DEFAULT_WIDTH : res;
+        }
+        return missingWidth;
     }
 
     /**
      * @return a string listing the character names defined in a font subset.
      */
     public String getCharSet() {
-        return getStringKey(ASAtom.CHAR_SET);
+        if (charSet == null) {
+            charSet = getStringKey(ASAtom.CHAR_SET);
+        }
+        return charSet;
     }
 
     /**
@@ -333,5 +435,110 @@ public class PDFontDescriptor extends PDObject {
         } else {
             return null;
         }
+    }
+
+    public void setFontName(ASAtom fontName) {
+        this.fontName = fontName.getValue();
+        this.setNameKey(ASAtom.FONT_NAME, fontName);
+    }
+
+    public void setFontFamily(String fontFamily) {
+        this.fontFamily = fontFamily;
+    }
+
+    public void setFontStretch(ASAtom fontStretch) {
+        this.fontStretch = fontStretch;
+    }
+
+    public void setFontWeight(Double fontWeight) {
+        this.fontWeight = fontWeight;
+    }
+
+    public void setFixedPitch(Boolean fixedPitch) {
+        isFixedPitch = fixedPitch;
+    }
+
+    public void setSerif(Boolean serif) {
+        isSerif = serif;
+    }
+
+    public void setSymbolic(Boolean symbolic) {
+        isSymbolic = symbolic;
+    }
+
+    public void setScript(Boolean script) {
+        isScript = script;
+    }
+
+    public void setNonSymblic(Boolean nonSymblic) {
+        isNonSymblic = nonSymblic;
+    }
+
+    public void setItalic(Boolean italic) {
+        isItalic = italic;
+    }
+
+    public void setAllCap(Boolean allCap) {
+        isAllCap = allCap;
+    }
+
+    public void setSmallCup(Boolean smallCup) {
+        isSmallCup = smallCup;
+    }
+
+    public void setForceBold(Boolean forceBold) {
+        isForceBold = forceBold;
+    }
+
+    public void setFontBoundingBox(double[] fontBoundingBox) {
+        this.fontBoundingBox = fontBoundingBox;
+    }
+
+    public void setItalicAngle(Double italicAngle) {
+        this.italicAngle = italicAngle;
+    }
+
+    public void setAscent(Double ascent) {
+        this.ascent = ascent;
+    }
+
+    public void setDescent(Double descent) {
+        this.descent = descent;
+    }
+
+    public void setLeading(Double leading) {
+        this.leading = leading;
+    }
+
+    public void setCapHeight(Double capHeight) {
+        this.capHeight = capHeight;
+    }
+
+    public void setxHeight(Double xHeight) {
+        this.xHeight = xHeight;
+    }
+
+    public void setStemV(Double stemV) {
+        this.stemV = stemV;
+    }
+
+    public void setStemH(Double stemH) {
+        this.stemH = stemH;
+    }
+
+    public void setAvgWidth(Double avgWidth) {
+        this.avgWidth = avgWidth;
+    }
+
+    public void setMaxWidth(Double maxWidth) {
+        this.maxWidth = maxWidth;
+    }
+
+    public void setMissingWidth(Double missingWidth) {
+        this.missingWidth = missingWidth;
+    }
+
+    public void setCharSet(String charSet) {
+        this.charSet = charSet;
     }
 }

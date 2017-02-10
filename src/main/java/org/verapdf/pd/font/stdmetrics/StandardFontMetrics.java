@@ -34,6 +34,18 @@ public class StandardFontMetrics {
 
     private Map<String, Integer> widths;
 
+    // values
+    private String fontName;
+    private String familyName;
+    private double[] fontBBox;
+    private String encodingScheme;
+    private String charSet;
+    private Double capHeight;
+    private Double XHeight;
+    private Double ascend;
+    private Double descend;
+    private Double italicAngle;
+
     public StandardFontMetrics() {
         this.widths = new HashMap<>();
     }
@@ -52,5 +64,85 @@ public class StandardFontMetrics {
     public int getWidth(String glyphName) {
         Integer res = this.widths.get(glyphName);
         return res == null ? this.widths.get(NOTDEF_STRING) : res;
+    }
+
+    public String getFontName() {
+        return fontName;
+    }
+
+    public void setFontName(String fontName) {
+        this.fontName = fontName;
+    }
+
+    public String getFamilyName() {
+        return familyName;
+    }
+
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
+    }
+
+    public double[] getFontBBox() {
+        return fontBBox;
+    }
+
+    public void setFontBBox(double[] fontBBox) {
+        this.fontBBox = fontBBox;
+    }
+
+    public String getEncodingScheme() {
+        return encodingScheme;
+    }
+
+    public void setEncodingScheme(String encodingScheme) {
+        this.encodingScheme = encodingScheme;
+    }
+
+    public String getCharSet() {
+        return charSet;
+    }
+
+    public void setCharSet(String charSet) {
+        this.charSet = charSet;
+    }
+
+    public Double getCapHeight() {
+        return capHeight;
+    }
+
+    public void setCapHeight(Double capHeight) {
+        this.capHeight = capHeight;
+    }
+
+    public Double getXHeight() {
+        return XHeight;
+    }
+
+    public void setXHeight(Double XHeight) {
+        this.XHeight = XHeight;
+    }
+
+    public Double getAscend() {
+        return ascend;
+    }
+
+    public void setAscend(Double ascend) {
+        this.ascend = ascend;
+    }
+
+    public Double getDescend() {
+        return descend;
+    }
+
+    public void setDescend(Double descend) {
+        this.descend = descend;
+    }
+
+    public Double getItalicAngle() {
+        return italicAngle;
+    }
+
+    public void setItalicAngle(Double italicAngle) {
+        this.italicAngle = italicAngle;
     }
 }
