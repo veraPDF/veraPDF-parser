@@ -71,7 +71,7 @@ public class PDType1Font extends PDSimpleFont {
 
     public PDType1Font(COSDictionary dictionary) {
         super(dictionary);
-        if (isNameStandard() && this.fontDescriptor.getObject().empty()) {
+        if (isNameStandard() && this.fontDescriptor.getObject().size() == 0) {
             fontMetrics = StandardFontMetricsFactory.getFontMetrics(this.getName());
             this.fontDescriptor = PDFontDescriptor.getDescriptorFromMetrics(fontMetrics);
         }

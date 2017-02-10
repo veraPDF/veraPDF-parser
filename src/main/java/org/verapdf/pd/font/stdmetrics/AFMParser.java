@@ -55,9 +55,11 @@ public class AFMParser extends BaseParser {
 
         StandardFontMetrics res = new StandardFontMetrics();
         try {
-            this.initializeToken();
-            this.findStartCharMetrics();
-
+            initializeToken();
+            while (this.getToken().type != Token.Type.TT_EOF) {
+                this.nextToken();
+                this.processToken(res);
+            }
         } finally {
             this.source.close();    // We close stream after first reading attempt
         }
@@ -77,6 +79,7 @@ public class AFMParser extends BaseParser {
 
     private void processToken(StandardFontMetrics res) throws IOException {
         if (getToken().type == Token.Type.TT_KEYWORD) {
+            this.skipSpaces();
             switch (getToken().getValue()) {
                 case START_CHAR_METRICS_STRING:
                     this.nextToken();
