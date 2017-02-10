@@ -28,10 +28,14 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.parser.COSParser;
+import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.PDFontDescriptor;
 import org.verapdf.pd.font.PDSimpleFont;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
+import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
+import org.verapdf.pd.font.stdmetrics.StandardFontMetricsFactory;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
 
 import java.io.IOException;
@@ -62,9 +66,15 @@ public class PDType1Font extends PDSimpleFont {
             ASAtom.ZAPF_DINGBATS};
 
     private Boolean isStandard = null;
+    private StandardFontMetrics fontMetrics;
+
 
     public PDType1Font(COSDictionary dictionary) {
         super(dictionary);
+        if (isNameStandard() && this.fontDescriptor.getObject().empty()) {
+            fontMetrics = StandardFontMetricsFactory.getFontMetrics(this.getName());
+            this.fontDescriptor = PDFontDescriptor.getDescriptorFromMetrics(fontMetrics);
+        }
     }
 
     public Set<String> getDescriptorCharSet() {
@@ -179,6 +189,24 @@ public class PDType1Font extends PDSimpleFont {
         }
     }
 
+    @Override
+    public Double getWidth(int code) {
+        if (getFontProgram() != null) {
+            return super.getWidth(code);
+        }
+        if (fontMetrics != null) {
+            StandardFontMetrics metrics =
+                    StandardFontMetricsFactory.getFontMetrics(this.getName());
+            Encoding enc = this.getEncodingMapping();
+            if (metrics != null) {
+                return Double.valueOf(metrics.getWidth(enc.getName(code)));
+            }
+        }
+        // should not get here
+        LOGGER.log(Level.FINE, "Can't get standard metrics");
+        return null;
+    }
+
     private boolean isEmbedded() {
         return this.getFontProgram() != null;
     }
@@ -192,4 +220,6 @@ public class PDType1Font extends PDSimpleFont {
         }
         return false;
     }
+
+
 }

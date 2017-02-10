@@ -26,6 +26,7 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.pd.PDObject;
+import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -438,8 +439,10 @@ public class PDFontDescriptor extends PDObject {
     }
 
     public void setFontName(ASAtom fontName) {
-        this.fontName = fontName.getValue();
-        this.setNameKey(ASAtom.FONT_NAME, fontName);
+        if (fontName != null) {
+            this.fontName = fontName.getValue();
+            this.setNameKey(ASAtom.FONT_NAME, fontName);
+        }
     }
 
     public void setFontFamily(String fontFamily) {
@@ -540,5 +543,23 @@ public class PDFontDescriptor extends PDObject {
 
     public void setCharSet(String charSet) {
         this.charSet = charSet;
+    }
+
+    public static PDFontDescriptor getDescriptorFromMetrics(StandardFontMetrics sfm) {
+        PDFontDescriptor res = new PDFontDescriptor(new COSObject());
+        boolean isSymbolic = "FontSpecific".equals(sfm.getEncodingScheme());
+        res.fontName = sfm.getFontName();
+        res.setFontName(ASAtom.getASAtom(sfm.getFontName()));
+        res.fontFamily = sfm.getFamilyName();
+        res.fontBoundingBox = sfm.getFontBBox();
+        res.isSymbolic = isSymbolic;
+        res.isNonSymblic = !isSymbolic;
+        res.charSet = sfm.getCharSet();
+        res.capHeight = sfm.getCapHeight();
+        res.xHeight = sfm.getXHeight();
+        res.descent = sfm.getDescend();
+        res.ascent = sfm.getAscend();
+        res.italicAngle = sfm.getItalicAngle();
+        return res;
     }
 }
