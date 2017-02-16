@@ -199,11 +199,11 @@ public class CMapParser extends BaseParser {
     private void readLineCodeSpaceRange() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "codespacerange list");
-        byte[] begin = getRawBytes(getToken().getValue());
+        byte[] begin = getToken().getByteValue();
 
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "codespacerange list");
-        byte[] end = getRawBytes(getToken().getValue());
+        byte[] end = getToken().getByteValue();
 
         CodeSpace codeSpace = new CodeSpace(begin, end);
 
@@ -227,11 +227,11 @@ public class CMapParser extends BaseParser {
     private void readLineCIDRange() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "cidrange list");
-        long cidRangeStart = numberFromBytes(getRawBytes(getToken().getValue()));
+        long cidRangeStart = numberFromBytes(getToken().getByteValue());
 
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "cidrange list");
-        long cidRangeEnd = numberFromBytes(getRawBytes(getToken().getValue()));
+        long cidRangeEnd = numberFromBytes(getToken().getByteValue());
 
         nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "cidrange list");
@@ -242,11 +242,11 @@ public class CMapParser extends BaseParser {
     private void readLineNotDefRange() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "notdef list");
-        long notDefRangeStart = numberFromBytes(getRawBytes(getToken().getValue()));
+        long notDefRangeStart = numberFromBytes(getToken().getByteValue());
 
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "notdef list");
-        long notDefRangeEnd = numberFromBytes(getRawBytes(getToken().getValue()));
+        long notDefRangeEnd = numberFromBytes(getToken().getByteValue());
 
         nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "notdef list");
@@ -257,7 +257,7 @@ public class CMapParser extends BaseParser {
     private void readSingleCharMapping() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "cidchar");
-        long charCode = numberFromBytes(getRawBytes(getToken().getValue()));
+        long charCode = numberFromBytes(getToken().getByteValue());
 
         nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "cidchar");
@@ -268,7 +268,7 @@ public class CMapParser extends BaseParser {
     private void readSingleNotDefMapping() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "notdefchar");
-        long notDefCharCode = numberFromBytes(getRawBytes(getToken().getValue()));
+        long notDefCharCode = numberFromBytes(getToken().getByteValue());
 
         nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "notdefchar");
@@ -279,7 +279,7 @@ public class CMapParser extends BaseParser {
     private void readSingleToUnicodeMapping() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "bfchar");
-        long bfCharCode = numberFromBytes(getRawBytes(getToken().getValue()));
+        long bfCharCode = numberFromBytes(getToken().getByteValue());
 
         String unicodeName = this.readStringFromUnicodeSequenceToken();
         this.cMap.addUnicodeMapping((int) bfCharCode, unicodeName);
@@ -288,11 +288,11 @@ public class CMapParser extends BaseParser {
     private void readLineBFRange() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "bfrange");
-        long bfRangeBegin = numberFromBytes(getRawBytes(getToken().getValue()));
+        long bfRangeBegin = numberFromBytes(getToken().getByteValue());
 
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "bfrange");
-        long bfRangeEnd = numberFromBytes(getRawBytes(getToken().getValue()));
+        long bfRangeEnd = numberFromBytes(getToken().getByteValue());
 
         nextToken();    // skip [
         if(getToken().getValue().equals("[")) {
@@ -304,7 +304,7 @@ public class CMapParser extends BaseParser {
             nextToken();    // skip ]
         } else {
             this.cMap.addUnicodeInterval(new ToUnicodeInterval(bfRangeBegin, bfRangeEnd,
-                    numberFromBytes(getRawBytes(getToken().getValue()))));
+                    numberFromBytes(getToken().getByteValue())));
         }
     }
 
@@ -321,7 +321,7 @@ public class CMapParser extends BaseParser {
         if (getToken().type == Token.Type.TT_NAME) {
             return this.getToken().getValue();
         } else if (getToken().type == Token.Type.TT_HEXSTRING) {
-            byte[] token = getRawBytes(getToken().getValue());
+            byte[] token = getToken().getByteValue();;
             if (token.length == 1) {
                 return new String(token, "ISO-8859-1");
             }

@@ -173,7 +173,17 @@ public class PDType0Font extends PDCIDFont {
         return type0FontDict;
     }
 
+    @Override
+    public ASAtom getSubtype() {
+        return this.type0FontDict.getNameKey(ASAtom.SUBTYPE);
+    }
+
     public int toCID(int code) {
         return this.pdcMap.getCMapFile().toCID(code);
+    }
+
+    @Override
+    public COSObject getObject() {
+        return new COSObject(this.type0FontDict);
     }
 }

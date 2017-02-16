@@ -28,6 +28,8 @@ import org.verapdf.cos.COSStream;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -560,6 +562,20 @@ public class PDFontDescriptor extends PDObject {
         res.descent = sfm.getDescend();
         res.ascent = sfm.getAscend();
         res.italicAngle = sfm.getItalicAngle();
+
+        double totalWidth = 0;
+        int glyphNum = 0;
+        Iterator<Map.Entry<String, Integer>> widthsIterator = sfm.getWidthsIterator();
+        while(widthsIterator.hasNext()) {
+            Integer width = widthsIterator.next().getValue();
+            if (width != null && width > 0) {
+                totalWidth += width;
+                glyphNum++;
+            }
+        }
+        if (glyphNum != 0) {
+            res.avgWidth = totalWidth / glyphNum;
+        }
         return res;
     }
 }

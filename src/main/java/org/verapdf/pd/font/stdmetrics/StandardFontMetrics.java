@@ -21,6 +21,7 @@
 package org.verapdf.pd.font.stdmetrics;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -144,5 +145,9 @@ public class StandardFontMetrics {
 
     public void setItalicAngle(Double italicAngle) {
         this.italicAngle = italicAngle;
+    }
+
+    public Iterator<Map.Entry<String, Integer>> getWidthsIterator() {
+        return this.widths.entrySet().iterator();
     }
 }
