@@ -24,9 +24,6 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDResource;
 import org.verapdf.pd.font.cmap.PDCMap;
-import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
-import org.verapdf.pd.font.stdmetrics.StandardFontMetricsFactory;
-import org.verapdf.pd.font.type1.PDType1Font;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -250,18 +247,6 @@ public abstract class PDFont extends PDResource {
 
         if (this instanceof PDType3Font) {
             return null;
-        }
-
-        if (this instanceof PDType1Font && ((PDType1Font) this).isStandard().booleanValue()) {
-            StandardFontMetrics metrics =
-                    StandardFontMetricsFactory.getFontMetrics(this.getName());
-            Encoding enc = this.getEncodingMapping();
-            if (metrics != null) {
-                return Double.valueOf(metrics.getWidth(enc.getName(code)));
-            }
-			// should not get here
-			LOGGER.log(Level.FINE, "Can't get standard metrics");
-			return null;
         }
 
         return Double.valueOf(0);

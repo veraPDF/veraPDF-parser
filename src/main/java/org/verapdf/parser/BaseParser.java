@@ -504,13 +504,13 @@ public class BaseParser {
 
 			if (ch == '#') {
 				byte ch1, ch2;
-				int dc;
+				byte dc;
 				ch1 = this.source.readByte();
 				if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.er) {
 					dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
 					ch2 = this.source.readByte();
 					if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.er) {
-						dc = ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
+						dc = (byte) ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
 						appendToToken(dc);
 					} else {
 						appendToToken(ch);

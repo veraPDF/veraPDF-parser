@@ -50,7 +50,7 @@ public class Token {
 	}
 
 	public String getValue() {
-		return this.token.toString();
+		return new String(getByteValue());
 	}
 
 	public byte[] getByteValue() {
