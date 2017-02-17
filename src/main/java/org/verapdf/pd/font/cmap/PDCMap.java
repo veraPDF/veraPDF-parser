@@ -74,6 +74,15 @@ public class PDCMap {
         return "";
     }
 
+    private String getCMapID() {
+        if (this.cMap.getType() == COSObjType.COS_STREAM) {
+            return "CMap " + cMap.getObjectKey().toString();
+        } else if (this.cMap.getType() == COSObjType.COS_NAME) {
+            return cMap.getString();
+        }
+        return "";
+    }
+
     /**
      * @return COSObject, representing this CMap.
      */
@@ -90,7 +99,11 @@ public class PDCMap {
             parsedCMap = true;
             if (this.cMap.getType() == COSObjType.COS_STREAM) {
                 try (ASInputStream cMapStream = this.cMap.getData(COSStream.FilterFlags.DECODE)) {
-                    this.cMapFile = CMapFactory.getCMap(getCMapName(), cMapStream);
+                    String cMapName = getCMapName();
+                    if (cMapName == null) {
+                        cMapName = getCMapID();
+                    }
+                    this.cMapFile = CMapFactory.getCMap(cMapName , cMapStream);
                     return this.cMapFile;
                 } catch (IOException e) {
                     LOGGER.log(Level.FINE, "Can't close stream", e);

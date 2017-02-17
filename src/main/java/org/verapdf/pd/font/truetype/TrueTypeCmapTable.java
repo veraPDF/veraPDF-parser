@@ -113,9 +113,7 @@ class TrueTypeCmapTable extends TrueTypeTable {
                         if (glyphCode != 0) {
                             glyphCode = (glyphCode + idDelta[i]) % 65536;
                         }
-                        if (!cmap.containsGlyph(glyphCode)) {
-                            cmap.put(j + startCode[i], glyphCode);
-                        }
+                        cmap.put(j + startCode[i], glyphCode);
                     }
                 }
             }
