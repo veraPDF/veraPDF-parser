@@ -116,11 +116,13 @@ public class COSPredictorDecode extends ASBufferingInFilter {
             if ((read = bufferPopArray(currentLine, lineLength)) != lineLength) {
                 if (this.feedBuffer(this.getBufferCapacity()) == -1) {
                     this.streamEnded = true;
+                    break;
                 }
                 byte[] extraBytes = new byte[lineLength - read];
                 int readAgain;
                 if ((readAgain = bufferPopArray(extraBytes, extraBytes.length)) != extraBytes.length) {
                     this.streamEnded = true;
+                    break;
                 }
                 System.arraycopy(extraBytes, 0, currentLine, read, readAgain);
             }

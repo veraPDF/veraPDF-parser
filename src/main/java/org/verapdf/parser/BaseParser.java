@@ -96,6 +96,11 @@ public class BaseParser {
 		return this.token.getValue();
 	}
 
+	protected byte[] getLineBytes() throws IOException {
+		getLine();
+		return this.token.getByteValue();
+	}
+
 	protected String getLine(final int offset) throws IOException {
 		initializeToken();
 		this.token.clearValue();

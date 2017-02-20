@@ -77,7 +77,7 @@ public class COSHeader {
 	}
 
 	public int getHeaderCommentByte1() {
-		return headerCommentByte1;
+		return headerCommentByte1 & 0xFF;
 	}
 
 	public void setHeaderCommentByte1(final int headerCommentByte1) {
@@ -85,7 +85,7 @@ public class COSHeader {
 	}
 
 	public int getHeaderCommentByte2() {
-		return headerCommentByte2;
+		return headerCommentByte2 & 0xFF;
 	}
 
 	public void setHeaderCommentByte2(final int headerCommentByte2) {
@@ -93,7 +93,7 @@ public class COSHeader {
 	}
 
 	public int getHeaderCommentByte3() {
-		return headerCommentByte3;
+		return headerCommentByte3 & 0xFF;
 	}
 
 	public void setHeaderCommentByte3(final int headerCommentByte3) {
@@ -101,7 +101,7 @@ public class COSHeader {
 	}
 
 	public int getHeaderCommentByte4() {
-		return headerCommentByte4;
+		return headerCommentByte4 & 0xFF;
 	}
 
 	public void setHeaderCommentByte4(final int headerCommentByte4) {
