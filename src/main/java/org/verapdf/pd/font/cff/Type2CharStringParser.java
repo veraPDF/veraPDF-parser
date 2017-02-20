@@ -48,8 +48,8 @@ class Type2CharStringParser extends BaseCharStringParser {
      * {@inheritDoc}
      */
     Type2CharStringParser(ASInputStream stream, CFFIndex localSubrs, int bias,
-                          CFFIndex globalSubrs) throws IOException {
-        super(stream, localSubrs, bias, globalSubrs);
+                          CFFIndex globalSubrs, int gBias) throws IOException {
+        super(stream, localSubrs, bias, globalSubrs, gBias);
     }
 
     /**
@@ -106,7 +106,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 29:    // callgsubr
                 subrNum = (int) this.stack.pop().getInteger();
                 if(this.stack.empty()) {
-                    this.setWidth(getWidthFromSubroutine(globalSubrs.get(subrNum + bias)));
+                    this.setWidth(getWidthFromSubroutine(globalSubrs.get(subrNum + gBias)));
                 } else {
                     this.setWidth(this.stack.get(0));
                 }return true;
@@ -132,7 +132,7 @@ class Type2CharStringParser extends BaseCharStringParser {
     private CFFNumber getWidthFromSubroutine(byte[] subr) throws IOException {
         ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
         Type2CharStringParser parser = new Type2CharStringParser(subrStream,
-                this.localSubrs, this.bias, this.globalSubrs);
+                this.localSubrs, this.bias, this.globalSubrs, this.gBias);
         return parser.getWidth();
     }
 

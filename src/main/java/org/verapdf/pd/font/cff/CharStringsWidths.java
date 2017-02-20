@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -48,11 +48,11 @@ public class CharStringsWidths {
     private CFFCharStringsHandler charStrings;
     private float[] fontMatrix;
     private boolean isDefaultFontMatrix;
-
-    private CFFIndex localSubrIndex;
+    
     private CFFIndex globalSubrs;
-    private int bias;
-
+    
+    private CFFIndex[] localSubrIndexes;
+    private int[] bias;
     private int[] defaultWidths;
     private int[] nominalWidths;
     private int[] fdSelect;
@@ -61,15 +61,15 @@ public class CharStringsWidths {
     private Map<Integer, Float> generalFontWidths;
 
     public CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
-                             float[] fontMatrix, CFFIndex localSubrIndex, CFFIndex globalSubrs,
-                             int bias, int[] defaultWidths, int[] nominalWidths, int[] fdSelect) {
+                             float[] fontMatrix, CFFIndex localSubrIndex[], CFFIndex globalSubrs,
+                             int[] bias, int[] defaultWidths, int[] nominalWidths, int[] fdSelect) {
         this.isSubset = isSubset;
         this.charStringType = charStringType;
         this.charStrings = charStrings;
         this.fontMatrix = fontMatrix;
         this.isDefaultFontMatrix = Arrays.equals(this.fontMatrix,
                 CFFType1FontProgram.DEFAULT_FONT_MATRIX);
-        this.localSubrIndex = localSubrIndex;
+        this.localSubrIndexes = localSubrIndex;
         this.globalSubrs = globalSubrs;
         this.bias = bias;
         this.defaultWidths = defaultWidths;
@@ -85,8 +85,8 @@ public class CharStringsWidths {
     public CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
                              float[] fontMatrix, CFFIndex localSubrIndex, CFFIndex globalSubrs,
                              int bias, int defaultWidth, int nominalWidth) {
-        this(isSubset, charStringType, charStrings, fontMatrix, localSubrIndex,
-                globalSubrs, bias, makeArray(defaultWidth), makeArray(nominalWidth), null);
+        this(isSubset, charStringType, charStrings, fontMatrix, makeArray(localSubrIndex),
+                globalSubrs, makeArray(bias), makeArray(defaultWidth), makeArray(nominalWidth), null);
     }
 
     public float getWidth(int gid) {
@@ -123,7 +123,7 @@ public class CharStringsWidths {
                 return parser.getWidth();
             } else if (this.charStringType == 2) {
                 Type2CharStringParser parser = new Type2CharStringParser(stream,
-                        localSubrIndex, bias, globalSubrs);
+                        getLocalSubrs(gid), getLocalBias(gid), globalSubrs, getGlobalBias());
                 return parser.getWidth();
             } else {
                 throw new IOException("Can't process CharString of type " + this.charStringType);
@@ -149,18 +149,41 @@ public class CharStringsWidths {
     }
 
     private int getDefaultWidth(int gid) {
-        return getPredefinedWidth(gid, this.defaultWidths);
+        return getPredefinedValue(gid, this.defaultWidths);
     }
 
     private int getNominalWidth(int gid) {
-        return getPredefinedWidth(gid, this.nominalWidths);
+        return getPredefinedValue(gid, this.nominalWidths);
     }
 
-    private int getPredefinedWidth(int gid, int[] widthArray) {
+    private int getPredefinedValue(int gid, int[] widthArray) {
         if (this.fdSelect == null) {
             return widthArray[0];
         } else {
             return widthArray[this.fdSelect[gid]];
+        }
+    }
+
+    private int getLocalBias(int gid) {
+        return getPredefinedValue(gid, this.bias);
+    }
+
+    private CFFIndex getLocalSubrs(int gid) {
+        if (this.fdSelect == null) {
+            return localSubrIndexes[0];
+        } else {
+            return localSubrIndexes[this.fdSelect[gid]];
+        }
+    }
+    
+    private int getGlobalBias() {
+        int nSubrs = globalSubrs.size();
+        if (nSubrs < 1240) {
+            return 107;
+        } else if (nSubrs < 33900) {
+            return 1131;
+        } else {
+            return 32768;
         }
     }
 
@@ -175,6 +198,12 @@ public class CharStringsWidths {
     private static int[] makeArray(int num) {
         int[] res = new int[1];
         res[0] = num;
+        return res;
+    }
+    
+    private static CFFIndex[] makeArray(CFFIndex index) {
+        CFFIndex[] res = new CFFIndex[1];
+        res[0] = index;
         return res;
     }
 }

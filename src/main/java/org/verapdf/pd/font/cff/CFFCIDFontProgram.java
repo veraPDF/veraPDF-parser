@@ -45,6 +45,8 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private int supplement;
     private String registry;
     private String ordering;
+    private int[] bias;
+    private CFFIndex[] localSubrIndexes;
 
     private CMap externalCMap;
 
@@ -176,18 +178,20 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         CFFIndex fontDictIndex = this.readIndex();
         this.nominalWidths = new int[fontDictIndex.size()];
         this.defaultWidths = new int[fontDictIndex.size()];
+        this.bias = new int[fontDictIndex.size()];
+        this.localSubrIndexes = new CFFIndex[fontDictIndex.size()];
         for (int i = 0; i < fontDictIndex.size(); ++i) {
             this.readTopDict(fontDictIndex.getOffset(i) + fdArrayOffset +
                     fontDictIndex.getOffsetShift() - 1,
                     fontDictIndex.getOffset(i + 1) + fdArrayOffset +
                             fontDictIndex.getOffsetShift() - 1);
-            this.readPrivateDict(this.privateDictOffset, this.privateDictSize);
+            this.readPrivateDict(this.privateDictOffset, this.privateDictSize, i);
             this.nominalWidths[i] = this.nominalWidthX;
             this.defaultWidths[i] = this.defaultWidthX;
         }
     }
 
-    private void readPrivateDict(long from, long size) throws IOException {
+    private void readPrivateDict(long from, long size, int fontDictNum) throws IOException {
         this.stack.clear();
         long startingOffset = this.source.getOffset();
         this.source.seek(from);
@@ -195,7 +199,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
             this.readPrivateDictUnit();
         }
         this.source.seek(startingOffset);
-        this.readLocalSubrsAndBias();
+        this.readLocalSubrsAndBias(fontDictNum);
     }
 
     private void readTopDict(long from, long to) throws IOException {
@@ -213,7 +217,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         CFFCharStringsHandler charStrings = new CFFCharStringsHandler(
                 this.charStrings, this.charStringsOffset, this.source);
         this.widths = new CharStringsWidths(this.isSubset, this.charStringType,
-                charStrings, this.fontMatrix, this.localSubrIndex, this.globalSubrs,
+                charStrings, this.fontMatrix, this.localSubrIndexes, this.globalSubrs,
                 this.bias, this.defaultWidths, this.nominalWidths, this.fdSelect);
     }
 
@@ -279,5 +283,24 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     @Override
     public boolean isSuccessfulParsing() {
         return this.successfullyParsed;
+    }
+
+    private void readLocalSubrsAndBias(int fontDictNum) throws IOException {
+        if (this.subrsOffset != -1) {
+            long startOffset = this.source.getOffset();
+            this.source.seek(this.subrsOffset);
+            this.localSubrIndexes[fontDictNum] = this.readIndex();
+            this.source.seek(startOffset);
+            int nSubrs = localSubrIndexes[fontDictNum].size();
+            if (this.charStringType == 1) {
+                this.bias[fontDictNum] = 0;
+            } else if (nSubrs < 1240) {
+                bias[fontDictNum] = 107;
+            } else if (nSubrs < 33900) {
+                bias[fontDictNum] = 1131;
+            } else {
+                bias[fontDictNum] = 32768;
+            }
+        }
     }
 }
