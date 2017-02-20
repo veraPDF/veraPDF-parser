@@ -193,26 +193,25 @@ public class PDFParser extends COSParser {
      * check second line of pdf header
      */
     private void checkComment(final COSHeader header) throws IOException {
-        String comment = getLine();
+        byte[] comment = getLineBytes();
         boolean isValidComment = true;
 
-        if (comment != null && !comment.isEmpty()) {
-            if (comment.charAt(0) != '%') {
+        if (comment != null && comment.length != 0) {
+            if (comment[0] != '%') {
                 isValidComment = false;
             }
 
-            int pos = comment.indexOf('%') > -1 ? comment.indexOf('%') + 1 : 0;
-            if (comment.substring(pos).length() < 4) {
+            if (comment.length < 5) {
                 isValidComment = false;
             }
         } else {
             isValidComment = false;
         }
         if (isValidComment) {
-            header.setBinaryHeaderBytes(comment.charAt(1), comment.charAt(2),
-                    comment.charAt(3), comment.charAt(4));
+            header.setBinaryHeaderBytes(comment[1], comment[2],
+                    comment[3], comment[4]);
         } else {
-            header.setBinaryHeaderBytes(-1, -1, -1, -1);
+            header.setBinaryHeaderBytes(0, 0, 0, 0);
         }
     }
 
