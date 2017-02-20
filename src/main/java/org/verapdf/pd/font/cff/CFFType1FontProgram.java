@@ -49,6 +49,9 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     private Map<String, Integer> charSet;   // mappings glyphName -> gid
     private Map<Integer, String> inverseCharSet;    // mappings gid -> glyph name
     private String[] encodingStrings;
+    private int bias;
+    private CFFIndex localSubrIndex;
+
 
     CFFType1FontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                         long topDictBeginOffset, long topDictEndOffset,
@@ -320,5 +323,24 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     @Override
     public boolean isSuccessfulParsing() {
         return this.successfullyParsed;
+    }
+
+    private void readLocalSubrsAndBias() throws IOException {
+        if (this.subrsOffset != -1) {
+            long startOffset = this.source.getOffset();
+            this.source.seek(this.subrsOffset);
+            this.localSubrIndex = this.readIndex();
+            this.source.seek(startOffset);
+            int nSubrs = localSubrIndex.size();
+            if (this.charStringType == 1) {
+                this.bias = 0;
+            } else if (nSubrs < 1240) {
+                bias = 107;
+            } else if (nSubrs < 33900) {
+                bias = 1131;
+            } else {
+                bias = 32768;
+            }
+        }
     }
 }

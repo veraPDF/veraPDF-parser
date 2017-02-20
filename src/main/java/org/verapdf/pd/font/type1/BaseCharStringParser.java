@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -41,6 +41,7 @@ public abstract class BaseCharStringParser {
     protected CFFIndex globalSubrs;
     protected CFFIndex localSubrs;
     protected int bias;
+    protected int gBias;
 
     /**
      * Constructor that calls method parse(), so width is extracted right after
@@ -62,18 +63,21 @@ public abstract class BaseCharStringParser {
      *
      * @param stream     is stream with decoded CharString.
      * @param localSubrs is local subroutines for this CharString.
-     * @param bias       is bias value as it is described in The Compact Font
-     *                   Format specification.
+     * @param bias       is bias value for local subroutines as it is described
+     *                   in The Compact Font Format specification.
+     * @param gBias      is bias value for global subroutines as it is described
+     *                   in The Compact Font Format specification.
      * @throws IOException if parsing fails.
      */
     protected BaseCharStringParser(ASInputStream stream, CFFIndex localSubrs,
-                                   int bias, CFFIndex globalSubrs) throws IOException {
+                                   int bias, CFFIndex globalSubrs, int gBias) throws IOException {
         this.stream = stream;
         this.stack = new Stack<>();
         this.width = null;
         this.globalSubrs = globalSubrs;
         this.localSubrs = localSubrs;
         this.bias = bias;
+        this.gBias = gBias;
         parse();
     }
 

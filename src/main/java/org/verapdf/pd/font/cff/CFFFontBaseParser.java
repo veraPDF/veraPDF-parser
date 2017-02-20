@@ -64,9 +64,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected int nominalWidthX;
 
     //Subrs
-    private long subrsOffset = -1;
-    protected int bias;
-    protected CFFIndex localSubrIndex;
+    protected long subrsOffset = -1;
 
     public CFFFontBaseParser(SeekableInputStream source) {
         super(source);
@@ -169,25 +167,6 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                     default:
                         this.stack.clear();
                 }
-            }
-        }
-    }
-
-    protected void readLocalSubrsAndBias() throws IOException {
-        if (this.subrsOffset != -1) {
-            long startOffset = this.source.getOffset();
-            this.source.seek(this.subrsOffset);
-            this.localSubrIndex = this.readIndex();
-            this.source.seek(startOffset);
-            int nSubrs = localSubrIndex.size();
-            if (this.charStringType == 1) {
-                this.bias = 0;
-            } else if (nSubrs < 1240) {
-                bias = 107;
-            } else if (nSubrs < 33900) {
-                bias = 1131;
-            } else {
-                bias = 32768;
             }
         }
     }
