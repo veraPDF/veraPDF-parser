@@ -156,7 +156,7 @@ public class PDFStreamParser extends COSParser {
 				break;
 			case 'n': {
 				// null
-				String nullString = readUntilWhitespace();
+				String nullString = readUntilDelimiter();
 				if (nullString.equals("null")) {
 					result = new COSObject(COSNull.NULL);
 				} else {
@@ -166,7 +166,7 @@ public class PDFStreamParser extends COSParser {
 			}
 			case 't':
 			case 'f': {
-				String line = readUntilWhitespace();
+				String line = readUntilDelimiter();
 				if (line.equals("true")) {
 					result = new COSObject(COSBoolean.TRUE);
 					break;

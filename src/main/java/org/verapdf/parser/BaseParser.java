@@ -116,11 +116,11 @@ public class BaseParser {
 		return this.token.getValue();
 	}
 
-	protected String readUntilWhitespace() throws IOException {
+	protected String readUntilDelimiter() throws IOException {
 		initializeToken();
 		this.token.clearValue();
 		byte ch = this.source.readByte();
-		while (!isSpace(ch)) {
+		while (!isSpace(ch) && !isTokenDelimiter(ch)) {
 			appendToToken(ch);
 			if (!this.source.isEOF()) {
 				ch = this.source.readByte();
@@ -128,7 +128,7 @@ public class BaseParser {
 				break;
 			}
 		}
-		if (isSpace(ch)) {
+		if (isSpace(ch) || isTokenDelimiter(ch)) {
 			this.source.unread();
 		}
 		return this.token.getValue();
