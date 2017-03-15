@@ -36,7 +36,7 @@ public abstract class ASInFilter extends ASInputStream {
 	 * @param inputStream is stream with initial encoded data.
 	 * @throws IOException
      */
-	protected ASInFilter(ASInputStream inputStream) throws IOException {
+	protected ASInFilter(ASInputStream inputStream) {
 		this.storedInStream = inputStream;
 	}
 
