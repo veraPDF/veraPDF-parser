@@ -90,7 +90,7 @@ public class EexecFilterDecode extends ASBufferingInFilter {
             return -1;
         }
         for (int i = 0; i < bytesRead; ++i) {
-            int encoded = this.internalBuffer[i] & 0xFF;
+            int encoded = this.buffer[i] & 0xFF;
             int decoded = encoded ^ r >> 8;
             if (i >= bytesToDiscard) {
                 buffer[i - bytesToDiscard] = (byte) decoded;

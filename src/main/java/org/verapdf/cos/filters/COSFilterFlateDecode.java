@@ -64,7 +64,7 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
             if (bytesFed == -1) {
                 return -1;
             }
-            inflater.setInput(this.internalBuffer, 0, bytesFed);
+            inflater.setInput(this.buffer, 0, bytesFed);
         }
         try {
             int res = inflater.inflate(buffer, 0, size);
@@ -73,7 +73,7 @@ public class COSFilterFlateDecode extends ASBufferingInFilter {
                 if (added == -1) {
                     return -1;
                 } else {
-                    inflater.setInput(this.internalBuffer, 0, (int) (bytesFed + added));
+                    inflater.setInput(this.buffer, 0, (int) (bytesFed + added));
                     return inflater.inflate(buffer, 0, size);
                 }
             } else {

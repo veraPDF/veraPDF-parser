@@ -132,7 +132,7 @@ public class ASBufferingInputStream extends ASInFilter {
     }
 
     public boolean isEOF() {
-        return pos > eod;
+        return eod != -1 && pos > eod;
     }
 
     public void resetReadCounter() {
