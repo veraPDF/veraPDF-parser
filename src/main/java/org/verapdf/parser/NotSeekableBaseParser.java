@@ -1,7 +1,7 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
-import org.verapdf.as.io.ASBufferingInputStream;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 
@@ -24,14 +24,15 @@ public class NotSeekableBaseParser {
     private static final byte ASCII_ZERO = 48;
     private static final byte ASCII_NINE = 57;
 
-    private ASBufferingInputStream source;
+    protected ASBufferedInFilter source;
     private Token token;
 
     public NotSeekableBaseParser(ASInputStream stream) throws IOException {
         if (stream == null) {
             throw new IOException("Stream in NotSeekableBaseParser can't be null.");
         }
-        this.source = new ASBufferingInputStream(stream);
+        this.source = new ASBufferedInFilter(stream);
+        source.initialize();
     }
 
     public void closeInputStream() throws IOException {

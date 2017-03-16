@@ -21,7 +21,7 @@
 package org.verapdf.cos.filters;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 
@@ -32,7 +32,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class COSPredictorDecode extends ASBufferingInFilter {
+public class COSPredictorDecode extends ASBufferedInFilter {
 
     public static final byte PREDICTOR_DEFAULT = 1;
     public static final int COLORS_DEFAULT = 1;

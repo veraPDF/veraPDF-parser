@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * @author Sergey Shemyakov
  */
-public class NotSeekableCOSParser extends BaseParser {
+public class NotSeekableCOSParser extends NotSeekableBaseParser {
 
     private static final Logger LOGGER = Logger.getLogger(
             NotSeekableCOSParser.class.getCanonicalName());
@@ -208,18 +208,7 @@ public class NotSeekableCOSParser extends BaseParser {
             throw new IOException("PDFParser::GetDictionary()" + StringExceptions.INVALID_PDF_DICTONARY);
         }
 
-        long reset = this.source.getOffset();
-        if (this.flag) {
-            nextToken();
-        }
-        this.flag = false;
-
-        if (token.type == Token.Type.TT_KEYWORD &&
-                token.keyword == Token.Keyword.KW_STREAM) {
-            return getStream(dict);
-        }
-        this.source.seek(reset);
-        this.flag = true;
+        // Don't parse COSStreams here.
 
         return dict;
     }

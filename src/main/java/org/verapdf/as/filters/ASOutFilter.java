@@ -20,7 +20,7 @@
  */
 package org.verapdf.as.filters;
 
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 
@@ -56,7 +56,7 @@ public abstract class ASOutFilter implements ASOutputStream {
  	}
 
  	public long write(ASInputStream stream) throws IOException {
-		byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+		byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
 		int read = stream.read(buf, buf.length);
 		int res = 0;
 		while (read != -1) {

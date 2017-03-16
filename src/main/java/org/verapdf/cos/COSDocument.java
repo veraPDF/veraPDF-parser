@@ -21,7 +21,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.io.IReader;
@@ -341,7 +341,7 @@ public class COSDocument {
 	}
 
 	private static void writeInputIntoOutput(InputStream input, OutputStream output) throws IOException {
-		byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+		byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
 		int read = input.read(buf, 0, buf.length);
 		while (read != -1) {
 			output.write(buf, 0, read);

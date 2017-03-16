@@ -20,7 +20,7 @@
  */
 package org.verapdf.cos.filters;
 
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.filters.io.COSFilterASCIIReader;
 import org.verapdf.as.io.ASInputStream;
 
@@ -29,7 +29,7 @@ import java.io.IOException;
 /**
  * @author Timur Kamalov
  */
-public class COSFilterASCIIHexDecode extends ASBufferingInFilter {
+public class COSFilterASCIIHexDecode extends ASBufferedInFilter {
 
     public final static byte ws = 17;
     public final static byte er = 127;

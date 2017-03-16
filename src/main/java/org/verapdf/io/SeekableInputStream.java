@@ -20,7 +20,7 @@
  */
 package org.verapdf.io;
 
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 
@@ -123,13 +123,13 @@ public abstract class SeekableInputStream extends ASInputStream {
     public static SeekableInputStream getSeekableStream(InputStream stream) throws IOException {
         int totalRead = 0;
         byte[] buffer = new byte[0];
-        byte[] temp = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+        byte[] temp = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
         while (totalRead < MAX_BUFFER_SIZE) {
             int read = stream.read(temp);
             if (read == -1) {
                 return new ASMemoryInStream(buffer, buffer.length, false);
             }
-            buffer = ASBufferingInFilter.concatenate(buffer, buffer.length, temp, read);
+            buffer = ASBufferedInFilter.concatenate(buffer, buffer.length, temp, read);
             totalRead += read;
         }
         return new InternalInputStream(buffer, stream);

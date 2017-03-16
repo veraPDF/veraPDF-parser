@@ -56,7 +56,7 @@ public class COSFilterASCIIReader {
     public COSFilterASCIIReader(ASInputStream stream, boolean isASCIIHex) throws IOException {
         this.stream = stream;
         this.isASCIIHex = isASCIIHex;
-        this.buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+        this.buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
         bufPointer = 0;
         if(buf[0] == '<' && buf[1] == '~') {    //Skipping leading <~
             bufPointer += 2;

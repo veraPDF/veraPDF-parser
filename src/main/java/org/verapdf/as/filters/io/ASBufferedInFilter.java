@@ -31,14 +31,14 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class ASBufferingInFilter extends ASInFilter {
+public class ASBufferedInFilter extends ASInFilter {
 
     public static final int BF_BUFFER_SIZE = 2048;
 
     private int HALF;
 
     // when pos reaches this value buffer should be fed
-    private int BUFFER_FEED_THRESHOLD = 3 * ASBufferingInFilter.BF_BUFFER_SIZE / 4;
+    private int BUFFER_FEED_THRESHOLD = 3 * ASBufferedInFilter.BF_BUFFER_SIZE / 4;
 
     /*
     pos is a pointer to data that will be read next. Preferably it should not
@@ -54,11 +54,11 @@ public class ASBufferingInFilter extends ASInFilter {
     protected byte[] buffer;
     private int bufferBegin, bufferEnd;
 
-    public ASBufferingInFilter(ASInputStream stream) throws IOException {
+    public ASBufferedInFilter(ASInputStream stream) throws IOException {
         this(stream, BF_BUFFER_SIZE);
     }
 
-    public ASBufferingInFilter(ASInputStream stream, int buffCapacity) throws IOException {
+    public ASBufferedInFilter(ASInputStream stream, int buffCapacity) throws IOException {
         super(stream);
         this.bufferCapacity = buffCapacity;
         buffer = new byte[buffCapacity];
@@ -67,21 +67,18 @@ public class ASBufferingInFilter extends ASInFilter {
         this.BUFFER_FEED_THRESHOLD = 3 * buffCapacity / 4;
     }
 
-    public ASBufferingInFilter(ASBufferingInFilter filter) {
-        super(filter);
-        this.bufferCapacity = filter.bufferCapacity;
-        buffer = new byte[bufferCapacity];
-        this.bufferBegin = filter.bufferBegin;
-        this.bufferEnd = filter.bufferEnd;
-        if (this.bufferSize() > 0) {
-            buffer = Arrays.copyOfRange(filter.buffer,
-                    filter.bufferBegin, filter.bufferEnd);
-        }
+    /**
+     * This method should be called before using ASBufferedInFilter as buffered
+     * stream.
+     */
+    public void initialize() throws IOException {
+        readFromStreamToBuffer(HALF, HALF);
+        pos = HALF;
     }
 
     @Override
     public int read(byte[] buffer, int size) throws IOException {
-        if (pos >= eod) {
+        if (eod != -1 && pos >= eod) {
             return -1;
         }
         if (size < bufferSize()) {
@@ -117,21 +114,16 @@ public class ASBufferingInFilter extends ASInFilter {
         return read(buffer, buffer.length);
     }
 
-    @Override
-    public int read() throws IOException {
-        if (pos >= eod) {
+    public byte readByte() throws IOException {
+        if (eod != -1 && pos >= eod) {
             return -1;
         }
         int res = buffer[pos++];
-        if (pos > BUFFER_FEED_THRESHOLD) {
+        if (pos > BUFFER_FEED_THRESHOLD && eod == -1) {
             feedBuffer();
         }
         readCounter++;
-        return res;
-    }
-
-    public byte readByte() throws IOException {
-        return (byte) read();
+        return (byte) res;
     }
 
     /**
@@ -171,7 +163,6 @@ public class ASBufferingInFilter extends ASInFilter {
             int bytesToFeed = pos - HALF;
             shiftBuffer(bytesToFeed);
             readFromStreamToBuffer(buffer.length - bytesToFeed, bytesToFeed);
-            pos = HALF;
         }
     }
 
@@ -325,7 +316,7 @@ public class ASBufferingInFilter extends ASInFilter {
         if (index > buffer.length || index < 0) {
             throw new IOException("Can't peek at index " + index + " in buffer in ASBufferingInputStream.");
         }
-        if (eod != -1 && index > eod) {
+        if (eod != -1 && index >= eod) {
             return -1;
         }
         return this.buffer[index];
@@ -345,7 +336,7 @@ public class ASBufferingInFilter extends ASInFilter {
     }
 
     public boolean isEOF() {
-        return eod != -1 && pos > eod;
+        return eod != -1 && pos >= eod;
     }
 
     public void resetReadCounter() {
@@ -379,5 +370,6 @@ public class ASBufferingInFilter extends ASInFilter {
         for (int i = length; i < buffer.length; ++i) {
             buffer[i - length] = buffer[i];
         }
+        this.pos -= length;
     }
 }

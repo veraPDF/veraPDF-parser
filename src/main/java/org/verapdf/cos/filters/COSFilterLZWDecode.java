@@ -21,7 +21,7 @@
 package org.verapdf.cos.filters;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 
@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  *
  * @author Sergey Shemyakov
  */
-public class COSFilterLZWDecode extends ASBufferingInFilter {
+public class COSFilterLZWDecode extends ASBufferedInFilter {
 
     private Logger LOGGER = Logger.getLogger(COSFilterLZWDecode.class.getCanonicalName());
 

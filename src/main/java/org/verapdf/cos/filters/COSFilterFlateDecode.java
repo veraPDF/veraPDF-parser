@@ -20,7 +20,7 @@
  */
 package org.verapdf.cos.filters;
 
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ import java.util.zip.Inflater;
  *
  * @author Sergey Shemyakov
  */
-public class COSFilterFlateDecode extends ASBufferingInFilter {
+public class COSFilterFlateDecode extends ASBufferedInFilter {
 
     private Inflater inflater;
 

@@ -26,7 +26,7 @@ import org.verapdf.as.filters.ASFilterFactory;
 import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.filters.ASOutFilter;
 import org.verapdf.as.filters.IASFilterFactory;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.COSDictionary;
@@ -80,7 +80,7 @@ public class COSFilterRegistry {
 			return filterFactory.getInFilter(inputStream, decodeParams);
 		}
 		LOGGER.log(Level.FINE, "Trying to use unimplemented decoding filter.");
-		return new ASBufferingInFilter(inputStream);
+		return new ASBufferedInFilter(inputStream);
 	}
 
 	public static ASOutFilter getEncodeFilter(final ASAtom filterName,

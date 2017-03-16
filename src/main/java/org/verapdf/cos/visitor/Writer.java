@@ -23,7 +23,7 @@ package org.verapdf.cos.visitor;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.ASCharsets;
 import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
@@ -244,7 +244,7 @@ public class Writer implements IVisitor {
 			// That is the case of fitered stream. Optimization can be reached
 			// if decoded data is stored in memory and not thrown away.
 			stream.reset();
-			byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+			byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
 			long res = 0;
 			int read = stream.read(buf);
 			while (read != -1) {

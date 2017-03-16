@@ -20,7 +20,7 @@
  */
 package org.verapdf.pd.font.type1;
 
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class EexecFilterDecode extends ASBufferingInFilter {
+public class EexecFilterDecode extends ASBufferedInFilter {
 
     /*All these constants are defined in Adobe Type 1 Font Format
     Specification. See chapter 7 "Encryption".*/
