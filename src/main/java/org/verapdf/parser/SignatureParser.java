@@ -122,7 +122,7 @@ public class SignatureParser extends COSParser {
         skipID();
         byteRange[0] = 0;
         parseDictionary();
-        byteRange[3] = getOffsetOfNextEOF(byteRange[2]) - byteRange[2] + 1;
+        byteRange[3] = getOffsetOfNextEOF(byteRange[2]) - byteRange[2];
         return byteRange;
     }
 
@@ -198,9 +198,9 @@ public class SignatureParser extends COSParser {
             }
             source.unread(buffer.length - 1);
         }
-        long result = source.getOffset() + buffer.length;
+        long result = source.getOffset() - 1 + buffer.length;   // byte right after 'F'
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
-        return result;
+        return result - 1;
     }
 
     private void skipID() throws IOException {
