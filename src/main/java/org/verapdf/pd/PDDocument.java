@@ -28,6 +28,7 @@ import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.form.PDAcroForm;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,6 +96,7 @@ public class PDDocument {
 			document = null;
 		}
 
+		StaticResources.clear();
 		catalog.clear();
 		//this.info.clear;
 	}

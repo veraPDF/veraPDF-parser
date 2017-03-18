@@ -20,7 +20,7 @@
  */
 package org.verapdf.cos.filters;
 
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSKey;
 import org.verapdf.tools.EncryptionTools;
@@ -36,7 +36,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class COSFilterRC4DecryptionDefault extends ASBufferingInFilter {
+public class COSFilterRC4DecryptionDefault extends ASBufferedInFilter {
 
     public static final int MAXIMAL_KEY_LENGTH = 16;
     private RC4Encryption rc4;
@@ -103,7 +103,7 @@ public class COSFilterRC4DecryptionDefault extends ASBufferingInFilter {
             throws NoSuchAlgorithmException {
         byte[] objectKeyDigest = getObjectKeyDigest(objectKey);
         MessageDigest md5 = MessageDigest.getInstance("MD5");
-        md5.update(ASBufferingInFilter.concatenate(encryptionKey,
+        md5.update(ASBufferedInFilter.concatenate(encryptionKey,
                 encryptionKey.length, objectKeyDigest, objectKeyDigest.length));
         byte[] resultEncryptionKey = md5.digest();
         int keyLength = Math.min(MAXIMAL_KEY_LENGTH, encryptionKey.length +

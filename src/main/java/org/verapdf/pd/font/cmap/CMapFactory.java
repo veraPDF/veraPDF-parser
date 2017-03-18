@@ -21,10 +21,9 @@
 package org.verapdf.pd.font.cmap;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +33,6 @@ import java.util.logging.Logger;
  * @author Sergey Shemyakov
  */
 class CMapFactory {
-    private static Map<String, CMap> cMapCache = new HashMap<>();
     private static final Logger LOGGER = Logger.getLogger(CMapFactory.class.getCanonicalName());
 
     private CMapFactory() {
@@ -42,7 +40,7 @@ class CMapFactory {
     }
 
     static CMap getCMap(String name, ASInputStream cMapStream) {
-        CMap res = cMapCache.get(name);
+        CMap res = StaticResources.getCMap(name);
         if (res != null) {
             return res;
         }
@@ -56,7 +54,7 @@ class CMapFactory {
             res = new CMap();
         }
 
-        cMapCache.put(name, res);
+        StaticResources.cacheCMap(name, res);
         return res;
     }
 }

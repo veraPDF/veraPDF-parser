@@ -20,7 +20,7 @@
  */
 package org.verapdf.cos.filters;
 
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSKey;
 
@@ -38,7 +38,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class COSFilterAESDecryptionDefault extends ASBufferingInFilter {
+public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
 
     private static final byte[] SALT_BYTES = new byte[]{0x73, 0x41, 0x6C, 0x54};
 

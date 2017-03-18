@@ -22,6 +22,7 @@ package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.*;
 import org.verapdf.operator.InlineImageOperator;
 import org.verapdf.operator.Operator;
@@ -38,9 +39,10 @@ import java.util.logging.Logger;
 /**
  * @author Timur Kamalov
  */
-public class PDFStreamParser extends COSParser {
+public class PDFStreamParser extends NotSeekableCOSParser {
 
 	private static final Logger LOGGER = Logger.getLogger(PDFStreamParser.class.getCanonicalName());
+	private static final int INLINE_IMAGE_BUFFER_SIZE = 8192;
 
 	private final List<Object> tokens = new ArrayList<>();
 	private List<Closeable> imageDataStreams = new ArrayList<>();
@@ -238,18 +240,8 @@ public class PDFStreamParser extends COSParser {
 				if (CharTable.isSpace(source.peek())) {
 					source.readByte();
 				}
-				long startOffset = source.getOffset();
-				int imageStreamLength = 2;
-				byte previousByte = source.readByte();
-				byte currentByte = source.readByte();
-				while (!(previousByte == 'E' && currentByte == 'I') && !source.isEOF()) {
-					previousByte = currentByte;
-					currentByte = source.readByte();
-					imageStreamLength++;
-				}
+				ASInputStream imageDataStream = readInlineImage();
 				result = Operator.getOperator("ID");
-				ASInputStream imageDataStream =
-						source.getStream(startOffset, imageStreamLength);
 				this.imageDataStreams.add(imageDataStream);
 				((InlineImageOperator) result).setImageData(imageDataStream);
 				break;
@@ -272,8 +264,8 @@ public class PDFStreamParser extends COSParser {
 
 		//maximum possible length of an operator is 3 and we'll leave some space for invalid cases
 		StringBuffer buffer = new StringBuffer(5);
-		byte nextByte = (byte) source.peek();
-		while (source.getOffset() < source.getStreamLength() && // EOF
+		byte nextByte = source.peek();
+		while (!source.isEOF() &&
 				!CharTable.isSpace(nextByte) && nextByte != ']' &&
 				nextByte != '[' && nextByte != '<' &&
 				nextByte != '(' && nextByte != '/' &&
@@ -281,17 +273,44 @@ public class PDFStreamParser extends COSParser {
 			byte currentByte = source.readByte();
 			buffer.append((char) currentByte);
 
-			if (source.getOffset() < source.getStreamLength()) {
+			if (!source.isEOF()) {
 				// d0 and d1 operators
-				nextByte = (byte) source.peek();
+				nextByte = source.peek();
 				if (currentByte == 'd' && (nextByte == '0' || nextByte == '1')) {
 					buffer.append((char) source.readByte());
-					nextByte = (byte) source.peek();
+					nextByte = source.peek();
 				}
 			}
 		}
 
 		return buffer.toString();
+	}
+
+	private ASInputStream readInlineImage() throws IOException {
+		source.resetReadCounter();
+		byte[] image = new byte[INLINE_IMAGE_BUFFER_SIZE];
+		byte previousByte = source.readByte();
+		byte currentByte = source.readByte();
+		image[0] = previousByte;
+		image[1] = currentByte;
+		int i = 2;
+		while (!(previousByte == 'E' && currentByte == 'I') && !source.isEOF()) {
+			previousByte = currentByte;
+			currentByte = source.readByte();
+			image = addByteToArrayAtIndex(image, currentByte, i++);
+		}
+		return new ASMemoryInStream(image, source.getReadCounter(), false);
+	}
+
+	private byte[] addByteToArrayAtIndex(byte[] buffer, byte b, int i) {
+		if (i < buffer.length) {
+			buffer[i] = b;
+			return buffer;
+		} else {
+			byte[] extendedBuffer = new byte[buffer.length * 2];
+			System.arraycopy(buffer, 0, extendedBuffer, 0, buffer.length);
+			return addByteToArrayAtIndex(extendedBuffer, b, i);
+		}
 	}
 
 	public List<Closeable> getImageDataStreams() {

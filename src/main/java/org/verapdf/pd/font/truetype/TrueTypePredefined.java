@@ -1160,7 +1160,7 @@ public class TrueTypePredefined {
         MAC_OS_ROMAN_ENCODING_MAP.put("colon", 58);
         MAC_OS_ROMAN_ENCODING_MAP.put("comma", 44);
         MAC_OS_ROMAN_ENCODING_MAP.put("copyright", 169);
-        MAC_OS_ROMAN_ENCODING_MAP.put("Euro", 219);
+        MAC_OS_ROMAN_ENCODING_MAP.put("currency", 219);
         MAC_OS_ROMAN_ENCODING_MAP.put("d", 100);
         MAC_OS_ROMAN_ENCODING_MAP.put("dagger", 160);
         MAC_OS_ROMAN_ENCODING_MAP.put("daggerdbl", 224);

@@ -21,7 +21,7 @@
 package org.verapdf.pd.encryption;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.*;
@@ -142,11 +142,11 @@ public class StandardSecurityHandler {
             filter = new COSFilterAESDecryptionDefault(stream, stringKey,
                     this.encryptionKey, false);
         }
-        byte[] buf = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
+        byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
         byte[] res = new byte[0];
         int read = filter.read(buf, buf.length);
         while (read != -1) {
-            res = ASBufferingInFilter.concatenate(res, res.length, buf, read);
+            res = ASBufferedInFilter.concatenate(res, res.length, buf, read);
             read = filter.read(buf, buf.length);
         }
         filter.close();

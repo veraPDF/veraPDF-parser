@@ -21,7 +21,7 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
@@ -129,12 +129,12 @@ class XrefStreamParser {
         int objIdIndex = 0;
 
         while (true) {
-            buffer = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
-            long read = xrefInputStream.read(buffer, ASBufferingInFilter.BF_BUFFER_SIZE);
+            buffer = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
+            long read = xrefInputStream.read(buffer, ASBufferedInFilter.BF_BUFFER_SIZE);
             if (read == -1) {
                 break;
             }
-            buffer = ASBufferingInFilter.concatenate(remainedBytes, remainedBytes.length,
+            buffer = ASBufferedInFilter.concatenate(remainedBytes, remainedBytes.length,
                     buffer, (int) read);
 
             int pointer = 0;
