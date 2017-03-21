@@ -48,7 +48,8 @@ public class CMapFile {
      * @return the value of the WMode entry in the parent CMap dictionary.
      */
     public int getDictWMode() {
-        return this.parentStream.getIntegerKey(ASAtom.W_MODE).intValue();
+        Long wMode = this.parentStream.getIntegerKey(ASAtom.W_MODE);
+        return wMode == null ? 0 : wMode.intValue();
     }
 
     /**
