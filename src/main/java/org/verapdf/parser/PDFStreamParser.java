@@ -121,7 +121,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		Object result = null;
 
 		skipSpaces(true);
-		byte nextByte = (byte) source.peek();
+		byte nextByte = source.peek();
 		if (nextByte == -1) {
 			return null;
 		}
@@ -129,10 +129,14 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		byte c = nextByte;
 
 		switch (c) {
-			case '<': {
+			case '(':
+                nextToken();
+                result = COSString.construct(getToken().getByteValue());
+                break;
+            case '<': {
 				//check brackets
 				source.readByte();
-				c = (byte) source.peek();
+				c = source.peek();
 				source.unread();
 
 				if (c == '<') {
@@ -148,10 +152,6 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 				result = getArray();
 				break;
 			}
-			case '(':
-				nextToken();
-				result = COSString.construct(getToken().getByteValue());
-				break;
 			case '/':
 				// name
 				result = getName();
@@ -233,7 +233,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			// ID operator
 			case 'I': {
 				//looking for an ID operator
-				if (source.readByte() != 73 && source.readByte() != 68) {
+				if (source.readByte() != 'I' && source.readByte() != 'D') {
 					//TODO : change
 					throw new IOException("Corrupted inline image operator");
 				}
@@ -288,32 +288,31 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 
 	private ASInputStream readInlineImage() throws IOException {
 		source.resetReadCounter();
-		byte[] image = new byte[INLINE_IMAGE_BUFFER_SIZE];
+		ArrayList<Byte> image = new ArrayList<>(INLINE_IMAGE_BUFFER_SIZE);
 		byte previousByte = source.readByte();
 		byte currentByte = source.readByte();
-		image[0] = previousByte;
-		image[1] = currentByte;
-		int i = 2;
-		while (!(previousByte == 'E' && currentByte == 'I') && !source.isEOF()) {
+		image.add(previousByte);
+		image.add(currentByte);
+		while (!(previousByte == 'E' && currentByte == 'I' &&
+				CharTable.isTokenDelimiter(source.peek())) && !source.isEOF()) {
 			previousByte = currentByte;
 			currentByte = source.readByte();
-			image = addByteToArrayAtIndex(image, currentByte, i++);
+			image.add(currentByte);
 		}
-		return new ASMemoryInStream(image, source.getReadCounter(), false);
-	}
-
-	private byte[] addByteToArrayAtIndex(byte[] buffer, byte b, int i) {
-		if (i < buffer.length) {
-			buffer[i] = b;
-			return buffer;
-		} else {
-			byte[] extendedBuffer = new byte[buffer.length * 2];
-			System.arraycopy(buffer, 0, extendedBuffer, 0, buffer.length);
-			return addByteToArrayAtIndex(extendedBuffer, b, i);
-		}
+		return new ASMemoryInStream(getByteArrayFromArrayList(image),
+				source.getReadCounter(), false);
 	}
 
 	public List<Closeable> getImageDataStreams() {
 		return imageDataStreams;
+	}
+
+	public static byte[] getByteArrayFromArrayList(ArrayList<Byte> list) {
+		byte[] res = new byte[list.size()];
+		int i = 0;
+		for (Byte b : list) {
+			res[i++] = b;
+		}
+		return res;
 	}
 }
