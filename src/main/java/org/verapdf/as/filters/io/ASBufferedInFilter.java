@@ -65,6 +65,7 @@ public class ASBufferedInFilter extends ASInFilter {
         bufferEnd = bufferBegin = 0;
         this.HALF = buffCapacity / 2;
         this.BUFFER_FEED_THRESHOLD = 3 * buffCapacity / 4;
+        stream.incrementResourceUsers();
     }
 
     /**
