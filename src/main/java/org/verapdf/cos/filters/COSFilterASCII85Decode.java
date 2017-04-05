@@ -55,16 +55,15 @@ public class COSFilterASCII85Decode extends ASBufferedInFilter {
     @Override
     public int read(byte[] buffer, int size) throws IOException {
         int pointer = 0;
-        byte[] fiveBytes = reader.getNextBytes();
         byte[] fourBytes = new byte[4];
         while (pointer + 4 <= size) {
+            byte[] fiveBytes = reader.getNextBytes();
             if(fiveBytes == null) {
                 break;
             }
             int decoded = decodeFiveBytes(fiveBytes, fourBytes);
             System.arraycopy(fourBytes, 0, buffer, pointer, decoded);
             pointer += decoded;
-            fiveBytes = reader.getNextBytes();
         }
         return pointer == 0 ? -1 : pointer;
     }
