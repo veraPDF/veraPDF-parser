@@ -20,8 +20,8 @@
  */
 package org.verapdf.pd.font.type1;
 
-import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
 
@@ -146,13 +146,12 @@ class Type1PrivateParser extends BaseParser {
         long beginOffset = this.source.getOffset();
         this.source.skip((int) charstringLength);
         try (ASInputStream chunk = this.source.getStream(beginOffset, charstringLength)) {
-            ASBufferedInFilter charString = new ASBufferedInFilter(chunk);
-            ASInputStream decodedCharString = new EexecFilterDecode(
-                    charString, true, this.getLenIV());
+            ASInputStream decodedCharString = new ASMemoryInStream(new EexecFilterDecode(
+                    chunk, true, this.getLenIV()));
             Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
             if (parser.getWidth() != null) {
                 if (!isDefaultFontMatrix) {
-                    glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getInteger()));
+                    glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getReal()));
                 } else {
                     glyphWidths.put(glyphName, (int) parser.getWidth().getInteger());
                 }
@@ -168,8 +167,8 @@ class Type1PrivateParser extends BaseParser {
         }
     }
 
-    private int applyFontMatrix(long width) {
-        return (int) (width * fontMatrix[0]) * 1000;
+    private int applyFontMatrix(float width) {
+        return (int) (width * (fontMatrix[0] * 1000));
     }
 
     Map<String, Integer> getGlyphWidths() {
