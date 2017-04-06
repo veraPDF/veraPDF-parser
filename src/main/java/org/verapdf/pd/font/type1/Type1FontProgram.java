@@ -50,7 +50,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
     private Encoding pdfEncoding;
 
-    private double[] fontMatrix = DEFAULT_FONT_MATRIX;
+    private double[] fontMatrix = Arrays.copyOf(DEFAULT_FONT_MATRIX, DEFAULT_FONT_MATRIX.length);
     private String[] encoding;
     private Map<String, Integer> glyphWidths;
     private static final byte[] CLEAR_TO_MARK_BYTES =
@@ -277,7 +277,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     private String getGlyph(int code) {
-        if (this.pdfEncoding == null) {
+        if (this.pdfEncoding == null || !pdfEncoding.containsCode(code)) {
             return encoding[code];
         } else {
             return this.pdfEncoding.getName(code);
