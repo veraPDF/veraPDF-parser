@@ -1,12 +1,29 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.cos;
 
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Timur Kamalov
@@ -137,13 +154,52 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof COSArray)) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if(obj instanceof COSObject) {
+            return this.equals(((COSObject) obj).get());
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        List<COSBasePair> checkedObjects = new LinkedList<COSBasePair>();
+        return this.equals(obj, checkedObjects);
 
-        COSArray that = (COSArray) o;
+    }
 
-        return entries != null ? entries.equals(that.entries) : that.entries == null;
-
+    boolean equals(Object obj, List<COSBasePair> checkedObjects) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if(obj instanceof COSObject) {
+            return this.equals(((COSObject) obj).get());
+        }
+        if (COSBasePair.listContainsPair(checkedObjects, this, (COSBase) obj)) {
+            return true;    // Not necessary true, but we should behave as it is
+        }
+        COSBasePair.addPairToList(checkedObjects, this, (COSBase) obj);
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        COSArray that = (COSArray) obj;
+        if (!that.size().equals(this.size())) {
+            return false;
+        }
+        for (int i = 0; i < this.size(); ++i) {
+            COSBase cosBase1 = this.at(i).getDirectBase();
+            COSBase cosBase2 = that.at(i).getDirectBase();
+            if (!cosBase1.equals(cosBase2, checkedObjects)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

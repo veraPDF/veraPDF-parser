@@ -1,11 +1,28 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.COSInteger;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,8 +50,8 @@ public class DecodedObjectStreamParser extends COSParser {
      */
     public DecodedObjectStreamParser(final ASInputStream inputStream,
                                      COSStream objectStream,
-                                     COSKey streamKey) throws IOException {
-        super(inputStream);
+                                     COSKey streamKey, COSDocument doc) throws IOException {
+        super(doc, inputStream);
         this.objectStream = objectStream;
         this.internalOffsets = new HashMap<>();
         try {
@@ -46,8 +63,8 @@ public class DecodedObjectStreamParser extends COSParser {
     }
 
     private void calculateInternalOffsets() throws IOException {
-        int n = (int) ((COSInteger) this.objectStream.getKey(ASAtom.N).get()).get();
-        long first = ((COSInteger) this.objectStream.getKey(ASAtom.FIRST).get()).get();
+        int n = (int) ((COSInteger) this.objectStream.getKey(ASAtom.N).getDirectBase()).get();
+        long first = ((COSInteger) this.objectStream.getKey(ASAtom.FIRST).getDirectBase()).get();
         for (int i = 0; i < n; ++i) {
             Long objNum, objOffset;
             skipSpaces(false);
@@ -80,10 +97,12 @@ public class DecodedObjectStreamParser extends COSParser {
 
     public COSObject getObject(int objNum) throws IOException {
         if (!this.internalOffsets.containsKey(objNum)) {
-            return COSObject.getEmpty();
+            return new COSObject();
         }
         this.source.seek(internalOffsets.get(objNum));
         this.flag = true;
+        this.objects.clear();   // In case if some COSInteger was read before.
+        this.integers.clear();
         return nextObject();
     }
 }

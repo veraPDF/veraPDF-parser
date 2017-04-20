@@ -1,19 +1,43 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
-import org.verapdf.cos.xref.COSFilterRegistry;
+import org.verapdf.cos.filters.COSFilterRegistry;
 import org.verapdf.pd.PDObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class COSFilters extends PDObject {
+
+	private static final Logger LOGGER = Logger.getLogger(COSFilters.class.getCanonicalName());
 
 	private List<ASAtom> entries;
 
@@ -30,17 +54,21 @@ public class COSFilters extends PDObject {
 	public ASInputStream getInputStream(ASInputStream inputStream,
 										COSObject decodeParams) throws IOException {
 		List<COSDictionary> decodeParameters = null;
-		if(!decodeParams.equals(COSObject.getEmpty())) {
+		if(!decodeParams.empty()) {
 			if(decodeParams.getType().equals(COSObjType.COS_DICT)) {
 				decodeParameters = new ArrayList<>(1);
-				decodeParameters.add((COSDictionary) decodeParams.get());
+				decodeParameters.add((COSDictionary) decodeParams.getDirectBase());
 			} else if (decodeParams.getType().equals(COSObjType.COS_ARRAY)) {
 				decodeParameters = new ArrayList<>(decodeParams.size());
 				for(int i = 0; i < decodeParams.size(); ++i) {
-					if(!decodeParams.at(i).getType().equals(COSObjType.COS_DICT)) {
+					COSObjType paramsType = decodeParams.at(i).getType();
+					if (decodeParams.at(i).empty() || paramsType == COSObjType.COS_NULL) {
+						decodeParameters.add((COSDictionary) COSDictionary.construct().get());
+					} else if (paramsType != COSObjType.COS_DICT) {
 						throw new IOException("DecodeParams shall be a dictionary or array of dictionaries.");
+					} else {
+						decodeParameters.add((COSDictionary) decodeParams.at(i).getDirectBase());
 					}
-					decodeParameters.add((COSDictionary) decodeParams.at(i).get());
 				}
 			}
 		}
@@ -51,7 +79,8 @@ public class COSFilters extends PDObject {
 			}
 		}
 		if(decodeParameters.size() != entries.size()) {
-			throw new IOException("Amount of DecodeParams dictionaries and amount of decode filters in COSStream shall be equal.");
+			LOGGER.log(Level.FINE, "Amount of DecodeParams dictionaries and " +
+					"amount of decode filters in COSStream shall be equal.");
 		}
 		for (int i = 0; i < entries.size(); ++i) {
 			inputStream = COSFilterRegistry.getDecodeFilter(entries.get(i),

@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
@@ -41,12 +61,24 @@ public class COSIndirect extends COSBase {
             this.child = value;
         } else {
             this.key = this.document.setObject(value);
+            this.child = value;
         }
+    }
+
+    // Access to base underlying object
+    public COSBase get() {
+        return this.child.get();
+    }
+
+    @Override
+    public COSKey getObjectKey() {
+        return this.key;
     }
 
     // OBJECT TYPE
     public COSObjType getType() {
-        return getDirect().getType();
+        COSObject direct = getDirect();
+        return direct == null ? COSObjType.COS_UNDEFINED : direct.getType();
     }
 
     public static COSObject construct(final COSKey value) {
@@ -70,7 +102,7 @@ public class COSIndirect extends COSBase {
     }
 
     public Object accept(final ICOSVisitor visitor) {
-        return null;
+        return get() != null ? get().accept(visitor) : COSNull.NULL.accept(visitor);
     }
 
     //! Boolean values
@@ -240,6 +272,11 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
+    public boolean setArrayKey(ASAtom key, COSObject array) {
+        getDirect().setArrayKey(key, array);
+        return true;
+    }
+
     public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
         getDirect().setArrayKey(key, size, value);
         return true;
@@ -331,6 +368,10 @@ public class COSIndirect extends COSBase {
         return this.document != null ? this.document.getObject(key) : this.child;
     }
 
+    public COSBase getDirectBase() {
+        return this.document != null ? this.document.getObject(key).get() : this.child.get();
+    }
+
     public boolean setDirect(final COSObject value) {
         if (this.document != null) {
             this.document.setObject(this.key, value);
@@ -356,8 +397,6 @@ public class COSIndirect extends COSBase {
 
         COSIndirect that = (COSIndirect) o;
 
-        if (key != null ? !key.equals(that.key) : that.key != null) return false;
-        return document == that.document;
-
+        return this.getDirect().equals(that.getDirect());
     }
 }

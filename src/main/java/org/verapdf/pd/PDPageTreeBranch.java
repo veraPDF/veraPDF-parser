@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
@@ -23,6 +43,8 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		this.isTerminal = true;
 		this.leafCount = 0;
 		this.children = new ArrayList<PDPageTreeNode>();
+
+		super.setObject(new COSObject());
 	}
 
 	public PDPageTreeBranch(final COSObject obj) {
@@ -64,6 +86,24 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return children.indexOf(node);
 	}
 
+	public PDPage findTerminalPDPage(int index) {
+		if (isTerminal) {
+			index = Math.min(index, (int) getLeafCount());
+			return (PDPage) this.getChild(index);
+		}
+
+		for (PDPageTreeNode branch : this.children) {
+			if (index >= branch.getLeafCount()) {
+				index -= branch.getLeafCount();
+			} else {
+				return branch.findTerminalPDPage(index);
+			}
+		}
+
+		int lastIndex = this.children.size() - 1;
+		return this.children.get(lastIndex).findTerminalPDPage(index);
+	}
+
 	public PDPageTreeBranch findTerminal(int index) {
 		if (isTerminal) {
 			index = Math.min(index, (int) getLeafCount());
@@ -92,27 +132,32 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		clear();
 
 		COSObject kids = getObject().getKey(ASAtom.KIDS);
-		for (int i = 0; i < kids.size(); i++) {
-			COSObject obj = kids.at(i);
+		if (kids != null && !kids.empty()) {
+			for (int i = 0; i < kids.size(); i++) {
+				COSObject obj = kids.at(i);
 
-			PDPageTreeNode kid_i;
+				PDPageTreeNode kid_i;
 
-			if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGE)) {
-				kid_i = new PDPage(obj);
-			} else if (obj.getNameKey(ASAtom.TYPE).equals(ASAtom.PAGES)) {
-				kid_i = new PDPageTreeBranch(obj);
-				isTerminal = false;
-			} else {
-				//TODO : ASException
-				throw new RuntimeException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
+				if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGE) {
+					kid_i = new PDPage(obj);
+				} else if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGES) {
+					kid_i = new PDPageTreeBranch(obj);
+					isTerminal = false;
+				} else {
+					//TODO : ASException
+					throw new RuntimeException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
+				}
+
+				kid_i.setParent(this);
+
+				this.children.add(kid_i);
 			}
-
-			kid_i.setParent(this);
-
-			this.children.add(kid_i);
 		}
 
-		this.leafCount = getObject().getIntegerKey(ASAtom.COUNT).intValue();
+		Long leafCount = getObject().getIntegerKey(ASAtom.COUNT);
+		if (leafCount != null) {
+			this.leafCount = leafCount.intValue();
+		}
 	}
 
 	protected void updateToObject() {

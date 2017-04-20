@@ -1,20 +1,41 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.external;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.pd.colors.PDColorSpace;
 import org.verapdf.pd.colors.PDDeviceCMYK;
 import org.verapdf.pd.colors.PDICCBased;
 import org.verapdf.pd.colors.PDLab;
 
-import java.io.IOException;
-
 /**
  * @author Maksim Bezrukov
  */
 public class JPEG2000 {
 
-    private static final Logger LOGGER = Logger.getLogger(JPEG2000.class);
+    private static final Logger LOGGER = Logger.getLogger(JPEG2000.class.getCanonicalName());
 
     private static final Long DEFAULT_NR_COLOR_CHANNELS = Long.valueOf(0);
     private static final Long DEFAULT_NR_COLOR_SPACE_SPECS = Long.valueOf(0);
@@ -60,11 +81,11 @@ public class JPEG2000 {
     public static JPEG2000 fromStream(ASInputStream stream) {
         Builder builder = new Builder();
 
-        byte[] sign = new byte[12];
+        byte[] tempSign = new byte[12];
         try {
             // Check if the stream starts with valid jp2 signature
-            if (stream.read(sign, sign.length) != 12 || !isValidSignature(sign)) {
-                LOGGER.debug("File contains wrong signature");
+            if (stream.read(tempSign, tempSign.length) != 12 || !isValidSignature(tempSign)) {
+                LOGGER.log(Level.FINE, "File contains wrong signature");
                 return builder.build();
             }
             // Finding the beginning of the header box content
@@ -75,7 +96,7 @@ public class JPEG2000 {
             }
 
         } catch (IOException e) {
-            LOGGER.debug(e);
+            LOGGER.log(Level.FINE, "IO Exception reading JP2K stream", e);
         }
         return builder.build();
     }
@@ -116,31 +137,31 @@ public class JPEG2000 {
 
             if (matches(tbox, ihdr)) {
                 if (leftInBox != 14 && length != 0) {
-                    LOGGER.debug("Image header content does not contain 14 bytes");
+                    LOGGER.log(Level.FINE, "Image header content does not contain 14 bytes");
                     break;
                 }
                 skipBytes(stream, 8);
                 byte[] nc = new byte[2];
                 if (stream.read(nc, nc.length) != 2) {
-                    LOGGER.debug("Can not read number of components");
+                    LOGGER.log(Level.FINE, "Can not read number of components");
                     break;
                 }
                 long ncColorChannels = convertArrayToLong(nc);
-                builder.setNrColorChannels(ncColorChannels);
+                builder.nrColorChannels(Long.valueOf(ncColorChannels));
                 byte[] bpc = new byte[1];
                 if (stream.read(bpc, bpc.length) != 1) {
-                    LOGGER.debug("Can not read bitDepth");
+                    LOGGER.log(Level.FINE, "Can not read bitDepth");
                     break;
                 }
                 long bitDepth = bpc[0] + 1;
-                builder.setBitDepth(bitDepth);
+                builder.bitDepth(Long.valueOf(bitDepth));
                 skipBytes(stream, 3);
             } else if (matches(tbox, bpcc)) {
-                builder.setBpccBoxPresent(Boolean.TRUE);
+                builder.bpccBoxPresent(Boolean.TRUE);
                 skipBytes(stream, leftInBox);
             } else if (matches(tbox, colr)) {
                 if (leftInBox < 3) {
-                    LOGGER.debug("Founded 'colr' box with length less than 3");
+                    LOGGER.log(Level.FINE, "Founded 'colr' box with length less than 3");
                     break;
                 }
                 if (nrColorSpaceSpecs == null) {
@@ -150,7 +171,7 @@ public class JPEG2000 {
                 }
                 byte[] meth = new byte[1];
                 if (stream.read(meth, meth.length) != 1) {
-                    LOGGER.debug("Can not read METH");
+                    LOGGER.log(Level.FINE, "Can not read METH");
                     break;
                 }
                 long methValue = convertArrayToLong(meth);
@@ -160,7 +181,7 @@ public class JPEG2000 {
                 skipBytes(stream, 1);
                 byte[] approx = new byte[1];
                 if (stream.read(approx, approx.length) != 1) {
-                    LOGGER.debug("Can not read APPROX");
+                    LOGGER.log(Level.FINE, "Can not read APPROX");
                     break;
                 }
                 long approxValue = convertArrayToLong(approx);
@@ -177,36 +198,36 @@ public class JPEG2000 {
                 long read = 3;
                 if (methValue == 1) {
                     if (leftInBox < 7) {
-                        LOGGER.debug("Founded 'colr' box with meth value 1 and length less than 7");
+                        LOGGER.log(Level.FINE, "Founded 'colr' box with meth value 1 and length less than 7");
                         break;
                     }
                     byte[] enumCS = new byte[4];
                     if (stream.read(enumCS, enumCS.length) != 4) {
-                        LOGGER.debug("Can not read EnumCS");
+                        LOGGER.log(Level.FINE, "Can not read EnumCS");
                         break;
                     }
                     read += 4;
                     long enumCSValue = convertArrayToLong(enumCS);
                     if (firstColrEnumCS == null) {
                         firstColrEnumCS = Long.valueOf(enumCSValue);
-                        firstColorSpace = createColorSpaceFromEnumValue(firstColrEnumCS);
-                        doesFirstContainsColorSpace = firstColorSpace != null;
+                        firstColorSpace = createColorSpaceFromEnumValue(firstColrEnumCS.longValue());
+                        doesFirstContainsColorSpace = Boolean.valueOf(firstColorSpace != null);
                     }
                     if (approxValue == 1 && colrEnumCS == null) {
                         colrEnumCS = Long.valueOf(enumCSValue);
-                        colorSpace = createColorSpaceFromEnumValue(colrEnumCS);
+                        colorSpace = createColorSpaceFromEnumValue(colrEnumCS.longValue());
                     }
                 } else if (methValue == 2) {
                     int profileLength = (int) (leftInBox - read);
                     byte[] profile = new byte[profileLength];
                     if (stream.read(profile, profileLength) != profileLength) {
-                        LOGGER.debug("Can not read Profile");
+                        LOGGER.log(Level.FINE, "Can not read Profile");
                         break;
                     }
                     read += profileLength;
                     if (doesFirstContainsColorSpace == null) {
                         firstColorSpace = createColorSpaceFromProfile(profile);
-                        doesFirstContainsColorSpace = firstColorSpace != null;
+                        doesFirstContainsColorSpace = Boolean.valueOf(firstColorSpace != null);
                     }
                     if (approxValue == 1 && colorSpace == null) {
                         colorSpace = createColorSpaceFromProfile(profile);
@@ -224,31 +245,31 @@ public class JPEG2000 {
         }
 
         if (nrColorSpaceSpecs != null) {
-            builder.setNrColorSpaceSpecs(nrColorSpaceSpecs);
+            builder.nrColorSpaceSpecs(nrColorSpaceSpecs);
         }
         if (nrColorSpacesWithApproxField != null) {
-            builder.setNrColorSpacesWithApproxField(nrColorSpacesWithApproxField);
+            builder.nrColorSpacesWithApproxField(nrColorSpacesWithApproxField);
         }
 
         if (nrColorSpacesWithApproxField != null) {
             if (colrMethod != null) {
-                builder.setColrMethod(colrMethod);
+                builder.colrMethod(colrMethod);
             }
             if (colrEnumCS != null) {
-                builder.setColrEnumCS(colrEnumCS);
+                builder.colrEnumCS(colrEnumCS);
             }
             if (colorSpace != null) {
-                builder.setColorSpace(colorSpace);
+                builder.colorSpace(colorSpace);
             }
         } else if (Long.valueOf(1L).equals(nrColorSpaceSpecs)) {
             if (firstColrMethod != null) {
-                builder.setColrMethod(firstColrMethod);
+                builder.colrMethod(firstColrMethod);
             }
             if (firstColrEnumCS != null) {
-                builder.setColrEnumCS(firstColrEnumCS);
+                builder.colrEnumCS(firstColrEnumCS);
             }
             if (firstColorSpace != null) {
-                builder.setColorSpace(firstColorSpace);
+                builder.colorSpace(firstColorSpace);
             }
         }
     }
@@ -276,7 +297,7 @@ public class JPEG2000 {
         }
     }
 
-    private static PDICCBased createColorSpaceFromProfile(byte[] profile) throws IOException {
+    private static PDICCBased createColorSpaceFromProfile(byte[] profile) {
         if (profile.length < 20) {
             return null;
         }
@@ -340,7 +361,7 @@ public class JPEG2000 {
                 nrOfComp = 15;
                 break;
             default:
-                LOGGER.debug("Unknown color space signature in ICC Profile of image. Current signature: " + type);
+                LOGGER.log(Level.FINE, "Unknown color space signature in ICC Profile of image. Current signature: " + type);
                 return null;
         }
         return new PDICCBased(nrOfComp, profile);
@@ -375,16 +396,13 @@ public class JPEG2000 {
             if (matches(tbox, header)) {
                 if (length == 0) {
                     return 0;
-                } else {
-                    return left <= 0 ? -1L : left;
                 }
-            } else {
-                if (length == 0 || left < 0) {
-                    return -1L;
-                } else {
-                    skipBytes(stream, left);
-                }
+				return left <= 0 ? -1L : left;
             }
+			if (length == 0 || left < 0) {
+			    return -1L;
+			}
+			skipBytes(stream, left);
         }
     }
 
@@ -469,78 +487,50 @@ public class JPEG2000 {
         private Boolean bpccBoxPresent = DEFAULT_BPCC_BOX_PRESENT;
         private PDColorSpace colorSpace = DEFAULT_COLOR_SPACE;
 
-        public JPEG2000 build() {
+        public Builder() {
+			// TODO Auto-generated constructor stub
+		}
+
+		public JPEG2000 build() {
             return new JPEG2000(this.nrColorChannels, this.nrColorSpaceSpecs, this.nrColorSpacesWithApproxField, this.colrMethod, this.colrEnumCS, this.bitDepth, this.bpccBoxPresent, this.colorSpace);
         }
 
-        public Long getNrColorChannels() {
-            return nrColorChannels;
-        }
-
-        public Builder setNrColorChannels(Long nrColorChannels) {
+        public Builder nrColorChannels(Long nrColorChannels) {
             this.nrColorChannels = nrColorChannels;
             return this;
         }
 
-        public Long getNrColorSpaceSpecs() {
-            return nrColorSpaceSpecs;
-        }
-
-        public Builder setNrColorSpaceSpecs(Long nrColorSpaceSpecs) {
+        public Builder nrColorSpaceSpecs(Long nrColorSpaceSpecs) {
             this.nrColorSpaceSpecs = nrColorSpaceSpecs;
             return this;
         }
 
-        public Long getNrColorSpacesWithApproxField() {
-            return nrColorSpacesWithApproxField;
-        }
-
-        public Builder setNrColorSpacesWithApproxField(Long nrColorSpacesWithApproxField) {
+        public Builder nrColorSpacesWithApproxField(Long nrColorSpacesWithApproxField) {
             this.nrColorSpacesWithApproxField = nrColorSpacesWithApproxField;
             return this;
         }
 
-        public Long getColrMethod() {
-            return colrMethod;
-        }
-
-        public Builder setColrMethod(Long colrMethod) {
+        public Builder colrMethod(Long colrMethod) {
             this.colrMethod = colrMethod;
             return this;
         }
 
-        public Long getColrEnumCS() {
-            return colrEnumCS;
-        }
-
-        public Builder setColrEnumCS(Long colrEnumCS) {
+        public Builder colrEnumCS(Long colrEnumCS) {
             this.colrEnumCS = colrEnumCS;
             return this;
         }
 
-        public Long getBitDepth() {
-            return bitDepth;
-        }
-
-        public Builder setBitDepth(Long bitDepth) {
+        public Builder bitDepth(Long bitDepth) {
             this.bitDepth = bitDepth;
             return this;
         }
 
-        public Boolean getBpccBoxPresent() {
-            return bpccBoxPresent;
-        }
-
-        public Builder setBpccBoxPresent(Boolean bpccBoxPresent) {
+        public Builder bpccBoxPresent(Boolean bpccBoxPresent) {
             this.bpccBoxPresent = bpccBoxPresent;
             return this;
         }
 
-        public PDColorSpace getColorSpace() {
-            return colorSpace;
-        }
-
-        public Builder setColorSpace(PDColorSpace colorSpace) {
+        public Builder colorSpace(PDColorSpace colorSpace) {
             this.colorSpace = colorSpace;
             return this;
         }

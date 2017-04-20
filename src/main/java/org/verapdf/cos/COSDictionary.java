@@ -1,13 +1,30 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Timur Kamalov
@@ -18,7 +35,7 @@ public class COSDictionary extends COSDirect {
 
     protected COSDictionary() {
         super();
-        this.entries = new HashMap<ASAtom, COSObject>();
+        this.entries = new HashMap<>();
     }
 
     protected COSDictionary(final ASAtom key, final COSObject value) {
@@ -129,7 +146,7 @@ public class COSDictionary extends COSDirect {
 
     public COSObject getKey(final ASAtom key) {
         COSObject value = this.entries.get(key);
-        return value != null ? value : COSObject.getEmpty();
+        return value != null ? value : new COSObject();
     }
 
     public boolean setKey(final ASAtom key, final COSObject value) {
@@ -204,6 +221,11 @@ public class COSDictionary extends COSDirect {
         return true;
     }
 
+    public boolean setArrayKey(final ASAtom key, final COSObject array) {
+        this.entries.put(key, array);
+        return true;
+    }
+
     public boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
         COSObject obj = new COSObject();
         obj.setArray(size, value);
@@ -236,13 +258,52 @@ public class COSDictionary extends COSDirect {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof COSDictionary)) return false;
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+        if(obj == null) {
+            return false;
+        }
+        if(obj instanceof COSObject) {
+            return this.equals(((COSObject) obj).get());
+        }
+        List<COSBasePair> checkedObjects = new LinkedList<COSBasePair>();
+        return this.equals(obj, checkedObjects);
+    }
 
-        COSDictionary that = (COSDictionary) o;
-
-        return entries != null ? entries.equals(that.entries) : that.entries == null;
-
+    boolean equals(Object obj, List<COSBasePair> checkedObjects) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if(obj instanceof COSObject) {
+            return this.equals(((COSObject) obj).get());
+        }
+        if (COSBasePair.listContainsPair(checkedObjects, this, (COSBase) obj)) {
+            return true;    // Not necessary true, but we should behave as it is
+        }
+        COSBasePair.addPairToList(checkedObjects, this, (COSBase) obj);
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        COSDictionary that = (COSDictionary) obj;
+        if (!that.size().equals(this.size())) {
+            return false;
+        }
+        Set<ASAtom> set1 = this.getKeySet();
+        if (!set1.equals(that.getKeySet())) {
+            return false;
+        }
+        for (ASAtom name : set1) {
+            COSBase cosBase1 = this.getKey(name).get();
+            COSBase cosBase2 = that.getKey(name).get();
+            if (!cosBase1.equals(cosBase2, checkedObjects)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

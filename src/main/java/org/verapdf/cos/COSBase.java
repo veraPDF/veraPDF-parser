@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
@@ -6,6 +26,7 @@ import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,11 +34,21 @@ import java.util.Set;
  */
 public abstract class COSBase {
 
+	private COSKey indirectKey;
+
 	public COSBase() {
 	}
 
 	// Returns object type
 	public abstract COSObjType getType();
+
+	public COSKey getObjectKey() {
+		return this.indirectKey;
+	}
+
+	public void setObjectKey(COSKey indirectKey) {
+		this.indirectKey = indirectKey;
+	}
 
 	// VISITOR DESIGN PATTERN
 	public abstract void accept(final IVisitor visitor);
@@ -73,6 +104,7 @@ public abstract class COSBase {
 	public abstract ASAtom getNameKey(final ASAtom key);
 	public abstract boolean setNameKey(final ASAtom key, final ASAtom value);
 	public abstract boolean setArrayKey(final ASAtom key);
+	public abstract boolean setArrayKey(final ASAtom key, final COSObject array);
 	public abstract boolean setArrayKey(final ASAtom key, final int size, final COSObject[] value);
 	public abstract boolean setArrayKey(final ASAtom key, final int size, final double[] value);
 	public abstract void removeKey(final ASAtom key);
@@ -101,7 +133,12 @@ public abstract class COSBase {
 	public abstract COSDocument getDocument();
 	public abstract boolean setKey(final COSKey key, final COSDocument document);
 	public abstract COSObject getDirect();
+	public abstract COSBase getDirectBase();
 	public abstract boolean setDirect(final COSObject value);
 
 	public abstract void mark();
+
+	boolean equals(Object obj, List<COSBasePair> checkedObjects) {
+		return this.equals(obj);
+	}
 }

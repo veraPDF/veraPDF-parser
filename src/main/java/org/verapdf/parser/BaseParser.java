@@ -1,14 +1,36 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
-import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.io.InternalInputStream;
+import org.verapdf.io.SeekableInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.verapdf.as.CharTable.*;
 
@@ -17,22 +39,37 @@ import static org.verapdf.as.CharTable.*;
  */
 public class BaseParser {
 
+	private static final Logger LOGGER = Logger.getLogger(BaseParser.class.getCanonicalName());
+
 	private static final byte ASCII_ZERO = 48;
 	private static final byte ASCII_NINE = 57;
 
-	protected InternalInputStream source;
+	protected SeekableInputStream source;
 	private Token token;
 
+	public BaseParser(SeekableInputStream stream) throws IOException {
+		if(stream == null) {
+			throw new IOException("Can't create SeekableStream, passed seekableeStream is null");
+		}
+		this.source = stream;
+	}
+
 	public BaseParser(String fileName) throws FileNotFoundException {
+		if(fileName == null) {
+			throw new FileNotFoundException("Can't create SeekableStream from file, filename is null");
+		}
 		this.source = new InternalInputStream(fileName);
 	}
 
 	public BaseParser(InputStream fileStream) throws IOException {
-		this.source = new InternalInputStream(fileStream);
-	}
-
-	public BaseParser(ASInputStream asInputStream) throws IOException {
-		this.source = new InternalInputStream(asInputStream);
+		if (fileStream == null) {
+			throw new IOException("Can't create SeekableStream, fileStream is null");
+		}
+		if (fileStream instanceof SeekableInputStream) {
+			this.source = (SeekableInputStream) fileStream;
+		} else {
+			this.source = SeekableInputStream.getSeekableStream(fileStream);
+		}
 	}
 
 	public void closeInputStream() throws IOException {
@@ -47,43 +84,54 @@ public class BaseParser {
 
 	protected String getLine() throws IOException {
 		initializeToken();
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch = this.source.readByte();
-		while (!this.source.isEof()) {
+		while (!this.source.isEOF()) {
 			if (ch == ASCII_LF || ch == ASCII_CR) {
 				break;
 			}
 			appendToToken(ch);
 			ch = this.source.readByte();
 		}
-		return this.token.token;
+		return this.token.getValue();
+	}
+
+	protected byte[] getLineBytes() throws IOException {
+		getLine();
+		return this.token.getByteValue();
 	}
 
 	protected String getLine(final int offset) throws IOException {
 		initializeToken();
+		this.token.clearValue();
 		this.source.seek(offset);
-		this.token.token = "";
 		byte ch = this.source.readByte();
-		while (!this.source.isEof()) {
+		while (!this.source.isEOF()) {
 			if (ch == ASCII_LF || ch == ASCII_CR) {
 				break;
 			}
 			appendToToken(ch);
 			ch = this.source.readByte();
 		}
-		return this.token.token;
+		return this.token.getValue();
 	}
 
-	protected String readUntilWhitespace() throws IOException {
+	protected String readUntilDelimiter() throws IOException {
 		initializeToken();
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch = this.source.readByte();
-		while (!this.source.isEof() || !isSpace(ch)) {
+		while (!isSpace(ch) && !isTokenDelimiter(ch)) {
 			appendToToken(ch);
-			ch = this.source.readByte();
+			if (!this.source.isEOF()) {
+				ch = this.source.readByte();
+			} else {
+				break;
+			}
 		}
-		this.source.unread();
-		return this.token.token;
+		if (isSpace(ch) || isTokenDelimiter(ch)) {
+			this.source.unread();
+		}
+		return this.token.getValue();
 	}
 
 	protected boolean findKeyword(final Token.Keyword keyword) throws IOException {
@@ -94,9 +142,24 @@ public class BaseParser {
 		return this.token.type == Token.Type.TT_KEYWORD && this.token.keyword == keyword;
 	}
 
+	// lookUpSize starts from current offset
+	protected boolean findKeyword(final Token.Keyword keyword, final int lookUpSize) throws IOException {
+		long endOffset = this.source.getOffset() + lookUpSize < this.source.getStreamLength()
+				? this.source.getOffset() + lookUpSize : this.source.getStreamLength();
+
+		nextToken();
+		while (this.token.type != Token.Type.TT_EOF && (this.token.type != Token.Type.TT_KEYWORD || this.token.keyword != keyword)) {
+			if (this.source.getOffset() >= endOffset) {
+				break;
+			}
+			nextToken();
+		}
+		return this.token.type == Token.Type.TT_KEYWORD && this.token.keyword == keyword;
+	}
+
 	protected void nextToken() throws IOException {
 		skipSpaces(true);
-		if (this.source.isEof()) {
+		if (this.source.isEOF()) {
 			this.token.type = Token.Type.TT_EOF;
 			return;
 		}
@@ -175,16 +238,16 @@ public class BaseParser {
 		}
 	}
 
-	public ASInputStream getStream(final long length) throws IOException {
+	public ASInputStream getRandomAccess(final long length) throws IOException {
 		skipEOL();
-		ASInputStream result = new ASFileInStream(this.source.getStream(), this.source.getOffset(), length);
+		ASInputStream result =
+				this.source.getStream(this.source.getOffset(), length);
 		source.seekFromCurrentPosition(length);
-
 		return result;
-	}
+    }
 
 	protected boolean isNextByteEOL() throws IOException {
-		byte c = this.source.peek();
+		byte c = (byte) this.source.peek();
 		return isLF(c) || isCR(c);
 	}
 
@@ -206,7 +269,7 @@ public class BaseParser {
 
 	protected void skipSpaces(boolean skipComment) throws IOException {
 		byte ch;
-		while (!this.source.isEof()) {
+		while (!this.source.isEOF()) {
 			ch = this.source.readByte();
 			if (CharTable.isSpace(ch)) {
 				continue;
@@ -221,11 +284,29 @@ public class BaseParser {
 		}
 	}
 
-	protected boolean isDigit() throws IOException {
-		return isDigit(this.source.peek());
+	protected void skipStreamSpaces() throws IOException {
+		byte space = this.source.readByte();
+
+		//check for whitespace
+		while (space == ASCII_SPACE) {
+			space = this.source.readByte();
+		}
+
+		if (space == ASCII_CR) {
+			space = this.source.readByte();
+			if (space != ASCII_LF) {
+				this.source.unread();
+			}
+		} else if (space != ASCII_LF) {
+			this.source.unread();
+		}
 	}
 
-	protected boolean isDigit(byte c) {
+	protected boolean isDigit() throws IOException {
+		return isDigit((byte) this.source.peek());
+	}
+
+	protected static boolean isDigit(byte c) {
 		return c >= ASCII_ZERO && c <= ASCII_NINE;
 	}
 
@@ -235,11 +316,11 @@ public class BaseParser {
 				|| (ch >= 'A' && ch <= 'F');
 	}
 
-	protected boolean isLF(int c) {
+	protected static boolean isLF(int c) {
 		return ASCII_LF == c;
 	}
 
-	protected boolean isCR(int c) {
+	protected static boolean isCR(int c) {
 		return ASCII_CR == c;
 	}
 
@@ -266,7 +347,7 @@ public class BaseParser {
 	private void skipComment() throws IOException {
 		// skips all characters till EOL == { CR, LF, CRLF }
 		byte ch;
-		while (!this.source.isEof()) {
+		while (!this.source.isEOF()) {
 			ch = this.source.readByte();
 			if (isLF(ch)) {
 				return; // EOL == LF
@@ -284,12 +365,12 @@ public class BaseParser {
 	}
 
 	private void readLitString() throws IOException {
-		this.token.token = "";
+		this.token.clearValue();
 
 		int parenthesesDepth = 0;
 
 		byte ch = this.source.readByte();
-		while (!this.source.isEof()) {
+		while (!this.source.isEOF()) {
 			switch (ch) {
 				default:
 					appendToToken(ch);
@@ -345,9 +426,8 @@ public class BaseParser {
 								if (ch < '0' || ch > '7') {
 									this.source.unread();
 									break;
-								} else {
-									ch1 = (char) ((ch1 << 3) + (ch - '0'));
 								}
+								ch1 = (char) ((ch1 << 3) + (ch - '0'));
 							}
 							appendToToken(ch1);
 							break;
@@ -373,7 +453,7 @@ public class BaseParser {
 	}
 
 	private void readHexString() throws IOException {
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch;
 		int uc = 0;
 		int hex;
@@ -383,7 +463,7 @@ public class BaseParser {
 		long hexCount = 0;
 
 		boolean odd = false;
-		while (!this.source.isEof()) {
+		while (!this.source.isEOF()) {
 			ch = this.source.readByte();
 			if (CharTable.isSpace(ch)) {
 				continue;
@@ -392,6 +472,8 @@ public class BaseParser {
 					uc <<= 4;
 					appendToToken(uc);
 				}
+				this.token.setContainsOnlyHex(containsOnlyHex);
+				this.token.setHexCount(Long.valueOf(hexCount));
 				return;
 			} else {
 				hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
@@ -412,13 +494,13 @@ public class BaseParser {
 		}
 
 		this.token.setContainsOnlyHex(containsOnlyHex);
-		this.token.setHexCount(hexCount);
+		this.token.setHexCount(Long.valueOf(hexCount));
 	}
 
 	private void readName() throws IOException {
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch;
-		while (!this.source.isEof()) {
+		while (!this.source.isEOF()) {
 			ch = this.source.readByte();
 			if (CharTable.isTokenDelimiter(ch)) {
 				this.source.unread();
@@ -427,13 +509,13 @@ public class BaseParser {
 
 			if (ch == '#') {
 				byte ch1, ch2;
-				int dc;
+				byte dc;
 				ch1 = this.source.readByte();
-				if (!source.isEof() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.er) {
+				if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.er) {
 					dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
 					ch2 = this.source.readByte();
-					if (!this.source.isEof() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.er) {
-						dc = ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
+					if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.er) {
+						dc = (byte) ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
 						appendToToken(dc);
 					} else {
 						appendToToken(ch);
@@ -451,9 +533,9 @@ public class BaseParser {
 	}
 
 	private void readToken() throws IOException {
-		this.token.token = "";
+		this.token.clearValue();
 		byte ch;
-		while (!this.source.isEof()) {
+		while (!this.source.isEOF()) {
 			ch = this.source.readByte();
 			if (CharTable.isTokenDelimiter(ch)) {
 				this.source.unread();
@@ -465,34 +547,38 @@ public class BaseParser {
 	}
 
 	protected void readNumber() throws IOException {
-		initializeToken();
-		this.token.token = "";
-		this.token.type = Token.Type.TT_INTEGER;
-		byte ch;
-		while (!this.source.isEof()) {
-			ch = this.source.readByte();
-			if (CharTable.isTokenDelimiter(ch)) {
-				this.source.unread();
-				break;
+		try {
+			initializeToken();
+			this.token.clearValue();
+			this.token.type = Token.Type.TT_INTEGER;
+			byte ch;
+			while (!this.source.isEOF()) {
+				ch = this.source.readByte();
+				if (CharTable.isTokenDelimiter(ch)) {
+					this.source.unread();
+					break;
+				}
+				if (ch >= '0' && ch <= '9') {
+					appendToToken(ch);
+				} else if (ch == '.') {
+					this.token.type = Token.Type.TT_REAL;
+					appendToToken(ch);
+				} else {
+					this.source.unread();
+					break;
+				}
 			}
-			if (ch >= '0' && ch <= '9') {
-				appendToToken(ch);
-			} else if (ch == '.') {
-				this.token.type = Token.Type.TT_REAL;
-				appendToToken(ch);
+			if (this.token.type == Token.Type.TT_INTEGER) {
+				long value = Long.valueOf(this.token.getValue()).longValue();
+				this.token.integer = value;
+				this.token.real = value;
 			} else {
-				this.source.unread();
-				break;
+				double value = Double.valueOf(this.token.getValue()).doubleValue();
+				this.token.integer = Math.round(value);
+				this.token.real = value;
 			}
-		}
-		if (this.token.type == Token.Type.TT_INTEGER) {
-			int value = Integer.valueOf(this.token.token);
-			this.token.integer = value;
-			this.token.real = (double) value;
-		} else {
-			double value = Double.valueOf(this.token.token);
-			this.token.integer = Math.round(value);
-			this.token.real = value;
+		} catch (NumberFormatException e) {
+			LOGGER.log(Level.FINE, "", e);
 		}
 	}
 
@@ -503,18 +589,26 @@ public class BaseParser {
 	}
 
 	private void appendToToken(final byte ch) {
-		this.token.token += (char) ch;
+		this.token.append((char) (ch & 0xff));
 	}
 
 	private void appendToToken(final int ch) {
-		this.token.token += (char) ch;
+		this.token.append((char) ch);
 	}
 
-	protected byte[] getRawBytes(String string) {
+	public static byte[] getRawBytes(String string) {
 		byte[] res = new byte[string.length()];
 		for (int i = 0; i < string.length(); ++i) {
 			res[i] = (byte) string.charAt(i);
 		}
 		return res;
+	}
+
+	protected void skipExpectedCharacter(char exp) throws IOException {
+		char c = (char) this.source.readByte();
+		if(c != exp) {
+			throw new IOException("Unexpected character on byte " + (this.source.getOffset() - 1) +
+			"; expected " + exp + " but got " + c);
+		}
 	}
 }

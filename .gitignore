@@ -22,3 +22,4 @@ hs_err_pid*
 
 # Maven artefacts
 **/pom.xml.versionsBackup
+/target/

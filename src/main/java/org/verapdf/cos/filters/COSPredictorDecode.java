@@ -1,7 +1,27 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.cos.filters;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 
@@ -12,7 +32,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class COSPredictorDecode extends ASBufferingInFilter {
+public class COSPredictorDecode extends ASBufferedInFilter {
 
     public static final byte PREDICTOR_DEFAULT = 1;
     public static final int COLORS_DEFAULT = 1;
@@ -96,11 +116,13 @@ public class COSPredictorDecode extends ASBufferingInFilter {
             if ((read = bufferPopArray(currentLine, lineLength)) != lineLength) {
                 if (this.feedBuffer(this.getBufferCapacity()) == -1) {
                     this.streamEnded = true;
+                    break;
                 }
                 byte[] extraBytes = new byte[lineLength - read];
                 int readAgain;
                 if ((readAgain = bufferPopArray(extraBytes, extraBytes.length)) != extraBytes.length) {
                     this.streamEnded = true;
+                    break;
                 }
                 System.arraycopy(extraBytes, 0, currentLine, read, readAgain);
             }
@@ -219,5 +241,10 @@ public class COSPredictorDecode extends ASBufferingInFilter {
         } else {
             return COLUMNS_DEFAULT;
         }
+    }
+
+    @Override
+    public void reset() throws IOException {
+        super.reset();
     }
 }

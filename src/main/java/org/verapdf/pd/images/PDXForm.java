@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.pd.images;
 
 import org.verapdf.as.ASAtom;
@@ -18,6 +38,11 @@ public class PDXForm extends PDXObject implements PDContentStream {
 
 	public PDXForm(COSObject obj) {
 		super(obj);
+	}
+
+	@Override
+	public ASAtom getType() {
+		return ASAtom.FORM;
 	}
 
 	@Override
@@ -45,7 +70,7 @@ public class PDXForm extends PDXObject implements PDContentStream {
 	public COSStream getPS() {
 		COSObject ps = getKey(ASAtom.PS);
 		if (ps != null && ps.getType() == COSObjType.COS_STREAM) {
-			return (COSStream) ps.get();
+			return (COSStream) ps.getDirectBase();
 		}
 		return null;
 	}
@@ -53,7 +78,7 @@ public class PDXForm extends PDXObject implements PDContentStream {
 	public COSDictionary getRef() {
 		COSObject ref = getKey(ASAtom.REF);
 		if (ref != null && ref.getType() == COSObjType.COS_DICT) {
-			return (COSDictionary) ref.get();
+			return (COSDictionary) ref.getDirectBase();
 		}
 		return null;
 	}
@@ -63,7 +88,11 @@ public class PDXForm extends PDXObject implements PDContentStream {
 	}
 
 	public double[] getMatrix() {
-		return TypeConverter.getRealArray(getKey(ASAtom.MATRIX), 6, "Matrix");
+		double[] matrix = TypeConverter.getRealArray(getKey(ASAtom.MATRIX), 6, "Matrix");
+		if (matrix == null) {
+			matrix = new double[]{1, 0, 0, 1, 0, 0};
+		}
+		return matrix;
 	}
 
 	public PDResources getResources() {
@@ -71,7 +100,7 @@ public class PDXForm extends PDXObject implements PDContentStream {
 		if (res != null && res.getType() == COSObjType.COS_DICT) {
 			return new PDResources(res);
 		}
-		return null;
+		return new PDResources(COSDictionary.construct());
 	}
 
 	public PDMetadata getMetadata() {

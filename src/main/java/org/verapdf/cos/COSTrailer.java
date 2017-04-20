@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
@@ -13,13 +33,13 @@ public class COSTrailer extends PDObject {
 		setObject(COSDictionary.construct(), false);
 	}
 
-	public long getSize() {
+	public Long getSize() {
 		return getObject().getIntegerKey(ASAtom.SIZE);
 	}
 
-	public void setSize(final long size) {
-		if (getPrev() != 0) {
-			final long prevSize = getObject().getIntegerKey(ASAtom.SIZE);
+	public void setSize(final Long size) {
+		if (getPrev() != null && getPrev() != 0) {
+			final Long prevSize = getObject().getIntegerKey(ASAtom.SIZE);
 			if (prevSize > size) {
 				return;
 			}
@@ -27,11 +47,11 @@ public class COSTrailer extends PDObject {
 		getObject().setIntegerKey(ASAtom.SIZE, size);
 	}
 
-	public long getPrev() {
+	public Long getPrev() {
 		return getObject().getIntegerKey(ASAtom.PREV);
 	}
 
-	public void setPrev(final long prev) {
+	public void setPrev(final Long prev) {
 		if (prev != 0) {
 			getObject().setIntegerKey(ASAtom.PREV, prev);
 		} else {
@@ -68,15 +88,7 @@ public class COSTrailer extends PDObject {
 	}
 
 	public void setID(final COSObject id) {
-		COSObject[] ids = new COSObject[2];
-
-		ids[0] = getObject().getKey(ASAtom.ID).at(0);
-		if (ids[0].empty()) {
-			ids[0] = id;
-		}
-		ids[1] = id;
-
-		getObject().setArrayKey(ASAtom.ID, 2, ids);
+		getObject().setArrayKey(ASAtom.ID, id);
 	}
 
 }

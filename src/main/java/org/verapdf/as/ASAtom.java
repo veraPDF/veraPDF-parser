@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.as;
 
 import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
@@ -8,7 +28,7 @@ import java.util.Map;
 /**
  * @author Timur Kamalov
  */
-public class ASAtom {
+public class ASAtom implements Comparable<ASAtom> {
 
     private static Map<String, ASAtom> predefinedPDFNames = new HashMap<>();
     private static Map<String, ASAtom> cachedPDFNames = new HashMap<>();
@@ -22,7 +42,9 @@ public class ASAtom {
     public static final ASAtom ADBE_PKCS7_SHA1 = new ASAtom("adbe.pkcs7.sha1");
     public static final ASAtom ADBE_X509_RSA_SHA1 = new ASAtom("adbe.x509.rsa_sha1");
     public static final ASAtom ADOBE_PPKLITE = new ASAtom("Adobe.PPKLite");
+    public static final ASAtom AESV2 = new ASAtom("AESV2");
     public static final ASAtom AESV3 = new ASAtom("AESV3");
+    public static final ASAtom AF = new ASAtom("AF");
     public static final ASAtom AF_RELATIONSHIP = new ASAtom("AFRelationship");
     public static final ASAtom AFTER = new ASAtom("After");
     public static final ASAtom AIS = new ASAtom("AIS");
@@ -62,6 +84,7 @@ public class ASAtom {
     public static final ASAtom BITS_PER_COORDINATE = new ASAtom("BitsPerCoordinate");
     public static final ASAtom BITS_PER_FLAG = new ASAtom("BitsPerFlag");
     public static final ASAtom BITS_PER_SAMPLE = new ASAtom("BitsPerSample");
+    public static final ASAtom BL_FOCUS = new ASAtom("Bl");
     public static final ASAtom BLACK_IS_1 = new ASAtom("BlackIs1");
     public static final ASAtom BLACK_POINT = new ASAtom("BlackPoint");
     public static final ASAtom BLEED_BOX = new ASAtom("BleedBox");
@@ -88,16 +111,18 @@ public class ASAtom {
     public static final ASAtom CENTER_WINDOW = new ASAtom("CenterWindow");
     public static final ASAtom CF = new ASAtom("CF");
     public static final ASAtom CFM = new ASAtom("CFM");
+    public static final ASAtom CHECKSUM = new ASAtom("CheckSum");
     //** Acro form field type for choice fields.
     public static final ASAtom CH = new ASAtom("Ch");
     public static final ASAtom CHAR_PROCS = new ASAtom("CharProcs");
     public static final ASAtom CHAR_SET = new ASAtom("CharSet");
     public static final ASAtom CICI_SIGNIT = new ASAtom("CICI.SignIt");
     public static final ASAtom CID_FONT_TYPE0 = new ASAtom("CIDFontType0");
+    public static final ASAtom CID_FONT_TYPE0C = new ASAtom("CIDFontType0C");
     public static final ASAtom CID_FONT_TYPE2 = new ASAtom("CIDFontType2");
     public static final ASAtom CID_TO_GID_MAP = new ASAtom("CIDToGIDMap");
     public static final ASAtom CID_SET = new ASAtom("CIDSet");
-    public static final ASAtom CIDSYSTEMINFO = new ASAtom("CIDSystemInfo");
+    public static final ASAtom CID_SYSTEM_INFO = new ASAtom("CIDSystemInfo");
     public static final ASAtom CLR_F = new ASAtom("ClrF");
     public static final ASAtom CLR_FF = new ASAtom("ClrFf");
     public static final ASAtom CMAP = new ASAtom("CMap");
@@ -114,8 +139,13 @@ public class ASAtom {
     public static final ASAtom COMPONENTS = new ASAtom("Components");
     public static final ASAtom CONTACT_INFO = new ASAtom("ContactInfo");
     public static final ASAtom CONTENTS = new ASAtom("Contents");
+    public static final ASAtom CONFIGS = new ASAtom("Configs");
     public static final ASAtom COORDS = new ASAtom("Coords");
     public static final ASAtom COUNT = new ASAtom("Count");
+    public static final ASAtom COURIER = new ASAtom("Courier");
+    public static final ASAtom COURIER_BOLD = new ASAtom("Courier-Bold");
+    public static final ASAtom COURIER_BOLD_OBLIQUE = new ASAtom("Courier-BoldOblique");
+    public static final ASAtom COURIER_OBLIQUE = new ASAtom("Courier-Oblique");
     public static final ASAtom CP = new ASAtom("CP");
     public static final ASAtom CREATION_DATE = new ASAtom("CreationDate");
     public static final ASAtom CREATOR = new ASAtom("Creator");
@@ -140,6 +170,7 @@ public class ASAtom {
     public static final ASAtom DESCENT = new ASAtom("Descent");
     public static final ASAtom DEST = new ASAtom("Dest");
     public static final ASAtom DEST_OUTPUT_PROFILE = new ASAtom("DestOutputProfile");
+    public static final ASAtom DEST_OUTPUT_PROFILE_REF = new ASAtom("DestOutputProfileRef");
     public static final ASAtom DESTS = new ASAtom("Dests");
     public static final ASAtom DEVICECMYK = new ASAtom("DeviceCMYK");
     public static final ASAtom DEVICEGRAY = new ASAtom("DeviceGray");
@@ -148,12 +179,14 @@ public class ASAtom {
     public static final ASAtom DI = new ASAtom("Di");
     public static final ASAtom DIFFERENCE = new ASAtom("Difference");
     public static final ASAtom DIFFERENCES = new ASAtom("Differences");
+    public static final ASAtom DIGEST_LOCATION = new ASAtom("DigestLocation");
     public static final ASAtom DIGEST_METHOD = new ASAtom("DigestMethod");
     public static final ASAtom DIGEST_RIPEMD160 = new ASAtom("RIPEMD160");
     public static final ASAtom DIGEST_SHA1 = new ASAtom("SHA1");
     public static final ASAtom DIGEST_SHA256 = new ASAtom("SHA256");
     public static final ASAtom DIGEST_SHA384 = new ASAtom("SHA384");
     public static final ASAtom DIGEST_SHA512 = new ASAtom("SHA512");
+    public static final ASAtom DIGEST_VALUE = new ASAtom("DigestValue");
     public static final ASAtom DIRECTION = new ASAtom("Direction");
     public static final ASAtom DISPLAY_DOC_TITLE = new ASAtom("DisplayDocTitle");
     public static final ASAtom DL = new ASAtom("DL");
@@ -193,6 +226,7 @@ public class ASAtom {
     public static final ASAtom EXT_G_STATE = new ASAtom("ExtGState");
     public static final ASAtom EXTEND = new ASAtom("Extend");
     public static final ASAtom EXTENDS = new ASAtom("Extends");
+    public static final ASAtom EVENT = new ASAtom("Event");
     // F
     public static final ASAtom F = new ASAtom("F");
     public static final ASAtom F_DECODE_PARMS = new ASAtom("FDecodeParms");
@@ -210,6 +244,7 @@ public class ASAtom {
     public static final ASAtom FLAGS = new ASAtom("Flags");
     public static final ASAtom FLATE_DECODE = new ASAtom("FlateDecode");
     public static final ASAtom FLATE_DECODE_ABBREVIATION = new ASAtom("Fl");
+    public static final ASAtom FOCUS_ABBREVIATION = new ASAtom("Fo");
     public static final ASAtom FONT = new ASAtom("Font");
     public static final ASAtom FONT_BBOX = new ASAtom("FontBBox");
     public static final ASAtom FONT_DESC = new ASAtom("FontDescriptor");
@@ -239,6 +274,10 @@ public class ASAtom {
     public static final ASAtom HALFTONE_TYPE = new ASAtom("HalftoneType");
     public static final ASAtom HARD_LIGHT = new ASAtom("HardLight");
     public static final ASAtom HEIGHT = new ASAtom("Height");
+    public static final ASAtom HELVETICA = new ASAtom("Helvetica");
+    public static final ASAtom HELVETICA_BOLD = new ASAtom("Helvetica-Bold");
+    public static final ASAtom HELVETICA_BOLD_OBLIQUE = new ASAtom("Helvetica-BoldOblique");
+    public static final ASAtom HELVETICA_OBLIQUE = new ASAtom("Helvetica-Oblique");
     public static final ASAtom HIDE_MENUBAR = new ASAtom("HideMenubar");
     public static final ASAtom HIDE_TOOLBAR = new ASAtom("HideToolbar");
     public static final ASAtom HIDE_WINDOWUI = new ASAtom("HideWindowUI");
@@ -285,6 +324,7 @@ public class ASAtom {
     public static final ASAtom LE = new ASAtom("LE");
     public static final ASAtom LEADING = new ASAtom("Leading");
     public static final ASAtom LEGAL_ATTESTATION = new ASAtom("LegalAttestation");
+    public static final ASAtom LINEARIZED = new ASAtom("Linearized");
     public static final ASAtom LENGTH = new ASAtom("Length");
     public static final ASAtom LENGTH1 = new ASAtom("Length1");
     public static final ASAtom LENGTH2 = new ASAtom("Length2");
@@ -303,6 +343,7 @@ public class ASAtom {
     public static final ASAtom M = new ASAtom("M");
     public static final ASAtom MAC = new ASAtom("Mac");
     public static final ASAtom MAC_ROMAN_ENCODING = new ASAtom("MacRomanEncoding");
+    public static final ASAtom MAC_EXPERT_ENCODING = new ASAtom("MacExpertEncoding");
     public static final ASAtom MARK_INFO = new ASAtom("MarkInfo");
     public static final ASAtom MARKED = new ASAtom("Marked");
     public static final ASAtom MASK = new ASAtom("Mask");
@@ -375,11 +416,16 @@ public class ASAtom {
     public static final ASAtom PARENT_TREE_NEXT_KEY = new ASAtom("ParentTreeNextKey");
     public static final ASAtom PATTERN = new ASAtom("Pattern");
     public static final ASAtom PATTERN_TYPE = new ASAtom("PatternType");
+    public static final ASAtom PC = new ASAtom("PC");
     public static final ASAtom PDF_DOC_ENCODING = new ASAtom("PDFDocEncoding");
     public static final ASAtom PERMS = new ASAtom("Perms");
     public static final ASAtom PG = new ASAtom("Pg");
+    public static final ASAtom PI = new ASAtom("PI");
+    public static final ASAtom PO = new ASAtom("PO");
+    public static final ASAtom POPUP = new ASAtom("Popup");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");
     public static final ASAtom PREDICTOR = new ASAtom("Predictor");
+    public static final ASAtom PRES_STEPS = new ASAtom("PresSteps");
     public static final ASAtom PREV = new ASAtom("Prev");
     public static final ASAtom PRINT_AREA = new ASAtom("PrintArea");
     public static final ASAtom PRINT_CLIP = new ASAtom("PrintClip");
@@ -391,6 +437,8 @@ public class ASAtom {
     public static final ASAtom PROPERTIES = new ASAtom("Properties");
     public static final ASAtom PS = new ASAtom("PS");
     public static final ASAtom PUB_SEC = new ASAtom("PubSec");
+    public static final ASAtom PV = new ASAtom("PV");
+    public static final ASAtom PZ = new ASAtom("PZ");
     // Q
     public static final ASAtom Q = new ASAtom("Q");
     public static final ASAtom QUADPOINTS = new ASAtom("QuadPoints");
@@ -404,6 +452,7 @@ public class ASAtom {
     public static final ASAtom RECIPIENTS = new ASAtom("Recipients");
     public static final ASAtom RECT = new ASAtom("Rect");
     public static final ASAtom REF = new ASAtom("Ref");
+    public static final ASAtom REFERENCE = new ASAtom("Reference");
     public static final ASAtom REGISTRY = new ASAtom("Registry");
     public static final ASAtom REGISTRY_NAME = new ASAtom("RegistryName");
     public static final ASAtom RENAME = new ASAtom("Rename");
@@ -437,6 +486,7 @@ public class ASAtom {
     public static final ASAtom SOFT_LIGHT = new ASAtom("SoftLight");
     public static final ASAtom SS = new ASAtom("SS");
     public static final ASAtom ST = new ASAtom("St");
+    public static final ASAtom STANDARD = new ASAtom("Standard");
     public static final ASAtom STANDARD_ENCODING = new ASAtom("StandardEncoding");
     public static final ASAtom STATE = new ASAtom("State");
     public static final ASAtom STATE_MODEL = new ASAtom("StateModel");
@@ -460,6 +510,7 @@ public class ASAtom {
     public static final ASAtom SV = new ASAtom("SV");
     public static final ASAtom SW = new ASAtom("SW");
     public static final ASAtom SY = new ASAtom("Sy");
+    public static final ASAtom SYMBOL = new ASAtom("Symbol");
     // T
     public static final ASAtom T = new ASAtom("T");
     public static final ASAtom TARGET = new ASAtom("Target");
@@ -467,6 +518,10 @@ public class ASAtom {
     public static final ASAtom THREADS = new ASAtom("Threads");
     public static final ASAtom TI = new ASAtom("TI");
     public static final ASAtom TILING_TYPE = new ASAtom("TilingType");
+    public static final ASAtom TIMES_BOLD = new ASAtom("Times-Bold");
+    public static final ASAtom TIMES_BOLD_ITALIC = new ASAtom("Times-BoldItalic");
+    public static final ASAtom TIMES_ITALIC = new ASAtom("Times-Italic");
+    public static final ASAtom TIMES_ROMAN = new ASAtom("Times-Roman");
     public static final ASAtom TIME_STAMP = new ASAtom("TimeStamp");
     public static final ASAtom TITLE = new ASAtom("Title");
     public static final ASAtom TK = new ASAtom("TK");
@@ -487,6 +542,7 @@ public class ASAtom {
     public static final ASAtom TYPE = new ASAtom("Type");
     public static final ASAtom TYPE0 = new ASAtom("Type0");
     public static final ASAtom TYPE1 = new ASAtom("Type1");
+    public static final ASAtom TYPE1C = new ASAtom("Type1C");
     public static final ASAtom TYPE3 = new ASAtom("Type3");
     // U
     public static final ASAtom U = new ASAtom("U");
@@ -496,6 +552,7 @@ public class ASAtom {
     public static final ASAtom UNIX = new ASAtom("Unix");
     public static final ASAtom URI = new ASAtom("URI");
     public static final ASAtom URL = new ASAtom("URL");
+    public static final ASAtom USE_CMAP = new ASAtom("UseCMap");
     // V
     public static final ASAtom V = new ASAtom("V");
     public static final ASAtom VERISIGN_PPKVS = new ASAtom("VeriSign.PPKVS");
@@ -508,12 +565,16 @@ public class ASAtom {
     // W
     public static final ASAtom W = new ASAtom("W");
     public static final ASAtom W2 = new ASAtom("W2");
+    public static final ASAtom WC = new ASAtom("WC");
     public static final ASAtom WHITE_POINT = new ASAtom("WhitePoint");
     public static final ASAtom WIDTH = new ASAtom("Width");
     public static final ASAtom WIDTHS = new ASAtom("Widths");
     public static final ASAtom WIN_ANSI_ENCODING = new ASAtom("WinAnsiEncoding");
+    public static final ASAtom WP = new ASAtom("WP");
+    public static final ASAtom WS = new ASAtom("WS");
     public static final ASAtom W_MODE = new ASAtom("WMode");
     // X
+    public static final ASAtom X = new ASAtom("X");
     public static final ASAtom XFA = new ASAtom("XFA");
     public static final ASAtom X_STEP = new ASAtom("XStep");
     public static final ASAtom XHEIGHT = new ASAtom("XHeight");
@@ -524,6 +585,9 @@ public class ASAtom {
     public static final ASAtom Y_STEP = new ASAtom("YStep");
     public static final ASAtom YES = new ASAtom("Yes");
 
+    // Z
+    public static final ASAtom ZAPF_DINGBATS = new ASAtom("ZapfDingbats");
+
     private String value;
 
     private ASAtom(String value) {
@@ -531,6 +595,7 @@ public class ASAtom {
     }
 
     private ASAtom(String value, boolean predefinedValue) {
+        this.value = value;
         if (predefinedValue) {
             predefinedPDFNames.put(value, this);
         } else {
@@ -551,6 +616,7 @@ public class ASAtom {
             return cachedPDFNames.get(value);
         } else {
             ASAtom result = new ASAtom(value, false);
+            result.setValue(value);
             cachedPDFNames.put(value, result);
             return result;
         }
@@ -558,6 +624,10 @@ public class ASAtom {
 
     public String getValue() {
         return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override
@@ -594,4 +664,9 @@ public class ASAtom {
         return value != null ? value.hashCode() : 0;
     }
 
+
+    @Override
+    public int compareTo(ASAtom o) {
+        return this.value.compareTo(o.value);
+    }
 }

@@ -1,31 +1,63 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.*;
+import org.verapdf.operator.InlineImageOperator;
 import org.verapdf.operator.Operator;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
-public class PDFStreamParser extends COSParser {
+public class PDFStreamParser extends NotSeekableCOSParser {
 
-	private final List<Object> tokens;
+	private static final Logger LOGGER = Logger.getLogger(PDFStreamParser.class.getCanonicalName());
+	private static final int INLINE_IMAGE_BUFFER_SIZE = 8192;
 
-	public PDFStreamParser(COSStream stream) throws IOException {
-		super(stream.getData());
+	private final List<Object> tokens = new ArrayList<>();
+	private List<Closeable> imageDataStreams = new ArrayList<>();
 
-		this.tokens = new ArrayList<>();
+	public PDFStreamParser(ASInputStream stream) throws IOException {
+		super(stream);
+		initializeToken();
 	}
 
 	public void parseTokens() throws IOException {
 		Object token = parseNextToken();
 		while (token != null) {
+			if (token instanceof COSObject) {
+				token = ((COSObject) token).get();
+			}
 			tokens.add(token);
 			token = parseNextToken();
 		}
@@ -88,7 +120,7 @@ public class PDFStreamParser extends COSParser {
 	public Object parseNextToken() throws IOException {
 		Object result = null;
 
-		skipSpaces();
+		skipSpaces(true);
 		byte nextByte = source.peek();
 		if (nextByte == -1) {
 			return null;
@@ -97,7 +129,11 @@ public class PDFStreamParser extends COSParser {
 		byte c = nextByte;
 
 		switch (c) {
-			case '<': {
+			case '(':
+                nextToken();
+                result = COSString.construct(getToken().getByteValue());
+                break;
+            case '<': {
 				//check brackets
 				source.readByte();
 				c = source.peek();
@@ -107,7 +143,8 @@ public class PDFStreamParser extends COSParser {
 					result = getDictionary();
 				} else {
 					nextToken();
-					result = COSString.construct(getToken().token);
+					Token token = getToken();
+					result = COSString.construct(token.getByteValue(), true, token.getHexCount(), token.isContainsOnlyHex());
 				}
 				break;
 			}
@@ -115,19 +152,15 @@ public class PDFStreamParser extends COSParser {
 				result = getArray();
 				break;
 			}
-			case '(':
-				nextToken();
-				result = COSString.construct(getToken().token);
-				break;
 			case '/':
 				// name
 				result = getName();
 				break;
 			case 'n': {
 				// null
-				String nullString = readUntilWhitespace();
+				String nullString = readUntilDelimiter();
 				if (nullString.equals("null")) {
-					result = COSNull.NULL;
+					result = new COSObject(COSNull.NULL);
 				} else {
 					result = Operator.getOperator(nullString);
 				}
@@ -135,17 +168,18 @@ public class PDFStreamParser extends COSParser {
 			}
 			case 't':
 			case 'f': {
-				String line = readUntilWhitespace();
+				String line = readUntilDelimiter();
 				if (line.equals("true")) {
-					result = COSBoolean.TRUE;
+					result = new COSObject(COSBoolean.TRUE);
 					break;
 				} else if (line.equals("false")) {
-					result = COSBoolean.FALSE;
+					result = new COSObject(COSBoolean.FALSE);
 				} else {
 					result = Operator.getOperator(line);
 				}
 				break;
 			}
+			case '.':
 			case '0':
 			case '1':
 			case '2':
@@ -166,7 +200,52 @@ public class PDFStreamParser extends COSParser {
 				}
 				break;
 			}
-			//TODO : Support inline image operators
+			// BI operator
+			case 'B': {
+				Token token = getToken();
+				nextToken();
+				result = Operator.getOperator(token.getValue());
+				if (result instanceof InlineImageOperator) {
+					InlineImageOperator imageOperator = (InlineImageOperator) result;
+					COSDictionary imageParameters = (COSDictionary) COSDictionary.construct().get();
+					imageOperator.setImageParameters(imageParameters);
+					Object nextToken = parseNextToken();
+					while (nextToken instanceof COSObject &&
+							((COSObject) nextToken).getType() == COSObjType.COS_NAME) {
+						Object value = parseNextToken();
+						if (value instanceof COSObject) {
+							imageParameters.setKey(((COSObject) nextToken).getName(), (COSObject) value);
+						} else {
+							LOGGER.log(Level.FINE, "Unexpected token in BI operator parsing: " + value.toString());
+						}
+						nextToken = parseNextToken();
+					}
+
+					if (nextToken instanceof InlineImageOperator) {
+						imageOperator.setImageData(((InlineImageOperator) nextToken).getImageData());
+					} else {
+						throw new IOException("Unexpected token instead of " +
+								"operator in operator parsing: " + nextToken.toString());
+					}
+				}
+				break;
+			}
+			// ID operator
+			case 'I': {
+				//looking for an ID operator
+				if (source.readByte() != 'I' && source.readByte() != 'D') {
+					//TODO : change
+					throw new IOException("Corrupted inline image operator");
+				}
+				if (CharTable.isSpace(source.peek())) {
+					source.readByte();
+				}
+				ASInputStream imageDataStream = readInlineImage();
+				result = Operator.getOperator("ID");
+				this.imageDataStreams.add(imageDataStream);
+				((InlineImageOperator) result).setImageData(imageDataStream);
+				break;
+			}
 			default: {
 				String operator = nextOperator();
 				if (operator.length() == 0) {
@@ -186,22 +265,54 @@ public class PDFStreamParser extends COSParser {
 		//maximum possible length of an operator is 3 and we'll leave some space for invalid cases
 		StringBuffer buffer = new StringBuffer(5);
 		byte nextByte = source.peek();
-		while (nextByte != -1 && // EOF
+		while (!source.isEOF() &&
 				!CharTable.isSpace(nextByte) && nextByte != ']' &&
 				nextByte != '[' && nextByte != '<' &&
 				nextByte != '(' && nextByte != '/' &&
 				(nextByte < '0' || nextByte > '9'))	{
 			byte currentByte = source.readByte();
-			nextByte = source.peek();
-			buffer.append(currentByte);
-			// d0 and d1 operators
-			if (currentByte == 'd' && (nextByte == '0' || nextByte == '1') ) {
-				buffer.append(source.readByte());
+			buffer.append((char) currentByte);
+
+			if (!source.isEOF()) {
+				// d0 and d1 operators
 				nextByte = source.peek();
+				if (currentByte == 'd' && (nextByte == '0' || nextByte == '1')) {
+					buffer.append((char) source.readByte());
+					nextByte = source.peek();
+				}
 			}
 		}
 
 		return buffer.toString();
 	}
 
+	private ASInputStream readInlineImage() throws IOException {
+		source.resetReadCounter();
+		ArrayList<Byte> image = new ArrayList<>(INLINE_IMAGE_BUFFER_SIZE);
+		byte previousByte = source.readByte();
+		byte currentByte = source.readByte();
+		image.add(previousByte);
+		image.add(currentByte);
+		while (!(previousByte == 'E' && currentByte == 'I' &&
+				CharTable.isTokenDelimiter(source.peek())) && !source.isEOF()) {
+			previousByte = currentByte;
+			currentByte = source.readByte();
+			image.add(currentByte);
+		}
+		return new ASMemoryInStream(getByteArrayFromArrayList(image),
+				source.getReadCounter(), false);
+	}
+
+	public List<Closeable> getImageDataStreams() {
+		return imageDataStreams;
+	}
+
+	public static byte[] getByteArrayFromArrayList(ArrayList<Byte> list) {
+		byte[] res = new byte[list.size()];
+		int i = 0;
+		for (Byte b : list) {
+			res[i++] = b;
+		}
+		return res;
+	}
 }

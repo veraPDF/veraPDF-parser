@@ -1,7 +1,27 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.filters.io.ASBufferingInFilter;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
@@ -46,15 +66,19 @@ class XrefStreamParser {
      */
     void parseStreamAndTrailer() throws IOException {
 
-        xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
-        fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).get();
-        if (fieldSizes.size() != 3) {
-            throw new IOException("W array in xref should have 3 elements.");
+        try {
+            xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
+            fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).getDirectBase();
+            if (fieldSizes.size() != 3) {
+                throw new IOException("W array in xref should have 3 elements.");
+            }
+            initializeIndex();
+            initializeObjIDs();
+            parseStream();
+            setTrailer();
+        } finally {
+            xrefInputStream.close();
         }
-        initializeIndex();
-        initializeObjIDs();
-        parseStream();
-        setTrailer();
     }
 
     /**
@@ -64,13 +88,13 @@ class XrefStreamParser {
      */
     private void initializeIndex()
             throws IOException {
-        index = (COSArray) xrefCOSStream.getKey(ASAtom.INDEX).get();
+        index = (COSArray) xrefCOSStream.getKey(ASAtom.INDEX).getDirectBase();
 
         if (index == null) {
             COSObject[] defaultIndex = new COSObject[2];
             defaultIndex[0] = COSInteger.construct(0);
             defaultIndex[1] = xrefCOSStream.getKey(ASAtom.SIZE);
-            index = (COSArray) COSArray.construct(2, defaultIndex).get();
+            index = (COSArray) COSArray.construct(2, defaultIndex).getDirectBase();
         } else if (index.size() % 2 != 0) {
             throw new IOException("Index array in xref stream has odd amount of elements.");
         }
@@ -83,8 +107,8 @@ class XrefStreamParser {
     private void initializeObjIDs() {
         objIDs = new ArrayList<>();
         for (int i = 0; i < index.size() / 2; ++i) {
-            COSInteger firstID = (COSInteger) index.at(2 * i).get();
-            COSInteger lengthOfSubsection = (COSInteger) index.at(2 * i + 1).get();
+            COSInteger firstID = (COSInteger) index.at(2 * i).getDirectBase();
+            COSInteger lengthOfSubsection = (COSInteger) index.at(2 * i + 1).getDirectBase();
             for (int j = 0; j < lengthOfSubsection.get(); ++j) {
                 objIDs.add(firstID.get() + j);
             }
@@ -105,12 +129,12 @@ class XrefStreamParser {
         int objIdIndex = 0;
 
         while (true) {
-            buffer = new byte[ASBufferingInFilter.BF_BUFFER_SIZE];
-            long read = xrefInputStream.read(buffer, ASBufferingInFilter.BF_BUFFER_SIZE);
+            buffer = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
+            long read = xrefInputStream.read(buffer, ASBufferedInFilter.BF_BUFFER_SIZE);
             if (read == -1) {
                 break;
             }
-            buffer = ASBufferingInFilter.concatenate(remainedBytes, remainedBytes.length,
+            buffer = ASBufferedInFilter.concatenate(remainedBytes, remainedBytes.length,
                     buffer, (int) read);
 
             int pointer = 0;

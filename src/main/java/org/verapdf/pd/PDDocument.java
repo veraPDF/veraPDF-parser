@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
@@ -6,17 +26,24 @@ import org.verapdf.cos.COSIndirect;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.visitor.IndirectWriter;
 import org.verapdf.cos.visitor.Writer;
+import org.verapdf.io.SeekableInputStream;
+import org.verapdf.pd.form.PDAcroForm;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class PDDocument {
 
+    private static final Logger LOGGER = Logger.getLogger(PDDocument.class.getCanonicalName());
 	public static final String PDF_HEADER_DEFAULT = "%PDF-1.4";
 
 	private PDCatalog catalog;
@@ -57,8 +84,19 @@ public class PDDocument {
 	}
 
 	public void close() {
-		document = null;
+		if (document != null) {
+			try {
+				if (document.getPDFSource() != null) {
+					document.getPDFSource().close();
+				}
+				document.getResourceHandler().close();
+			} catch (IOException e) {
+				LOGGER.log(Level.FINE, "Error in closing stream", e);
+			}
+			document = null;
+		}
 
+		StaticResources.clear();
 		catalog.clear();
 		//this.info.clear;
 	}
@@ -69,6 +107,10 @@ public class PDDocument {
 		}
 
 		COSObject root = document.getTrailer().getRoot();
+		if (root == COSObject.getEmpty()) {
+			root = new COSObject();
+			document.getTrailer().setRoot(root);
+		}
 
 		if (!root.empty()) {
 			catalog.setObject(root);
@@ -140,7 +182,7 @@ public class PDDocument {
 	}
 
 	public void saveAs(final String fileName) throws IOException {
-		final Writer out = new IndirectWriter(this.document, fileName, false);
+		final Writer out = new IndirectWriter(this.document, fileName, false, 0);
 		this.saveAs(out, fileName);
 	}
 
@@ -155,6 +197,12 @@ public class PDDocument {
 		out.close();
 	}
 
+	public void saveTo(final OutputStream stream) {
+		if (this.document != null) {
+			document.saveTo(stream);
+		}
+	}
+
 	public PDStructTreeRoot getStructTreeRoot() throws IOException {
 		return getCatalog().getStructTreeRoot();
 	}
@@ -163,4 +211,19 @@ public class PDDocument {
 		return getCatalog().getMetadata();
 	}
 
+	public List<PDOutputIntent> getOutputIntents() throws IOException {
+		return getCatalog().getOutputIntents();
+	}
+
+	public PDOutlineDictionary getOutlines() throws IOException {
+		return getCatalog().getOutlines();
+	}
+
+	public PDAcroForm getAcroForm() throws IOException {
+		return getCatalog().getAcroForm();
+	}
+
+	public SeekableInputStream getPDFSource() {
+		return this.document.getPDFSource();
+	}
 }

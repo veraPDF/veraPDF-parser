@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
@@ -63,6 +83,16 @@ public class COSObject {
 		this.set(null);
 	}
 
+	public COSKey getObjectKey() {
+		return this.base != null ? this.base.getObjectKey() : null;
+	}
+
+	public void setObjectKey(final COSKey key) {
+		if (this.base != null) {
+			this.base.setObjectKey(key);
+		}
+	}
+
 	// OBJECT TYPE
 	public COSObjType getType() {
 		return this.base != null ? this.base.getType() : COSObjType.COS_UNDEFINED;
@@ -119,7 +149,8 @@ public class COSObject {
 
 	public void setString(final String value, final boolean isHex) {
 		if (this.base == null || !this.base.setString(value, isHex)) {
-			this.base = new COSString(value, isHex);
+			this.base = new COSString();
+			this.base.setString(value);
 		}
 	}
 
@@ -207,7 +238,7 @@ public class COSObject {
 	}
 
 	public Boolean getBooleanKey(final ASAtom key) {
-		return this.base != null ? this.base.getBooleanKey(key) : true;
+		return this.base != null ? this.base.getBooleanKey(key) : null;
 	}
 
 	public void setBooleanKey(final ASAtom key, final boolean value) {
@@ -258,6 +289,13 @@ public class COSObject {
 
 	public void setArrayKey(final ASAtom key) {
 		if (this.base == null || !this.base.setArrayKey(key)) {
+			COSObject obj = COSArray.construct();
+			this.base = new COSDictionary(key, obj);
+		}
+	}
+
+	public void setArrayKey(final ASAtom key, final COSObject array) {
+		if (this.base == null || !this.base.setArrayKey(key, array)) {
 			COSObject obj = COSArray.construct();
 			this.base = new COSDictionary(key, obj);
 		}
@@ -396,6 +434,10 @@ public class COSObject {
 		return this.base != null ? this.base.getDirect() : null;
 	}
 
+	public COSBase getDirectBase() {
+		return this.base != null ? this.base.getDirectBase() : null;
+	}
+
 	public void setDirect(final COSObject value) {
 		if (this.base == null || !this.base.setDirect(value)) {
 			set(value.base);
@@ -446,9 +488,6 @@ public class COSObject {
 
 		COSObject cosObject = (COSObject) o;
 
-		if (isHeaderOfObjectComplyPDFA != cosObject.isHeaderOfObjectComplyPDFA) return false;
-		if (isEndOfObjectComplyPDFA != cosObject.isEndOfObjectComplyPDFA) return false;
-		if (isHeaderFormatComplyPDFA != cosObject.isHeaderFormatComplyPDFA) return false;
 		return base != null ? base.equals(cosObject.base) : cosObject.base == null;
 
 	}

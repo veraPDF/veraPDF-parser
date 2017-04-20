@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.parser;
 
 import java.util.HashMap;
@@ -14,7 +34,7 @@ public class Token {
 	public long integer;
 	public double real;
 
-	public String token;
+	private StringBuilder token = new StringBuilder();
 
 	//fields specific for pdf/a validation of strings
 	private boolean containsOnlyHex = true;
@@ -22,7 +42,27 @@ public class Token {
 
 	public void toKeyword() {
 		this.type = Type.TT_KEYWORD;
-		this.keyword = getKeyword(token);
+		this.keyword = getKeyword(token.toString());
+	}
+
+	public void append(char c) {
+		this.token.append(c);
+	}
+
+	public String getValue() {
+		return new String(getByteValue());
+	}
+
+	public byte[] getByteValue() {
+		byte[] res = new byte[this.token.length()];
+		for (int i = 0; i < token.length(); i++) {
+			res[i] = (byte) token.charAt(i);
+		}
+		return res;
+	}
+
+	public void clearValue() {
+		this.token.setLength(0);
 	}
 
 	public enum Type {
@@ -57,33 +97,27 @@ public class Token {
 		KW_TRAILER
 	}
 
-	private static final Map<Keyword, String> keywords = new HashMap<Keyword, String>();
+	private static final Map<String, Keyword> keywords = new HashMap<>();
 
 	static {
-		keywords.put(Keyword.KW_NULL, "null");
-		keywords.put(Keyword.KW_TRUE, "true");
-		keywords.put(Keyword.KW_FALSE, "false");
-		keywords.put(Keyword.KW_STREAM, "stream");
-		keywords.put(Keyword.KW_ENDSTREAM, "endstream");
-		keywords.put(Keyword.KW_OBJ, "obj");
-		keywords.put(Keyword.KW_ENDOBJ, "endobj");
-		keywords.put(Keyword.KW_R, "R");
-		keywords.put(Keyword.KW_N, "n");
-		keywords.put(Keyword.KW_F, "f");
-		keywords.put(Keyword.KW_XREF, "xref");
-		keywords.put(Keyword.KW_STARTXREF, "startxref");
-		keywords.put(Keyword.KW_TRAILER, "trailer");
-		keywords.put(Keyword.KW_NONE, null);
+		keywords.put("null", Keyword.KW_NULL);
+		keywords.put("true", Keyword.KW_TRUE);
+		keywords.put("false", Keyword.KW_FALSE);
+		keywords.put("stream", Keyword.KW_STREAM);
+		keywords.put("endstream", Keyword.KW_ENDSTREAM);
+		keywords.put("obj", Keyword.KW_OBJ );
+		keywords.put("endobj", Keyword.KW_ENDOBJ);
+		keywords.put("R", Keyword.KW_R );
+		keywords.put("n", Keyword.KW_N);
+		keywords.put("f", Keyword.KW_F);
+		keywords.put("xref", Keyword.KW_XREF);
+		keywords.put("startxref", Keyword.KW_STARTXREF);
+		keywords.put("trailer", Keyword.KW_TRAILER);
+		keywords.put(null, Keyword.KW_NONE);
 	}
 
 	public static Keyword getKeyword(final String keyword) {
-		for (Map.Entry<Keyword, String> entry : keywords.entrySet()) {
-			if (keyword.equals(entry.getValue())) {
-				return entry.getKey();
-			}
-		}
-		//TODO : not sure it's correct
-		return Keyword.KW_NONE;
+		return keywords.get(keyword);
 	}
 
 	//GETTERS & SETTERS
