@@ -6,8 +6,8 @@ veraPDF-parser
 [![Build Status](http://jenkins.openpreservation.org/buildStatus/icon?job=veraPDF-parser)](http://jenkins.openpreservation.org/job/veraPDF-parser/ "OPF Jenkins Release")
 [![Build Status](http://jenkins.openpreservation.org/buildStatus/icon?job=veraPDF-parser-dev)](http://jenkins.openpreservation.org/job/veraPDF-parser-dev/ "OPF Jenkins Development")
 [![Maven Central](https://img.shields.io/maven-central/v/org.verapdf/parser.svg)](http://repo1.maven.org/maven2/org/verapdf/pdf-model/ "Maven central")
-[![CodeCov Coverage](https://img.shields.io/codecov/c/github/veraPDF/veraPDF-parser.svg)](https://codecov.io/gh/veraPDF/veraPDF-parser/ "CodeCov grade")
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c0cab187a06a4820bc0891dd2bf8db85)](https://www.codacy.com/app/veraPDF/veraPDF-parser?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=veraPDF/veraPDF-parser&amp;utm_campaign=Badge_Grade)
+[![CodeCov Coverage](https://img.shields.io/codecov/c/github/veraPDF/veraPDF-parser.svg)](https://codecov.io/gh/veraPDF/veraPDF-parser/ "CodeCov coverage")
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c0cab187a06a4820bc0891dd2bf8db85)](https://www.codacy.com/app/veraPDF/veraPDF-parser?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=veraPDF/veraPDF-parser&amp;utm_campaign=Badge_Grade "Codacy grade")
 
 Licensing
 ---------
