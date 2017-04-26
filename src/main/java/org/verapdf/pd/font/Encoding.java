@@ -102,4 +102,16 @@ public class Encoding {
         }
     }
 
+    /**
+     * Checks if mapping for given code is available.
+     *
+     * @param code is character code to check.
+     * @return true if encoding has mapping for this code.
+     */
+    public boolean containsCode(int code) {
+        if (differences != null && differences.containsKey(code)) {
+            return true;
+        }
+        return code < predefinedEncoding.length;
+    }
 }

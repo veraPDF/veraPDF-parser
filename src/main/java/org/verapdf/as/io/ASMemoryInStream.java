@@ -67,6 +67,7 @@ public class ASMemoryInStream extends SeekableInputStream {
             buffer = ASBufferedInFilter.concatenate(buffer, buffer.length, temp, read);
             read = stream.read(temp);
         }
+        bufferSize = buffer.length;
         this.numOfBufferUsers = new IntReference(1);
     }
 
