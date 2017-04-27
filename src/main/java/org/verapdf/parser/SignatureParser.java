@@ -208,7 +208,7 @@ public class SignatureParser extends COSParser {
             result += 2;
         }
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
-        return result - 1;
+        return result;
     }
 
     private boolean isEOFFound(byte[] buffer) throws IOException {
