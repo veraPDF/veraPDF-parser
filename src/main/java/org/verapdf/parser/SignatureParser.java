@@ -179,13 +179,6 @@ public class SignatureParser extends COSParser {
         }
     }
 
-    /**
-     * Scans stream until next %%EOF is found.
-     *
-     * @param currentOffset byte offset of position, from which scanning stats
-     * @return number of byte that contains 'F' in %%EOF
-     * @throws IOException
-     */
     private long getOffsetOfNextEOF(long currentOffset) throws IOException {
         byte[] buffer = new byte[EOF_STRING.length];
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
@@ -199,13 +192,15 @@ public class SignatureParser extends COSParser {
             }
             source.unread(buffer.length - 1);
         }
-        long result = source.getOffset() - 1 + buffer.length;   // byte right after 'F'
+        long result = source.getOffset() - 1 + buffer.length;   // byte right after '%%EOF'
         this.source.skip(EOF_STRING.length - 1);
-        if (isLF(this.source.peek())) {
+        if (isLF(this.source.peek())) { // allows single LF, CR or CR-LF after %%EOF
             result++;
-        }
-        if (isCR(this.source.read()) && isLF(this.source.peek())) {
-            result += 2;
+        } else if (isCR(this.source.read())) {
+            result++;
+            if (isLF(this.source.peek())) {
+                result++;
+            }
         }
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         return result;

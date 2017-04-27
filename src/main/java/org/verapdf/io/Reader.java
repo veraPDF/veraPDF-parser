@@ -93,7 +93,7 @@ public class Reader extends XRefReader {
 		//TODO : set object key
 		DecodedObjectStreamParser parser = objectStreams.get(Long.valueOf(-offset));
 		if(parser != null) {
-			return parser.getObject(key.getNumber());
+			return parser.getObject(key);
 		}
 		COSKey newKey = new COSKey(- (int)offset, 0);
 		COSObject object = getObject(newKey);
@@ -108,7 +108,7 @@ public class Reader extends XRefReader {
 				objectStream, new COSKey((int) -offset, 0),
 				this.parser.getDocument());
 		objectStreams.put(Long.valueOf(-offset), parser);
-		return parser.getObject(key.getNumber());
+		return parser.getObject(key);
 	}
 
 	@Override

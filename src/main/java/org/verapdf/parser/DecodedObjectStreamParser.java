@@ -95,7 +95,8 @@ public class DecodedObjectStreamParser extends COSParser {
         return res;
     }
 
-    public COSObject getObject(int objNum) throws IOException {
+    public COSObject getObject(COSKey key) throws IOException {
+        int objNum = key.getNumber();
         if (!this.internalOffsets.containsKey(objNum)) {
             return new COSObject();
         }
@@ -103,6 +104,8 @@ public class DecodedObjectStreamParser extends COSParser {
         this.flag = true;
         this.objects.clear();   // In case if some COSInteger was read before.
         this.integers.clear();
-        return nextObject();
+        COSObject res = nextObject();
+        res.setObjectKey(key);
+        return res;
     }
 }
