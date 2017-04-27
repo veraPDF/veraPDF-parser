@@ -21,6 +21,7 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.CharTable;
 import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
@@ -190,7 +191,7 @@ public class SignatureParser extends COSParser {
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         source.read(buffer);
         source.unread(buffer.length - 1);
-        while (!Arrays.equals(buffer, EOF_STRING)) {    //TODO: does it need to be optimized?
+        while (!isEOFFound(buffer)) {
             source.read(buffer);
             if (source.isEOF()) {
                 source.seek(currentOffset + document.getHeader().getHeaderOffset());
@@ -199,8 +200,34 @@ public class SignatureParser extends COSParser {
             source.unread(buffer.length - 1);
         }
         long result = source.getOffset() - 1 + buffer.length;   // byte right after 'F'
+        this.source.skip(EOF_STRING.length - 1);
+        if (isLF(this.source.peek())) {
+            result++;
+        }
+        if (isCR(this.source.read()) && isLF(this.source.peek())) {
+            result += 2;
+        }
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
-        return result - 1;
+        return result;
+    }
+
+    private boolean isEOFFound(byte[] buffer) throws IOException {
+        if (!Arrays.equals(buffer, EOF_STRING)) {
+            return false;
+        }
+        long pointer = this.source.getOffset();
+        this.source.unread(2);
+        int byteBeforeEOF = this.source.peek();
+        while (!isLF(byteBeforeEOF)) {
+            this.source.unread();
+            byteBeforeEOF = this.source.peek();
+            if (byteBeforeEOF != CharTable.ASCII_SPACE) {
+                this.source.seek(pointer);
+                return false;
+            }
+        }
+        this.source.seek(pointer);
+        return true;
     }
 
     private void skipID() throws IOException {

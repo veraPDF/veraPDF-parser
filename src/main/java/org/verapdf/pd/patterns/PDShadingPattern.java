@@ -50,7 +50,8 @@ public class PDShadingPattern extends PDPattern {
     }
 
     public double[] getMatrix() {
-        return TypeConverter.getRealArray(getKey(ASAtom.MATRIX), 6, "Matrix");
+        double[] res = TypeConverter.getRealArray(getKey(ASAtom.MATRIX), 6, "Matrix");
+        return res != null ? res : new double[]{1, 0, 0, 1, 0, 0};
     }
 
     public PDExtGState getExtGState() {

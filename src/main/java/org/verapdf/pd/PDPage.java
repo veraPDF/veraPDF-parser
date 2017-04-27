@@ -304,13 +304,13 @@ public class PDPage extends PDPageTreeNode {
                 if (object.getType() == COSObjType.COS_INTEGER) {
                     return object.getInteger();
                 } else {
-                    return null;
+                    return Long.valueOf(0);
                 }
             } else {
                 current = current.getKey(ASAtom.PARENT);
             }
         }
-        return null;
+        return Long.valueOf(0);
     }
 
     public Double getScaling() {

@@ -46,13 +46,13 @@ public class PDCalGray extends PDCIEDictionaryBased {
     }
 
     public Double getGamma() {
-        return getNumber(this.dictionary.getKey(ASAtom.GAMMA));
+        return getNumber(this.dictionary.getKey(ASAtom.GAMMA), 1);
     }
 
-    private static Double getNumber(COSObject object) {
+    private static Double getNumber(COSObject object, double defaultValue) {
         if (object != null) {
             return object.getReal();
         }
-        return null;
+        return defaultValue;
     }
 }
