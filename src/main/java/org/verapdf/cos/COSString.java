@@ -105,6 +105,11 @@ public class COSString extends COSDirect {
                 return new String(value, 2, value.length - 2, Charset.forName("UTF-16BE"));
             }
         }
+        if (value.length > 3) {
+            if ((value[0] & 0xff) == 0xEF && (value[1] & 0xff) == 0xBB && (value[2] & 0xff) == 0xBF) {
+                return new String(value, 3, value.length - 3, Charset.forName("UTF-8"));
+            }
+        }
         return PDFDocEncoding.getStringFromBytes(value);
     }
 
