@@ -50,6 +50,7 @@ public class StandardSecurityHandler {
     private Boolean isEmptyStringPassword;
     private byte[] encryptionKey;
     private boolean isRC4Decryption;
+    private ASAtom method;
 
     /**
      * Constructor.
@@ -64,6 +65,10 @@ public class StandardSecurityHandler {
             this.pdEncryption = new PDEncryption();
         }
         this.id = id;
+        PDCryptFilter stdCrypt = this.pdEncryption.getStandardCryptFilter();
+        if (stdCrypt != null) {
+            this.method = stdCrypt.getMethod();
+        }
         this.isRC4Decryption = isRC4Decryption();
     }
 
@@ -140,7 +145,7 @@ public class StandardSecurityHandler {
                     this.encryptionKey);
         } else {
             filter = new COSFilterAESDecryptionDefault(stream, stringKey,
-                    this.encryptionKey, false);
+                    this.encryptionKey, false, method);
         }
         byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
         byte[] res = new byte[0];
@@ -168,7 +173,7 @@ public class StandardSecurityHandler {
                     this.encryptionKey);
         } else {
             filter = new COSFilterAESDecryptionDefault(encStream, key,
-                    this.encryptionKey, true);
+                    this.encryptionKey, true, method);
         }
         stream.setData(filter, COSStream.FilterFlags.RAW_DATA);
     }
@@ -207,11 +212,7 @@ public class StandardSecurityHandler {
 
     private boolean isRC4Decryption() {
         if (this.pdEncryption.getV() >= 4) {
-            PDCryptFilter stdCrypt = this.pdEncryption.getStandardCryptFilter();
-            if (stdCrypt != null) {
-                ASAtom method = stdCrypt.getMethod();
-                return method != ASAtom.AESV3 && method != ASAtom.AESV2;
-            }
+            return method != ASAtom.AESV3 && method != ASAtom.AESV2;
         }
         return true;
     }

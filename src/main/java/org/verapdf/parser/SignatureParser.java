@@ -77,14 +77,10 @@ public class SignatureParser extends COSParser {
             char c = (char) source.peek();
             if (c == '>') {
                 done = true;
-            } else if (c == '/') {
+            } else {
                 if(parseSignatureNameValuePair()) {
                     done = true;
                 }
-            } else {
-                // invalid dictionary, we were expecting a /Name, read until the end or until we can recover
-                LOGGER.log(Level.FINE, "Invalid dictionary, found: '" + c + "' but expected: '/'");
-                return;
             }
         }
     }
@@ -128,8 +124,12 @@ public class SignatureParser extends COSParser {
     }
 
     private boolean parseSignatureNameValuePair() throws IOException {
-        ASAtom key = nextObject().getName();
-        if (key != ASAtom.CONTENTS) {
+        COSObject key = getName();
+        if (key.getType() != COSObjType.COS_NAME) {
+            LOGGER.log(Level.FINE, "Invalid signature dictionary");
+            return false;
+        }
+        if (key.getName() != ASAtom.CONTENTS) {
             passCOSDictionaryValue();
             return false;
         }

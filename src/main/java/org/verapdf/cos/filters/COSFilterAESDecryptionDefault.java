@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -20,6 +20,7 @@
  */
 package org.verapdf.cos.filters;
 
+import org.verapdf.as.ASAtom;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSKey;
@@ -29,6 +30,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -58,12 +60,21 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
      *                      that contains it.
      * @param encryptionKey is encryption key that is calculated from user
      *                      password and encryption dictionary.
+     * @param method        value of CFM key in crypt filter dictionary, should
+     *                      be AESV2 or AESV3.
      */
     public COSFilterAESDecryptionDefault(ASInputStream stream, COSKey objectKey,
-                                         byte[] encryptionKey, boolean decryptingCOSStream)
+                                         byte[] encryptionKey, boolean decryptingCOSStream,
+                                         ASAtom method)
             throws IOException, GeneralSecurityException {
         super(stream);
-        initAES(objectKey, encryptionKey);
+        if (method == ASAtom.AESV2) {
+            initAES128(objectKey, encryptionKey);
+        } else if (method == ASAtom.AESV3) {
+            initAES256(encryptionKey);
+        } else {
+            throw new IllegalStateException("Unknown version of AES encryption algorithm");
+        }
         decryptedBytes = new byte[0];
         decryptedPointer = 0;
         this.decryptingCOSStream = decryptingCOSStream;
@@ -75,7 +86,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
         if (this.getInputStream() == null) {
             return -1;
         }
-        if(decryptingCOSStream && !haveReadStream) {
+        if (decryptingCOSStream && !haveReadStream) {
             this.getInputStream().skip(16);
             this.haveReadStream = true;
         }
@@ -103,7 +114,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
         }
     }
 
-    private void initAES(COSKey objectKey, byte[] encryptionKey)
+    private void initAES128(COSKey objectKey, byte[] encryptionKey)
             throws IOException, GeneralSecurityException {
         byte[] objectKeyDigest =
                 COSFilterRC4DecryptionDefault.getObjectKeyDigest(objectKey);
@@ -121,6 +132,26 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
                 IvParameterSpec(getAESInitializingVector());
         this.aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
         this.aes.init(Cipher.DECRYPT_MODE, key, initializingVector);
+    }
+
+    private void initAES256(byte[] encryptionKey) throws IOException,
+            GeneralSecurityException {
+        try {   // Allow using of AES with 256-bit key.
+            Field field = Class.forName("javax.crypto.JceSecurity").
+                    getDeclaredField("isRestricted");
+            field.setAccessible(true);
+            field.set(null, Boolean.FALSE);
+        } catch (Exception ex) {
+            throw new GeneralSecurityException("Can't enable using of 256-bit key for AES encryption", ex);
+        }
+
+        SecretKey key = new SecretKeySpec(
+                Arrays.copyOf(encryptionKey, 32), "AES");
+        IvParameterSpec initializingVector = new
+                IvParameterSpec(getAESInitializingVector());
+        this.aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        this.aes.init(Cipher.DECRYPT_MODE, key, initializingVector);
+
     }
 
     private byte[] getAESInitializingVector() throws IOException {

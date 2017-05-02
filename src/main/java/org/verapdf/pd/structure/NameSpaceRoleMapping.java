@@ -28,7 +28,10 @@ public class NameSpaceRoleMapping {
                     PDStructureElementNameSpace nameSpace2 = NameSpaceFactory.getNameSpace(object.at(1));
                     COSObject name2 = object.at(0);
                     if (nameSpace2 != null && name2.getType() == COSObjType.COS_NAME) {
-                        return nameSpace2.getNameSpaceMapping().getNameInDefault((COSName) name2.get());
+                        NameSpaceRoleMapping mapping2 = nameSpace2.getNameSpaceMapping();
+                        if (mapping2.dictionary != this.dictionary || name2.getName() != name.getName()) {
+                            return nameSpace2.getNameSpaceMapping().getNameInDefault((COSName) name2.get());
+                        }
                     }
                 }
             }
