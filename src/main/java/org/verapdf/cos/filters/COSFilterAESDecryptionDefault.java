@@ -24,13 +24,13 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSKey;
+import org.verapdf.tools.EncryptionToolsRevision6;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -136,15 +136,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
 
     private void initAES256(byte[] encryptionKey) throws IOException,
             GeneralSecurityException {
-        try {   // Allow using of AES with 256-bit key.
-            Field field = Class.forName("javax.crypto.JceSecurity").
-                    getDeclaredField("isRestricted");
-            field.setAccessible(true);
-            field.set(null, Boolean.FALSE);
-        } catch (Exception ex) {
-            throw new GeneralSecurityException("Can't enable using of 256-bit key for AES encryption", ex);
-        }
-
+        EncryptionToolsRevision6.enableAES256();
         SecretKey key = new SecretKeySpec(
                 Arrays.copyOf(encryptionKey, 32), "AES");
         IvParameterSpec initializingVector = new

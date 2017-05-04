@@ -27,11 +27,11 @@ import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.*;
 import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
 import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
-import org.verapdf.tools.EncryptionTools;
+import org.verapdf.tools.EncryptionToolsRevision4;
+import org.verapdf.tools.EncryptionToolsRevision6;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -88,14 +88,19 @@ public class StandardSecurityHandler {
         byte[] u = getU();
         if (o != null && p != null && id != null && revision != null && u != null) {
             try {
-                this.encryptionKey = EncryptionTools.authenticateUserPassword("",
-                        o, p.intValue(), id, revision.intValue(), encMetadata,
-                        length, u);
+                if (revision <= 4) {
+                    this.encryptionKey = EncryptionToolsRevision4.authenticateUserPassword("",
+                            o, p.intValue(), id, revision.intValue(), encMetadata,
+                            length, u);
+                } else if (revision >= 5) {    //   Revision 5 should not be used
+                    this.encryptionKey = EncryptionToolsRevision6.getFileEncryptionKey(new byte[]{}, o, u,
+                            getOE(), getUE());
+                }
                 this.isEmptyStringPassword =
                         Boolean.valueOf(this.encryptionKey != null);
                 return this.isEmptyStringPassword;
-            } catch (NoSuchAlgorithmException e) {
-                LOGGER.log(Level.FINE, "Caught NoSuchAlgorithmException while document decryption", e);
+            } catch (GeneralSecurityException e) {
+                LOGGER.log(Level.FINE, "Caught Security Exception while document decryption", e);
                 this.isEmptyStringPassword = Boolean.valueOf(false);
                 return this.isEmptyStringPassword;
             }
@@ -191,6 +196,14 @@ public class StandardSecurityHandler {
 
     private byte[] getU() {
         return getBytesOfHexString(pdEncryption.getU());
+    }
+
+    private byte[] getOE() {
+        return getBytesOfHexString(pdEncryption.getOE());
+    }
+
+    private byte[] getUE() {
+        return getBytesOfHexString(pdEncryption.getUE());
     }
 
     private byte[] getID() {

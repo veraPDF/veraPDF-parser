@@ -113,6 +113,20 @@ public class PDEncryption extends PDObject {
     }
 
     /**
+     * @return value of OE key, as described in PDF-2.0 specification.
+     */
+    public COSString getOE() {
+        return getCOSString(ASAtom.OE);
+    }
+
+    /**
+     * @return value of UE key, as described in PDF-2.0 specification.
+     */
+    public COSString getUE() {
+        return getCOSString(ASAtom.UE);
+    }
+
+    /**
      * @return true if document-level metadata stream shall be be encrypted.
      */
     public boolean isEncryptMetadata() {
