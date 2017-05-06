@@ -300,7 +300,7 @@ public class COSParser extends BaseParser {
 		} else {
 			//trying to find endstream keyword
 			long realStreamSize = -1;
-			int bufferLength = (int) (size > 512 ? 512 : size);
+			int bufferLength = 512;
 			byte[] buffer = new byte[bufferLength];
 			while (!source.isEOF()) {
 				long bytesRead = source.read(buffer, bufferLength);

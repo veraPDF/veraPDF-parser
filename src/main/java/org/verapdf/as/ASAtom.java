@@ -372,6 +372,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom NON_FULL_SCREEN_PAGE_MODE = new ASAtom("NonFullScreenPageMode");
     public static final ASAtom NONE = new ASAtom("None");
     public static final ASAtom NORMAL = new ASAtom("Normal");
+    public static final ASAtom NS = new ASAtom("NS");
     public static final ASAtom NUMS = new ASAtom("Nums");
     // O
     public static final ASAtom O = new ASAtom("O");
@@ -461,6 +462,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom RGB = new ASAtom("RGB");
     public static final ASAtom RI = new ASAtom("RI");
     public static final ASAtom ROLE_MAP = new ASAtom("RoleMap");
+    public static final ASAtom ROLE_MAP_NS = new ASAtom("RoleMapNS");
     public static final ASAtom ROOT = new ASAtom("Root");
     public static final ASAtom ROTATE = new ASAtom("Rotate");
     public static final ASAtom ROWS = new ASAtom("Rows");

@@ -30,7 +30,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class EncryptionTools {
+public class EncryptionToolsRevision4 {
 
     private static final int PADDED_PASSWORD_LENGTH = 32;
     private static final int AMOUNT_OF_REPEATS_MD5 = 50;
@@ -44,7 +44,7 @@ public class EncryptionTools {
     };
     private static final byte[] FF_STRING = new byte[]{-1, -1, -1, -1};
 
-    private EncryptionTools() {
+    private EncryptionToolsRevision4() {
     }
 
     /**
