@@ -93,7 +93,7 @@ public class StandardSecurityHandler {
                             o, p.intValue(), id, revision.intValue(), encMetadata,
                             length, u);
                 } else if (revision >= 5) {    //   Revision 5 should not be used
-                    this.encryptionKey = EncryptionToolsRevision6.getFileEncryptionKey(new byte[]{}, o, u,
+                    this.encryptionKey = EncryptionToolsRevision6.getFileEncryptionKey("".getBytes(), o, u,
                             getOE(), getUE());
                 }
                 this.isEmptyStringPassword =

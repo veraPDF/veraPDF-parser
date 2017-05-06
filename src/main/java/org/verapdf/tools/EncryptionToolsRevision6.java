@@ -23,43 +23,45 @@ public class EncryptionToolsRevision6 {
      * described in PDF-2.0 specification.
      *
      * @param password is UTF-8 representation of password.
-     * @param o is value of O key.
-     * @param u is value of U key.
-     * @param oe is value of OE key. At least one of oe, ue should not be null.
-     * @param ue is value of UE key. At least one of oe, ue should not be null.
+     * @param o        is value of O key.
+     * @param u        is value of U key.
+     * @param oe       is value of OE key. At least one of oe, ue should not be null.
+     * @param ue       is value of UE key. At least one of oe, ue should not be null.
      * @return calculated file encryption key.
      * @throws GeneralSecurityException if password is not valid or error with
-     * AES-256 happens.
+     *                                  AES-256 happens.
      */
     public static byte[] getFileEncryptionKey(byte[] password, byte[] o, byte[] u,
                                               byte[] oe, byte[] ue) throws GeneralSecurityException {
-        byte[] hashInput = ASBufferedInFilter.concatenate(password, password.length, getValSaltFromString(o), 8);
-        hashInput = ASBufferedInFilter.concatenate(hashInput, hashInput.length, u, u.length);
-        if (!Arrays.equals(computeHashRevision6(hashInput, u, true), getHashValueFromString(o))) {
-            throw new GeneralSecurityException("Incorrect password: failed check of owner hash.");
+
+
+        byte[] hash = computeHashRevision6(password, o, u, true);
+        boolean isUser = false;
+
+        if (!Arrays.equals(hash, getHashValueFromString(o))) {
+            isUser = true;
+            hash = computeHashRevision6(password, u, u, false);
+            if (!Arrays.equals(hash, getHashValueFromString(u))) {
+                throw new GeneralSecurityException("Incorrect password: failed check of owner hash.");
+            }
         }
 
         byte[] res = null;
-        if (oe != null) {
-            hashInput = ASBufferedInFilter.concatenate(password, password.length, getKeySaltFromString(o), 8);
-            hashInput = ASBufferedInFilter.concatenate(hashInput, hashInput.length, u, u.length);
-            byte[] aesKey = computeHashRevision6(hashInput, u, true);
+        if (oe != null && !isUser) {
+            byte[] aesKey = computeHashRevision6(password, o, u, true);
             enableAES256();
-            IvParameterSpec initializingVector = new IvParameterSpec(new byte[]{});
             SecretKey key = new SecretKeySpec(aesKey, "AES");
             Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
-            aes.init(Cipher.ENCRYPT_MODE, key, initializingVector);
+            aes.init(Cipher.ENCRYPT_MODE, key);
             res = aes.doFinal(oe);
         }
 
-        if (ue != null && res == null) {
-            hashInput = ASBufferedInFilter.concatenate(password, password.length, getKeySaltFromString(u), 8);
-            byte[] aesKey = computeHashRevision6(hashInput, u, false);
+        if (ue != null && isUser) {
+            byte[] aesKey = computeHashRevision6(password, u, u, false);
             enableAES256();
-            IvParameterSpec initializingVector = new IvParameterSpec(new byte[]{});
             SecretKey key = new SecretKeySpec(aesKey, "AES");
             Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
-            aes.init(Cipher.ENCRYPT_MODE, key, initializingVector);
+            aes.init(Cipher.ENCRYPT_MODE, key);
             res = aes.doFinal(ue);
         }
 
@@ -72,20 +74,25 @@ public class EncryptionToolsRevision6 {
      * Implements algorithm 2.B: Computing a hash (revision 6 and later),
      * introduced in PDF-2.0.
      *
-     * @param input                   is UTF-8 password input string.
+     * @param string                  is UTF-8 password hashInput string.
      * @param u                       is 48 byte user key.
      * @param isCheckingOwnerPassword is true if hash is being calculated for
      *                                checking the owner password or creating
      *                                the owner key.
      * @return computed hash.
      */
-    public static byte[] computeHashRevision6(byte[] input, byte[] u,
+    public static byte[] computeHashRevision6(byte[] password, byte[] string, byte[] u,
                                               boolean isCheckingOwnerPassword)
             throws GeneralSecurityException {
+        byte[] hashInput = ASBufferedInFilter.concatenate(password,
+                password.length, getValSaltFromString(string), 8);
+        if (isCheckingOwnerPassword) {
+            hashInput = ASBufferedInFilter.concatenate(hashInput, hashInput.length, u, u.length);
+        }
         int rounds = 0;
-        byte[] k = getSHAHash(256, input);
+        byte[] k = getSHAHash(256, hashInput);
         while (true) {
-            byte[] sequence = ASBufferedInFilter.concatenate(input, input.length, k, k.length);
+            byte[] sequence = ASBufferedInFilter.concatenate(password, password.length, k, k.length);
             if (isCheckingOwnerPassword) {
                 sequence = ASBufferedInFilter.concatenate(sequence, sequence.length, u, u.length);
             }

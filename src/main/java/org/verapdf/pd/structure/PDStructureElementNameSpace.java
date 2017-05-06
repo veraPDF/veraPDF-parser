@@ -4,7 +4,6 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSString;
 import org.verapdf.pd.PDObject;
 
 /**
@@ -23,15 +22,15 @@ public class PDStructureElementNameSpace extends PDObject {
     /**
      * @return the string defining the namespace name.
      */
-    public COSString getNS() {
+    public String getNS() {
         COSObject obj = this.getKey(ASAtom.NS);
         if (obj != null && obj.getType() == COSObjType.COS_STRING) {
-            return (COSString) obj.get();
+            return obj.getString();
         }
         return null;
     }
 
-    public COSDictionary getRoleMapNS() {
+    public COSDictionary getRoleMap() {
         COSObject obj = this.getKey(ASAtom.ROLE_MAP_NS);
         if (obj != null && obj.getType() == COSObjType.COS_DICT) {
             return (COSDictionary) obj.get();
@@ -40,7 +39,7 @@ public class PDStructureElementNameSpace extends PDObject {
     }
 
     public NameSpaceRoleMapping getNameSpaceMapping() {
-        return new NameSpaceRoleMapping(getRoleMapNS());
+        return new NameSpaceRoleMapping(getRoleMap());
     }
 
     public static PDStructureElementNameSpace getNameSpace(COSObject obj) {

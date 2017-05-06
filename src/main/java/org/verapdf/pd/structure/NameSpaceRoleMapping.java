@@ -6,8 +6,6 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 
 /**
- *
- *
  * @author Sergey Shemyakov
  */
 public class NameSpaceRoleMapping {

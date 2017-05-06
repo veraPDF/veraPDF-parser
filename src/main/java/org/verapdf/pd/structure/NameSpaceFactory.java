@@ -2,7 +2,6 @@ package org.verapdf.pd.structure;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +17,7 @@ public class NameSpaceFactory {
 
     public static void addNameSpace(PDStructureElementNameSpace nameSpace) {
         if (nameSpace != null) {
-            COSString name = nameSpace.getNS();
-            String key = name == null ? null : name.getString();
+            String key = nameSpace.getNS();
             storedNameSpaces.put(key, nameSpace);
         }
     }
