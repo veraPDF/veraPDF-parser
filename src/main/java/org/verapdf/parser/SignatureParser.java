@@ -199,13 +199,15 @@ public class SignatureParser extends COSParser {
             }
             source.unread(buffer.length - 1);
         }
-        long result = source.getOffset() - 1 + buffer.length;   // byte right after 'F'
+        long result = source.getOffset() - 1 + buffer.length;   // byte right after '%%EOF'
         this.source.skip(EOF_STRING.length - 1);
-        if (isLF(this.source.peek())) {
+        if (isLF(this.source.peek())) { // allows single LF, CR or CR-LF after %%EOF
             result++;
-        }
-        if (isCR(this.source.read()) && isLF(this.source.peek())) {
-            result += 2;
+        } else if (isCR(this.source.read())) {
+            result++;
+            if (isLF(this.source.peek())) {
+                result++;
+            }
         }
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         return result;
