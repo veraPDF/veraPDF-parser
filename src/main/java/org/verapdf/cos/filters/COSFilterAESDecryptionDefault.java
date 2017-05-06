@@ -91,7 +91,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
             this.haveReadStream = true;
         }
         int readDecrypted = this.readFromDecryptedBytes(buffer, size);
-        if (readDecrypted != -1) {
+        if (readDecrypted == -1) {
             return readDecrypted;
         }
 
@@ -143,7 +143,6 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
                 IvParameterSpec(getAESInitializingVector());
         this.aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
         this.aes.init(Cipher.DECRYPT_MODE, key, initializingVector);
-
     }
 
     private byte[] getAESInitializingVector() throws IOException {
