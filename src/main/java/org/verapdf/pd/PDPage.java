@@ -293,7 +293,7 @@ public class PDPage extends PDPageTreeNode {
     }
 
     public int getPageNumber() {
-        return pagesTotal;
+        return pageNumber;
     }
 
     public Long getRotation() {
