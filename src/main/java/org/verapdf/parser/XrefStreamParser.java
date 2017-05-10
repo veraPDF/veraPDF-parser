@@ -142,7 +142,7 @@ class XrefStreamParser {
             for (; objIdIndex < objIDs.size(); ++objIdIndex) {
                 if(pointer + field0.length + field1.length + field2.length >
                         buffer.length) {
-                    remainedBytes = Arrays.copyOfRange(buffer, pointer, (int) read);
+                    remainedBytes = Arrays.copyOfRange(buffer, pointer, buffer.length);
                     break;
                 }
                 Long id = objIDs.get(objIdIndex);
