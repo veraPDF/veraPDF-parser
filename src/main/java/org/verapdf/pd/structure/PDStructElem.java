@@ -28,22 +28,22 @@ import org.verapdf.cos.COSString;
 import org.verapdf.tools.TaggedPDFHelper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Maksim Bezrukov
  */
 public class PDStructElem extends PDStructTreeNode {
 
-	public PDStructElem(COSObject obj) {
+	private Map<ASAtom, ASAtom> rootRoleMap;
+
+	public PDStructElem(COSObject obj, Map<ASAtom, ASAtom> rootRoleMap) {
 		super(obj);
+		this.rootRoleMap = rootRoleMap;
 	}
 
 	public ASAtom getType() {
 		return getObject().getNameKey(ASAtom.TYPE);
-	}
-
-	public ASAtom getStructureType() {
-		return getObject().getNameKey(ASAtom.S);
 	}
 
 	public COSName getCOSStructureType() {
@@ -62,16 +62,24 @@ public class PDStructElem extends PDStructTreeNode {
 		return null;
 	}
 
-	public PDStructureElementNameSpace getNameSpace() {
+	public PDStructureNameSpace getNameSpace() {
 		COSObject object = getKey(ASAtom.NS);
 		if (object != null && object.getType() == COSObjType.COS_DICT) {
-			return PDStructureElementNameSpace.getNameSpace(object);
+			return PDStructureNameSpace.createNameSpace(object);
 		}
 		return null;
 	}
 
+	public StructureType getStructureType() {
+		return StructureType.createStructureType(getKey(ASAtom.S), getKey(ASAtom.NS));
+	}
+
+	public StructureType getDefaultStructureType() {
+		return TaggedPDFHelper.getDefaultStructureType(this.getStructureType(), this.rootRoleMap);
+	}
+
 	@Override
 	public List<PDStructElem> getChildren() {
-		return TaggedPDFHelper.getStructElemChildren(getObject());
+		return TaggedPDFHelper.getStructElemChildren(getObject(), rootRoleMap);
 	}
 }
