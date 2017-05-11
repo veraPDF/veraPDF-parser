@@ -26,7 +26,6 @@ import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.type1.Type1CharStringParser;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -216,10 +215,16 @@ public class CharStringsWidths {
         res[0] = num;
         return res;
     }
-    
-    private static <T> T[] makeArray(T index) {
-        T[] res = (T[]) Array.newInstance(index.getClass(), 1);
+
+    private static CFFIndex[] makeArray(CFFIndex index) {
+        CFFIndex[] res = new CFFIndex[1];
         res[0] = index;
+        return res;
+    }
+
+    private static float[][] makeArray(float[] matrix) {
+        float[][] res = new float[1][];
+        res[0] = matrix;
         return res;
     }
 
