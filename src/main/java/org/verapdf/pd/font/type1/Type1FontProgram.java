@@ -138,8 +138,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
 
                         while (true) {
                             nextToken();
-                            if (this.getToken().getValue().equals(
-                                    Type1StringConstants.DEF_STRING)) {
+                            String token = this.getToken().getValue();
+                            if (token.equals(Type1StringConstants.DEF_STRING) ||
+                                    token.equals(Type1StringConstants.READONLY_STRING)) {
                                 break;
                             }
                             if (this.getToken().type == Token.Type.TT_EOF) {
