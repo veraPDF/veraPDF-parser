@@ -295,9 +295,9 @@ public class CMapParser extends BaseParser {
         long bfRangeEnd = numberFromBytes(getToken().getByteValue());
 
         nextToken();    // skip [
-        if(getToken().getValue().equals("[")) {
+        if(getToken().type == Token.Type.TT_OPENARRAY) {
 
-            for (long i = bfRangeBegin; i < bfRangeEnd; ++i) {
+            for (long i = bfRangeBegin; i <= bfRangeEnd; ++i) {
                 this.cMap.addUnicodeMapping((int) i, readStringFromUnicodeSequenceToken());
             }
 
