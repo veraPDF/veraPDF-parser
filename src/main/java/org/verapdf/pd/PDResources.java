@@ -48,6 +48,7 @@ public class PDResources extends PDObject {
 	private Map<ASAtom, PDXObject> xObjectMap = new HashMap<>();
 	private Map<ASAtom, PDExtGState> extGStateMap = new HashMap<>();
 	private Map<ASAtom, PDFont> fontMap = new HashMap<>();
+	private Map<ASAtom, PDResource> propertiesMap = new HashMap<>();
 
 	public PDResources(COSObject resourcesDictionary) {
 		super(resourcesDictionary);
@@ -136,7 +137,6 @@ public class PDResources extends PDObject {
 	}
 
 	public PDFont getFont(ASAtom name) {
-
 		if (fontMap.containsKey(name)) {
 			return fontMap.get(name);
 		}
@@ -144,6 +144,16 @@ public class PDResources extends PDObject {
 		PDFont font = PDFontFactory.getPDFont(rawFont);
 		fontMap.put(name, font);
 		return font;
+	}
+
+	public PDResource getProperties(ASAtom name) {
+		if (propertiesMap.containsKey(name)) {
+			return propertiesMap.get(name);
+		}
+		COSObject rawProperties = getResource(ASAtom.PROPERTIES, name);
+		PDResource properties = new PDResource(rawProperties);
+		propertiesMap.put(name, properties);
+		return properties;
 	}
 
 	public Set<ASAtom> getExtGStateNames() {
