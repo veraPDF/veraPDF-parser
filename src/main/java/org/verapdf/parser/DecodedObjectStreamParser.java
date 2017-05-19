@@ -95,6 +95,13 @@ public class DecodedObjectStreamParser extends COSParser {
         return res;
     }
 
+    /**
+     * Parses object from object stream.
+     *
+     * @param key is key of object to parse. Object with this key should be
+     *            present in this object stream.
+     * @return object for given key or empty COSObject if key is not present.
+     */
     public COSObject getObject(COSKey key) throws IOException {
         int objNum = key.getNumber();
         if (!this.internalOffsets.containsKey(objNum)) {

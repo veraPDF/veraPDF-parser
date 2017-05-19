@@ -59,6 +59,9 @@ class Type1PrivateParser extends BaseParser {
         this.lenIV = 4;
     }
 
+    /**
+     * Parses private part of Type 1 font program.
+     */
     public void parse() throws IOException {
         initializeToken();
 
@@ -97,6 +100,9 @@ class Type1PrivateParser extends BaseParser {
                         nextToken();    // reading "array"
                         for (int i = 0; i < amountOfSubrs; ++i) {
                             nextToken();    // reading "dup"
+                            if (!this.getToken().getValue().equals(Type1StringConstants.DUP_STRING)) {
+                                break;
+                            }
                             nextToken();    // reading number
                             nextToken();
                             long toSkip = this.getToken().integer;

@@ -34,7 +34,7 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 import java.io.IOException;
 
 /**
- * Represents OpenType font.
+ * Represents OpenType font program.
  *
  * @author Sergey Shemyakov
  */
@@ -94,11 +94,17 @@ public class OpenTypeFontProgram implements FontProgram {
         return this.font.containsCode(code);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isAttemptedParsing() {
         return this.attemptedParsing;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isSuccessfulParsing() {
         return this.successfullyParsed;
@@ -163,6 +169,9 @@ public class OpenTypeFontProgram implements FontProgram {
         return res | readUShort();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ASFileStreamCloser getFontProgramResource() {
         if (this.source instanceof ASMemoryInStream) {

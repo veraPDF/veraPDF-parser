@@ -21,6 +21,8 @@
 package org.verapdf.as;
 
 /**
+ * Class contains tools for char processing.
+ *
  * @author Timur Kamalov
  */
 public class CharTable {
@@ -180,10 +182,16 @@ public class CharTable {
 	public static final byte ASCII_LEFT_PAR = 40;
 	public static final byte ASCII_RIGHT_PAR = 41;
 
-	public static byte getAttributes(int c) {
+	private static byte getAttributes(int c) {
 		return charAttributes[c];
 	}
 
+	/**
+	 * Checks if character is a space character.
+	 *
+	 * @param c is character to check.
+	 * @return true if c is a space character.
+	 */
 	public static boolean isSpace(int c) {
 		if (c < 0 || c > 255) {
 			return false;

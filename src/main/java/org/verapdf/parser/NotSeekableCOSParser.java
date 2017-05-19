@@ -13,6 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Parser for COS objects that operates with a buffered stream. The seek()
+ * operation of stream is not required.
+ *
  * @author Sergey Shemyakov
  */
 public class NotSeekableCOSParser extends NotSeekableBaseParser {
@@ -36,6 +39,11 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
         this.document = document;
     }
 
+    /**
+     * Gets next object from the source.
+     *
+     * @return next COSObject.
+     */
     public COSObject nextObject() throws IOException {
         if (!this.objects.isEmpty()) {
             COSObject result = this.objects.peek();

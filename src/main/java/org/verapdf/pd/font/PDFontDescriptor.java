@@ -86,6 +86,10 @@ public class PDFontDescriptor extends PDObject {
     private Double missingWidth;
     private String charSet;
 
+    /**
+     * Constructor from font descriptor COSObject.
+     * @param obj is descriptor COSObject.
+     */
     public PDFontDescriptor(COSObject obj) {
         super(obj);
         flags = getFlags();
@@ -427,6 +431,13 @@ public class PDFontDescriptor extends PDObject {
         return getCOSStreamWithCheck(ASAtom.FONT_FILE3);
     }
 
+    /**
+     * Checks if specific font program can be read from this font descriptor.
+     *
+     * @param key is key of font program in font descriptor dictionary, e.g.
+     *            FontFile or FontFile2.
+     * @return true if value with this key exists and is a COSStream.
+     */
     public boolean canParseFontFile(ASAtom key) {
         return this.knownKey(key) && getCOSStreamWithCheck(key) != null;
     }
@@ -547,6 +558,12 @@ public class PDFontDescriptor extends PDObject {
         this.charSet = charSet;
     }
 
+    /**
+     * Constructs font descriptor for given standard font metrics.
+     *
+     * @param sfm is standard font metrics.
+     * @return font descriptor with fields set in accordance with sfm.
+     */
     public static PDFontDescriptor getDescriptorFromMetrics(StandardFontMetrics sfm) {
         PDFontDescriptor res = new PDFontDescriptor(new COSObject());
         boolean isSymbolic = "FontSpecific".equals(sfm.getEncodingScheme());

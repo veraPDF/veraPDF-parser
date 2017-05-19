@@ -21,7 +21,7 @@
 package org.verapdf.pd.font;
 
 /**
- * Instance of this class can represent int or float.
+ * Instance of this class can represent int or float. It is used in CFF fonts.
  *
  * @author Sergey Shemyakov
  */
@@ -31,26 +31,43 @@ public class CFFNumber {
     private float real;
     private boolean isInteger;
 
+    /**
+     * Initializes this number with integer.
+     * @param integer is integer to initialize CFFNumber.
+     */
     public CFFNumber(int integer) {
         this.integer = integer;
         this.real = integer;
         this.isInteger = true;
     }
 
+    /**
+     * Initializes this number with float.
+     * @param real is float number to initialize CFFNumber.
+     */
     public CFFNumber(float real) {
         this.real = real;
         this.integer = (long) real;
         this.isInteger = false;
     }
 
+    /**
+     * @return true if CFFNumber is initialized with integer.
+     */
     public boolean isInteger() {
         return isInteger;
     }
 
+    /**
+     * @return integer if this number is initialized with integer.
+     */
     public long getInteger() {
         return integer;
     }
 
+    /**
+     * @return float if this number is initialized with float.
+     */
     public float getReal() {
         return real;
     }

@@ -60,6 +60,19 @@ public class CharStringsWidths {
     private float[] subsetFontWidths;
     private Map<Integer, Float> generalFontWidths;
 
+    /**
+     * TODO: docs
+     * @param isSubset
+     * @param charStringType
+     * @param charStrings
+     * @param fontMatrices
+     * @param localSubrIndex
+     * @param globalSubrs
+     * @param bias
+     * @param defaultWidths
+     * @param nominalWidths
+     * @param fdSelect
+     */
     public CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
                              float[][] fontMatrices, CFFIndex localSubrIndex[], CFFIndex globalSubrs,
                              int[] bias, int[] defaultWidths, int[] nominalWidths, int[] fdSelect) {
@@ -81,6 +94,20 @@ public class CharStringsWidths {
         }
     }
 
+    /**
+     * Initializes handler with given values.
+     *
+     * @param isSubset is true if font is subset. In this case all widths will
+     *                 be parsed during handler initialization.
+     * @param charStringType is type of charstring.
+     * @param charStrings is charstring handler with charstring data.
+     * @param fontMatrices is array with font matrices for each FDArray element.
+     * @param localSubrIndex is CFFIndex with local subrs.
+     * @param globalSubrs is CFFIndex with global subrs.
+     * @param bias is bias value that depends on local subrs size.
+     * @param defaultWidth is a default width for this font program.
+     * @param nominalWidth is a nominal width for this font program.
+     */
     public CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
                              float[] fontMatrices, CFFIndex localSubrIndex, CFFIndex globalSubrs,
                              int bias, int defaultWidth, int nominalWidth) {
@@ -88,6 +115,13 @@ public class CharStringsWidths {
                 globalSubrs, makeArray(bias), makeArray(defaultWidth), makeArray(nominalWidth), null);
     }
 
+    /**
+     * Gets width for glyph with given gid from charstrings.
+     *
+     * @param gid is glyph id.
+     * @return width for glyph with given gid.
+     *
+     */
     public float getWidth(int gid) {
         if (isSubset && gid >= 0 && gid < subsetFontWidths.length) {
             return subsetFontWidths[gid];
@@ -109,6 +143,9 @@ public class CharStringsWidths {
         }
     }
 
+    /**
+     * @return amount of width in charstrings.
+     */
     public int getWidthsAmount() {
         return this.charStrings.getCharStringAmount();
     }
