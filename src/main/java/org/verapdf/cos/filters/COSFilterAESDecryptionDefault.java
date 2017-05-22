@@ -81,6 +81,9 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
         this.haveReadStream = false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
         if (this.getInputStream() == null) {

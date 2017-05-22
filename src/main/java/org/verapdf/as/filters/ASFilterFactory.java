@@ -30,6 +30,8 @@ import org.verapdf.cos.filters.*;
 import java.io.IOException;
 
 /**
+ * Factory for constructing COSFilters.
+ *
  * @author Sergey Shemyakov
  */
 public class ASFilterFactory implements IASFilterFactory{

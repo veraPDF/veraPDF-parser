@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Class represents predefined PDF name. Also it caches known PDF names.
+ *
  * @author Timur Kamalov
  */
 public class ASAtom implements Comparable<ASAtom> {
@@ -607,6 +609,12 @@ public class ASAtom implements Comparable<ASAtom> {
         }
     }
 
+    /**
+     * Gets PDF name from string. Also caches it if necessary.
+     *
+     * @param value is PDF name as string.
+     * @return PDF name as ASAtom.
+     */
     public static ASAtom getASAtom(String value) {
         if (value == null) {
             return null;
@@ -624,14 +632,20 @@ public class ASAtom implements Comparable<ASAtom> {
         }
     }
 
+    /**
+     * @return string value of ASAtom.
+     */
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    private void setValue(String value) {
         this.value = value;
     }
 
+    /**
+     * @return string value of ASAtom with appended / character.
+     */
     @Override
     public String toString() {
         String result = "";

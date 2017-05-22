@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.zip.Deflater;
 
 /**
+ * Filter that implements flate encoding.
+ *
  * @author Sergey Shemyakov
  */
 public class COSFilterFlateEncode extends ASBufferingOutFilter {

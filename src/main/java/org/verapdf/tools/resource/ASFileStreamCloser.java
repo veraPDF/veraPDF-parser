@@ -32,6 +32,9 @@ public class ASFileStreamCloser implements Closeable {
 
     private Closeable stream;
 
+    /**
+     * Sets inner stream.
+     */
     public ASFileStreamCloser(Closeable stream) {
         this.stream = stream;
     }

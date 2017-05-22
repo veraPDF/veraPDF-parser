@@ -38,6 +38,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Class that registers encoding and decoding filters.
+ *
  * @author Timur Kamalov
  */
 public class COSFilterRegistry {
@@ -65,13 +67,21 @@ public class COSFilterRegistry {
 		return registeredFactories.get(name);
 	}
 
-	public static void registerFactory(final ASAtom filterName, final IASFilterFactory factory) throws Exception {
+	private static void registerFactory(final ASAtom filterName, final IASFilterFactory factory) throws Exception {
 		if (registeredFactories.containsKey(filterName)) {
 			throw new Exception("COSFilterRegistry::RegisterFactory(...)" + StringExceptions.DUPLICATE_FACTORY_NAMES);
 		}
 		registeredFactories.put(filterName, factory);
 	}
 
+	/**
+	 * Gets decode filter from given input stream with given parameters.
+	 *
+	 * @param filterName is name of filter to decode stream with.
+	 * @param inputStream is a stream with encoded data.
+	 * @param decodeParams is dictionary with decoding parameters.
+	 * @return filter with decoded data.
+	 */
 	public static ASInFilter getDecodeFilter(final ASAtom filterName,
 											 final ASInputStream inputStream,
 											 COSDictionary decodeParams) throws IOException {
@@ -83,6 +93,13 @@ public class COSFilterRegistry {
 		return new ASBufferedInFilter(inputStream);
 	}
 
+	/**
+	 * Gets decode filter from given input stream.
+	 *
+	 * @param filterName is name of filter to encode stream with.
+	 * @param outputStream is a stream with data to encode.
+	 * @return filter with encoded data.
+	 */
 	public static ASOutFilter getEncodeFilter(final ASAtom filterName,
 											  ASOutputStream outputStream) throws IOException {
 		final IASFilterFactory filterFactory = factoryByName(filterName);

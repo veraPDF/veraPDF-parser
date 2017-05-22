@@ -27,12 +27,28 @@ import org.verapdf.cos.COSDictionary;
 import java.io.IOException;
 
 /**
+ * Interface for filter factories.
+ *
  * @author Timur Kamalov
  */
 public interface IASFilterFactory {
 
+	/**
+	 * Gets input filter from given encoded stream with specified decode
+	 * parameters.
+	 *
+	 * @param inputStream is encoded data.
+	 * @param decodeParams is dictionary with parameters for filter.
+	 * @return stream with decoded data.
+	 */
 	ASInFilter getInFilter(ASInputStream inputStream, COSDictionary decodeParams) throws IOException;
 
+	/**
+	 * Gets output filter with encoded data.
+	 *
+	 * @param outputStream stream to encode.
+	 * @return stream with encoded data.
+	 */
 	ASOutFilter getOutFilter(ASOutputStream outputStream) throws IOException;
 
 }

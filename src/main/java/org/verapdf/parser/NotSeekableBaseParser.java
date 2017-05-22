@@ -12,7 +12,8 @@ import java.util.logging.Logger;
 import static org.verapdf.as.CharTable.*;
 
 /**
- * Base PDF parser that operates with a buffered stream.
+ * Base PDF parser that operates with a buffered stream. The seek() operation
+ * of stream is not required.
  *
  * @author Sergey Shemyakov
  */
@@ -27,6 +28,10 @@ public class NotSeekableBaseParser {
     protected ASBufferedInFilter source;
     private Token token;
 
+    /**
+     * Constructor from stream. New buffered stream from given stream is created.
+     * @param stream is source data stream.
+     */
     public NotSeekableBaseParser(ASInputStream stream) throws IOException {
         if (stream == null) {
             throw new IOException("Stream in NotSeekableBaseParser can't be null.");
@@ -35,6 +40,9 @@ public class NotSeekableBaseParser {
         source.initialize();
     }
 
+    /**
+     * Closes source stream.
+     */
     public void closeInputStream() throws IOException {
         this.source.close();
     }

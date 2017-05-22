@@ -60,8 +60,23 @@ public class CharStringsWidths {
     private float[] subsetFontWidths;
     private Map<Integer, Float> generalFontWidths;
 
+    /**
+     * Initializes handler with given values.
+     *
+     * @param isSubset is true if font is subset. In this case all widths will
+     *                 be parsed during handler initialization.
+     * @param charStringType is type of charstring.
+     * @param charStrings is charstring handler with charstring data.
+     * @param fontMatrices is array of font matrix for each FDArray element.
+     * @param localSubrIndex is array of local subrs for each FDArray element.
+     * @param globalSubrs is array of global subrs for each FDArray element.
+     * @param bias is array of bias values for each FDArray element.
+     * @param defaultWidths is array of default widths for each FDArray element.
+     * @param nominalWidths is array of nominal widths for each FDArray element.
+     * @param fdSelect is fd select array as specified in CFF font.
+     */
     public CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
-                             float[][] fontMatrices, CFFIndex localSubrIndex[], CFFIndex globalSubrs,
+                             float[][] fontMatrices, CFFIndex[] localSubrIndex, CFFIndex globalSubrs,
                              int[] bias, int[] defaultWidths, int[] nominalWidths, int[] fdSelect) {
         this.isSubset = isSubset;
         this.charStringType = charStringType;
@@ -81,13 +96,34 @@ public class CharStringsWidths {
         }
     }
 
+    /**
+     * Initializes handler with given values.
+     *
+     * @param isSubset is true if font is subset. In this case all widths will
+     *                 be parsed during handler initialization.
+     * @param charStringType is type of charstring.
+     * @param charStrings is charstring handler with charstring data.
+     * @param fontMatrix is font matrix for this charstrings.
+     * @param localSubrIndex is CFFIndex with local subrs.
+     * @param globalSubrs is CFFIndex with global subrs.
+     * @param bias is bias value that depends on local subrs size.
+     * @param defaultWidth is a default width for this font program.
+     * @param nominalWidth is a nominal width for this font program.
+     */
     public CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
-                             float[] fontMatrices, CFFIndex localSubrIndex, CFFIndex globalSubrs,
+                             float[] fontMatrix, CFFIndex localSubrIndex, CFFIndex globalSubrs,
                              int bias, int defaultWidth, int nominalWidth) {
-        this(isSubset, charStringType, charStrings, makeArray(fontMatrices), makeArray(localSubrIndex),
+        this(isSubset, charStringType, charStrings, makeArray(fontMatrix), makeArray(localSubrIndex),
                 globalSubrs, makeArray(bias), makeArray(defaultWidth), makeArray(nominalWidth), null);
     }
 
+    /**
+     * Gets width for glyph with given gid from charstrings.
+     *
+     * @param gid is glyph id.
+     * @return width for glyph with given gid.
+     *
+     */
     public float getWidth(int gid) {
         if (isSubset && gid >= 0 && gid < subsetFontWidths.length) {
             return subsetFontWidths[gid];
@@ -109,6 +145,9 @@ public class CharStringsWidths {
         }
     }
 
+    /**
+     * @return amount of width in charstrings.
+     */
     public int getWidthsAmount() {
         return this.charStrings.getCharStringAmount();
     }

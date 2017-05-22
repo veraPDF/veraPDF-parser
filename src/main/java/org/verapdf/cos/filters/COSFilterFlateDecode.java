@@ -48,7 +48,7 @@ public class COSFilterFlateDecode extends ASBufferedInFilter {
     }
 
     /**
-     * Decodes given flate compressed data from stream and reads up to
+     * Decodes flate compressed data from stream and reads up to
      * <code>size</code> bytes of decompressed data into given array.
      *
      * @param buffer is array into which data will be decompressed.
@@ -84,6 +84,9 @@ public class COSFilterFlateDecode extends ASBufferedInFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() throws IOException {
         super.reset();

@@ -44,6 +44,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Class represents Type 1 font on PD level.
+ *
  * @author Sergey Shemyakov
  */
 public class PDType1Font extends PDSimpleFont {
@@ -68,7 +70,10 @@ public class PDType1Font extends PDSimpleFont {
     private Boolean isStandard = null;
     private StandardFontMetrics fontMetrics;
 
-
+    /**
+     * Constructor from type 1 font dictionary.
+     * @param dictionary is type 1 font dictionary.
+     */
     public PDType1Font(COSDictionary dictionary) {
         super(dictionary);
         if (isNameStandard() && this.fontDescriptor.getObject().size() == 0) {
@@ -77,6 +82,10 @@ public class PDType1Font extends PDSimpleFont {
         }
     }
 
+    /**
+     * @return set of character names defined in font as specified in CIDSet in
+     * font descriptor.
+     */
     public Set<String> getDescriptorCharSet() {
         String descriptorCharSetString = this.fontDescriptor.getCharSet();
         if (descriptorCharSetString != null) {
@@ -101,6 +110,9 @@ public class PDType1Font extends PDSimpleFont {
         return Collections.emptySet();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FontProgram getFontProgram() {
         if (this.isFontParsed) {
@@ -138,6 +150,9 @@ public class PDType1Font extends PDSimpleFont {
         return null;
     }
 
+    /**
+     * @return true if this font is one of standard 14 fonts.
+     */
     public Boolean isStandard() {
         if (this.isStandard == null) {
             if (!containsDiffs() && !isEmbedded() && isNameStandard()) {
@@ -189,6 +204,9 @@ public class PDType1Font extends PDSimpleFont {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Double getWidth(int code) {
         if (getFontProgram() != null) {

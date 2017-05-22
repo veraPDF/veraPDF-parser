@@ -63,6 +63,12 @@ public class PDFDocEncoding {
     private PDFDocEncoding() {
     }
 
+    /**
+     * Applies PDF doc encoding to given byte array.
+     *
+     * @param bytes to be PDF doc encoded.
+     * @return String that containes PDF doc encoded bytes.
+     */
     public static String getStringFromBytes(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {

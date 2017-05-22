@@ -33,16 +33,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Represents True Type font on PD level.
+ *
  * @author Sergey Shemyakov
  */
 public class PDTrueTypeFont extends PDSimpleFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDTrueTypeFont.class.getCanonicalName());
 
+    /**
+     * Constructor from true type font dictionary.
+     * @param dictionary is true type font dictionary.
+     */
     public PDTrueTypeFont(COSDictionary dictionary) {
         super(dictionary);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FontProgram getFontProgram() {
         if (this.isFontParsed) {

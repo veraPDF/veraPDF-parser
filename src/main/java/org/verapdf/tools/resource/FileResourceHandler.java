@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class that handles resource closing.
+ *
  * @author Sergey Shemyakov
  */
 public class FileResourceHandler implements Closeable {
@@ -36,6 +38,11 @@ public class FileResourceHandler implements Closeable {
         this.resources = new ArrayList<>();
     }
 
+    /**
+     * Adds resource for closing.
+     *
+     * @param obj is a file stream closer to be stored.
+     */
     public void addResource(ASFileStreamCloser obj) {
         if (obj != null) {
             Closeable resource = obj.getStream();
@@ -45,12 +52,20 @@ public class FileResourceHandler implements Closeable {
         }
     }
 
+    /**
+     * Adds resource for closing.
+     *
+     * @param res is a closeable object to be stored.
+     */
     public void addResource(Closeable res) {
         if (res != null && !resources.contains(res)) {
             resources.add(res);
         }
     }
 
+    /**
+     * Closes all stored resources.
+     */
     @Override
     public void close() throws IOException {
         for (Closeable obj : resources) {
@@ -58,6 +73,10 @@ public class FileResourceHandler implements Closeable {
         }
     }
 
+    /**
+     * Adds all closeable objects from given list to handler.
+     * @param resources
+     */
     public void addAll(List<Closeable> resources) {
         this.resources.addAll(resources);
     }
