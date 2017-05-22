@@ -27,6 +27,8 @@ import org.verapdf.as.io.ASInputStream;
 import java.io.IOException;
 
 /**
+ * Filter for ASCIIHex data decoding.
+ *
  * @author Timur Kamalov
  */
 public class COSFilterASCIIHexDecode extends ASBufferedInFilter {
@@ -95,6 +97,13 @@ public class COSFilterASCIIHexDecode extends ASBufferedInFilter {
         return pointer == 0 ? -1 : pointer;
     }
 
+    /**
+     * Converts char byte to it's hex value, e.g. '1' -> 1 and 'A' -> 10.
+     *
+     * @param val is character that should be hexadecimal digit.
+     * @return actual value for this character or 127 if character is not a
+     * valid hex digit.
+     */
     public static byte decodeLoHex(byte val) {
         return loHexTable[val & 0xFF];
     }

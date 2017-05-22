@@ -25,6 +25,8 @@ import org.verapdf.cos.COSKey;
 import java.util.*;
 
 /**
+ *
+ *
  * @author Timur Kamalov
  */
 public class COSXRefSection {

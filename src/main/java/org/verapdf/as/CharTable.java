@@ -199,6 +199,12 @@ public class CharTable {
 		return (getAttributes(c) & SPACE) != 0;
 	}
 
+	/**
+	 * Checks if given character is a token delimiter.
+	 *
+	 * @param c is a character to check.
+	 * @return true if c is a token delimiter.
+	 */
 	public static boolean isTokenDelimiter(int c) {
 		if (c < 0 || c > 255) {
 			return false;
@@ -206,6 +212,12 @@ public class CharTable {
 		return (getAttributes(c) & (SPACE | DELIMITER)) != 0;
 	}
 
+	/**
+	 * Checks if given character is not a space and not a token delimiter.
+	 *
+	 * @param c is a character to check.
+	 * @return true if c is a regular character.
+	 */
 	public static boolean isRegular(int c) {
 		if (c < 0 || c > 255) {
 			return false;
