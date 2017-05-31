@@ -271,6 +271,21 @@ public abstract class PDFont extends PDResource {
     }
 
     /**
+     * @return value of Subtype key in embedded font program stream or null if
+     * no value available.
+     */
+    public ASAtom getProgramSubtype() {
+        COSStream fontFile = fontDescriptor.getFontFile();
+        if (fontFile == null) {
+            fontFile = fontDescriptor.getFontFile2();
+            if (fontFile == null) {
+                fontFile = fontDescriptor.getFontFile3();
+            }
+        }
+        return fontFile == null ? null : fontFile.getNameKey(ASAtom.SUBTYPE);
+    }
+
+    /**
      * Gets width for glyph with given code in this font.
      *
      * @param code is code of glyph.
