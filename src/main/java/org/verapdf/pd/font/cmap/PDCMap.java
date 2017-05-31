@@ -67,7 +67,7 @@ public class PDCMap {
         }
         if (this.cMap.getType() == COSObjType.COS_STREAM) {
             COSObject cMapName = this.cMap.getKey(ASAtom.CMAPNAME);
-            if (cMapName != COSObject.getEmpty()) {
+            if (!cMapName.empty()) {
                 return cMapName.getString();
             }
         }
