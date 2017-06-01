@@ -169,7 +169,7 @@ public class Reader extends XRefReader {
 				return false;
 			}
 			StandardSecurityHandler ssh = new StandardSecurityHandler(encryption,
-					this.parser.getId());
+					this.getTrailer().getID());
 			boolean res = ssh.isEmptyStringPassword();
 			if (res) {
 				this.parser.getDocument().setStandardSecurityHandler(ssh);
