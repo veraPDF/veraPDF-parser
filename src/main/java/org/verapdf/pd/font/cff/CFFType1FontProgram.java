@@ -141,7 +141,9 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
                         int first = this.readCard8() & 0xFF;
                         int nLeft = this.readCard8() & 0xFF;
                         for (int j = 0; j <= nLeft; ++j) {
-                            encoding[(first + j)] = encodingPointer++;
+                            if (first + j < encoding.length) {
+                                encoding[(first + j)] = encodingPointer++;
+                            }
                         }
                     }
                     if (format == 1) {
@@ -227,21 +229,27 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
             return pdEncoding.getName(code);
         }
         if(isStandardEncoding) {
-            return CFFPredefined.STANDARD_STRINGS[CFFPredefined.STANDARD_ENCODING[code]];
-        } else if (isExpertEncoding) {
-            int sid = CFFPredefined.EXPERT_ENCODING[code];
-            if(sid == CFFPredefined.SPACE_SID_EXPERT) {
-                return CFFPredefined.EXPERT_CHARSET[CFFPredefined.SPACE_SID_EXPERT];
-            } else if (sid < CFFPredefined.ISO_ADOBE_CHARSET.length) {
-                return CFFPredefined.STANDARD_STRINGS[sid];
-            } else if (sid <= CFFPredefined.EXPERT_ENCODING_LAST_SID) {
-                return CFFPredefined.EXPERT_CHARSET[sid -
-                        CFFPredefined.ISO_ADOBE_CHARSET.length - 2];
+            if (code < CFFPredefined.STANDARD_ENCODING.length) {
+                return CFFPredefined.STANDARD_STRINGS[CFFPredefined.STANDARD_ENCODING[code]];
             }
-            return NOTDEF_STRING;
+        } else if (isExpertEncoding) {
+            if (code < CFFPredefined.EXPERT_ENCODING.length) {
+                int sid = CFFPredefined.EXPERT_ENCODING[code];
+                if (sid == CFFPredefined.SPACE_SID_EXPERT) {
+                    return CFFPredefined.EXPERT_CHARSET[CFFPredefined.SPACE_SID_EXPERT];
+                } else if (sid < CFFPredefined.ISO_ADOBE_CHARSET.length) {
+                    return CFFPredefined.STANDARD_STRINGS[sid];
+                } else if (sid <= CFFPredefined.EXPERT_ENCODING_LAST_SID) {
+                    return CFFPredefined.EXPERT_CHARSET[sid -
+                            CFFPredefined.ISO_ADOBE_CHARSET.length - 2];
+                }
+            }
         } else {
-            return inverseCharSet.get(encoding[code] + 1);
+            if (code < encoding.length) {
+                return inverseCharSet.get(encoding[code] + 1);
+            }
         }
+        return NOTDEF_STRING;
     }
 
     /**

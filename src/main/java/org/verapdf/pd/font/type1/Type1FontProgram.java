@@ -278,7 +278,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     private String getGlyph(int code) {
-        if (this.pdfEncoding == null || !pdfEncoding.containsCode(code)) {
+        if ((this.pdfEncoding == null || !pdfEncoding.containsCode(code)) && code < encoding.length) {
             return encoding[code];
         } else {
             return this.pdfEncoding.getName(code);
