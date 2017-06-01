@@ -162,7 +162,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
                 for (int i = 0; i < numberOfRanges; ++i) {
                     int fd = this.readCard8();
                     int afterLast = this.readCard16();
-                    for (int j = first; j < afterLast; ++j) {
+                    for (int j = first; j < afterLast && j < fdSelect.length; ++j) {
                         this.fdSelect[j] = fd;
                     }
                     first = afterLast;
