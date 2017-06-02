@@ -58,11 +58,18 @@ class Type2CharStringParser extends BaseCharStringParser {
     @Override
     protected boolean processNextOperator(int nextByte) throws IOException {
         switch (nextByte) {
-            case 14:    // endchar
             case 19:    // cntrmask
             case 20:    // hintmask
             case 11:    // return
                 if (!this.stack.empty()) {
+                    this.setWidth(this.stack.get(0));
+                    return true;
+                }
+                break;
+            case 14:    // endchar
+                if (!this.stack.empty() && this.stack.size() != 4) {
+                    // If endchar is proceeded with 4 numbers, they are arguments
+                    // for "seac" operator from charsting type 1.
                     this.setWidth(this.stack.get(0));
                     return true;
                 }
