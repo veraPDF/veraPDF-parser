@@ -84,4 +84,14 @@ public class PDTilingPattern extends PDPattern implements PDContentStream {
         }
         return new PDResources(COSDictionary.construct());
     }
+
+    public boolean isColored() {
+        Long paintType = getPaintType();
+        return paintType != null && paintType == 1;
+    }
+
+    public boolean isUncolored() {
+        Long paintType = getPaintType();
+        return paintType != null && paintType == 2;
+    }
 }
