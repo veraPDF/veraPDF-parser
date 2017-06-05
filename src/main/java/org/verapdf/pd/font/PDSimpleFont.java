@@ -20,11 +20,11 @@
  */
 package org.verapdf.pd.font;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.pd.font.truetype.AdobeGlyphList;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents simple font on pd level (Type1, TrueType, Type3).
@@ -35,6 +35,10 @@ public abstract class PDSimpleFont extends PDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDSimpleFont.class.getCanonicalName());
 
+    /**
+     * Constructor from font dictionary.
+     * @param dictionary is font dictionary for this simple font.
+     */
     public PDSimpleFont(COSDictionary dictionary) {
         super(dictionary);
     }

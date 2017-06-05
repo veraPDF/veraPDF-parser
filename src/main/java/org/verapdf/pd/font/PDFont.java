@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -125,6 +125,9 @@ public abstract class PDFont extends PDResource {
         return this.fontDescriptor.isSymbolic();
     }
 
+    /**
+     * @return encoding mapping object for this font.
+     */
     public Encoding getEncodingMapping() {
         if (this.encoding == null) {
             this.encoding = getEncodingMappingFromCOSObject(this.getEncoding());
@@ -132,6 +135,12 @@ public abstract class PDFont extends PDResource {
         return this.encoding;
     }
 
+    /**
+     * Gets encoding object from COSObject.
+     *
+     * @param e is value of Encoding key in font dictionary.
+     * @return encoding object for given COSObject.
+     */
     public static Encoding getEncodingMappingFromCOSObject(COSObject e) {
         Encoding encodingObj;
         COSBase cosEncoding = e.getDirectBase();
@@ -148,22 +157,39 @@ public abstract class PDFont extends PDResource {
         return null;
     }
 
+    /**
+     * @return name of the font as specified in BaseFont key of font dictionary.
+     */
     public String getName() {
         return this.dictionary.getStringKey(ASAtom.BASE_FONT);
     }
 
+    /**
+     * @return encoding of the font as specified in Encoding key of font
+     * dictionary.
+     */
     public COSObject getEncoding() {
         return this.dictionary.getKey(ASAtom.ENCODING);
     }
 
+    /**
+     * @return COSStream with font file 2 taken from font descriptor.
+     */
     public COSStream getFontFile2() {
         return this.fontDescriptor.getFontFile2();
     }
 
+    /**
+     * @return map of differences as given in Differences key in Encoding of
+     * this font.
+     */
     public Map<Integer, String> getDifferences() {
         return getDifferencesFromCosEncoding(this.getEncoding());
     }
 
+    /**
+     * @return map of differences as given in Differences key in Encoding.
+     */
     public static Map<Integer, String> getDifferencesFromCosEncoding(COSObject e) {
         COSArray differences = (COSArray)
                 e.getKey(ASAtom.DIFFERENCES).getDirectBase();
@@ -182,14 +208,25 @@ public abstract class PDFont extends PDResource {
         return res;
     }
 
+    /**
+     * @return widths of the font as specified in Widths key of font dictionary.
+     */
     public COSObject getWidths() {
         return this.dictionary.getKey(ASAtom.WIDTHS);
     }
 
+    /**
+     * @return first char in the font as specified in FirstChar key of font
+     * dictionary.
+     */
     public Long getFirstChar() {
         return this.dictionary.getIntegerKey(ASAtom.FIRST_CHAR);
     }
 
+    /**
+     * @return last char in the font as specified in LastChar key of font
+     * dictionary.
+     */
     public Long getLastChar() {
         return this.dictionary.getIntegerKey(ASAtom.LAST_CHAR);
     }
@@ -206,6 +243,9 @@ public abstract class PDFont extends PDResource {
         return stream.read();
     }
 
+    /**
+     * @return embedded font program fo this PDFont.
+     */
     public abstract FontProgram getFontProgram();
 
     /**
@@ -230,6 +270,27 @@ public abstract class PDFont extends PDResource {
         return this.toUnicodeCMap.toUnicode(code);
     }
 
+    /**
+     * @return value of Subtype key in embedded font program stream or null if
+     * no value available.
+     */
+    public ASAtom getProgramSubtype() {
+        COSStream fontFile = fontDescriptor.getFontFile();
+        if (fontFile == null) {
+            fontFile = fontDescriptor.getFontFile2();
+            if (fontFile == null) {
+                fontFile = fontDescriptor.getFontFile3();
+            }
+        }
+        return fontFile == null ? null : fontFile.getNameKey(ASAtom.SUBTYPE);
+    }
+
+    /**
+     * Gets width for glyph with given code in this font.
+     *
+     * @param code is code of glyph.
+     * @return width for glyph with given code as specified in Widths array.
+     */
     public Double getWidth(int code) {
         if (dictionary.knownKey(ASAtom.WIDTHS).booleanValue()
                 && dictionary.knownKey(ASAtom.FIRST_CHAR).booleanValue()
@@ -252,14 +313,23 @@ public abstract class PDFont extends PDResource {
         return Double.valueOf(0);
     }
 
+    /**
+     * @return default width for this font as specified in font descriptor.
+     */
     public Double getDefaultWidth() {
         return fontDescriptor.getMissingWidth();
     }
 
+    /**
+     * @return true if font program for this font has been successfully parsed.
+     */
     public boolean isSuccessfullyParsed() {
         return successfullyParsed;
     }
 
+    /**
+     * Sets flag indicating successful parsing of embedded font program.
+     */
     public void setSuccessfullyParsed(boolean successfullyParsed) {
         this.successfullyParsed = successfullyParsed;
     }

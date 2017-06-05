@@ -95,7 +95,15 @@ public class DecodedObjectStreamParser extends COSParser {
         return res;
     }
 
-    public COSObject getObject(int objNum) throws IOException {
+    /**
+     * Parses object from object stream.
+     *
+     * @param key is key of object to parse. Object with this key should be
+     *            present in this object stream.
+     * @return object for given key or empty COSObject if key is not present.
+     */
+    public COSObject getObject(COSKey key) throws IOException {
+        int objNum = key.getNumber();
         if (!this.internalOffsets.containsKey(objNum)) {
             return new COSObject();
         }
@@ -103,6 +111,8 @@ public class DecodedObjectStreamParser extends COSParser {
         this.flag = true;
         this.objects.clear();   // In case if some COSInteger was read before.
         this.integers.clear();
-        return nextObject();
+        COSObject res = nextObject();
+        res.setObjectKey(key);
+        return res;
     }
 }

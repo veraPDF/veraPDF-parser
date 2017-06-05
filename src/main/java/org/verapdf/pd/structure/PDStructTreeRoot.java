@@ -18,7 +18,7 @@
  * If a copy of the MPL was not distributed with this file, you can obtain one at
  * http://mozilla.org/MPL/2.0/.
  */
-package org.verapdf.pd;
+package org.verapdf.pd.structure;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
@@ -38,7 +38,7 @@ public class PDStructTreeRoot extends PDStructTreeNode {
 
 	@Override
 	public List<PDStructElem> getChildren() {
-		return TaggedPDFHelper.getStructTreeRootChildren(getObject());
+		return TaggedPDFHelper.getStructTreeRootChildren(getObject(), getRoleMap());
 	}
 
 	public Map<ASAtom, ASAtom> getRoleMap() {

@@ -18,52 +18,21 @@
  * If a copy of the MPL was not distributed with this file, you can obtain one at
  * http://mozilla.org/MPL/2.0/.
  */
-package org.verapdf.pd;
+package org.verapdf.pd.structure;
 
-import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSString;
-import org.verapdf.tools.TaggedPDFHelper;
+import org.verapdf.pd.PDObject;
 
 import java.util.List;
 
 /**
  * @author Maksim Bezrukov
  */
-public class PDStructElem extends PDStructTreeNode {
+public abstract class PDStructTreeNode extends PDObject {
 
-	public PDStructElem(COSObject obj) {
+	protected PDStructTreeNode(COSObject obj) {
 		super(obj);
 	}
 
-	public ASAtom getType() {
-		return getObject().getNameKey(ASAtom.TYPE);
-	}
-
-	public ASAtom getStructureType() {
-		return getObject().getNameKey(ASAtom.S);
-	}
-
-	public COSName getCOSStructureType() {
-		COSObject object = getKey(ASAtom.S);
-		if (object != null && object.getType() == COSObjType.COS_NAME) {
-			return (COSName) object.getDirectBase();
-		}
-		return null;
-	}
-
-	public COSString getLang() {
-		COSObject object = getKey(ASAtom.LANG);
-		if (object != null && object.getType() == COSObjType.COS_STRING) {
-			return (COSString) object.getDirectBase();
-		}
-		return null;
-	}
-
-	@Override
-	public List<PDStructElem> getChildren() {
-		return TaggedPDFHelper.getStructElemChildren(getObject());
-	}
+	public abstract List<PDStructElem> getChildren();
 }

@@ -27,6 +27,8 @@ import org.verapdf.as.io.ASInputStream;
 import java.io.IOException;
 
 /**
+ * Filter for ASCII 85 data decoding.
+ *
  * @author Sergey Shemyakov
  */
 public class COSFilterASCII85Decode extends ASBufferedInFilter {

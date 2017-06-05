@@ -42,7 +42,7 @@ public class PDSeparation extends PDSpecialColorSpace {
     }
 
     public PDColorSpace getAlternate() {
-        return this.baseColorSpace;
+        return super.getBaseColorSpace();
     }
 
     @Override

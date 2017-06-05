@@ -75,6 +75,9 @@ public abstract class SeekableInputStream extends ASInputStream {
      */
     public abstract ASInputStream getStream(long startOffset, long length) throws IOException;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void incrementResourceUsers() {
         this.resourceUsers.increment();
@@ -87,24 +90,46 @@ public abstract class SeekableInputStream extends ASInputStream {
         return this.getOffset() == this.getStreamLength();
     }
 
+    /**
+     * Resets reading pointer one byte backwards.
+     */
     public void unread() throws IOException {
         this.seek(this.getOffset() - 1);
     }
 
-
+    /**
+     * Resets reading pointer several bytes backwards.
+     *
+     * @param count is number of bytes to unread.
+     */
     public void unread(final int count) throws IOException {
         this.seek(this.getOffset() - count);
     }
 
+    /**
+     * Sets reading pointer several bytes forward.
+     *
+     * @param pos is amount of bytes to skip.
+     */
     public void seekFromCurrentPosition(final long pos) throws IOException {
         this.seek(getOffset() + pos);
     }
 
+    /**
+     * Seeks given number of bytes from the end of stream.
+     *
+     * @param pos is a number of bytes to seek from the end of stream.
+     */
     public void seekFromEnd(final long pos) throws IOException {
         final long size = this.getStreamLength();
         this.seek(size - pos);
     }
 
+    /**
+     * Reads next byte from stream.
+     *
+     * @return the byte read.
+     */
     public byte readByte() throws IOException {
         int next = this.read();
         if (next < 0) {

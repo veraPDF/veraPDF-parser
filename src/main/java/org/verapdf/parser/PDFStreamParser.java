@@ -20,6 +20,7 @@
  */
 package org.verapdf.parser;
 
+import org.verapdf.as.ASAtom;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
@@ -46,6 +47,8 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 
 	private final List<Object> tokens = new ArrayList<>();
 	private List<Closeable> imageDataStreams = new ArrayList<>();
+
+	private COSDictionary lastInlineImageDict;
 
 	public PDFStreamParser(ASInputStream stream) throws IOException {
 		super(stream);
@@ -208,6 +211,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 				if (result instanceof InlineImageOperator) {
 					InlineImageOperator imageOperator = (InlineImageOperator) result;
 					COSDictionary imageParameters = (COSDictionary) COSDictionary.construct().get();
+					lastInlineImageDict = imageParameters;
 					imageOperator.setImageParameters(imageParameters);
 					Object nextToken = parseNextToken();
 					while (nextToken instanceof COSObject &&
@@ -293,14 +297,24 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		byte currentByte = source.readByte();
 		image.add(previousByte);
 		image.add(currentByte);
-		while (!(previousByte == 'E' && currentByte == 'I' &&
-				CharTable.isTokenDelimiter(source.peek())) && !source.isEOF()) {
+		Long l = this.lastInlineImageDict == null ? new Long(0) : lastInlineImageDict.getIntegerKey(ASAtom.L);
+		if (l == null) {
+			l = lastInlineImageDict.getIntegerKey(ASAtom.LENGTH);
+		}
+		while (!(this.source.isEOF())) {
+			if (previousByte == 'E' && currentByte == 'I' && isSourceAfterImage(l)) {
+			    break;
+            }
 			previousByte = currentByte;
 			currentByte = source.readByte();
 			image.add(currentByte);
 		}
 		return new ASMemoryInStream(getByteArrayFromArrayList(image),
 				source.getReadCounter(), false);
+	}
+
+	private boolean isSourceAfterImage(Long length) {
+		 return length == null || source.getReadCounter() >= length;
 	}
 
 	public List<Closeable> getImageDataStreams() {

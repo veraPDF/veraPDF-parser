@@ -28,6 +28,7 @@ import org.verapdf.pd.actions.PDAction;
 import org.verapdf.pd.actions.PDCatalogAdditionalActions;
 import org.verapdf.pd.form.PDAcroForm;
 import org.verapdf.pd.optionalcontent.PDOptionalContentProperties;
+import org.verapdf.pd.structure.PDStructTreeRoot;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -119,6 +119,9 @@ public class Type1CharStringParser extends BaseCharStringParser {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected CFFNumber readNextNumber(int firstByte) throws IOException {
         byte[] buf = new byte[4];

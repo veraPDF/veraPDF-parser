@@ -34,7 +34,7 @@
 
     <groupId>org.verapdf</groupId>
     <artifactId>parser</artifactId>
-    <version>1.4.0</version>
+    <version>1.6.0</version>
 
     <name>veraPDF Parser</name>
     <description>veraPDF tools for parsing, modifying and creating PDF documents.</description>

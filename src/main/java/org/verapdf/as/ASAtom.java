@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Class represents predefined PDF name. Also it caches known PDF names.
+ *
  * @author Timur Kamalov
  */
 public class ASAtom implements Comparable<ASAtom> {
@@ -372,6 +374,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom NON_FULL_SCREEN_PAGE_MODE = new ASAtom("NonFullScreenPageMode");
     public static final ASAtom NONE = new ASAtom("None");
     public static final ASAtom NORMAL = new ASAtom("Normal");
+    public static final ASAtom NS = new ASAtom("NS");
     public static final ASAtom NUMS = new ASAtom("Nums");
     // O
     public static final ASAtom O = new ASAtom("O");
@@ -461,6 +464,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom RGB = new ASAtom("RGB");
     public static final ASAtom RI = new ASAtom("RI");
     public static final ASAtom ROLE_MAP = new ASAtom("RoleMap");
+    public static final ASAtom ROLE_MAP_NS = new ASAtom("RoleMapNS");
     public static final ASAtom ROOT = new ASAtom("Root");
     public static final ASAtom ROTATE = new ASAtom("Rotate");
     public static final ASAtom ROWS = new ASAtom("Rows");
@@ -605,6 +609,12 @@ public class ASAtom implements Comparable<ASAtom> {
         }
     }
 
+    /**
+     * Gets PDF name from string. Also caches it if necessary.
+     *
+     * @param value is PDF name as string.
+     * @return PDF name as ASAtom.
+     */
     public static ASAtom getASAtom(String value) {
         if (value == null) {
             return null;
@@ -622,14 +632,20 @@ public class ASAtom implements Comparable<ASAtom> {
         }
     }
 
+    /**
+     * @return string value of ASAtom.
+     */
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    private void setValue(String value) {
         this.value = value;
     }
 
+    /**
+     * @return string value of ASAtom with appended / character.
+     */
     @Override
     public String toString() {
         String result = "";

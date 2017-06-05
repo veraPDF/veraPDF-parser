@@ -74,6 +74,9 @@ public class COSPredictorDecode extends ASBufferedInFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
         if (streamEnded) {
@@ -243,6 +246,9 @@ public class COSPredictorDecode extends ASBufferedInFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() throws IOException {
         super.reset();

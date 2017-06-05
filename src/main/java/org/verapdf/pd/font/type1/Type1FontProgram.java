@@ -138,8 +138,9 @@ public class Type1FontProgram extends COSParser implements FontProgram {
 
                         while (true) {
                             nextToken();
-                            if (this.getToken().getValue().equals(
-                                    Type1StringConstants.DEF_STRING)) {
+                            String token = this.getToken().getValue();
+                            if (token.equals(Type1StringConstants.DEF_STRING) ||
+                                    token.equals(Type1StringConstants.READONLY_STRING)) {
                                 break;
                             }
                             if (this.getToken().type == Token.Type.TT_EOF) {
@@ -277,7 +278,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     private String getGlyph(int code) {
-        if (this.pdfEncoding == null || !pdfEncoding.containsCode(code)) {
+        if ((this.pdfEncoding == null || !pdfEncoding.containsCode(code)) && code < encoding.length) {
             return encoding[code];
         } else {
             return this.pdfEncoding.getName(code);

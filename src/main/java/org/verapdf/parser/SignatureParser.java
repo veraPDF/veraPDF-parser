@@ -21,6 +21,7 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.CharTable;
 import org.verapdf.cos.COSDocument;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
@@ -76,14 +77,10 @@ public class SignatureParser extends COSParser {
             char c = (char) source.peek();
             if (c == '>') {
                 done = true;
-            } else if (c == '/') {
+            } else {
                 if(parseSignatureNameValuePair()) {
                     done = true;
                 }
-            } else {
-                // invalid dictionary, we were expecting a /Name, read until the end or until we can recover
-                LOGGER.log(Level.FINE, "Invalid dictionary, found: '" + c + "' but expected: '/'");
-                return;
             }
         }
     }
@@ -127,8 +124,12 @@ public class SignatureParser extends COSParser {
     }
 
     private boolean parseSignatureNameValuePair() throws IOException {
-        ASAtom key = nextObject().getName();
-        if (key != ASAtom.CONTENTS) {
+        COSObject key = getName();
+        if (key.getType() != COSObjType.COS_NAME) {
+            LOGGER.log(Level.FINE, "Invalid signature dictionary");
+            return false;
+        }
+        if (key.getName() != ASAtom.CONTENTS) {
             passCOSDictionaryValue();
             return false;
         }
@@ -190,7 +191,7 @@ public class SignatureParser extends COSParser {
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         source.read(buffer);
         source.unread(buffer.length - 1);
-        while (!Arrays.equals(buffer, EOF_STRING)) {    //TODO: does it need to be optimized?
+        while (!isEOFFound(buffer)) {
             source.read(buffer);
             if (source.isEOF()) {
                 source.seek(currentOffset + document.getHeader().getHeaderOffset());
@@ -198,9 +199,37 @@ public class SignatureParser extends COSParser {
             }
             source.unread(buffer.length - 1);
         }
-        long result = source.getOffset() - 1 + buffer.length;   // byte right after 'F'
+        long result = source.getOffset() - 1 + buffer.length;   // byte right after '%%EOF'
+        this.source.skip(EOF_STRING.length - 1);
+        if (isLF(this.source.peek())) { // allows single LF, CR or CR-LF after %%EOF
+            result++;
+        } else if (isCR(this.source.read())) {
+            result++;
+            if (isLF(this.source.peek())) {
+                result++;
+            }
+        }
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
-        return result - 1;
+        return result;
+    }
+
+    private boolean isEOFFound(byte[] buffer) throws IOException {
+        if (!Arrays.equals(buffer, EOF_STRING)) {
+            return false;
+        }
+        long pointer = this.source.getOffset();
+        this.source.unread(2);
+        int byteBeforeEOF = this.source.peek();
+        while (!isLF(byteBeforeEOF)) {
+            this.source.unread();
+            byteBeforeEOF = this.source.peek();
+            if (byteBeforeEOF != CharTable.ASCII_SPACE) {
+                this.source.seek(pointer);
+                return false;
+            }
+        }
+        this.source.seek(pointer);
+        return true;
     }
 
     private void skipID() throws IOException {

@@ -23,7 +23,7 @@ package org.verapdf.cos.filters;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSKey;
-import org.verapdf.tools.EncryptionTools;
+import org.verapdf.tools.EncryptionToolsRevision4;
 import org.verapdf.tools.RC4Encryption;
 
 import java.io.IOException;
@@ -59,6 +59,9 @@ public class COSFilterRC4DecryptionDefault extends ASBufferedInFilter {
         initRC4(objectKey, encryptionKey);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
         if(this.bufferSize() == 0) {
@@ -76,6 +79,9 @@ public class COSFilterRC4DecryptionDefault extends ASBufferedInFilter {
         return encDataLength;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(byte[] buffer, int off, int size) throws IOException {
         if(this.bufferSize() == 0) {
@@ -93,6 +99,9 @@ public class COSFilterRC4DecryptionDefault extends ASBufferedInFilter {
         return encDataLength;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() throws IOException {
         super.reset();
@@ -111,11 +120,19 @@ public class COSFilterRC4DecryptionDefault extends ASBufferedInFilter {
         rc4 = new RC4Encryption(Arrays.copyOf(resultEncryptionKey, keyLength));
     }
 
+    /**
+     * Gets a byte string consisting of object number and object generation
+     * concatenated.
+     *
+     * @param objectKey is key of object.
+     * @return byte string consisting of object number and object generation
+     * concatenated.
+     */
     public static byte[] getObjectKeyDigest(COSKey objectKey) {
         byte[] res = new byte[5];
-        System.arraycopy(EncryptionTools.intToBytesLowOrderFirst(
+        System.arraycopy(EncryptionToolsRevision4.intToBytesLowOrderFirst(
                 objectKey.getNumber()), 0, res, 0, 3);
-        System.arraycopy(EncryptionTools.intToBytesLowOrderFirst(
+        System.arraycopy(EncryptionToolsRevision4.intToBytesLowOrderFirst(
                 objectKey.getGeneration()), 0, res, 3, 2);
         return res;
     }

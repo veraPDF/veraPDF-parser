@@ -25,6 +25,8 @@ import org.verapdf.as.io.ASInputStream;
 import java.io.IOException;
 
 /**
+ * Base class for input filters.
+ *
  * @author Timur Kamalov
  */
 public abstract class ASInFilter extends ASInputStream {
@@ -46,6 +48,9 @@ public abstract class ASInFilter extends ASInputStream {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int read() throws IOException {
 		byte[] temp = new byte[1];
@@ -55,14 +60,26 @@ public abstract class ASInFilter extends ASInputStream {
 		return -1;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int read(byte[] buffer, int size) throws IOException {
 		return this.storedInStream != null ? this.storedInStream.read(buffer, size) : -1;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int read(byte[] buffer) throws IOException {
 		return this.read(buffer, buffer.length);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int skip(int size) throws IOException {
 		return this.storedInStream != null ? this.storedInStream.skip(size) : 0;
 	}
@@ -71,12 +88,19 @@ public abstract class ASInFilter extends ASInputStream {
 		this.storedInStream.closeResource();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void reset() throws IOException {
 		if (this.storedInStream != null) {
 			this.storedInStream.reset();
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void close() throws IOException {
 		if (this.storedInStream != null) {
@@ -92,6 +116,9 @@ public abstract class ASInFilter extends ASInputStream {
 		this.storedInStream = inputStream;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void incrementResourceUsers() {
 		this.storedInStream.incrementResourceUsers();

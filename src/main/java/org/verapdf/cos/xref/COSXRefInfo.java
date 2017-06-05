@@ -24,6 +24,8 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSTrailer;
 
 /**
+ * Class represents xref section with trailer.
+ *
  * @author Timur Kamalov
  */
 public class COSXRefInfo {
@@ -32,33 +34,54 @@ public class COSXRefInfo {
 	private COSXRefSection xref;
 	private COSTrailer trailer;
 
+	/**
+	 * Creates empty COSXrefInfo object.
+	 */
 	public COSXRefInfo() {
 		this.startXRef = 0;
 		this.xref = new COSXRefSection();
 		this.trailer = new COSTrailer();
 	}
 
+	/**
+	 * @return offset of xref section.
+	 */
 	public long getStartXRef() {
 		return this.startXRef;
 	}
 
+	/**
+	 * Sets offset of xref section.
+	 */
 	public void setStartXRef(final long startXRef) {
 		this.startXRef = startXRef;
 	}
 
+	/**
+	 * @return xref section object.
+	 */
 	public COSXRefSection getXRefSection() {
 		return this.xref;
 	}
 
+	/**
+	 * Sets xref section object.
+	 */
 	public void setXref(COSXRefSection xref) {
 		this.xref = xref;
 	}
 
+	/**
+	 * @return trailer of this section.
+	 */
 	public COSTrailer getTrailer() {
 		return this.trailer;
 	}
 
-	public void setTrailer(final COSObject object) throws Exception {
+	/**
+	 * Sets trailer of this section.
+	 */
+	public void setTrailer(final COSObject object) {
 		this.trailer.setObject(object);
 	}
 

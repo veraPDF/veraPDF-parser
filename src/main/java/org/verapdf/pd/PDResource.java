@@ -32,7 +32,7 @@ public class PDResource extends PDObject {
     public PDResource() {
     }
 
-    protected PDResource(COSObject obj) {
+    public PDResource(COSObject obj) {
         super(obj);
     }
 

@@ -21,22 +21,51 @@
 package org.verapdf.cos.xref;
 
 /**
+ * Class represents entry in xref. Entry has offset, generation and character
+ * showing if it is a free entry.
+ *
  * @author Timur Kamalov
  */
 public class COSXRefEntry {
 
+	/**
+	 * Is offset of object in the document.
+	 */
 	public long offset;
+	/**
+	 * Is generation number for this entry.
+	 */
 	public int generation;
+	/**
+	 * Is 'f' is entry is free and 'n' otherwise.
+	 */
 	public char free;
 
+	/**
+	 * Default constructor that initializes offset and generation with zeroes,
+	 * entry is marked as in-use.
+	 */
 	public COSXRefEntry() {
 		this(0, 0, 'n');
 	}
 
+	/**
+	 * Constructor from offset and generation. Entry is marked as in-use.
+	 *
+	 * @param offset is offset of object represented by this entry.
+	 * @param generation is generation of object represented by this entry.
+	 */
 	public COSXRefEntry(long offset, int generation) {
 		this(offset, generation, 'n');
 	}
 
+	/**
+	 * Constructor setting offset, generation and free value.
+	 *
+	 * @param offset is offset of object represented by this entry.
+	 * @param generation is generation of object represented by this entry.
+	 * @param free is 'f' is entry is free and 'n' otherwise.
+	 */
 	public COSXRefEntry(long offset, int generation, char free) {
 		this.offset = offset;
 		this.generation = generation;

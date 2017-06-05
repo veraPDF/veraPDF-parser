@@ -65,6 +65,13 @@ public class COSFilterLZWDecode extends ASBufferedInFilter {
     private long thisWord = -1;
     private long previousWord = -1;
 
+    /**
+     * Constructor from LZW encoded data stream and decode parameters
+     * dictionary.
+     *
+     * @param stream is LZW encoded data.
+     * @param decodeParams is decode parameters dictionary.
+     */
     public COSFilterLZWDecode(ASInputStream stream, COSDictionary decodeParams) throws IOException {
         super(stream);
         Long earlyChangeFromDecodeParams = decodeParams.getIntegerKey(ASAtom.EARLY_CHANGE);
@@ -80,6 +87,9 @@ public class COSFilterLZWDecode extends ASBufferedInFilter {
         initLZWTable();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
         int position = 0;
@@ -104,6 +114,9 @@ public class COSFilterLZWDecode extends ASBufferedInFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int skip(int size) throws IOException {
         byte[] buf = new byte[BF_BUFFER_SIZE];
@@ -114,6 +127,9 @@ public class COSFilterLZWDecode extends ASBufferedInFilter {
         return read;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() throws IOException {
         super.reset();

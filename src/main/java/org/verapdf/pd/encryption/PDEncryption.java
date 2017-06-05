@@ -100,16 +100,40 @@ public class PDEncryption extends PDObject {
         return getIntegerKey(ASAtom.R);
     }
 
+    /**
+     * @return O string from encryption dictionary.
+     */
     public COSString getO() {
         return getCOSString(ASAtom.O);
     }
 
+    /**
+     * @return U string from encryption dictionary.
+     */
     public COSString getU() {
         return getCOSString(ASAtom.U);
     }
 
+    /**
+     * @return integer that is a set of flags specifying which operations can
+     * be performed when document is opened with user access.
+     */
     public Long getP() {
         return getIntegerKey(ASAtom.P);
+    }
+
+    /**
+     * @return value of OE key, as described in PDF-2.0 specification.
+     */
+    public COSString getOE() {
+        return getCOSString(ASAtom.OE);
+    }
+
+    /**
+     * @return value of UE key, as described in PDF-2.0 specification.
+     */
+    public COSString getUE() {
+        return getCOSString(ASAtom.UE);
     }
 
     /**

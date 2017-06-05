@@ -47,6 +47,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private String ordering;
     private int[] bias;
     private CFFIndex[] localSubrIndexes;
+    private float[][] fontMatrices;
 
     private CMap externalCMap;
 
@@ -161,7 +162,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
                 for (int i = 0; i < numberOfRanges; ++i) {
                     int fd = this.readCard8();
                     int afterLast = this.readCard16();
-                    for (int j = first; j < afterLast; ++j) {
+                    for (int j = first; j < afterLast && j < fdSelect.length; ++j) {
                         this.fdSelect[j] = fd;
                     }
                     first = afterLast;
@@ -178,6 +179,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         CFFIndex fontDictIndex = this.readIndex();
         this.nominalWidths = new int[fontDictIndex.size()];
         this.defaultWidths = new int[fontDictIndex.size()];
+        this.fontMatrices = new float[fontDictIndex.size()][6];
         this.bias = new int[fontDictIndex.size()];
         this.localSubrIndexes = new CFFIndex[fontDictIndex.size()];
         for (int i = 0; i < fontDictIndex.size(); ++i) {
@@ -188,6 +190,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
             this.readPrivateDict(this.privateDictOffset, this.privateDictSize, i);
             this.nominalWidths[i] = this.nominalWidthX;
             this.defaultWidths[i] = this.defaultWidthX;
+            this.fontMatrices[i] = this.fontMatrix;
         }
     }
 
@@ -217,7 +220,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         CFFCharStringsHandler charStrings = new CFFCharStringsHandler(
                 this.charStrings, this.charStringsOffset, this.source);
         this.widths = new CharStringsWidths(this.isSubset, this.charStringType,
-                charStrings, this.fontMatrix, this.localSubrIndexes, this.globalSubrs,
+                charStrings, this.fontMatrices, this.localSubrIndexes, this.globalSubrs,
                 this.bias, this.defaultWidths, this.nominalWidths, this.fdSelect);
     }
 

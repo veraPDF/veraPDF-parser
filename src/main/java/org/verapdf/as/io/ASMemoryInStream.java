@@ -253,7 +253,7 @@ public class ASMemoryInStream extends SeekableInputStream {
     @Override
     public ASInputStream getStream(long startOffset, long length) throws IOException {
         if (startOffset > 0 && startOffset < this.bufferSize &&
-                startOffset + length < this.bufferSize) {
+                startOffset + length <= this.bufferSize) {
             return new ASMemoryInStream(this, (int) startOffset, (int) length);
         } else {
             throw new IOException();
