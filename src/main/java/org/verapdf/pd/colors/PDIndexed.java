@@ -42,7 +42,7 @@ public class PDIndexed extends PDSpecialColorSpace {
     }
 
     public PDColorSpace getBase() {
-        return this.baseColorSpace;
+        return super.getBaseColorSpace();
     }
 
     @Override
