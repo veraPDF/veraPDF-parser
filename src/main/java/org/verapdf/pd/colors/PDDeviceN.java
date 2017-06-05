@@ -50,7 +50,7 @@ public class PDDeviceN extends PDSpecialColorSpace {
     }
 
     public PDColorSpace getAlternateSpace() {
-        return this.baseColorSpace;
+        return super.getBaseColorSpace();
     }
 
     @Override
