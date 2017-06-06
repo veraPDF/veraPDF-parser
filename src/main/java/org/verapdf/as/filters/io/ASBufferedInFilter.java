@@ -103,7 +103,7 @@ public class ASBufferedInFilter extends ASInFilter {
             int readSize = Math.min(buffer.length, copied + read);
             System.arraycopy(buffer, sourceBeginOffset, this.buffer, destBeginOffset,
                     readSize);
-            pos = buffer.length;
+            pos = this.buffer.length;
             feedBuffer();
             readCounter += copied + read;
             return copied + read;
@@ -372,5 +372,8 @@ public class ASBufferedInFilter extends ASInFilter {
             buffer[i - length] = buffer[i];
         }
         this.pos -= length;
+        if (this.eod != -1) {
+            this.eod -= length;
+        }
     }
 }
