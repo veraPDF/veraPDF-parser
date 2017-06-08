@@ -324,4 +324,12 @@ public class PDPage extends PDPageTreeNode {
         }
         return null;
     }
+
+    public PDNavigationNode getPresSteps() {
+        COSObject cosPresSteps = getCOSPresSteps();
+        if (cosPresSteps != null) {
+            return new PDNavigationNode(cosPresSteps);
+        }
+        return null;
+    }
 }

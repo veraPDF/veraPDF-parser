@@ -37,6 +37,7 @@ public class ASAtom implements Comparable<ASAtom> {
 
     // A
     public static final ASAtom A = new ASAtom("A");
+    public static final ASAtom A_LOWERCASE = new ASAtom("a");
     public static final ASAtom AA = new ASAtom("AA");
     public static final ASAtom ACRO_FORM = new ASAtom("AcroForm");
     public static final ASAtom ACTUAL_TEXT = new ASAtom("ActualText");
@@ -364,6 +365,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom MULTIPLY = new ASAtom("Multiply");
     // N
     public static final ASAtom N = new ASAtom("N");
+    public static final ASAtom NA = new ASAtom("NA");
     public static final ASAtom NAME = new ASAtom("Name");
     public static final ASAtom NAMES = new ASAtom("Names");
     public static final ASAtom NEED_APPEARANCES = new ASAtom("NeedAppearances");
@@ -406,6 +408,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom OVERLAY = new ASAtom("Overlay");
     // P
     public static final ASAtom P = new ASAtom("P");
+    public static final ASAtom PA = new ASAtom("PA");
     public static final ASAtom PAGE = new ASAtom("Page");
     public static final ASAtom PAGE_LABELS = new ASAtom("PageLabels");
     public static final ASAtom PAGE_LAYOUT = new ASAtom("PageLayout");
@@ -447,6 +450,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom QUADPOINTS = new ASAtom("QuadPoints");
     // R
     public static final ASAtom R = new ASAtom("R");
+    public static final ASAtom R_LOWERCASE = new ASAtom("r");
     public static final ASAtom RANGE = new ASAtom("Range");
     public static final ASAtom RC = new ASAtom("RC");
     public static final ASAtom RD = new ASAtom("RD");
