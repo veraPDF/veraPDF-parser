@@ -48,16 +48,21 @@ public class PDFormField extends PDObject {
     }
 
 	public ASAtom getFT() {
-		return getInheritedFT(getObject());
+		COSObject object = getInheritedObject(ASAtom.FT);
+		return object == null || object.getType() != COSObjType.COS_NAME ? null : object.getName();
 	}
 
-	private static ASAtom getInheritedFT(COSObject obj) {
-		COSObject currObject = obj;
+	public COSObject getV() {
+		return getInheritedObject(ASAtom.V);
+	}
+
+	private COSObject getInheritedObject(ASAtom key) {
+		COSObject currObject = getObject();
 		Set<COSKey> checkedObjects = new HashSet<>();
 		while (currObject != null) {
-			ASAtom currFT = currObject.getNameKey(ASAtom.FT);
-			if (currFT != null) {
-				return currFT;
+			COSObject currVal = currObject.getKey(key);
+			if (currVal != null && !currVal.empty()) {
+				return currVal;
 			}
 
 			COSKey currKey = currObject.getKey();
@@ -73,6 +78,39 @@ public class PDFormField extends PDObject {
 			} else {
 				currObject = null;
 			}
+		}
+		return null;
+	}
+
+	public String getFullyQualifiedName() {
+		List<String> parts = new ArrayList<>();
+		COSObject currObject = getObject();
+		Set<COSKey> checkedObjects = new HashSet<>();
+		while (currObject != null && !currObject.empty()) {
+			String partial = getStringKey(ASAtom.T);
+			if (partial != null) {
+				parts.add(partial);
+			}
+			COSKey currKey = currObject.getKey();
+			if (currKey != null) {
+				checkedObjects.add(currKey);
+			}
+			COSObject parent = currObject.getKey(ASAtom.PARENT);
+			if (parent != null
+					&& parent.getType().isDictionaryBased()
+					&& !checkedObjects.contains(parent.getKey())) {
+				currObject = parent;
+			} else {
+				currObject = null;
+			}
+		}
+		if (!parts.isEmpty()) {
+			StringBuilder builder = new StringBuilder();
+			for (int i = parts.size() - 1; i > 0; --i) {
+				builder.append(parts.get(i)).append(".");
+			}
+			builder.append(parts.get(0));
+			return builder.toString();
 		}
 		return null;
 	}
