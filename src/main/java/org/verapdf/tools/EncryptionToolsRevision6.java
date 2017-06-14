@@ -106,7 +106,7 @@ public class EncryptionToolsRevision6 {
             int shaType = getReminderByModulo3(Arrays.copyOf(e, 16));
             k = shaType == 0 ? getSHAHash(256, e) :
                     shaType == 1 ? getSHAHash(384, e) : getSHAHash(512, e);
-            if (rounds > 63 && (e[e.length - 1] & 0xFF) <= rounds - 32) {
+            if (rounds >= 63 && (e[e.length - 1] & 0xFF) <= rounds - 32) {
                 break;
             }
             rounds++;
