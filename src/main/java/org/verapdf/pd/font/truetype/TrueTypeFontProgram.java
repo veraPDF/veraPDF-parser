@@ -80,23 +80,8 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             if (TrueTypePredefined.NOTDEF_STRING.equals(glyph)) {
                 return false;
             }
-            AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyph);
-            TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
-            if (cmap31 != null) {
-                int gid = cmap31.getGlyph(unicode.getSymbolCode());
-                if (gid >= 0 && gid < getNGlyphs()) {
-                    return true;
-                }
-            }
-            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
-            if (cmap10 != null) {
-                Integer charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyph);
-                if (charCode == null) {
-                    return false;
-                }
-                int gid = cmap10.getGlyph(charCode);
-                return gid >= 0 && gid < getNGlyphs();
-            }
+            int gid = getGidFromCMaps(glyph);
+            return gid >= 0 && gid < getNGlyphs();
         } else {
             int gid = getGIDFrom30(code);
             if (gid >= 0 && gid < getNGlyphs()) {
@@ -140,22 +125,31 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         if (isSymbolic) {
             return -1;
         }
+        int gid = getGidFromCMaps(glyphName);
+        if (this.getNrOfEncodingCMaps() != 0) {
+            return getWidthWithCheck(gid);
+        } else {
+            return -1;  //case when no cmap (3,1) and no (1,0) is found
+        }
+    }
+
+    private int getGidFromCMaps(String glyphName) {
+        AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
         TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
         if (cmap31 != null) {
-            AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
             int gid = cmap31.getGlyph(unicode.getSymbolCode());
             if (gid != 0) {
-                return getWidthWithCheck(gid);
+                return gid;
             }
         }
         TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
         if (cmap10 != null) {
             Integer charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyphName);
-            int gid = charCode == null ? 0 : cmap10.getGlyph(charCode);
-            return getWidthWithCheck(gid);
-        } else {
-            return -1;  //case when no cmap (3,1) and no (1,0) is found
+            if (charCode != null) {
+                return cmap10.getGlyph(charCode);
+            }
         }
+        return 0;
     }
 
     /**

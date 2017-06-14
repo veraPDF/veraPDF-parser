@@ -83,11 +83,17 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
      * @return array, containing platform ID and encoding ID for each cmap in
      * this True Type font.
      */
-    public TrueTypeCmapSubtable[] getCmapEncodingPlatform() {
+    public int getNrOfEncodingCMaps() {
         if(this.parser.getCmapParser() != null) {
-            return this.parser.getCmapParser().getCmapInfos();
+            int res = 0;
+            for (TrueTypeCmapSubtable subtable : this.parser.getCmapParser().getCmapInfos()) {
+                if (subtable.isStandardEncodingCMap()) {
+                    res++;
+                }
+            }
+            return res;
         } else {
-            return new TrueTypeCmapSubtable[0];
+            return 0;
         }
     }
 
