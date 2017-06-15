@@ -55,12 +55,20 @@ public interface FontProgram {
     void parseFont() throws IOException;
 
     /**
-     * Checks if font contains character with given ID.
+     * Checks if font contains character with given code.
      *
      * @param code is character code.
-     * @return true if font contains character with given ID.
+     * @return true if font contains character with given code.
      */
     boolean containsCode(int code);
+
+    /**
+     * Checks if this font program has glyph for given glyph name.
+     *
+     * @param glyphName is the name of glyph.
+     * @return true if this font program has glyph for given name.
+     */
+    boolean containsGlyph(String glyphName);
 
     /**
      * @return true if font parsing has been attempted.
