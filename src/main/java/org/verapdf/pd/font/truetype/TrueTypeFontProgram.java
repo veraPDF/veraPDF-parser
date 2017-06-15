@@ -133,6 +133,16 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         }
     }
 
+    @Override
+    public boolean containsGlyph(String glyphName) {
+        if (!isSymbolic) {
+            int gid = getGidFromCMaps(glyphName);
+            return gid >= 0 && gid < getNGlyphs();
+        } else {
+            return false;   // no notation of glyph name for symbolic fonts?
+        }
+    }
+
     private int getGidFromCMaps(String glyphName) {
         AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
         TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);

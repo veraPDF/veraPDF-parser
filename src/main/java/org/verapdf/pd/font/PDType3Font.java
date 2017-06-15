@@ -113,4 +113,14 @@ public class PDType3Font extends PDSimpleFont {
     private COSDictionary getCharProcs() {
         return (COSDictionary) this.dictionary.getKey(ASAtom.CHAR_PROCS).getDirectBase();
     }
+
+    @Override
+    public float getWidthFromProgram(int code) {
+        return getWidth(code).floatValue();
+    }
+
+    @Override
+    public boolean glyphIsPresent(int code) {
+        return containsCharString(code);
+    }
 }

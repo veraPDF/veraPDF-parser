@@ -25,7 +25,6 @@ import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
-import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
 import org.verapdf.tools.resource.ASFileStreamCloser;
@@ -48,7 +47,6 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     public static final Logger LOGGER =
             Logger.getLogger(Type1FontProgram.class.getCanonicalName());
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
-    private Encoding pdfEncoding;
 
     private double[] fontMatrix = Arrays.copyOf(DEFAULT_FONT_MATRIX, DEFAULT_FONT_MATRIX.length);
     private String[] encoding;
@@ -69,11 +67,10 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     /**
      * {@inheritDoc}
      */
-    public Type1FontProgram(InputStream fileStream, Encoding pdfEncoding)
+    public Type1FontProgram(InputStream fileStream)
             throws IOException {
         super(fileStream);
         encoding = new String[256];
-        this.pdfEncoding = pdfEncoding;
     }
 
     /**
@@ -241,6 +238,12 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     @Override
+    public boolean containsGlyph(String glyphName) {
+        return this.glyphWidths != null &&
+                this.glyphWidths.keySet().contains(glyphName);
+    }
+
+    @Override
     public boolean isAttemptedParsing() {
         return this.attemptedParsing;
     }
@@ -278,10 +281,10 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     private String getGlyph(int code) {
-        if ((this.pdfEncoding == null || !pdfEncoding.containsCode(code)) && code < encoding.length) {
+        if (code < encoding.length) {
             return encoding[code];
         } else {
-            return this.pdfEncoding.getName(code);
+            return TrueTypePredefined.NOTDEF_STRING;
         }
     }
 
