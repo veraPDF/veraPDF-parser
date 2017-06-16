@@ -126,11 +126,20 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             return -1;
         }
         int gid = getGidFromCMaps(glyphName);
-        if (this.getNrOfEncodingCMaps() != 0) {
+        if (gid == 0) {
+            // if cmap lookup fails we go to post table
+            gid = getGidFromPostTable(glyphName);
+        }
+        if (mappingForGlyphIsPresent(glyphName)) {
             return getWidthWithCheck(gid);
         } else {
             return -1;  //case when no cmap (3,1) and no (1,0) is found
         }
+    }
+
+    private boolean mappingForGlyphIsPresent(String glyphName) {
+        TrueTypePostTable postTable = this.parser.getPostParser();
+        return getNrOfEncodingCMaps() != 0 || (postTable != null && postTable.containsGlyph(glyphName));
     }
 
     @Override
@@ -160,6 +169,11 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             }
         }
         return 0;
+    }
+
+    private int getGidFromPostTable(String glyphName) {
+        TrueTypePostTable postTable = this.parser.getPostParser();
+        return postTable == null ? 0 : postTable.getGID(glyphName);
     }
 
     /**
