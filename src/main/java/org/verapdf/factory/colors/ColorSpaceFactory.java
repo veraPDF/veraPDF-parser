@@ -21,6 +21,7 @@
 package org.verapdf.factory.colors;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResources;
@@ -136,7 +137,11 @@ public class ColorSpaceFactory {
             return new PDIndexed(base, resources);
         } else if (ASAtom.PATTERN == name) {
             return PDPattern.INSTANCE;
-        } else {
+        } else if (ASAtom.CALCMYK == name) {
+            return getColorSpaceFromName(COSName.construct(ASAtom.DEVICECMYK), resources,
+                    false);
+        }
+        else {
             LOGGER.log(Level.FINE, "Unknown ColorSpace name");
             return null;
         }
