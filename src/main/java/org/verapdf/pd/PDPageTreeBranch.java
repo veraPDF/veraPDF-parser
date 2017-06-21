@@ -24,7 +24,6 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.cos.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,7 +121,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return this.children.get(lastIndex).findTerminal(index);
 	}
 
-	public boolean insertLeaf(final PDPage leaf, int insertAt) throws IOException {
+	public boolean insertLeaf(final PDPage leaf, int insertAt) {
 		insertAt = Math.min(insertAt, getChildCount());
 		incLeafCount();
 		return insertNode(leaf, insertAt);

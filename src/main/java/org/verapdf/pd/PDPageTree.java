@@ -22,8 +22,6 @@ package org.verapdf.pd;
 
 import org.verapdf.cos.COSObject;
 
-import java.io.IOException;
-
 /**
  * @author Timur Kamalov
  */
@@ -47,7 +45,7 @@ public class PDPageTree {
 		return this.getRoot().getObject();
 	}
 
-	public void setObject(final COSObject object) throws IOException {
+	public void setObject(final COSObject object) {
 		this.getRoot().setObject(object);
 	}
 
@@ -73,7 +71,7 @@ public class PDPageTree {
 		}
 	}
 
-	public PDPage newPage(final int insertAt) throws IOException {
+	public PDPage newPage(final int insertAt) {
 		final PDPage page = new PDPage(null);
 		if (this.addPage(page, insertAt)) {
 			page.pageNumber = (insertAt == -1 ? this.getPageCount() - 1 : insertAt);
@@ -81,7 +79,7 @@ public class PDPageTree {
 		return page;
 	}
 
-	public boolean addPage(final PDPage page, final int insertAt) throws IOException {
+	public boolean addPage(final PDPage page, final int insertAt) {
 		final PDPageTreeBranch branch = this.getRoot().findTerminal(insertAt);
 
 		if (branch.insertLeaf(page, insertAt)) {

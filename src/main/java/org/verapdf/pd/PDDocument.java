@@ -102,7 +102,7 @@ public class PDDocument {
 		//this.info.clear;
 	}
 
-	public PDCatalog getCatalog() throws IOException {
+	public PDCatalog getCatalog() {
 		if (!catalog.empty() || document == null) {
 			return catalog;
 		}
@@ -140,11 +140,11 @@ public class PDDocument {
 		return document;
 	}
 
-	public int getNumberOfPages() throws IOException {
+	public int getNumberOfPages() {
 		return this.getCatalog().getPageTree().getPageCount();
 	}
 
-	public List<PDPage> getPages() throws IOException {
+	public List<PDPage> getPages() {
 		final List<PDPage> pages = new ArrayList<>();
 		final int pageCount = this.getCatalog().getPageTree().getPageCount();
 		for (int i = 0; i < pageCount; i++) {
@@ -153,11 +153,11 @@ public class PDDocument {
 		return pages;
 	}
 
-	public PDPage getPage(final int number) throws IOException {
+	public PDPage getPage(final int number) {
 		return this.getCatalog().getPageTree().getPage(number);
 	}
 
-	public void addPage(final PDPage page, final int number) throws IOException {
+	public void addPage(final PDPage page, final int number) {
 		if (document == null) {
 			return;
 		}
@@ -172,7 +172,7 @@ public class PDDocument {
 		document.setObject(obj);
 	}
 
-	public PDPage newPage(final double[] bbox, final int insertAt) throws IOException {
+	public PDPage newPage(final double[] bbox, final int insertAt) {
 		final PDPage page = new PDPage(bbox, document);
 		this.addPage(page, insertAt);
 		return page;
@@ -204,23 +204,23 @@ public class PDDocument {
 		}
 	}
 
-	public PDStructTreeRoot getStructTreeRoot() throws IOException {
+	public PDStructTreeRoot getStructTreeRoot() {
 		return getCatalog().getStructTreeRoot();
 	}
 
-	public PDMetadata getMetadata() throws IOException {
+	public PDMetadata getMetadata() {
 		return getCatalog().getMetadata();
 	}
 
-	public List<PDOutputIntent> getOutputIntents() throws IOException {
+	public List<PDOutputIntent> getOutputIntents() {
 		return getCatalog().getOutputIntents();
 	}
 
-	public PDOutlineDictionary getOutlines() throws IOException {
+	public PDOutlineDictionary getOutlines() {
 		return getCatalog().getOutlines();
 	}
 
-	public PDAcroForm getAcroForm() throws IOException {
+	public PDAcroForm getAcroForm() {
 		return getCatalog().getAcroForm();
 	}
 
