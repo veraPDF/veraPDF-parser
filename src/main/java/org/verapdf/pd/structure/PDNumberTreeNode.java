@@ -61,15 +61,15 @@ public class PDNumberTreeNode extends PDObject {
      * null if nums are not present.
      * TODO: test method
      */
-    public Map<Integer, COSObject> getNums() {
+    public Map<Long, COSObject> getNums() {
         COSObject nums = this.getKey(ASAtom.NUMS);
         if (nums != null && !nums.empty() && nums.getType() == COSObjType.COS_ARRAY) {
-            Map<Integer, COSObject> res = new HashMap<>();
+            Map<Long, COSObject> res = new HashMap<>();
             for (int i = 0; i < nums.size() - 1; i += 2) { // size - 1 checks case with odd amount of entries in array
                 COSObject key = nums.at(i);
                 if (key.getType() == COSObjType.COS_INTEGER) {
                     COSObject value = nums.at(i + 1);
-                    res.put(key.getInteger().intValue(), value);
+                    res.put(key.getInteger(), value);
                 }
             }
             return Collections.unmodifiableMap(res);
@@ -95,7 +95,7 @@ public class PDNumberTreeNode extends PDObject {
 
         if (this.knownKey(ASAtom.NUMS)) {
             // just get object from nums or check if it is not in nums
-            Map<Integer, COSObject> nums = getNums();
+            Map<Long, COSObject> nums = getNums();
             return nums == null ? null : nums.get(key);
         }
 
