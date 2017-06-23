@@ -104,6 +104,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom C1 = new ASAtom("C1");
     public static final ASAtom CA = new ASAtom("CA");
     public static final ASAtom CA_NS = new ASAtom("ca");
+    public static final ASAtom CALCMYK= new ASAtom("CalCMYK");
     public static final ASAtom CALGRAY = new ASAtom("CalGray");
     public static final ASAtom CALRGB = new ASAtom("CalRGB");
     public static final ASAtom CAP = new ASAtom("Cap");
