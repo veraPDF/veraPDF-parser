@@ -81,6 +81,14 @@ public interface FontProgram {
     boolean isSuccessfulParsing();
 
     /**
+     * Returns glyph name for glyph with given code.
+     *
+     * @param code is code of glyph.
+     * @return glyph name.
+     */
+    String getGlyphName(int code);
+
+    /**
      * @return file stream closer that handles the closing of font program
      * stream or null if stream is memory stream.
      */
