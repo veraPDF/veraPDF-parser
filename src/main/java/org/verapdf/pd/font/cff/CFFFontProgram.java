@@ -132,6 +132,11 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         return this.font.getWidth(glyphName);
     }
 
+    @Override
+    public String getGlyphName(int code) {
+        return this.font.getGlyphName(code);
+    }
+
     /**
      * @return true if this font is CFF CID font.
      */

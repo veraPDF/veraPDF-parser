@@ -256,6 +256,11 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         return 0;
     }
 
+    @Override
+    public String getGlyphName(int code) {
+        return null;  // No need in this method
+    }
+
     /**
      * {@inheritDoc}
      */

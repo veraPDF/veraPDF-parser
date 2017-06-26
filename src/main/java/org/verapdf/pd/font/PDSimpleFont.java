@@ -22,6 +22,8 @@ package org.verapdf.pd.font;
 
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.pd.font.truetype.AdobeGlyphList;
+import org.verapdf.pd.font.type1.SymbolSet;
+import org.verapdf.pd.font.type1.ZapfDingbats;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,16 +62,23 @@ public abstract class PDSimpleFont extends PDFont {
         }
 
         Encoding fontEncoding = this.getEncodingMapping();
+        String glyphName =  null;
         if (fontEncoding != null) {
-            String glyphName = fontEncoding.getName(code);
-            if (glyphName != null) {
-                AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
-                if (unicode != AdobeGlyphList.empty()) {
-                    return unicode.getUnicodeString();
-                }
-                LOGGER.log(Level.FINE, "Cannot find glyph " + glyphName + " in Adobe Glyph List.");
-                return null;
+            glyphName = fontEncoding.getName(code);
+        }
+        if (glyphName == null) {
+            glyphName = fontProgram.getGlyphName(code);
+        }
+        if (glyphName != null) {
+            AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
+            if (unicode != AdobeGlyphList.empty()) {
+                return unicode.getUnicodeString();
             }
+            LOGGER.log(Level.FINE, "Cannot find glyph " + glyphName + " in Adobe Glyph List.");
+            if (ZapfDingbats.hasGlyphName(glyphName) || SymbolSet.hasGlyphName(glyphName)) {
+                return " "; // indicates that toUnicode should not be checked.
+            }
+            return null;
         }
         LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code" + code + " in font " + this.getName());
         return null;

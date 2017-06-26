@@ -98,6 +98,11 @@ public class OpenTypeFontProgram implements FontProgram {
         return this.font.containsGlyph(glyphName);
     }
 
+    @Override
+    public String getGlyphName(int code) {
+        return this.font.getGlyphName(code);
+    }
+
     /**
      * {@inheritDoc}
      */

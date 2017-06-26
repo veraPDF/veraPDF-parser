@@ -221,7 +221,8 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
                 this.bias, this.defaultWidthX, this.nominalWidthX);
     }
 
-    private String getGlyphName(int code) {
+    @Override
+    public String getGlyphName(int code) {
         if(isStandardEncoding) {
             if (code < CFFPredefined.STANDARD_ENCODING.length) {
                 return CFFPredefined.STANDARD_STRINGS[CFFPredefined.STANDARD_ENCODING[code]];
