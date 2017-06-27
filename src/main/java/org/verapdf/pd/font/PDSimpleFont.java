@@ -66,7 +66,7 @@ public abstract class PDSimpleFont extends PDFont {
         if (fontEncoding != null) {
             glyphName = fontEncoding.getName(code);
         }
-        if (glyphName == null) {
+        if (glyphName == null && getFontProgram() != null) {
             glyphName = fontProgram.getGlyphName(code);
         }
         if (glyphName != null) {
