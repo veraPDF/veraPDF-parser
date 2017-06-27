@@ -37,23 +37,24 @@ public class PDExtGState extends PDResource {
     }
 
     public Boolean getAlphaSourceFlag() {
-        return getObject().getBooleanKey(ASAtom.AIS);
+        return getBooleanKey(ASAtom.AIS);
     }
 
     public Boolean getAutomaticStrokeAdjustment() {
-        return getObject().getBooleanKey(ASAtom.SA);
+        return getBooleanKey(ASAtom.SA);
     }
 
     public Boolean getStrokingOverprintControl() {
-        return getObject().getBooleanKey(ASAtom.OP);
+        return getBooleanKey(ASAtom.OP);
     }
 
     public Boolean getNonStrokingOverprintControl() {
-        return getObject().getBooleanKey(ASAtom.OP_NS);
+        Boolean opNS = getBooleanKey(ASAtom.OP_NS);
+        return opNS == null ? getBooleanKey(ASAtom.OP) : opNS;
     }
 
     public Long getOverprintMode() {
-         return getObject().getIntegerKey(ASAtom.OPM);
+         return getIntegerKey(ASAtom.OPM);
     }
 
     public COSObject getCOSTR() {
@@ -73,11 +74,11 @@ public class PDExtGState extends PDResource {
     }
 
     public Double getCA() {
-        return getObject().getRealKey(ASAtom.CA);
+        return getRealKey(ASAtom.CA);
     }
 
     public Double getCA_NS() {
-        return getObject().getRealKey(ASAtom.CA_NS);
+        return getRealKey(ASAtom.CA_NS);
     }
 
     public COSName getCOSRenderingIntentName() {
