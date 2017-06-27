@@ -262,6 +262,15 @@ public class Type1FontProgram extends COSParser implements FontProgram {
         return charSet.toArray(new String[charSet.size()]);
     }
 
+    @Override
+    public String getGlyphName(int code) {
+        if (code > 0 && code < encoding.length) {
+            return encoding[code];
+        } else {
+            return null;
+        }
+    }
+
     private boolean isEncodingName() throws IOException {
         long startOffset = this.source.getOffset();
         nextToken();

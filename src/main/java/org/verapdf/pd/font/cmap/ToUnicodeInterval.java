@@ -79,7 +79,7 @@ public class ToUnicodeInterval {
         arr[0] = (byte) (unicode & 0xFF);
         try {
             if (arr[0] == 0) {
-                return String.valueOf(arr[1]);
+                return String.valueOf((char)arr[1]);
             }
             return new String(arr, "UTF-16BE");
         } catch (UnsupportedEncodingException e) {
