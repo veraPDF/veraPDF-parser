@@ -34,4 +34,6 @@ interface CIDMappable {
      * @return CID of given character or -1 if no mapping available.
      */
     int getCID(int character);
+
+    int getMaxCID();
 }
