@@ -40,4 +40,9 @@ class SingleCIDMapping implements CIDMappable {
         }
         return to;
     }
+
+    @Override
+    public int getMaxCID() {
+        return to;
+    }
 }

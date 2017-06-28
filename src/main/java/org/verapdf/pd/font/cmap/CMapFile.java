@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSStream;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Class represents CMap file embedded into COSStream.
@@ -63,5 +64,16 @@ public class CMapFile {
                     this.parentStream.getData(COSStream.FilterFlags.DECODE));
         }
         return cMap.getwMode();
+    }
+
+    public int getMaxCID() {
+        List<CIDMappable> cidMapings = this.cMap.getCidMappings();
+        int res = 0;
+        for (CIDMappable cidMappable : cidMapings) {
+            if (cidMappable.getMaxCID() > res) {
+                res = cidMappable.getMaxCID();
+            }
+        }
+        return res;
     }
 }
