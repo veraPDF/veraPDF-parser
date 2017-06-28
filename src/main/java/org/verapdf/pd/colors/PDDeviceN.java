@@ -37,11 +37,11 @@ public class PDDeviceN extends PDSpecialColorSpace {
     private final List<COSObject> names;
 
     public PDDeviceN(COSObject obj) {
-        this(obj, null);
+        this(obj, null, false);
     }
 
-    public PDDeviceN(COSObject obj, PDResources resources) {
-        super(obj, resources);
+    public PDDeviceN(COSObject obj, PDResources resources, boolean wasDefault) {
+        super(obj, resources, wasDefault);
         this.names = parseNames(obj.at(1));
     }
 
