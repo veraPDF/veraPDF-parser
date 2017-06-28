@@ -12,18 +12,24 @@ import org.verapdf.pd.PDResources;
 public abstract class PDSpecialColorSpace extends PDColorSpace {
 
     private final PDResources resources;
+    private boolean wasDefault;
 
     /**
      * Constructor from colorspace COSObject and resources.
      */
-    public PDSpecialColorSpace(COSObject obj, PDResources resources) {
+    public PDSpecialColorSpace(COSObject obj, PDResources resources, boolean wasDefault) {
         super(obj);
         this.resources = resources;
+        this.wasDefault = wasDefault;
     }
 
     protected PDColorSpace getBaseColorSpace() {
         return ColorSpaceFactory.getColorSpace(
-                getBaseColorSpaceObject(), this.resources);
+                getBaseColorSpaceObject(), this.resources, wasDefault);
+    }
+
+    public void setWasDefault(boolean wasDefault) {
+        this.wasDefault = wasDefault;
     }
 
     abstract COSObject getBaseColorSpaceObject();
