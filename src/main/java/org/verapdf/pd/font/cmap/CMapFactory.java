@@ -40,9 +40,12 @@ class CMapFactory {
     }
 
     static CMap getCMap(String name, ASInputStream cMapStream) {
-        CMap res = StaticResources.getCMap(name);
-        if (res != null) {
-            return res;
+        CMap res;
+        if (!name.isEmpty()) {
+            res = StaticResources.getCMap(name);
+            if (res != null) {
+                return res;
+            }
         }
         try {
             CMapParser parser =
