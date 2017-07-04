@@ -30,11 +30,11 @@ import org.verapdf.pd.PDResources;
 public class PDSeparation extends PDSpecialColorSpace {
 
     public PDSeparation(COSObject obj) {
-        this(obj, null);
+        this(obj, null, false);
     }
 
-    public PDSeparation(COSObject obj, PDResources resources) {
-        super(obj, resources);
+    public PDSeparation(COSObject obj, PDResources resources, boolean wasDefault) {
+        super(obj, resources, wasDefault);
     }
 
     public COSObject getColorantName() {

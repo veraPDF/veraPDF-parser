@@ -56,4 +56,12 @@ public class PDStructTreeRoot extends PDStructTreeNode {
 		}
 		return Collections.emptyMap();
 	}
+
+	public PDNumberTreeNode getParentTree() {
+		COSObject parentTree = getKey(ASAtom.PARENT_TREE);
+		if (parentTree != null && !parentTree.empty()) {
+			return new PDNumberTreeNode(parentTree);
+		}
+		return null;
+	}
 }

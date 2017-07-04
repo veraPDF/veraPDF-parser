@@ -85,4 +85,14 @@ public class PDTrueTypeFont extends PDSimpleFont {
         this.fontProgram = null;
         return null;
     }
+
+    @Override
+    public float getWidthFromProgram(int code) {
+        return this.getFontProgram().getWidth(code);
+    }
+
+    @Override
+    public boolean glyphIsPresent(int code) {
+        return this.getFontProgram().containsCode(code);
+    }
 }

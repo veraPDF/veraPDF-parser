@@ -282,4 +282,8 @@ public class CMap {
     void addUnicodeInterval(ToUnicodeInterval interval) {
         this.unicodeIntervals.add(interval);
     }
+
+    public List<CIDMappable> getCidMappings() {
+        return cidMappings;
+    }
 }

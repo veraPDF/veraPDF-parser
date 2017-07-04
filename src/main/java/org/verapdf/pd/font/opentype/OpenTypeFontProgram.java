@@ -25,7 +25,6 @@ import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.FontProgram;
-import org.verapdf.pd.font.PDFont;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
@@ -94,6 +93,16 @@ public class OpenTypeFontProgram implements FontProgram {
         return this.font.containsCode(code);
     }
 
+    @Override
+    public boolean containsGlyph(String glyphName) {
+        return this.font.containsGlyph(glyphName);
+    }
+
+    @Override
+    public String getGlyphName(int code) {
+        return this.font.getGlyphName(code);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -121,9 +130,7 @@ public class OpenTypeFontProgram implements FontProgram {
                 this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
                 this.font.parseFont();
             } else {
-                this.font = new CFFFontProgram(getCFFTable(),
-                        PDFont.getEncodingMappingFromCOSObject(encoding),
-                        externalCMap, isSubset);
+                this.font = new CFFFontProgram(getCFFTable(), externalCMap, isSubset);
                 this.font.parseFont();
             }
             this.successfullyParsed = true;

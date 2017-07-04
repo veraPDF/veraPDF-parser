@@ -20,7 +20,9 @@
  */
 package org.verapdf.pd.font.truetype;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,6 +37,13 @@ public class TrueTypeCmapSubtable {
     private long offset;
     private Map<Integer, Integer> mapping;
     private int sampleCode;
+
+    private static List<PlatformEncodingPair> standardEncodingCMaps = new ArrayList<>();
+
+    static {
+        standardEncodingCMaps.add(new PlatformEncodingPair(3,1));
+        standardEncodingCMaps.add(new PlatformEncodingPair(1,0));
+    }
 
     /**
      * Constructor.
@@ -115,5 +124,15 @@ public class TrueTypeCmapSubtable {
      */
     public boolean containsCID(int cid) {
         return this.mapping.containsKey(cid);
+    }
+
+    public boolean isStandardEncodingCMap() {
+        for (PlatformEncodingPair pair : standardEncodingCMaps) {
+            if (this.platformID == pair.getPlatformID() &&
+                    this.encodingID == pair.getEncodingID()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

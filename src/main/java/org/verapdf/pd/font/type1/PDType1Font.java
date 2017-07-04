@@ -122,8 +122,7 @@ public class PDType1Font extends PDSimpleFont {
         if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE)) {
             COSStream type1FontFile = fontDescriptor.getFontFile();
             try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
-                this.fontProgram = new Type1FontProgram(
-                        fontData, this.getEncodingMapping());
+                this.fontProgram = new Type1FontProgram(fontData);
                 return this.fontProgram;
             } catch (IOException e) {
                 LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
@@ -134,8 +133,7 @@ public class PDType1Font extends PDSimpleFont {
             try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
                 if (subtype == ASAtom.TYPE1C) {
 
-                    this.fontProgram = new CFFFontProgram(fontData, this.getEncodingMapping(),
-                            null, this.isSubset());
+                    this.fontProgram = new CFFFontProgram(fontData, null, this.isSubset());
                     return this.fontProgram;
                 } else if (subtype == ASAtom.OPEN_TYPE) {
                     this.fontProgram = new OpenTypeFontProgram(fontData, true, this.isSymbolic(),
@@ -225,6 +223,30 @@ public class PDType1Font extends PDSimpleFont {
         return null;
     }
 
+    @Override
+    public float getWidthFromProgram(int code) {
+        Encoding pdEncoding = this.getEncodingMapping();
+        if (pdEncoding != null) {
+            String glyphName = pdEncoding.getName(code);
+            if (glyphName != null) {
+                return this.getFontProgram().getWidth(glyphName);
+            }
+        }
+        return this.getFontProgram().getWidth(code);
+    }
+
+    @Override
+    public boolean glyphIsPresent(int code) {
+        Encoding pdEncoding = this.getEncodingMapping();
+        if (pdEncoding != null) {
+            String glyphName = pdEncoding.getName(code);
+            if (glyphName != null) {
+                return this.getFontProgram().containsGlyph(glyphName);
+            }
+        }
+        return this.getFontProgram().containsCode(code);
+    }
+
     private boolean isEmbedded() {
         return this.getFontProgram() != null;
     }
@@ -238,6 +260,5 @@ public class PDType1Font extends PDSimpleFont {
         }
         return false;
     }
-
 
 }

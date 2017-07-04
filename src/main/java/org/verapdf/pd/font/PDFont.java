@@ -249,6 +249,22 @@ public abstract class PDFont extends PDResource {
     public abstract FontProgram getFontProgram();
 
     /**
+     * Gets width of given code from font program.
+     *
+     * @param code is code of character in strings to display.
+     * @return width of glyph for this code.
+     */
+    public abstract float getWidthFromProgram(int code);
+
+    /**
+     * Checks if glyph for given code is present in this font.
+     *
+     * @param code is code for glyph in this font.
+     * @return true if glyph is present.
+     */
+    public abstract boolean glyphIsPresent(int code);
+
+    /**
      * Gets Unicode string for given character code. This method returns null in
      * case when no toUnicode mapping for this character was found, so some
      * inherited classes need to call this method, check return value on null

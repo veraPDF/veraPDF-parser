@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.pd.font.cff.CFFFontProgram;
+import org.verapdf.pd.font.cff.CFFType1FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.truetype.CIDFontType2Program;
@@ -170,8 +171,7 @@ public class PDCIDFont extends PDFont {
             COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).getDirectBase();
             try (ASInputStream fontData = fontFile.getData(COSStream.FilterFlags.DECODE)) {
                 if (ASAtom.CID_FONT_TYPE0C == subtype.getName()) {
-                    this.fontProgram = new CFFFontProgram(
-                            fontData, this.getEncodingMapping(), this.cMap, this.isSubset());
+                    this.fontProgram = new CFFFontProgram(fontData, this.cMap, this.isSubset());
                     return this.fontProgram;
                 } else if (ASAtom.OPEN_TYPE == subtype.getName()) {
                     ASAtom fontName = this.getFontName();
@@ -192,6 +192,32 @@ public class PDCIDFont extends PDFont {
         }
         this.fontProgram = null;
         return null;
+    }
+
+    @Override
+    public float getWidthFromProgram(int code) {
+        int cid = this.cMap.toCID(code);
+        FontProgram font = getFontProgram();
+        CFFType1FontProgram cffType1 = CFFType1FontProgram.getCFFType1(font);
+        if (cid != 0 && cffType1 != null) {
+            // In this case we ignore internal notations of names from CFF
+            // Type 1 font and use external CMap
+            return cffType1.getWidthFromGID(cid);
+        }
+        return font.getWidth(code);
+    }
+
+    @Override
+    public boolean glyphIsPresent(int code) {
+        int cid = this.cMap.toCID(code);
+        FontProgram font = getFontProgram();
+        CFFType1FontProgram cffType1 = CFFType1FontProgram.getCFFType1(font);
+        if (cid != 0 && cffType1 != null) {
+            // In this case we ignore internal notations of names from CFF
+            // Type 1 font and use external CMap
+            return cffType1.containsGID(cid);
+        }
+        return font.containsCode(code);
     }
 
     /**

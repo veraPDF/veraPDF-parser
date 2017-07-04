@@ -85,4 +85,14 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
         }
         return false;
     }
+
+    @Override
+    public boolean containsGlyph(String glyphName) {
+        return false;   // no need in this method
+    }
+
+    @Override
+    public String getGlyphName(int code) {
+        return null;  // No need in this method
+    }
 }
