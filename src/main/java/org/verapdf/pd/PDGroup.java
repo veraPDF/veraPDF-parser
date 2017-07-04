@@ -42,6 +42,10 @@ public class PDGroup extends PDObject {
 		return ColorSpaceFactory.getColorSpace(getKey(ASAtom.CS));
 	}
 
+	public PDColorSpace getColorSpace(PDResources resources) {
+		return ColorSpaceFactory.getColorSpace(getKey(ASAtom.CS), resources);
+	}
+
 	public boolean isIsolated() {
 		Boolean value = getObject().getBooleanKey(ASAtom.I);
 		return value != null ? value.booleanValue() : false;
