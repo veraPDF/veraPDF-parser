@@ -579,6 +579,8 @@ public class BaseParser {
 			}
 		} catch (NumberFormatException e) {
 			LOGGER.log(Level.FINE, "", e);
+			this.token.integer = Math.round(Double.MAX_VALUE);
+			this.token.real = Double.MAX_VALUE;
 		}
 	}
 
