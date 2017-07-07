@@ -252,5 +252,6 @@ public class COSPredictorDecode extends ASBufferedInFilter {
     @Override
     public void reset() throws IOException {
         super.reset();
+        this.streamEnded = false;
     }
 }
