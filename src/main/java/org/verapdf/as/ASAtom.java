@@ -165,7 +165,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom DCT_DECODE_ABBREVIATION = new ASAtom("DCT");
     public static final ASAtom DECODE = new ASAtom("Decode");
     public static final ASAtom DECODE_PARMS = new ASAtom("DecodeParms");
-    public static final ASAtom DEFAULT = new ASAtom("default");
+    public static final ASAtom DEFAULT = new ASAtom("Default");
     public static final ASAtom DEFAULT_CMYK = new ASAtom("DefaultCMYK");
     public static final ASAtom DEFAULT_GRAY = new ASAtom("DefaultGray");
     public static final ASAtom DEFAULT_RGB = new ASAtom("DefaultRGB");
