@@ -2,8 +2,10 @@ package org.verapdf.pd.structure;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.exceptions.LoopedTreeException;
 import org.verapdf.pd.PDObject;
 
 import java.util.*;
@@ -85,6 +87,15 @@ public class PDNumberTreeNode extends PDObject {
      * null if object can't be found.
      */
     public COSObject getObject(Long key) {
+        HashSet<COSKey> visitedKeys = new HashSet<>();
+        COSKey objectKey = getObject().getObjectKey();
+        if (objectKey != null) {
+            visitedKeys.add(objectKey);
+        }
+        return getObject(key, visitedKeys);
+    }
+
+    public COSObject getObject(Long key, Set<COSKey> visitedKeys) {
         long[] limits = this.getLimitsArray();
         if (limits != null) {
             if (key < limits[0] || key > limits[1]) {
@@ -105,7 +116,13 @@ public class PDNumberTreeNode extends PDObject {
             if (kids != null) {
                 COSObject res;
                 for (PDNumberTreeNode kid : kids) {
-                    res = kid.getObject(key);
+                    COSKey kidObjectKey = kid.getObject().getObjectKey();
+                    if (visitedKeys.contains(kidObjectKey)) {
+                        throw new LoopedTreeException("Loop inside number tree");
+                    } else {
+                        visitedKeys.add(kidObjectKey);
+                    }
+                    res = kid.getObject(key, visitedKeys);
                     if (res != null) {
                         return res;
                     }
