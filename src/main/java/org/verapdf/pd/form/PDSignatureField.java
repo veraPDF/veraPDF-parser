@@ -22,8 +22,11 @@ package org.verapdf.pd.form;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
+import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDSignature;
+
+import java.util.Set;
 
 /**
  * Represents signature field.
@@ -32,8 +35,8 @@ import org.verapdf.pd.PDSignature;
  */
 public class PDSignatureField extends PDFormField {
 
-    public PDSignatureField(COSObject obj) {
-        super(obj);
+    protected PDSignatureField(COSObject obj, Set<COSKey> parents) {
+        super(obj, parents);
     }
 
     /**
