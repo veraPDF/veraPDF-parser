@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
+import org.verapdf.exceptions.LoopedException;
 import org.verapdf.io.IReader;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.Reader;
@@ -148,6 +149,8 @@ public class COSDocument {
 				} catch (IOException e) {
 					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
 							" " + key.getGeneration(), e);
+				} catch (StackOverflowError e) {
+					throw new LoopedException("Loop in getting object from reader", e);
 				}
 			}
 		}

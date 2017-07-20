@@ -25,7 +25,7 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.exceptions.LoopedTreeException;
+import org.verapdf.exceptions.LoopedException;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.actions.PDFormFieldActions;
 
@@ -44,7 +44,7 @@ public class PDFormField extends PDObject {
 		this.parents = new HashSet<>(parents);
 		if (objectKey != null) {
 			if (this.parents.contains(objectKey)) {
-				throw new LoopedTreeException("Loop form field tree");
+				throw new LoopedException("Loop form field tree");
 			} else {
 				this.parents.add(objectKey);
 			}

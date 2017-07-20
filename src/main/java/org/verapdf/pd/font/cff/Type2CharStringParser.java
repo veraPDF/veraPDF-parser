@@ -60,7 +60,6 @@ class Type2CharStringParser extends BaseCharStringParser {
         switch (nextByte) {
             case 19:    // cntrmask
             case 20:    // hintmask
-            case 11:    // return
                 if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
                     return true;
@@ -104,6 +103,14 @@ class Type2CharStringParser extends BaseCharStringParser {
                 return false;
             case 10:    // subrcall
                 int subrNum = (int) this.stack.pop().getInteger();
+                if(this.stack.empty()) {
+                    CFFNumber subrWidth = getWidthFromSubroutine(localSubrs.get(subrNum + bias));
+                    if (subrWidth != null) {
+                        this.setWidth(subrWidth);
+                    } else {
+                        break;
+                    }
+                } else {
                 if(this.stack.empty() && localSubrs.size() > subrNum + bias) {
                     this.setWidth(getWidthFromSubroutine(localSubrs.get(subrNum + bias)));
                 } else if (!this.stack.empty()) {
@@ -112,6 +119,14 @@ class Type2CharStringParser extends BaseCharStringParser {
                 return true;
             case 29:    // callgsubr
                 subrNum = (int) this.stack.pop().getInteger();
+                if(this.stack.empty()) {
+                    CFFNumber subrWidth = getWidthFromSubroutine(globalSubrs.get(subrNum + gBias));
+                    if (subrWidth != null) {
+                        this.setWidth(subrWidth);
+                    } else {
+                        break;
+                    }
+                } else {
                 if(this.stack.empty() && globalSubrs.size() > subrNum + gBias) {
                     this.setWidth(getWidthFromSubroutine(globalSubrs.get(subrNum + gBias)));
                 } else if (!this.stack.empty()) {
@@ -129,6 +144,8 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 31:    // hvcurveto
                 this.stack.clear();     // this is perfectly correct handling of stack in case of these ops
                 break;
+            case 11:    // return, not clear stack
+                break;
             default:
                 this.stack.clear();     // this is more of a hack. May not be fully correct, but correct enough
                 break;
@@ -140,7 +157,14 @@ class Type2CharStringParser extends BaseCharStringParser {
         ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
         Type2CharStringParser parser = new Type2CharStringParser(subrStream,
                 this.localSubrs, this.bias, this.globalSubrs, this.gBias);
-        return parser.getWidth();
+        if (parser.getWidth() != null) {
+            return parser.getWidth();
+        } else {
+            for (int i = 0; i < parser.stack.size(); ++i) {
+                this.stack.push(parser.stack.get(i));
+            }
+            return null;
+        }
     }
 
     @Override

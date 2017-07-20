@@ -23,20 +23,20 @@ package org.verapdf.exceptions;
 /**
  * @author Maksim Bezrukov
  */
-public class LoopedTreeException extends RuntimeException {
+public class LoopedException extends RuntimeException {
 
-	public LoopedTreeException() {
+	public LoopedException() {
 	}
 
-	public LoopedTreeException(String message) {
+	public LoopedException(String message) {
 		super(message);
 	}
 
-	public LoopedTreeException(String message, Throwable cause) {
+	public LoopedException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public LoopedTreeException(Throwable cause) {
+	public LoopedException(Throwable cause) {
 		super(cause);
 	}
 }
