@@ -25,7 +25,7 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.exceptions.LoopedTreeException;
+import org.verapdf.exceptions.LoopedException;
 
 import java.util.*;
 
@@ -45,7 +45,7 @@ public class PDNameTreeNode extends PDObject {
 		this.parents = new HashSet<>(parents);
 		if (objectKey != null) {
 			if (parents.contains(objectKey)) {
-				throw new LoopedTreeException("Loop in name tree");
+				throw new LoopedException("Loop in name tree");
 			} else {
 				this.parents.add(objectKey);
 			}

@@ -23,7 +23,7 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.cos.*;
-import org.verapdf.exceptions.LoopedTreeException;
+import org.verapdf.exceptions.LoopedException;
 
 import java.util.*;
 
@@ -136,7 +136,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 			for (int i = 0; i < kids.size(); i++) {
 				COSObject obj = kids.at(i);
 				if (keys.contains(obj.getObjectKey())) {
-					throw new LoopedTreeException("Page tree loop found");
+					throw new LoopedException("Page tree loop found");
 				}
 				PDPageTreeNode kid_i;
 
@@ -169,7 +169,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 			COSObject object = curr.getObject();
 			COSKey objectKey = object.getObjectKey();
 			if (res.contains(objectKey)) {
-				throw new LoopedTreeException("Page tree loop found");
+				throw new LoopedException("Page tree loop found");
 			}
 			res.add(objectKey);
 			curr = this.getParent();
