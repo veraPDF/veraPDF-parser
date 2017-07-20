@@ -104,17 +104,17 @@ class Type2CharStringParser extends BaseCharStringParser {
                 return false;
             case 10:    // subrcall
                 int subrNum = (int) this.stack.pop().getInteger();
-                if(this.stack.empty()) {
+                if(this.stack.empty() && localSubrs.size() > subrNum + bias) {
                     this.setWidth(getWidthFromSubroutine(localSubrs.get(subrNum + bias)));
-                } else {
+                } else if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
                 }
                 return true;
             case 29:    // callgsubr
                 subrNum = (int) this.stack.pop().getInteger();
-                if(this.stack.empty()) {
+                if(this.stack.empty() && globalSubrs.size() > subrNum + gBias) {
                     this.setWidth(getWidthFromSubroutine(globalSubrs.get(subrNum + gBias)));
-                } else {
+                } else if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
                 }return true;
             case 5:     // rlineto
