@@ -5,7 +5,7 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.exceptions.LoopedTreeException;
+import org.verapdf.exceptions.LoopedException;
 import org.verapdf.pd.PDObject;
 
 import java.util.*;
@@ -118,7 +118,7 @@ public class PDNumberTreeNode extends PDObject {
                 for (PDNumberTreeNode kid : kids) {
                     COSKey kidObjectKey = kid.getObject().getObjectKey();
                     if (visitedKeys.contains(kidObjectKey)) {
-                        throw new LoopedTreeException("Loop inside number tree");
+                        throw new LoopedException("Loop inside number tree");
                     } else {
                         visitedKeys.add(kidObjectKey);
                     }
