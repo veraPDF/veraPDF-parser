@@ -21,6 +21,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.as.io.ASOutputStream;
@@ -373,8 +374,9 @@ public class COSStream extends COSDictionary {
 		byte[] tmp = new byte[2048];
 		int read = stream.read(tmp);
 		while (read != -1) {
-			file.write(tmp);
+			file.write(tmp, 0, read);
 			read = stream.read(tmp);
 		}
+		file.write(CharTable.ASCII_CR);
 	}
 }

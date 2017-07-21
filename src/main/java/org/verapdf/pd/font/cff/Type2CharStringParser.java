@@ -103,35 +103,30 @@ class Type2CharStringParser extends BaseCharStringParser {
                 return false;
             case 10:    // subrcall
                 int subrNum = (int) this.stack.pop().getInteger();
-                if(this.stack.empty()) {
+                if(this.stack.empty() && localSubrs.size() > subrNum + bias) {
                     CFFNumber subrWidth = getWidthFromSubroutine(localSubrs.get(subrNum + bias));
                     if (subrWidth != null) {
                         this.setWidth(subrWidth);
                     } else {
                         break;
                     }
-                } else {
-                if(this.stack.empty() && localSubrs.size() > subrNum + bias) {
-                    this.setWidth(getWidthFromSubroutine(localSubrs.get(subrNum + bias)));
                 } else if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
                 }
                 return true;
             case 29:    // callgsubr
                 subrNum = (int) this.stack.pop().getInteger();
-                if(this.stack.empty()) {
+                if(this.stack.empty() && globalSubrs.size() > subrNum + gBias) {
                     CFFNumber subrWidth = getWidthFromSubroutine(globalSubrs.get(subrNum + gBias));
                     if (subrWidth != null) {
                         this.setWidth(subrWidth);
                     } else {
                         break;
                     }
-                } else {
-                if(this.stack.empty() && globalSubrs.size() > subrNum + gBias) {
-                    this.setWidth(getWidthFromSubroutine(globalSubrs.get(subrNum + gBias)));
                 } else if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
-                }return true;
+                }
+                return true;
             case 5:     // rlineto
             case 6:     // hlineto
             case 7:     // vlineto
