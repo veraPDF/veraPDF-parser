@@ -109,7 +109,7 @@ public class CMap {
      * @return CID of read code.
      */
     public int getCodeFromStream(InputStream stream) throws IOException {
-        byte[] charCode = new byte[4];
+        byte[] charCode = new byte[5];
         byte[] temp = new byte[1];
         int previousShortestMatchingCodeSpaceLength = this.shortestCodeSpaceLength;
 
@@ -140,7 +140,7 @@ public class CMap {
                     shortestMatchingCodeSpaceLength = codeSpace.getLength();    // Remembering length of shortest partially matching codespace
                 }
             }
-            if (shortestMatchingCodeSpaceLength == Integer.MAX_VALUE) {
+            if (shortestMatchingCodeSpaceLength == Integer.MAX_VALUE && !codeSpaces.isEmpty()) {
                 byte[] tmp = new byte[previousShortestMatchingCodeSpaceLength - i - 1];
                 stream.read(tmp);
                 System.arraycopy(tmp, 0, charCode, 0, tmp.length);      // No described partial matching, reading necessary amount of bytes and returning 0
