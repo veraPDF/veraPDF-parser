@@ -35,7 +35,7 @@ public class PDObject {
 	}
 
 	public PDObject(final COSObject obj) {
-		this.setObject(obj);
+		this.setObject(obj == null ? COSObject.getEmpty() : obj);
 	}
 
 	public boolean empty() {
