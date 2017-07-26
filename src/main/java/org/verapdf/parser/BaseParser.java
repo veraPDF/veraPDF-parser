@@ -37,7 +37,7 @@ import static org.verapdf.as.CharTable.*;
 /**
  * @author Timur Kamalov
  */
-public abstract class BaseParser {
+public class BaseParser {
 
 	private static final Logger LOGGER = Logger.getLogger(BaseParser.class.getCanonicalName());
 
