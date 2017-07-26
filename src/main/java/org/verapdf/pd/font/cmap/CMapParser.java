@@ -359,4 +359,9 @@ public class CMapParser extends BaseParser {
                     ". Expected " + type + " but got " + getToken().type);
         }
     }
+
+    @Override
+    protected boolean isEndOfComment(byte ch) {
+        return isCR(ch) || isFF(ch);
+    }
 }
