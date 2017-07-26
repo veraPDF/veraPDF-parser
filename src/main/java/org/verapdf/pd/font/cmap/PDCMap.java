@@ -46,6 +46,7 @@ public class PDCMap extends PDObject {
 
     private COSDictionary cidSystemInfo;
     private CMap cMapFile = null;
+    private PDCMap useCMap = null;
     private boolean parsedCMap = false;
 
     /**
@@ -104,7 +105,6 @@ public class PDCMap extends PDObject {
                         cMapName = getCMapID();
                     }
                     this.cMapFile = CMapFactory.getCMap(cMapName , cMapStream);
-                    return this.cMapFile;
                 } catch (IOException e) {
                     LOGGER.log(Level.FINE, "Can't close stream", e);
                 }
@@ -113,12 +113,15 @@ public class PDCMap extends PDObject {
                 String cMapPath = "/font/cmap/" + name;
                 try (ASInputStream cMapStream = loadCMap(cMapPath)) {
                     this.cMapFile = CMapFactory.getCMap(getCMapName(), cMapStream);
-                    return this.cMapFile;
                 } catch (IOException e) {
                     LOGGER.log(Level.FINE, "Can't close stream", e);
                 }
             } else {
                 return null;
+            }
+            parseUseCMap();
+            if (useCMap != null) {
+                this.cMapFile.useCMap(useCMap.getCMapFile());
             }
         }
         return this.cMapFile;
@@ -180,6 +183,15 @@ public class PDCMap extends PDObject {
         return this.cidSystemInfo;
     }
 
+    private void parseUseCMap() {
+        if (this.useCMap == null) {
+            COSObject useCMap = getUseCMap();
+            if (!useCMap.empty()) {
+                this.useCMap = new PDCMap(useCMap);
+            }
+        }
+    }
+
     private static ASInputStream loadCMap(String cMapName) {
         try {
             File cMapFile;
@@ -216,6 +228,16 @@ public class PDCMap extends PDObject {
     }
 
     public String toUnicode(int code) {
-        return this.getCMapFile() == null ? null : this.getCMapFile().getUnicode(code);
+        String res = null;
+        if (this.getCMapFile() != null) {
+            res = this.getCMapFile().getUnicode(code);
+            if (res == null) {
+                parseUseCMap();
+                if (useCMap != null) {
+                    res = useCMap.toUnicode(code);
+                }
+            }
+        }
+        return res;
     }
 }
