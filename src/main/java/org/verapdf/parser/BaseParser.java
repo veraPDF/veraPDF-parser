@@ -324,6 +324,9 @@ public class BaseParser {
 		return ASCII_CR == c;
 	}
 
+	protected static boolean isFF(int c) {
+		return ASCII_FF == c;
+	}
 	// PRIVATE METHODS
 
 	private void skipEOL() throws IOException {
@@ -353,15 +356,21 @@ public class BaseParser {
 				return; // EOL == LF
 			}
 
-			if (isCR(ch)) {
-				ch = this.source.readByte();
-				if (isLF(ch)) { // EOL == CR
-					this.source.unread();
-				} // else EOL == CRLF
+			if (isEndOfComment(ch)) {
+				if (isCR(ch)) {
+					ch = this.source.readByte();
+					if (isLF(ch)) { // EOL == CR
+						this.source.unread();
+					} // else EOL == CRLF
+				}
 				return;
 			}
 			// else skip regular character
 		}
+	}
+
+	protected boolean isEndOfComment(byte ch) {
+		return isCR(ch);
 	}
 
 	private void readLitString() throws IOException {

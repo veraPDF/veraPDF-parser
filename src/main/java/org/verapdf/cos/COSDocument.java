@@ -150,6 +150,7 @@ public class COSDocument {
 					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
 							" " + key.getGeneration(), e);
 				} catch (StackOverflowError e) {
+					// TODO: double check this StackOverfrow catching
 					throw new LoopedException("Loop in getting object from reader", e);
 				}
 			}
