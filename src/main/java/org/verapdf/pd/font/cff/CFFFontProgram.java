@@ -159,6 +159,11 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
     }
 
     @Override
+    public boolean containsCID(int cid) {
+        return font.containsCID(cid);
+    }
+
+    @Override
     public boolean isAttemptedParsing() {
         if (font != null) {
             return this.font.isAttemptedParsing();

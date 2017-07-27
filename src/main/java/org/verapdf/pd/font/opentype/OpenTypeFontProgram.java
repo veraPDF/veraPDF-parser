@@ -99,6 +99,11 @@ public class OpenTypeFontProgram implements FontProgram {
     }
 
     @Override
+    public boolean containsCID(int cid) {
+        return this.font.containsCID(cid);
+    }
+
+    @Override
     public String getGlyphName(int code) {
         return this.font.getGlyphName(code);
     }

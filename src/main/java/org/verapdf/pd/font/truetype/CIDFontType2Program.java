@@ -76,12 +76,7 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
     public boolean containsCode(int code) {
         if (this.cMap.containsCode(code)) {
             int cid = this.cMap.toCID(code);
-            if (this.cidToGID.contains(cid) && cid != 0) {
-                int gid = this.cidToGID.getGID(cid);
-                TrueTypeMaxpTable maxpParser = parser.getMaxpParser();
-                return maxpParser != null &&
-                        gid < maxpParser.getNumGlyphs();
-            }
+            return containsCID(cid);
         }
         return false;
     }
@@ -94,5 +89,16 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
     @Override
     public String getGlyphName(int code) {
         return null;  // No need in this method
+    }
+
+    @Override
+    public boolean containsCID(int cid) {
+        if (this.cidToGID.contains(cid) && cid != 0) {
+            int gid = this.cidToGID.getGID(cid);
+            TrueTypeMaxpTable maxpParser = parser.getMaxpParser();
+            return maxpParser != null &&
+                    gid < maxpParser.getNumGlyphs();
+        }
+        return false;
     }
 }

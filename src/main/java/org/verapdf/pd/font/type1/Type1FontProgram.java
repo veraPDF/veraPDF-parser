@@ -244,6 +244,11 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     @Override
+    public boolean containsCID(int cid) {
+        return false;
+    }
+
+    @Override
     public boolean isAttemptedParsing() {
         return this.attemptedParsing;
     }

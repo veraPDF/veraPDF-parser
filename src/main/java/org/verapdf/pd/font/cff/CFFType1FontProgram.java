@@ -301,6 +301,11 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         return this.charSet.keySet().contains(this.getGlyphName(code));
     }
 
+    @Override
+    public boolean containsCID(int cid) {
+        return false;
+    }
+
     private void initializeCharSet(String[] charSetArray) {
         for (int i = 0; i < charSetArray.length; ++i) {
             charSet.put(charSetArray[i], i);
