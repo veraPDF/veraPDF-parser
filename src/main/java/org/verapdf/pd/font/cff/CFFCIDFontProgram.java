@@ -268,14 +268,19 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     public boolean containsCode(int code) {
         int cid = externalCMap.toCID(code);
         return this.externalCMap.containsCode(code) &&
-                this.charSet.get(cid) != null &&
-                this.charSet.get(cid) != 0;
+                containsCID(cid);
     }
 
     @Override
     public boolean containsGlyph(String glyphName) {
         // not applicable in this case
         return false;
+    }
+
+    @Override
+    public boolean containsCID(int cid) {
+        return this.charSet.get(cid) != null &&
+                this.charSet.get(cid) != 0;
     }
 
     public int getSupplement() {

@@ -286,4 +286,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             }
         }
     }
+
+    @Override
+    public boolean containsCID(int cid) {
+        return false;
+    }
 }

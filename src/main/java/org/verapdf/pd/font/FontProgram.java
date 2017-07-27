@@ -63,6 +63,12 @@ public interface FontProgram {
     boolean containsCode(int code);
 
     /**
+     * Method works only for fonts where cid notation is used.
+     * @return true if font a is cid font and contains given cid.
+     */
+    boolean containsCID(int cid);
+
+    /**
      * Checks if this font program has glyph for given glyph name.
      *
      * @param glyphName is the name of glyph.
