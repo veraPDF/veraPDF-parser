@@ -98,6 +98,14 @@ public class CIDToGIDMapping {
         return cid < mapping.length && cid >= 0;
     }
 
+    public boolean isIdentity() {
+        return isIdentity;
+    }
+
+    public int getMappingSize() {
+        return this.mapping.length;
+    }
+
     private void parseCIDToGIDStream(ASInputStream stream) throws IOException {
         int b = stream.read();
         int i = 0;
