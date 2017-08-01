@@ -39,6 +39,7 @@ public class CMap {
     private String registry, ordering;
     private int supplement;
     private String name;
+    private boolean usesNonPredefinedCMap;
     int shortestCodeSpaceLength;
 
     private List<CIDMappable> cidMappings;
@@ -54,6 +55,7 @@ public class CMap {
         this.toUnicode = new HashMap<>();
         this.unicodeIntervals = new ArrayList<>();
         wMode = 0; // default
+        this.usesNonPredefinedCMap = false; // default
         shortestCodeSpaceLength = Integer.MAX_VALUE;
     }
 
@@ -217,6 +219,14 @@ public class CMap {
     }
 
     /**
+     * @return true if this CMap references non-predefined CMap with usecmap
+     * operator.
+     */
+    public boolean isUsesNonPredefinedCMap() {
+        return usesNonPredefinedCMap;
+    }
+
+    /**
      * Setter for name of CMap.
      */
     void setName(String name) {
@@ -228,6 +238,13 @@ public class CMap {
      */
     void setCodeSpaces(List<CodeSpace> codeSpaces) {
         this.codeSpaces = codeSpaces;
+    }
+
+    /**
+     * Sets indicator for CMap to contain reference to a non-predefined CMap.
+     */
+    public void setUsesNonPredefinedCMap(boolean usesNonPredefinedCMap) {
+        this.usesNonPredefinedCMap = usesNonPredefinedCMap;
     }
 
     void addUnicodeMapping(int code, String toUnicodeMap) {

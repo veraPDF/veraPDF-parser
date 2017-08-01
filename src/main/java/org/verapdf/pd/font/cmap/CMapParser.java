@@ -149,6 +149,7 @@ public class CMapParser extends BaseParser {
                         if (usedCMap != null) {
                             this.cMap.useCMap(usedCMap);
                         } else {
+                            this.cMap.setUsesNonPredefinedCMap(true);
                             LOGGER.log(Level.FINE, "Can't load predefined CMap with name " + lastCOSName);
                         }
                         break;
