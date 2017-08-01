@@ -330,9 +330,8 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     /**
      * @return list of names for all glyphs in this font.
      */
-    public String[] getCharSet() {
-        Set<String> set = this.charSet.keySet();
-        return set.toArray(new String[set.size()]);
+    public Set<String> getCharSet() {
+        return this.charSet.keySet();
     }
 
 
