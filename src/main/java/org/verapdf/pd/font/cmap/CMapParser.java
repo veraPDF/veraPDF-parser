@@ -305,6 +305,11 @@ public class CMapParser extends BaseParser {
 
             nextToken();    // skip ]
         } else {
+            byte[] token = getToken().getByteValue();
+            int lastByte = token[token.length - 1] & 0xFF;
+            if (lastByte > 255 - bfRangeEnd + bfRangeBegin) {
+                bfRangeEnd = 255 + bfRangeBegin - lastByte;
+            }
             this.cMap.addUnicodeInterval(new ToUnicodeInterval(bfRangeBegin, bfRangeEnd,
                     numberFromBytes(getToken().getByteValue())));
         }
