@@ -149,6 +149,7 @@ public class CMapParser extends BaseParser {
                         if (usedCMap != null) {
                             this.cMap.useCMap(usedCMap);
                         } else {
+                            this.cMap.setUsesNonPredefinedCMap(true);
                             LOGGER.log(Level.FINE, "Can't load predefined CMap with name " + lastCOSName);
                         }
                         break;
@@ -304,6 +305,11 @@ public class CMapParser extends BaseParser {
 
             nextToken();    // skip ]
         } else {
+            byte[] token = getToken().getByteValue();
+            int lastByte = token[token.length - 1] & 0xFF;
+            if (lastByte > 255 - bfRangeEnd + bfRangeBegin) {
+                bfRangeEnd = 255 + bfRangeBegin - lastByte;
+            }
             this.cMap.addUnicodeInterval(new ToUnicodeInterval(bfRangeBegin, bfRangeEnd,
                     numberFromBytes(getToken().getByteValue())));
         }

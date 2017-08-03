@@ -22,6 +22,7 @@ package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.filters.COSFilterASCII85Decode;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
@@ -29,6 +30,7 @@ import org.verapdf.io.SeekableInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -180,6 +182,9 @@ public class BaseParser {
 				ch = source.readByte();
 				if (ch == '<') {
 					this.token.type = Token.Type.TT_OPENDICT;
+				} else if (ch == '~') {
+					this.token.type = Token.Type.TT_HEXSTRING;
+					readASCII85();
 				} else {
 					this.source.unread();
 					this.token.type = Token.Type.TT_HEXSTRING;
@@ -504,6 +509,29 @@ public class BaseParser {
 
 		this.token.setContainsOnlyHex(containsOnlyHex);
 		this.token.setHexCount(Long.valueOf(hexCount));
+	}
+
+	private void readASCII85() throws IOException {
+		long ascii85Start = this.source.getOffset();
+		long ascii85End = this.source.getStreamLength();
+		byte b = this.source.readByte();
+		while (!source.isEOF()) {
+			if (b == '~' && this.source.peek() == '>') {
+				ascii85End = this.source.getOffset() - 1;
+				this.source.readByte();	// here we finished reading all ascii85 string
+				break;
+			}
+			b = source.readByte();
+		}
+		ASInputStream ascii85 = this.source.getStream(ascii85Start, ascii85End - ascii85Start);
+		COSFilterASCII85Decode ascii85Decode = new COSFilterASCII85Decode(ascii85);
+		byte[] buf = new byte[(int) (ascii85End - ascii85Start)];
+		int read = ascii85Decode.read(buf);
+		buf = Arrays.copyOf(buf, read);
+
+		this.token.setContainsOnlyHex(false);
+		this.token.setHexCount(Long.valueOf(0));
+		this.token.setByteValue(buf);
 	}
 
 	private void readName() throws IOException {

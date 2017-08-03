@@ -150,7 +150,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
 
     private boolean mappingForGlyphIsPresent(String glyphName) {
         TrueTypePostTable postTable = this.parser.getPostParser();
-        return getNrOfEncodingCMaps() != 0 || (postTable != null && postTable.containsGlyph(glyphName));
+        return getNrOfCMaps() != 0 || (postTable != null && postTable.containsGlyph(glyphName));
     }
 
     @Override

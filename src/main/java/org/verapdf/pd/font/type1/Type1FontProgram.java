@@ -262,9 +262,8 @@ public class Type1FontProgram extends COSParser implements FontProgram {
         return encoding;
     }
 
-    public String[] getCharSet() {
-        Set<String> charSet = this.glyphWidths.keySet();
-        return charSet.toArray(new String[charSet.size()]);
+    public Set<String> getCharSet() {
+        return this.glyphWidths.keySet();
     }
 
     @Override
