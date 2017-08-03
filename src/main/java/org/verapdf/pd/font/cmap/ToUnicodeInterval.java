@@ -73,6 +73,10 @@ public class ToUnicodeInterval {
     }
 
     private static String getUnicodeNameFromLong(long unicode) {
+        if ((unicode & 0xFFFF) == 0xFFFE) {
+            char[] c = new char[] {0xFFFE};
+            return new String(c);
+        }
         byte[] arr = new byte[2];
         arr[1] = (byte) (unicode & 0xFF);
         unicode >>= 8;
