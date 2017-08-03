@@ -137,4 +137,11 @@ public class Token {
 		this.hexCount = hexCount;
 	}
 
+	public void setByteValue(byte[] array) {
+		clearValue();
+		for (byte b : array) {
+			this.token.append((char) b);
+		}
+	}
+
 }
