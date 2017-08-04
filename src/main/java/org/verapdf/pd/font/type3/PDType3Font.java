@@ -2,31 +2,34 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
  * If a copy of the MPL was not distributed with this file, you can obtain one at
  * http://mozilla.org/MPL/2.0/.
  */
-package org.verapdf.pd.font;
+package org.verapdf.pd.font.type3;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResources;
+import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.PDSimpleFont;
 import org.verapdf.tools.TypeConverter;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,13 +72,7 @@ public class PDType3Font extends PDSimpleFont {
     }
 
     public boolean containsCharString(int code) {
-        String glyphName = this.getEncodingMapping().getName(code);
-        COSDictionary charProcs = this.getCharProcs();
-        if(charProcs != null) {
-            ASAtom asAtomGlyph = ASAtom.getASAtom(glyphName);
-            return charProcs.knownKey(asAtomGlyph);
-        }
-        return false;
+        return !getCharProc(code).empty();
     }
 
     /**
@@ -114,9 +111,28 @@ public class PDType3Font extends PDSimpleFont {
         return (COSDictionary) this.dictionary.getKey(ASAtom.CHAR_PROCS).getDirectBase();
     }
 
+    private COSObject getCharProc(int code) {
+        String glyphName = this.getEncodingMapping().getName(code);
+        COSDictionary charProcs = this.getCharProcs();
+        if (charProcs != null) {
+            ASAtom asAtomGlyph = ASAtom.getASAtom(glyphName);
+            return charProcs.getKey(asAtomGlyph);
+        }
+        return COSObject.getEmpty();
+    }
+
     @Override
     public float getWidthFromProgram(int code) {
-        return getWidth(code).floatValue();
+        COSObject charProc = getCharProc(code);
+        if (charProc.getType() == COSObjType.COS_STREAM) {
+            try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData())) {
+                parser.parse();
+                return (float) parser.getWidth();
+            } catch (IOException e) {
+                LOGGER.log(Level.FINE, "Can't get width from type 3 char proc", e);
+            }
+        }
+        return -1;
     }
 
     @Override
