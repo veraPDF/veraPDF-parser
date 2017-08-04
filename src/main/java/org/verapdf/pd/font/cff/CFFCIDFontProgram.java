@@ -25,8 +25,7 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Instance of this class represent a parser of CIDFont from FontSet of CFF file.
@@ -322,5 +321,16 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
                 bias[fontDictNum] = 32768;
             }
         }
+    }
+
+    public List<Integer> getCIDList() {
+        if (charSet != null) {
+            List<Integer> res = new ArrayList<>(this.charSet.size());
+            for (Map.Entry<Integer, Integer> entry : this.charSet.entrySet()) {
+                res.add(entry.getKey());
+            }
+            return res;
+        }
+        return Collections.emptyList();
     }
 }

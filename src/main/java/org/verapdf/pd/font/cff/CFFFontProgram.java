@@ -27,6 +27,8 @@ import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -178,6 +180,14 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             return this.font.isSuccessfulParsing();
         } else {
             return false;
+        }
+    }
+
+    public List<Integer> getCIDList() {
+        if (this.font instanceof CFFCIDFontProgram) {
+            return ((CFFCIDFontProgram) this.font).getCIDList();
+        } else {
+            return Collections.emptyList();
         }
     }
 
