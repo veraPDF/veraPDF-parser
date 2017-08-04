@@ -27,6 +27,8 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents CIDFontType2 font program.
@@ -100,5 +102,26 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
                     gid < maxpParser.getNumGlyphs();
         }
         return false;
+    }
+
+    public List<Integer> getCIDList() {
+        if (!cidToGID.isIdentity()) {
+            int size = cidToGID.getMappingSize();
+            List<Integer> res = new ArrayList<>(size);
+            for (int i = 0; i < size; ++i) {
+                if (containsCID(i)) {
+                    res.add(i);
+                }
+            }
+            return res;
+        } else {
+            // CIDToGID is identity, so we check which glyphs are present
+            int size = this.widths.length;
+            List<Integer> res = new ArrayList<>(size);
+            for (int i = 0; i < size; ++i) {
+                res.add(i);
+            }
+            return res;
+        }
     }
 }
