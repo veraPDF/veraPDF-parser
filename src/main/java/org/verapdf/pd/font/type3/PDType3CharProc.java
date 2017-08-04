@@ -18,10 +18,12 @@
  * If a copy of the MPL was not distributed with this file, you can obtain one at
  * http://mozilla.org/MPL/2.0/.
  */
-package org.verapdf.pd;
+package org.verapdf.pd.font.type3;
 
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.pd.PDContentStream;
+import org.verapdf.pd.PDObject;
 
 /**
  * Class represents content stream that constructs and paints the glyph for

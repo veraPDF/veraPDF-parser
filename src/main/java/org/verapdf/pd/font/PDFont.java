@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDResource;
 import org.verapdf.pd.font.cmap.PDCMap;
+import org.verapdf.pd.font.type3.PDType3Font;
 
 import java.io.IOException;
 import java.io.InputStream;
