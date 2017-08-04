@@ -20,6 +20,7 @@
  */
 package org.verapdf.pd.font.type1;
 
+import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.parser.BaseParser;
@@ -71,6 +72,21 @@ class Type1PrivateParser extends BaseParser {
                 !Type1StringConstants.CLOSEFILE.equals(getToken().getValue())) {
             nextToken();
             processToken();
+        }
+    }
+
+    @Override
+    protected void readName() throws IOException {
+        this.clearToken();
+        byte ch;
+        while (!this.source.isEOF()) {
+            ch = this.source.readByte();
+            if (CharTable.isTokenDelimiter(ch)) {
+                this.source.unread();
+                break;
+            }
+
+            appendToToken(ch);
         }
     }
 
