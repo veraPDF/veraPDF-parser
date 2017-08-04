@@ -534,7 +534,7 @@ public class BaseParser {
 		this.token.setByteValue(buf);
 	}
 
-	private void readName() throws IOException {
+	protected void readName() throws IOException {
 		this.token.clearValue();
 		byte ch;
 		while (!this.source.isEOF()) {
@@ -627,7 +627,11 @@ public class BaseParser {
 		}
 	}
 
-	private void appendToToken(final byte ch) {
+	protected void clearToken() {
+		this.token.clearValue();
+	}
+
+	protected void appendToToken(final byte ch) {
 		this.token.append((char) (ch & 0xff));
 	}
 
