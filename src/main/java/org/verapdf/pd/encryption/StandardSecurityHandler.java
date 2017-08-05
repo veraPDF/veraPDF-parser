@@ -29,6 +29,7 @@ import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
 import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
 import org.verapdf.tools.EncryptionToolsRevision4;
 import org.verapdf.tools.EncryptionToolsRevision6;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -51,20 +52,23 @@ public class StandardSecurityHandler {
     private byte[] encryptionKey;
     private boolean isRC4Decryption;
     private ASAtom method;
+    private COSDocument document;
 
     /**
      * Constructor.
      *
      * @param pdEncryption is encryption object of this PDF document.
      * @param id           is ID object from document trailer.
+     * @param document     is COSDocument object associated with this security handler
      */
-    public StandardSecurityHandler(PDEncryption pdEncryption, COSObject id) {
+    public StandardSecurityHandler(PDEncryption pdEncryption, COSObject id, COSDocument document) {
         if (pdEncryption != null) {
             this.pdEncryption = pdEncryption;
         } else {
             this.pdEncryption = new PDEncryption();
         }
         this.id = id;
+        this.document = document;
         PDCryptFilter stdCrypt = this.pdEncryption.getStandardCryptFilter();
         if (stdCrypt != null) {
             this.method = stdCrypt.getMethod();
@@ -180,6 +184,7 @@ public class StandardSecurityHandler {
             filter = new COSFilterAESDecryptionDefault(encStream, key,
                     this.encryptionKey, true, method);
         }
+        document.addFileResource(new ASFileStreamCloser(filter));
         stream.setData(filter, COSStream.FilterFlags.RAW_DATA);
     }
 

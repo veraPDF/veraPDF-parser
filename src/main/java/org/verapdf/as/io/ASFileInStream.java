@@ -136,6 +136,11 @@ public class ASFileInStream extends ASInputStream {
 	}
 
 	@Override
+	public void decrementResourceUsers() {
+		this.resourceUsers.decrement();
+	}
+
+	@Override
 	public void reset() {
 		this.curPos = 0;
 	}
