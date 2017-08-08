@@ -136,6 +136,7 @@ public abstract class BaseCharStringParser {
             }
             cont = this.stream.read(buf, 1);
         }
+        this.stack.clear();
     }
 
     /**
