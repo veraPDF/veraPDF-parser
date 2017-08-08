@@ -144,7 +144,9 @@ public class COSObject {
 	}
 
 	public void setString(final String value) {
-		setString(value, false);
+		if (value != null) {
+			setString(value, false);
+		}
 	}
 
 	public void setString(final String value, final boolean isHex) {
@@ -205,13 +207,13 @@ public class COSObject {
 	}
 
 	public void setArray(final int size, final COSObject[] value) {
-		if (this.base == null || !this.base.setArray(size, value)) {
+		if (value != null && (this.base == null || !this.base.setArray(size, value))) {
 			this.base = new COSArray(size, value);
 		}
 	}
 
 	public void setArray(final int size, final double[] value) {
-		if (this.base == null || !this.base.setArray(size, value)) {
+		if (value != null && (this.base == null || !this.base.setArray(size, value))) {
 			this.base = new COSArray(size, value);
 		}
 	}
@@ -232,7 +234,7 @@ public class COSObject {
 	}
 
 	public void setKey(final ASAtom key, final COSObject value) {
-		if (this.base == null || !this.base.setKey(key, value)) {
+		if (value != null && (this.base == null || !this.base.setKey(key, value))) {
 			this.base = new COSDictionary(key, value);
 		}
 	}
@@ -272,7 +274,7 @@ public class COSObject {
 	}
 
 	public void setStringKey(final ASAtom key, final String value) {
-		if (this.base == null || !this.base.setStringKey(key, value)) {
+		if (value != null && (this.base == null || !this.base.setStringKey(key, value))) {
 			this.base = new COSDictionary(key, value);
 		}
 	}
@@ -282,7 +284,7 @@ public class COSObject {
 	}
 
 	public void setNameKey(final ASAtom key, final ASAtom value) {
-		if (this.base == null || !this.base.setNameKey(key, value)) {
+		if (value != null && (this.base == null || !this.base.setNameKey(key, value))) {
 			this.base = new COSDictionary(key, value);
 		}
 	}
@@ -295,21 +297,21 @@ public class COSObject {
 	}
 
 	public void setArrayKey(final ASAtom key, final COSObject array) {
-		if (this.base == null || !this.base.setArrayKey(key, array)) {
+		if (array != null && (this.base == null || !this.base.setArrayKey(key, array))) {
 			COSObject obj = COSArray.construct();
 			this.base = new COSDictionary(key, obj);
 		}
 	}
 
 	public void setArrayKey(final ASAtom key, final int size, final COSObject[] value) {
-		if (this.base == null || !this.base.setArrayKey(key, size, value)) {
+		if (value != null && (this.base == null || !this.base.setArrayKey(key, size, value))) {
 			COSObject obj = COSArray.construct(size, value);
 			this.base = new COSDictionary(key, obj);
 		}
 	}
 
 	public void setArrayKey(final ASAtom key, final int size, final double[] value) {
-		if (this.base == null || this.base.setArrayKey(key, size, value)) {
+		if (value != null && (this.base == null || this.base.setArrayKey(key, size, value))) {
 			COSObject obj = COSArray.construct(size, value);
 			this.base = new COSDictionary(key, obj);
 		}
@@ -345,11 +347,13 @@ public class COSObject {
 	}
 
 	public void setData(final ASInputStream stream) {
-		setData(stream, COSStream.FilterFlags.RAW_DATA);
+		if (stream != null) {
+			setData(stream, COSStream.FilterFlags.RAW_DATA);
+		}
 	}
 
 	public void setData(final ASInputStream stream, final COSStream.FilterFlags flags) {
-		if (this.base == null || !this.base.setData(stream, flags)) {
+		if (stream != null && (this.base == null || !this.base.setData(stream, flags))) {
 			COSObject obj;
 			if (this.base instanceof COSDictionary) {
 				obj = COSStream.construct((COSDictionary) this.base, stream, flags);
@@ -439,7 +443,7 @@ public class COSObject {
 	}
 
 	public void setDirect(final COSObject value) {
-		if (this.base == null || !this.base.setDirect(value)) {
+		if (value != null && (this.base == null || !this.base.setDirect(value))) {
 			set(value.base);
 		}
 	}
