@@ -311,7 +311,7 @@ public class CMapParser extends BaseParser {
                 bfRangeEnd = 255 + bfRangeBegin - lastByte;
             }
             this.cMap.addUnicodeInterval(new ToUnicodeInterval(bfRangeBegin, bfRangeEnd,
-                    numberFromBytes(getToken().getByteValue())));
+                    getToken().getByteValue()));
         }
     }
 
