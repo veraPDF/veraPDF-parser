@@ -62,6 +62,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 20:    // hintmask
                 if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                     return true;
                 }
                 break;
@@ -70,6 +71,7 @@ class Type2CharStringParser extends BaseCharStringParser {
                     // If endchar is proceeded with 4 numbers, they are arguments
                     // for "seac" operator from charsting type 1.
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                     return true;
                 }
                 break;
@@ -77,6 +79,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 22:    // hmoveto
                 if (this.stack.size() > 1) {
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                     return true;
                 }
                 this.stack.pop();
@@ -84,6 +87,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 21:    // rmoveto
                 if (this.stack.size() > 2) {
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                     return true;
                 }
                 this.popStack(2);
@@ -107,8 +111,8 @@ class Type2CharStringParser extends BaseCharStringParser {
                     CFFNumber subrWidth = getWidthFromSubroutine(localSubrs.get(subrNum + bias));
                     if (subrWidth != null) {
                         this.setWidth(subrWidth);
-                    } else {
-                        break;
+                    } else if (!this.stack.empty()) {
+                        return false;
                     }
                 } else if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
@@ -120,11 +124,12 @@ class Type2CharStringParser extends BaseCharStringParser {
                     CFFNumber subrWidth = getWidthFromSubroutine(globalSubrs.get(subrNum + gBias));
                     if (subrWidth != null) {
                         this.setWidth(subrWidth);
-                    } else {
-                        break;
+                    } else if (!this.stack.empty()) {
+                        return false;
                     }
                 } else if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                 }
                 return true;
             case 5:     // rlineto
