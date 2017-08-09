@@ -76,6 +76,9 @@ public class ToUnicodeInterval {
 
     private static String getUnicodeNameFromLong(byte[] unicode) {
         String fffe = getFFFEFromUnicode(unicode);
+        if (fffe == null) {
+            fffe = getFEFFFromUnicode(unicode);
+        }
         if (fffe != null) {
             return fffe;
         }
@@ -93,6 +96,16 @@ public class ToUnicodeInterval {
     private static String getFFFEFromUnicode(byte[] unicode) {
         for (int i = 0; i < unicode.length - 1; ++i) {
             if (unicode[i] == (byte) 0xFF && unicode[i+1] == (byte) 0xFE) {
+                char[] c = new char[] {0xFFFE};
+                return new String(c);
+            }
+        }
+        return null;
+    }
+
+    private static String getFEFFFromUnicode(byte[] unicode) {
+        for (int i = 0; i < unicode.length - 1; ++i) {
+            if (unicode[i] == (byte) 0xFE && unicode[i+1] == (byte) 0xFF) {
                 char[] c = new char[] {0xFFFE};
                 return new String(c);
             }
