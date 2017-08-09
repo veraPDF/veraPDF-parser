@@ -32,6 +32,7 @@ public abstract class ASInputStream extends InputStream {
 
 	protected int nPos = -1;
 	protected boolean isClosed = false;
+	protected boolean isSourceClosed = false;
 
 	protected IntReference resourceUsers = new IntReference(1);
 
