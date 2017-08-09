@@ -176,9 +176,16 @@ public class PDCMap extends PDObject {
         }
 
         if (cidSystemInfo == null) {
-            this.cidSystemInfo = (COSDictionary)
-                    this.getObject().getKey(ASAtom.CID_SYSTEM_INFO).getDirectBase();
-            return this.cidSystemInfo;
+            COSObject cidSystemInfoObject = this.getObject().getKey(ASAtom.CID_SYSTEM_INFO);
+            if (cidSystemInfoObject.getType() == COSObjType.COS_DICT) {
+                this.cidSystemInfo = (COSDictionary) cidSystemInfoObject.getDirectBase();
+            } else if (cidSystemInfoObject.getType() == COSObjType.COS_ARRAY) { // see PDF-1.4 specification
+                cidSystemInfoObject = cidSystemInfoObject.at(0);
+                if (cidSystemInfoObject != null &&
+                        cidSystemInfoObject.getType() == COSObjType.COS_DICT) {
+                    this.cidSystemInfo = (COSDictionary) cidSystemInfoObject.getDirectBase();
+                }
+            }
         }
         return this.cidSystemInfo;
     }

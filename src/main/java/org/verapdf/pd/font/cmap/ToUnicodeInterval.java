@@ -21,6 +21,7 @@
 package org.verapdf.pd.font.cmap;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,14 +36,14 @@ public class ToUnicodeInterval {
 
     private long intervalBegin;
     private long intervalEnd;
-    private long startingValue;
+    private byte[] startingValue;
 
     /**
      * @param intervalBegin is the first code of mapping interval.
      * @param intervalEnd is the last code of mapping interval.
      * @param startingValue is the cid value for first code of mapping interval.
      */
-    public ToUnicodeInterval(long intervalBegin, long intervalEnd, long startingValue) {
+    public ToUnicodeInterval(long intervalBegin, long intervalEnd, byte[] startingValue) {
         this.intervalBegin = intervalBegin;
         this.intervalEnd = intervalEnd;
         this.startingValue = startingValue;
@@ -68,27 +69,47 @@ public class ToUnicodeInterval {
      * @return Unicode value for character code as a String object.
      */
     public String toUnicode(int code) {
-        long unicode = code - intervalBegin + startingValue;
+        byte[] unicode = Arrays.copyOf(startingValue, startingValue.length);
+        unicode[unicode.length - 1] = (byte) (code - intervalBegin + startingValue[startingValue.length - 1]);
         return getUnicodeNameFromLong(unicode);
     }
 
-    private static String getUnicodeNameFromLong(long unicode) {
-        if ((unicode & 0xFFFF) == 0xFFFE) {
-            char[] c = new char[] {0xFFFE};
-            return new String(c);
+    private static String getUnicodeNameFromLong(byte[] unicode) {
+        String fffe = getFFFEFromUnicode(unicode);
+        if (fffe == null) {
+            fffe = getFEFFFromUnicode(unicode);
         }
-        byte[] arr = new byte[2];
-        arr[1] = (byte) (unicode & 0xFF);
-        unicode >>= 8;
-        arr[0] = (byte) (unicode & 0xFF);
+        if (fffe != null) {
+            return fffe;
+        }
         try {
-            if (arr[0] == 0) {
-                return String.valueOf((char)arr[1]);
+            if (unicode[0] == 0) {
+                return String.valueOf((char)unicode[1]);
             }
-            return new String(arr, "UTF-16BE");
+            return new String(unicode, "UTF-16BE");
         } catch (UnsupportedEncodingException e) {
             LOGGER.log(Level.FINE, "Can't find String encoding UTF-16BE", e);
             return null;    // I'm sure this won't be reached
         }
+    }
+
+    private static String getFFFEFromUnicode(byte[] unicode) {
+        for (int i = 0; i < unicode.length - 1; ++i) {
+            if (unicode[i] == (byte) 0xFF && unicode[i+1] == (byte) 0xFE) {
+                char[] c = new char[] {0xFFFE};
+                return new String(c);
+            }
+        }
+        return null;
+    }
+
+    private static String getFEFFFromUnicode(byte[] unicode) {
+        for (int i = 0; i < unicode.length - 1; ++i) {
+            if (unicode[i] == (byte) 0xFE && unicode[i+1] == (byte) 0xFF) {
+                char[] c = new char[] {0xFFFE};
+                return new String(c);
+            }
+        }
+        return null;
     }
 }
