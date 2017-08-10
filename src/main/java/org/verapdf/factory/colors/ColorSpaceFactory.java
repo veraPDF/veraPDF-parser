@@ -21,6 +21,7 @@
 package org.verapdf.factory.colors;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResources;
@@ -75,7 +76,7 @@ public class ColorSpaceFactory {
             PDColorSpace cs = getColorSpaceFromName(base, resources, wasDefault);
             return cs;
         } else if (type == COSObjType.COS_ARRAY) {
-            return getColorSpaceFromArray(base, resources);
+            return getColorSpaceFromArray(base, resources, wasDefault);
         } else if (type != null && type.isDictionaryBased()) {
             return getPattern(base);
         } else {
@@ -114,7 +115,8 @@ public class ColorSpaceFactory {
         }
     }
 
-    private static PDColorSpace getColorSpaceFromArray(COSObject base, PDResources resources) {
+    private static PDColorSpace getColorSpaceFromArray(COSObject base, PDResources resources,
+                                                       boolean wasDefault) {
         if (base.size().intValue() < 2) {
             LOGGER.log(Level.FINE, "ColorSpace array can not contain less than two elements");
             return null;
@@ -129,14 +131,18 @@ public class ColorSpaceFactory {
         } else if (ASAtom.ICCBASED.equals(name)) {
             return new PDICCBased(base);
         } else if (ASAtom.SEPARATION.equals(name)) {
-            return new PDSeparation(base, resources);
+            return new PDSeparation(base, resources, wasDefault);
         } else if (ASAtom.DEVICEN.equals(name)) {
-            return new PDDeviceN(base, resources);
+            return new PDDeviceN(base, resources, wasDefault);
         } else if (ASAtom.INDEXED.equals(name)) {
             return new PDIndexed(base, resources);
         } else if (ASAtom.PATTERN == name) {
             return PDPattern.INSTANCE;
-        } else {
+        } else if (ASAtom.CALCMYK == name) {
+            return getColorSpaceFromName(COSName.construct(ASAtom.DEVICECMYK), resources,
+                    false);
+        }
+        else {
             LOGGER.log(Level.FINE, "Unknown ColorSpace name");
             return null;
         }

@@ -21,6 +21,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.as.io.ASOutputStream;
@@ -31,6 +32,7 @@ import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -351,5 +353,30 @@ public class COSStream extends COSDictionary {
 		} while (readFromOne != -1);
 
 		return true;
+	}
+
+	public static COSObject concatenateStreams(COSArray streams) throws IOException {
+		File mergedContentStream = File.createTempFile("verapdf_tmp_file", ".tmp");
+		FileOutputStream outputStream = new FileOutputStream(mergedContentStream);
+		for (COSObject stream : streams) {
+			if (stream.getType() == COSObjType.COS_STREAM) {
+				ASInputStream streamData = stream.getData();
+				writeStreamToFile(outputStream, streamData);
+			}
+		}
+		outputStream.close();
+		ASInputStream inputContentStream = new InternalInputStream(mergedContentStream);
+		COSObject streamDict = COSDictionary.construct(ASAtom.LENGTH, mergedContentStream.length());
+		return COSStream.construct((COSDictionary) streamDict.get(), inputContentStream);
+	}
+
+	private static void writeStreamToFile(FileOutputStream file, ASInputStream stream) throws IOException {
+		byte[] tmp = new byte[2048];
+		int read = stream.read(tmp);
+		while (read != -1) {
+			file.write(tmp, 0, read);
+			read = stream.read(tmp);
+		}
+		file.write(CharTable.ASCII_CR);
 	}
 }

@@ -59,4 +59,9 @@ class CIDInterval implements CIDMappable {
         }
         return startingCID + character - intervalStart;
     }
+
+    @Override
+    public int getMaxCID() {
+        return startingCID + intervalEnd - intervalStart;
+    }
 }

@@ -5,6 +5,7 @@ import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,7 +18,7 @@ import static org.verapdf.as.CharTable.*;
  *
  * @author Sergey Shemyakov
  */
-public class NotSeekableBaseParser {
+public class NotSeekableBaseParser implements Closeable {
 
     private static final Logger LOGGER = Logger.getLogger(
             NotSeekableBaseParser.class.getCanonicalName());
@@ -43,7 +44,7 @@ public class NotSeekableBaseParser {
     /**
      * Closes source stream.
      */
-    public void closeInputStream() throws IOException {
+    public void close() throws IOException {
         this.source.close();
     }
 

@@ -65,4 +65,8 @@ public class CFFIndex {
     int getDataLength() {
         return this.data.length;
     }
+
+    public static CFFIndex getEmptyIndex() {
+        return new CFFIndex(0, 0, new int[0], new byte[0]);
+    }
 }

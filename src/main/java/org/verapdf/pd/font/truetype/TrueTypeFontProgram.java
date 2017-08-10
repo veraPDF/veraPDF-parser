@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -80,23 +80,8 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             if (TrueTypePredefined.NOTDEF_STRING.equals(glyph)) {
                 return false;
             }
-            AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyph);
-            TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
-            if (cmap31 != null) {
-                int gid = cmap31.getGlyph(unicode.getSymbolCode());
-                if (gid >= 0 && gid < getNGlyphs()) {
-                    return true;
-                }
-            }
-            TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
-            if (cmap10 != null) {
-                Integer charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyph);
-                if (charCode == null) {
-                    return false;
-                }
-                int gid = cmap10.getGlyph(charCode);
-                return gid >= 0 && gid < getNGlyphs();
-            }
+            int gid = getGidFromCMaps(glyph);
+            return gid >= 0 && gid < getNGlyphs();
         } else {
             int gid = getGIDFrom30(code);
             if (gid >= 0 && gid < getNGlyphs()) {
@@ -132,6 +117,17 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         }
     }
 
+    @Override
+    public String getGlyphName(int code) {
+        if (!isSymbolic && encodingMappingArray != null &&
+                code < encodingMappingArray.length) {
+            return encodingMappingArray[code];
+        } else if (isSymbolic) {
+            return " "; // indicates that toUnicode should not be checked.
+        }
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -140,22 +136,55 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         if (isSymbolic) {
             return -1;
         }
+        int gid = getGidFromCMaps(glyphName);
+        if (gid == 0) {
+            // if cmap lookup fails we go to post table
+            gid = getGidFromPostTable(glyphName);
+        }
+        if (mappingForGlyphIsPresent(glyphName)) {
+            return getWidthWithCheck(gid);
+        } else {
+            return -1;  //case when no cmap (3,1) and no (1,0) is found
+        }
+    }
+
+    private boolean mappingForGlyphIsPresent(String glyphName) {
+        TrueTypePostTable postTable = this.parser.getPostParser();
+        return getNrOfCMaps() != 0 || (postTable != null && postTable.containsGlyph(glyphName));
+    }
+
+    @Override
+    public boolean containsGlyph(String glyphName) {
+        if (!isSymbolic) {
+            int gid = getGidFromCMaps(glyphName);
+            return gid >= 0 && gid < getNGlyphs();
+        } else {
+            return false;   // no notation of glyph name for symbolic fonts?
+        }
+    }
+
+    private int getGidFromCMaps(String glyphName) {
+        AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
         TrueTypeCmapSubtable cmap31 = this.parser.getCmapTable(3, 1);
         if (cmap31 != null) {
-            AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
             int gid = cmap31.getGlyph(unicode.getSymbolCode());
             if (gid != 0) {
-                return getWidthWithCheck(gid);
+                return gid;
             }
         }
         TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
         if (cmap10 != null) {
             Integer charCode = TrueTypePredefined.MAC_OS_ROMAN_ENCODING_MAP.get(glyphName);
-            int gid = charCode == null ? 0 : cmap10.getGlyph(charCode);
-            return getWidthWithCheck(gid);
-        } else {
-            return -1;  //case when no cmap (3,1) and no (1,0) is found
+            if (charCode != null) {
+                return cmap10.getGlyph(charCode);
+            }
         }
+        return 0;
+    }
+
+    private int getGidFromPostTable(String glyphName) {
+        TrueTypePostTable postTable = this.parser.getPostParser();
+        return postTable == null ? 0 : postTable.getGID(glyphName);
     }
 
     /**
@@ -256,5 +285,10 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
                 throw new IOException("Error in reading /Encoding entry in font dictionary");
             }
         }
+    }
+
+    @Override
+    public boolean containsCID(int cid) {
+        return false;
     }
 }

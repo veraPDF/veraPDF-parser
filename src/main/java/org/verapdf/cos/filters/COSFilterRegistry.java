@@ -90,7 +90,9 @@ public class COSFilterRegistry {
 			return filterFactory.getInFilter(inputStream, decodeParams);
 		}
 		LOGGER.log(Level.FINE, "Trying to use unimplemented decoding filter.");
-		return new ASBufferedInFilter(inputStream);
+		ASBufferedInFilter res = new ASBufferedInFilter(inputStream);
+		res.initialize();
+		return res;
 	}
 
 	/**

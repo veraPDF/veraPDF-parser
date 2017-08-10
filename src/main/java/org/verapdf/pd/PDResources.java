@@ -77,7 +77,7 @@ public class PDResources extends PDObject {
 	public PDColorSpace getDefaultColorSpace(ASAtom name) {
 		ASAtom defaultName = ColorSpaceFactory.getDefaultValue(this, name);
 		if (hasColorSpace(defaultName)) {
-			return getColorSpace(defaultName);
+			return getColorSpace(defaultName, true);
 		}
 		return null;
 	}

@@ -21,7 +21,6 @@
 package org.verapdf.pd.font.cff;
 
 import org.verapdf.io.SeekableInputStream;
-import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 
@@ -40,7 +39,6 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     private static final String NOTDEF_STRING = ".notdef";
 
-    private Encoding pdEncoding;    // mapping code -> glyphName
     private CMap externalCMap;  // in case if font is located in
     private long encodingOffset;
     private int[] encoding;     // array with mapping code -> gid
@@ -55,7 +53,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     CFFType1FontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                         long topDictBeginOffset, long topDictEndOffset,
-                        Encoding pdEncoding, CMap externalCMap, boolean isSubset) {
+                        CMap externalCMap, boolean isSubset) {
         super(stream);
         encodingOffset = 0;
         encoding = new int[256];
@@ -63,7 +61,6 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         this.globalSubrs = globalSubrs;
         this.topDictBeginOffset = topDictBeginOffset;
         this.topDictEndOffset = topDictEndOffset;
-        this.pdEncoding = pdEncoding;
         this.externalCMap = externalCMap;
         this.isSubset = isSubset;
     }
@@ -224,10 +221,8 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
                 this.bias, this.defaultWidthX, this.nominalWidthX);
     }
 
-    private String getGlyphName(int code) {
-        if(pdEncoding != null) {
-            return pdEncoding.getName(code);
-        }
+    @Override
+    public String getGlyphName(int code) {
         if(isStandardEncoding) {
             if (code < CFFPredefined.STANDARD_ENCODING.length) {
                 return CFFPredefined.STANDARD_STRINGS[CFFPredefined.STANDARD_ENCODING[code]];
@@ -273,6 +268,19 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         }
     }
 
+    public float getWidthFromGID(int gid) {
+        return widths.getWidth(gid);
+    }
+
+    public boolean containsGID(int gid) {
+        return gid >= 0 && this.charStrings.size() > gid;
+    }
+
+    @Override
+    public boolean containsGlyph(String glyphName) {
+        return this.charSet.keySet().contains(glyphName);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -291,6 +299,11 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     @Override
     public boolean containsCode(int code) {
         return this.charSet.keySet().contains(this.getGlyphName(code));
+    }
+
+    @Override
+    public boolean containsCID(int cid) {
+        return false;
     }
 
     private void initializeCharSet(String[] charSetArray) {
@@ -317,9 +330,8 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     /**
      * @return list of names for all glyphs in this font.
      */
-    public String[] getCharSet() {
-        Set<String> set = this.charSet.keySet();
-        return set.toArray(new String[set.size()]);
+    public Set<String> getCharSet() {
+        return this.charSet.keySet();
     }
 
 
@@ -350,5 +362,23 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
                 bias = 32768;
             }
         }
+    }
+
+    /**
+     * Gets CFF Type 1 font program for given font program (CFF font program
+     * with inner CFF Type 1 or CFF Type 1).
+     * @return CFF Type 1 font program or null if no CFF Type 1 font program
+     * can be obtained.
+     */
+    public static CFFType1FontProgram getCFFType1(FontProgram fontProgram) {
+        if (fontProgram instanceof CFFType1FontProgram) {
+            return (CFFType1FontProgram) fontProgram;
+        } else if (fontProgram instanceof CFFFontProgram) {
+            FontProgram innerCFF = ((CFFFontProgram) fontProgram).getFont();
+            if (innerCFF instanceof CFFType1FontProgram) {
+                return (CFFType1FontProgram) innerCFF;
+            }
+        }
+        return null;
     }
 }

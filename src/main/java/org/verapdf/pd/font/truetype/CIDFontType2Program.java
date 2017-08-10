@@ -27,6 +27,8 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents CIDFontType2 font program.
@@ -76,13 +78,50 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
     public boolean containsCode(int code) {
         if (this.cMap.containsCode(code)) {
             int cid = this.cMap.toCID(code);
-            if (this.cidToGID.contains(cid) && cid != 0) {
-                int gid = this.cidToGID.getGID(cid);
-                TrueTypeMaxpTable maxpParser = parser.getMaxpParser();
-                return maxpParser != null &&
-                        gid < maxpParser.getNumGlyphs();
-            }
+            return containsCID(cid);
         }
         return false;
+    }
+
+    @Override
+    public boolean containsGlyph(String glyphName) {
+        return false;   // no need in this method
+    }
+
+    @Override
+    public String getGlyphName(int code) {
+        return null;  // No need in this method
+    }
+
+    @Override
+    public boolean containsCID(int cid) {
+        if (this.cidToGID.contains(cid) && cid != 0) {
+            int gid = this.cidToGID.getGID(cid);
+            TrueTypeMaxpTable maxpParser = parser.getMaxpParser();
+            return maxpParser != null &&
+                    gid < maxpParser.getNumGlyphs();
+        }
+        return false;
+    }
+
+    public List<Integer> getCIDList() {
+        if (!cidToGID.isIdentity()) {
+            int size = cidToGID.getMappingSize();
+            List<Integer> res = new ArrayList<>(size);
+            for (int i = 0; i < size; ++i) {
+                if (containsCID(i)) {
+                    res.add(i);
+                }
+            }
+            return res;
+        } else {
+            // CIDToGID is identity, so we check which glyphs are present
+            int size = this.widths.length;
+            List<Integer> res = new ArrayList<>(size);
+            for (int i = 0; i < size; ++i) {
+                res.add(i);
+            }
+            return res;
+        }
     }
 }

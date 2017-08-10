@@ -25,6 +25,7 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.exceptions.LoopedException;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.actions.PDFormFieldActions;
 
@@ -35,29 +36,55 @@ import java.util.*;
  */
 public class PDFormField extends PDObject {
 
-	protected PDFormField(COSObject obj) {
+	private Set<COSKey> parents = null;
+
+	protected PDFormField(COSObject obj, Set<COSKey> parents) {
 		super(obj);
+		COSKey objectKey = obj.getObjectKey();
+		this.parents = new HashSet<>(parents);
+		if (objectKey != null) {
+			if (this.parents.contains(objectKey)) {
+				throw new LoopedException("Loop form field tree");
+			} else {
+				this.parents.add(objectKey);
+			}
+		}
 	}
 
-    public static PDFormField createTypedFormField(COSObject obj) {
+	public static PDFormField createTypedFormField(COSObject obj) {
+		return createTypedFormField(obj, new HashSet<COSKey>());
+	}
+
+    private static PDFormField createTypedFormField(COSObject obj, Set<COSKey> parents) {
+		if (obj == null) {
+			throw new IllegalStateException("Argument object can not be null");
+		}
+		if (parents == null) {
+			throw new IllegalStateException("Argument parents can not be null");
+		}
         ASAtom fieldType = getFieldTypeCOSObject(obj);
         if (fieldType == ASAtom.SIG) {
-            return new PDSignatureField(obj);
+            return new PDSignatureField(obj, parents);
         }
-        return new PDFormField(obj);
+        return new PDFormField(obj, parents);
     }
 
 	public ASAtom getFT() {
-		return getInheritedFT(getObject());
+		COSObject object = getInheritedObject(ASAtom.FT);
+		return object == null || object.getType() != COSObjType.COS_NAME ? null : object.getName();
 	}
 
-	private static ASAtom getInheritedFT(COSObject obj) {
-		COSObject currObject = obj;
+	public COSObject getV() {
+		return getInheritedObject(ASAtom.V);
+	}
+
+	private COSObject getInheritedObject(ASAtom key) {
+		COSObject currObject = getObject();
 		Set<COSKey> checkedObjects = new HashSet<>();
 		while (currObject != null) {
-			ASAtom currFT = currObject.getNameKey(ASAtom.FT);
-			if (currFT != null) {
-				return currFT;
+			COSObject currVal = currObject.getKey(key);
+			if (currVal != null && !currVal.empty()) {
+				return currVal;
 			}
 
 			COSKey currKey = currObject.getKey();
@@ -77,6 +104,39 @@ public class PDFormField extends PDObject {
 		return null;
 	}
 
+	public String getFullyQualifiedName() {
+		List<String> parts = new ArrayList<>();
+		COSObject currObject = getObject();
+		Set<COSKey> checkedObjects = new HashSet<>();
+		while (currObject != null && !currObject.empty()) {
+			String partial = getStringKey(ASAtom.T);
+			if (partial != null) {
+				parts.add(partial);
+			}
+			COSKey currKey = currObject.getKey();
+			if (currKey != null) {
+				checkedObjects.add(currKey);
+			}
+			COSObject parent = currObject.getKey(ASAtom.PARENT);
+			if (parent != null
+					&& parent.getType().isDictionaryBased()
+					&& !checkedObjects.contains(parent.getKey())) {
+				currObject = parent;
+			} else {
+				currObject = null;
+			}
+		}
+		if (!parts.isEmpty()) {
+			StringBuilder builder = new StringBuilder();
+			for (int i = parts.size() - 1; i > 0; --i) {
+				builder.append(parts.get(i)).append(".");
+			}
+			builder.append(parts.get(0));
+			return builder.toString();
+		}
+		return null;
+	}
+
 	public PDFormFieldActions getActions() {
 		COSObject object = getKey(ASAtom.AA);
 		if (object != null && object.getType().isDictionaryBased()) {
@@ -89,7 +149,7 @@ public class PDFormField extends PDObject {
 		if (isNonTerminalField()) {
 			List<PDFormField> res = new ArrayList<>();
 			for (COSObject elem : (COSArray) getKey(ASAtom.KIDS).getDirectBase()) {
-				res.add(new PDFormField(elem));
+				res.add(createTypedFormField(elem, this.parents));
 			}
 			return Collections.unmodifiableList(res);
 		}

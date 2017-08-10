@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -25,8 +25,7 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Instance of this class represent a parser of CIDFont from FontSet of CFF file.
@@ -252,7 +251,13 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
      */
     @Override
     public float getWidth(String glyphName) {
+        // not applicable in this case
         return 0;
+    }
+
+    @Override
+    public String getGlyphName(int code) {
+        return null;  // No need in this method
     }
 
     /**
@@ -262,7 +267,18 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     public boolean containsCode(int code) {
         int cid = externalCMap.toCID(code);
         return this.externalCMap.containsCode(code) &&
-                this.charSet.get(cid) != null &&
+                containsCID(cid);
+    }
+
+    @Override
+    public boolean containsGlyph(String glyphName) {
+        // not applicable in this case
+        return false;
+    }
+
+    @Override
+    public boolean containsCID(int cid) {
+        return this.charSet.get(cid) != null &&
                 this.charSet.get(cid) != 0;
     }
 
@@ -305,5 +321,16 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
                 bias[fontDictNum] = 32768;
             }
         }
+    }
+
+    public List<Integer> getCIDList() {
+        if (charSet != null) {
+            List<Integer> res = new ArrayList<>(this.charSet.size());
+            for (Map.Entry<Integer, Integer> entry : this.charSet.entrySet()) {
+                res.add(entry.getKey());
+            }
+            return res;
+        }
+        return Collections.emptyList();
     }
 }

@@ -60,9 +60,9 @@ class Type2CharStringParser extends BaseCharStringParser {
         switch (nextByte) {
             case 19:    // cntrmask
             case 20:    // hintmask
-            case 11:    // return
                 if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                     return true;
                 }
                 break;
@@ -71,6 +71,7 @@ class Type2CharStringParser extends BaseCharStringParser {
                     // If endchar is proceeded with 4 numbers, they are arguments
                     // for "seac" operator from charsting type 1.
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                     return true;
                 }
                 break;
@@ -78,6 +79,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 22:    // hmoveto
                 if (this.stack.size() > 1) {
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                     return true;
                 }
                 this.stack.pop();
@@ -85,6 +87,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 21:    // rmoveto
                 if (this.stack.size() > 2) {
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                     return true;
                 }
                 this.popStack(2);
@@ -104,19 +107,31 @@ class Type2CharStringParser extends BaseCharStringParser {
                 return false;
             case 10:    // subrcall
                 int subrNum = (int) this.stack.pop().getInteger();
-                if(this.stack.empty()) {
-                    this.setWidth(getWidthFromSubroutine(localSubrs.get(subrNum + bias)));
-                } else {
+                if(this.stack.empty() && localSubrs.size() > subrNum + bias) {
+                    CFFNumber subrWidth = getWidthFromSubroutine(localSubrs.get(subrNum + bias));
+                    if (subrWidth != null) {
+                        this.setWidth(subrWidth);
+                    } else if (!this.stack.empty()) {
+                        return false;
+                    }
+                } else if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
                 }
                 return true;
             case 29:    // callgsubr
                 subrNum = (int) this.stack.pop().getInteger();
-                if(this.stack.empty()) {
-                    this.setWidth(getWidthFromSubroutine(globalSubrs.get(subrNum + gBias)));
-                } else {
+                if(this.stack.empty() && globalSubrs.size() > subrNum + gBias) {
+                    CFFNumber subrWidth = getWidthFromSubroutine(globalSubrs.get(subrNum + gBias));
+                    if (subrWidth != null) {
+                        this.setWidth(subrWidth);
+                    } else if (!this.stack.empty()) {
+                        return false;
+                    }
+                } else if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
-                }return true;
+                    this.stack.clear();
+                }
+                return true;
             case 5:     // rlineto
             case 6:     // hlineto
             case 7:     // vlineto
@@ -129,6 +144,8 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 31:    // hvcurveto
                 this.stack.clear();     // this is perfectly correct handling of stack in case of these ops
                 break;
+            case 11:    // return, not clear stack
+                break;
             default:
                 this.stack.clear();     // this is more of a hack. May not be fully correct, but correct enough
                 break;
@@ -140,7 +157,14 @@ class Type2CharStringParser extends BaseCharStringParser {
         ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
         Type2CharStringParser parser = new Type2CharStringParser(subrStream,
                 this.localSubrs, this.bias, this.globalSubrs, this.gBias);
-        return parser.getWidth();
+        if (parser.getWidth() != null) {
+            return parser.getWidth();
+        } else {
+            for (int i = 0; i < parser.stack.size(); ++i) {
+                this.stack.push(parser.stack.get(i));
+            }
+            return null;
+        }
     }
 
     @Override

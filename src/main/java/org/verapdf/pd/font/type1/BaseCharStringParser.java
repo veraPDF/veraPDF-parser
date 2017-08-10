@@ -74,8 +74,8 @@ public abstract class BaseCharStringParser {
         this.stream = stream;
         this.stack = new Stack<>();
         this.width = null;
-        this.globalSubrs = globalSubrs;
-        this.localSubrs = localSubrs;
+        this.globalSubrs = globalSubrs == null ? CFFIndex.getEmptyIndex() : globalSubrs;
+        this.localSubrs = localSubrs == null ? CFFIndex.getEmptyIndex() : localSubrs;
         this.bias = bias;
         this.gBias = gBias;
         parse();
@@ -136,6 +136,7 @@ public abstract class BaseCharStringParser {
             }
             cont = this.stream.read(buf, 1);
         }
+        this.stack.clear();
     }
 
     /**

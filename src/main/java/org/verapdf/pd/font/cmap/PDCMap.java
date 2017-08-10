@@ -27,6 +27,7 @@ import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
+import org.verapdf.pd.PDObject;
 import org.verapdf.tools.IntReference;
 
 import java.io.*;
@@ -39,13 +40,13 @@ import java.util.logging.Logger;
  *
  * @author Sergey Shemyakov
  */
-public class PDCMap {
+public class PDCMap extends PDObject {
 
     private static final Logger LOGGER = Logger.getLogger(PDCMap.class.getCanonicalName());
 
-    private COSObject cMap;
     private COSDictionary cidSystemInfo;
     private CMap cMapFile = null;
+    private PDCMap useCMap = null;
     private boolean parsedCMap = false;
 
     /**
@@ -55,18 +56,18 @@ public class PDCMap {
      *             predefined CMap.
      */
     public PDCMap(COSObject cMap) {
-        this.cMap = cMap == null ? COSObject.getEmpty() : cMap;
+        super(cMap == null ? COSObject.getEmpty() : cMap);
     }
 
     /**
      * @return name of this CMap.
      */
     public String getCMapName() {
-        if (this.cMap.getType() == COSObjType.COS_NAME) {
-            return cMap.getString();
+        if (this.getObject().getType() == COSObjType.COS_NAME) {
+            return getObject().getString();
         }
-        if (this.cMap.getType() == COSObjType.COS_STREAM) {
-            COSObject cMapName = this.cMap.getKey(ASAtom.CMAPNAME);
+        if (this.getObject().getType() == COSObjType.COS_STREAM) {
+            COSObject cMapName = this.getObject().getKey(ASAtom.CMAPNAME);
             if (!cMapName.empty()) {
                 return cMapName.getString();
             }
@@ -75,10 +76,10 @@ public class PDCMap {
     }
 
     private String getCMapID() {
-        if (this.cMap.getType() == COSObjType.COS_STREAM) {
-            return "CMap " + cMap.getObjectKey().toString();
-        } else if (this.cMap.getType() == COSObjType.COS_NAME) {
-            return cMap.getString();
+        if (this.getObject().getType() == COSObjType.COS_STREAM) {
+            return "CMap " + getObject().getObjectKey().toString();
+        } else if (this.getObject().getType() == COSObjType.COS_NAME) {
+            return getObject().getString();
         }
         return "";
     }
@@ -87,7 +88,7 @@ public class PDCMap {
      * @return COSObject, representing this CMap.
      */
     public COSObject getcMap() {
-        return cMap;
+        return getObject();
     }
 
     /**
@@ -97,28 +98,30 @@ public class PDCMap {
     public CMap getCMapFile() {
         if (!parsedCMap) {
             parsedCMap = true;
-            if (this.cMap.getType() == COSObjType.COS_STREAM) {
-                try (ASInputStream cMapStream = this.cMap.getData(COSStream.FilterFlags.DECODE)) {
+            if (this.getObject().getType() == COSObjType.COS_STREAM) {
+                try (ASInputStream cMapStream = this.getObject().getData(COSStream.FilterFlags.DECODE)) {
                     String cMapName = getCMapName();
                     if (cMapName == null) {
                         cMapName = getCMapID();
                     }
                     this.cMapFile = CMapFactory.getCMap(cMapName , cMapStream);
-                    return this.cMapFile;
                 } catch (IOException e) {
                     LOGGER.log(Level.FINE, "Can't close stream", e);
                 }
-            } else if (this.cMap.getType() == COSObjType.COS_NAME) {
-                String name = this.cMap.getString();
+            } else if (this.getObject().getType() == COSObjType.COS_NAME) {
+                String name = this.getObject().getString();
                 String cMapPath = "/font/cmap/" + name;
                 try (ASInputStream cMapStream = loadCMap(cMapPath)) {
                     this.cMapFile = CMapFactory.getCMap(getCMapName(), cMapStream);
-                    return this.cMapFile;
                 } catch (IOException e) {
                     LOGGER.log(Level.FINE, "Can't close stream", e);
                 }
             } else {
                 return null;
+            }
+            parseUseCMap();
+            if (useCMap != null) {
+                this.cMapFile.useCMap(useCMap.getCMapFile());
             }
         }
         return this.cMapFile;
@@ -155,12 +158,12 @@ public class PDCMap {
     }
 
     public COSObject getUseCMap() {
-        COSObject res = this.cMap.getKey(ASAtom.USE_CMAP);
+        COSObject res = this.getObject().getKey(ASAtom.USE_CMAP);
         return res == null ? COSObject.getEmpty() : res;
     }
 
     private COSDictionary getCIDSystemInfo() {
-        if (this.cMap.getType() == COSObjType.COS_NAME) {
+        if (this.getObject().getType() == COSObjType.COS_NAME) {
             // actually creating COSDictionary with values from predefined CMap.
             String registry = this.getCMapFile().getRegistry();
             String ordering = this.getCMapFile().getOrdering();
@@ -173,11 +176,27 @@ public class PDCMap {
         }
 
         if (cidSystemInfo == null) {
-            this.cidSystemInfo = (COSDictionary)
-                    this.cMap.getKey(ASAtom.CID_SYSTEM_INFO).getDirectBase();
-            return this.cidSystemInfo;
+            COSObject cidSystemInfoObject = this.getObject().getKey(ASAtom.CID_SYSTEM_INFO);
+            if (cidSystemInfoObject.getType() == COSObjType.COS_DICT) {
+                this.cidSystemInfo = (COSDictionary) cidSystemInfoObject.getDirectBase();
+            } else if (cidSystemInfoObject.getType() == COSObjType.COS_ARRAY) { // see PDF-1.4 specification
+                cidSystemInfoObject = cidSystemInfoObject.at(0);
+                if (cidSystemInfoObject != null &&
+                        cidSystemInfoObject.getType() == COSObjType.COS_DICT) {
+                    this.cidSystemInfo = (COSDictionary) cidSystemInfoObject.getDirectBase();
+                }
+            }
         }
         return this.cidSystemInfo;
+    }
+
+    private void parseUseCMap() {
+        if (this.useCMap == null) {
+            COSObject useCMap = getUseCMap();
+            if (!useCMap.empty()) {
+                this.useCMap = new PDCMap(useCMap);
+            }
+        }
     }
 
     private static ASInputStream loadCMap(String cMapName) {
@@ -216,6 +235,16 @@ public class PDCMap {
     }
 
     public String toUnicode(int code) {
-        return this.getCMapFile() == null ? null : this.getCMapFile().getUnicode(code);
+        String res = null;
+        if (this.getCMapFile() != null) {
+            res = this.getCMapFile().getUnicode(code);
+            if (res == null) {
+                parseUseCMap();
+                if (useCMap != null) {
+                    res = useCMap.toUnicode(code);
+                }
+            }
+        }
+        return res;
     }
 }

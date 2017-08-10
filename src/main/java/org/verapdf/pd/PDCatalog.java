@@ -22,6 +22,7 @@ package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.actions.PDAction;
@@ -29,6 +30,7 @@ import org.verapdf.pd.actions.PDCatalogAdditionalActions;
 import org.verapdf.pd.form.PDAcroForm;
 import org.verapdf.pd.optionalcontent.PDOptionalContentProperties;
 import org.verapdf.pd.structure.PDStructTreeRoot;
+import org.verapdf.tools.PageLabels;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +54,7 @@ public class PDCatalog extends PDObject {
 		this.pages = new PDPageTree();
 	}
 
-	public PDPageTree getPageTree() throws IOException {
+	public PDPageTree getPageTree() {
 		if (pages.empty()) {
 			final COSObject pages = super.getObject().getKey(ASAtom.PAGES);
 			if (pages != null) {
@@ -131,6 +133,22 @@ public class PDCatalog extends PDObject {
 		COSObject acroForm = getKey(ASAtom.ACRO_FORM);
 		if (acroForm != null && acroForm.getType().isDictionaryBased()) {
 			return new PDAcroForm(acroForm);
+		}
+		return null;
+	}
+
+	public PDNamesDictionary getNamesDictionary() {
+		COSObject buffer = getKey(ASAtom.NAMES);
+		if (buffer != null && buffer.getType() == COSObjType.COS_DICT) {
+			return new PDNamesDictionary(buffer);
+		}
+		return null;
+	}
+
+	public PageLabels getPageLabels() {
+		COSObject labelsTree = getKey(ASAtom.PAGE_LABELS);
+		if (labelsTree != null && !labelsTree.empty() && labelsTree.getType() == COSObjType.COS_DICT) {
+			return new PageLabels((COSDictionary) labelsTree.getDirectBase());
 		}
 		return null;
 	}

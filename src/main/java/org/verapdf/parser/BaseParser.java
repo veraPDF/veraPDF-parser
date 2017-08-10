@@ -22,6 +22,7 @@ package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.filters.COSFilterASCII85Decode;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
@@ -29,6 +30,7 @@ import org.verapdf.io.SeekableInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -180,6 +182,9 @@ public class BaseParser {
 				ch = source.readByte();
 				if (ch == '<') {
 					this.token.type = Token.Type.TT_OPENDICT;
+				} else if (ch == '~') {
+					this.token.type = Token.Type.TT_HEXSTRING;
+					readASCII85();
 				} else {
 					this.source.unread();
 					this.token.type = Token.Type.TT_HEXSTRING;
@@ -324,6 +329,9 @@ public class BaseParser {
 		return ASCII_CR == c;
 	}
 
+	protected static boolean isFF(int c) {
+		return ASCII_FF == c;
+	}
 	// PRIVATE METHODS
 
 	private void skipEOL() throws IOException {
@@ -353,15 +361,21 @@ public class BaseParser {
 				return; // EOL == LF
 			}
 
-			if (isCR(ch)) {
-				ch = this.source.readByte();
-				if (isLF(ch)) { // EOL == CR
-					this.source.unread();
-				} // else EOL == CRLF
+			if (isEndOfComment(ch)) {
+				if (isCR(ch)) {
+					ch = this.source.readByte();
+					if (isLF(ch)) { // EOL == CR
+						this.source.unread();
+					} // else EOL == CRLF
+				}
 				return;
 			}
 			// else skip regular character
 		}
+	}
+
+	protected boolean isEndOfComment(byte ch) {
+		return isCR(ch);
 	}
 
 	private void readLitString() throws IOException {
@@ -497,7 +511,30 @@ public class BaseParser {
 		this.token.setHexCount(Long.valueOf(hexCount));
 	}
 
-	private void readName() throws IOException {
+	private void readASCII85() throws IOException {
+		long ascii85Start = this.source.getOffset();
+		long ascii85End = this.source.getStreamLength();
+		byte b = this.source.readByte();
+		while (!source.isEOF()) {
+			if (b == '~' && this.source.peek() == '>') {
+				ascii85End = this.source.getOffset() - 1;
+				this.source.readByte();	// here we finished reading all ascii85 string
+				break;
+			}
+			b = source.readByte();
+		}
+		ASInputStream ascii85 = this.source.getStream(ascii85Start, ascii85End - ascii85Start);
+		COSFilterASCII85Decode ascii85Decode = new COSFilterASCII85Decode(ascii85);
+		byte[] buf = new byte[(int) (ascii85End - ascii85Start)];
+		int read = ascii85Decode.read(buf);
+		buf = Arrays.copyOf(buf, read);
+
+		this.token.setContainsOnlyHex(false);
+		this.token.setHexCount(Long.valueOf(0));
+		this.token.setByteValue(buf);
+	}
+
+	protected void readName() throws IOException {
 		this.token.clearValue();
 		byte ch;
 		while (!this.source.isEOF()) {
@@ -579,6 +616,8 @@ public class BaseParser {
 			}
 		} catch (NumberFormatException e) {
 			LOGGER.log(Level.FINE, "", e);
+			this.token.integer = Math.round(Double.MAX_VALUE);
+			this.token.real = Double.MAX_VALUE;
 		}
 	}
 
@@ -588,7 +627,11 @@ public class BaseParser {
 		}
 	}
 
-	private void appendToToken(final byte ch) {
+	protected void clearToken() {
+		this.token.clearValue();
+	}
+
+	protected void appendToToken(final byte ch) {
 		this.token.append((char) (ch & 0xff));
 	}
 

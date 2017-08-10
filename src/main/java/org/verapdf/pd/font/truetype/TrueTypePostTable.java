@@ -105,6 +105,10 @@ class TrueTypePostTable extends TrueTypeTable {
         return res == null ? 0 : res.intValue();    // gid for .notdef
     }
 
+    boolean containsGlyph(String glyphName) {
+        return this.stringToGid.containsKey(glyphName);
+    }
+
     private String readPascalString() throws IOException {
         int length = this.readByte();
         byte[] str = new byte[length];

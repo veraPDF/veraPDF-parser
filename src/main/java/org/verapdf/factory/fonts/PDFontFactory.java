@@ -26,9 +26,9 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.font.PDFont;
 import org.verapdf.pd.font.PDType0Font;
-import org.verapdf.pd.font.PDType3Font;
 import org.verapdf.pd.font.truetype.PDTrueTypeFont;
 import org.verapdf.pd.font.type1.PDType1Font;
+import org.verapdf.pd.font.type3.PDType3Font;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

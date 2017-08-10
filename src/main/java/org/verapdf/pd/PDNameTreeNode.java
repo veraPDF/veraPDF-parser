@@ -22,8 +22,10 @@ package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.exceptions.LoopedException;
 
 import java.util.*;
 
@@ -32,11 +34,22 @@ import java.util.*;
  */
 public class PDNameTreeNode extends PDObject {
 
+	private Set<COSKey> parents = null;
+
 	private List<PDNameTreeNode> kids = null;
 	private Map<String, COSObject> names = null;
 
-	private PDNameTreeNode(COSObject obj) {
+	private PDNameTreeNode(COSObject obj, Set<COSKey> parents) {
 		super(obj);
+		COSKey objectKey = obj.getObjectKey();
+		this.parents = new HashSet<>(parents);
+		if (objectKey != null) {
+			if (parents.contains(objectKey)) {
+				throw new LoopedException("Loop in name tree");
+			} else {
+				this.parents.add(objectKey);
+			}
+		}
 	}
 
 	public static PDNameTreeNode create(COSObject object) {
@@ -44,7 +57,7 @@ public class PDNameTreeNode extends PDObject {
 			throw new IllegalArgumentException("Argument object shall be dictionary or stream type");
 		}
 
-		return new PDNameTreeNode(object);
+		return new PDNameTreeNode(object, new HashSet<COSKey>());
 	}
 
 	public List<PDNameTreeNode> getKids() {
@@ -60,7 +73,7 @@ public class PDNameTreeNode extends PDObject {
 			List<PDNameTreeNode> res = new ArrayList<>();
 			for (COSObject obj : (COSArray) kids.getDirectBase()) {
 				if (obj != null && obj.getType().isDictionaryBased()) {
-					res.add(PDNameTreeNode.create(obj));
+					res.add(new PDNameTreeNode(obj, this.parents));
 				}
 			}
 			return res;

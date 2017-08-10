@@ -18,22 +18,25 @@
  * If a copy of the MPL was not distributed with this file, you can obtain one at
  * http://mozilla.org/MPL/2.0/.
  */
-package org.verapdf.pd.font.cmap;
+package org.verapdf.exceptions;
 
 /**
- * Interface represents object that makes mapping of character code into CID.
- *
- * @author Sergey Shemyakov
+ * @author Maksim Bezrukov
  */
-interface CIDMappable {
+public class LoopedException extends RuntimeException {
 
-    /**
-     * Gets CID of given character.
-     *
-     * @param character is code of given character.
-     * @return CID of given character or -1 if no mapping available.
-     */
-    int getCID(int character);
+	public LoopedException() {
+	}
 
-    int getMaxCID();
+	public LoopedException(String message) {
+		super(message);
+	}
+
+	public LoopedException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public LoopedException(Throwable cause) {
+		super(cause);
+	}
 }

@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -20,12 +20,12 @@
  */
 package org.verapdf.pd.font.type1;
 
+import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
-import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
 import org.verapdf.tools.resource.ASFileStreamCloser;
@@ -48,7 +48,6 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     public static final Logger LOGGER =
             Logger.getLogger(Type1FontProgram.class.getCanonicalName());
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
-    private Encoding pdfEncoding;
 
     private double[] fontMatrix = Arrays.copyOf(DEFAULT_FONT_MATRIX, DEFAULT_FONT_MATRIX.length);
     private String[] encoding;
@@ -69,11 +68,10 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     /**
      * {@inheritDoc}
      */
-    public Type1FontProgram(InputStream fileStream, Encoding pdfEncoding)
+    public Type1FontProgram(InputStream fileStream)
             throws IOException {
         super(fileStream);
         encoding = new String[256];
-        this.pdfEncoding = pdfEncoding;
     }
 
     /**
@@ -101,6 +99,21 @@ public class Type1FontProgram extends COSParser implements FontProgram {
             } finally {
                 this.source.close();    // We close stream after first reading attempt
             }
+        }
+    }
+
+    @Override
+    protected void readName() throws IOException {
+        this.clearToken();
+        byte ch;
+        while (!this.source.isEOF()) {
+            ch = this.source.readByte();
+            if (CharTable.isTokenDelimiter(ch)) {
+                this.source.unread();
+                break;
+            }
+
+            appendToToken(ch);
         }
     }
 
@@ -241,6 +254,17 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     @Override
+    public boolean containsGlyph(String glyphName) {
+        return this.glyphWidths != null &&
+                this.glyphWidths.keySet().contains(glyphName);
+    }
+
+    @Override
+    public boolean containsCID(int cid) {
+        return false;
+    }
+
+    @Override
     public boolean isAttemptedParsing() {
         return this.attemptedParsing;
     }
@@ -254,9 +278,17 @@ public class Type1FontProgram extends COSParser implements FontProgram {
         return encoding;
     }
 
-    public String[] getCharSet() {
-        Set<String> charSet = this.glyphWidths.keySet();
-        return charSet.toArray(new String[charSet.size()]);
+    public Set<String> getCharSet() {
+        return this.glyphWidths.keySet();
+    }
+
+    @Override
+    public String getGlyphName(int code) {
+        if (code > 0 && code < encoding.length) {
+            return encoding[code];
+        } else {
+            return null;
+        }
     }
 
     private boolean isEncodingName() throws IOException {
@@ -278,10 +310,10 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     private String getGlyph(int code) {
-        if ((this.pdfEncoding == null || !pdfEncoding.containsCode(code)) && code < encoding.length) {
+        if (code < encoding.length) {
             return encoding[code];
         } else {
-            return this.pdfEncoding.getName(code);
+            return TrueTypePredefined.NOTDEF_STRING;
         }
     }
 

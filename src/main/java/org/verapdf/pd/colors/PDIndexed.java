@@ -38,7 +38,7 @@ public class PDIndexed extends PDSpecialColorSpace {
     }
 
     public PDIndexed(COSObject obj, PDResources resources) {
-        super(obj, resources);
+        super(obj, resources, false);
     }
 
     public PDColorSpace getBase() {

@@ -149,6 +149,7 @@ public class CMapParser extends BaseParser {
                         if (usedCMap != null) {
                             this.cMap.useCMap(usedCMap);
                         } else {
+                            this.cMap.setUsesNonPredefinedCMap(true);
                             LOGGER.log(Level.FINE, "Can't load predefined CMap with name " + lastCOSName);
                         }
                         break;
@@ -288,14 +289,15 @@ public class CMapParser extends BaseParser {
     private void readLineBFRange() throws IOException {
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "bfrange");
-        long bfRangeBegin = numberFromBytes(getToken().getByteValue());
+        byte[] rangeBegin = getToken().getByteValue();
+        long bfRangeBegin = numberFromBytes(rangeBegin);
 
         nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "bfrange");
-        long bfRangeEnd = numberFromBytes(getToken().getByteValue());
+        long bfRangeEnd = getBfrangeEndFromBytes(getToken().getByteValue(), rangeBegin);
 
         nextToken();    // skip [
-    if(getToken().type == Token.Type.TT_OPENARRAY) {
+        if(getToken().type == Token.Type.TT_OPENARRAY) {
 
             for (long i = bfRangeBegin; i <= bfRangeEnd; ++i) {
                 this.cMap.addUnicodeMapping((int) i, readStringFromUnicodeSequenceToken());
@@ -303,8 +305,13 @@ public class CMapParser extends BaseParser {
 
             nextToken();    // skip ]
         } else {
+            byte[] token = getToken().getByteValue();
+            int lastByte = token[token.length - 1] & 0xFF;
+            if (lastByte > 255 - bfRangeEnd + bfRangeBegin) {
+                bfRangeEnd = 255 + bfRangeBegin - lastByte;
+            }
             this.cMap.addUnicodeInterval(new ToUnicodeInterval(bfRangeBegin, bfRangeEnd,
-                    numberFromBytes(getToken().getByteValue())));
+                    getToken().getByteValue()));
         }
     }
 
@@ -312,6 +319,27 @@ public class CMapParser extends BaseParser {
         long res = 0;
         for (int i = 0; i < num.length; ++i) {
             res += (num[i] & 0x00FF) << ((num.length - i - 1) * 8);
+        }
+        return res;
+    }
+
+    private static long getBfrangeEndFromBytes(byte[] endRange, byte[] beginRange) {
+        long res = 0;
+        for (int i = 0; i < endRange.length; ++i) {
+            if (i < endRange.length - 1) {
+                // getting first hex digits of begin range string.
+                // see PDF 32000 2008, 9.10.3: these digits should be the same as
+                // in end range strings.
+                byte endRangeByte = endRange[i];
+                byte beginRangeByte = beginRange[i];
+                if (endRangeByte != beginRangeByte) {
+                    LOGGER.log(Level.FINE, "Incorrect bfrange in toUnicode CMap: " +
+                            "bfrange contains more than 256 code.");
+                }
+                res += (beginRangeByte & 0x00FF) << ((endRange.length - i - 1) * 8);
+            } else {    // getting last two hex digits of end range string
+                res += (endRange[i] & 0x00FF) << ((endRange.length - i - 1) * 8);
+            }
         }
         return res;
     }
@@ -336,5 +364,10 @@ public class CMapParser extends BaseParser {
             throw new IOException("CMap contains invalid entry in " + where +
                     ". Expected " + type + " but got " + getToken().type);
         }
+    }
+
+    @Override
+    protected boolean isEndOfComment(byte ch) {
+        return isCR(ch) || isFF(ch);
     }
 }

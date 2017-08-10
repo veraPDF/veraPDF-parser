@@ -22,12 +22,13 @@ package org.verapdf.pd.font.cff;
 
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +41,6 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
     private static final Logger LOGGER = Logger.getLogger(CFFFontProgram.class.getCanonicalName());
     private FontProgram font;
-    private Encoding pdEncoding;
     private CMap externalCMap;
     private boolean isCIDFont = false;
     private boolean isFontParsed = false;
@@ -50,14 +50,12 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
      * Constructor from stream.
      *
      * @param stream is stream with CFF program.
-     * @param pdEncoding is encoding object specified in font dictionary.
      * @throws IOException if creation of @{link SeekableStream} fails.
      */
-    public CFFFontProgram(ASInputStream stream, Encoding pdEncoding, CMap cMap,
+    public CFFFontProgram(ASInputStream stream, CMap cMap,
                           boolean isSubset)
             throws IOException {
         super(stream);
-        this.pdEncoding = pdEncoding;
         this.externalCMap = cMap;
         this.isSubset = isSubset;
     }
@@ -89,7 +87,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
                 font = new CFFType1FontProgram(this.source, this.definedNames, globalSubrs,
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                         topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
-                        this.pdEncoding, this.externalCMap, this.isSubset);
+                        this.externalCMap, this.isSubset);
                 font.parseFont();
             }
         }
@@ -136,6 +134,11 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         return this.font.getWidth(glyphName);
     }
 
+    @Override
+    public String getGlyphName(int code) {
+        return this.font.getGlyphName(code);
+    }
+
     /**
      * @return true if this font is CFF CID font.
      */
@@ -153,6 +156,16 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
     }
 
     @Override
+    public boolean containsGlyph(String glyphName) {
+        return font.containsGlyph(glyphName);
+    }
+
+    @Override
+    public boolean containsCID(int cid) {
+        return font.containsCID(cid);
+    }
+
+    @Override
     public boolean isAttemptedParsing() {
         if (font != null) {
             return this.font.isAttemptedParsing();
@@ -167,6 +180,14 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             return this.font.isSuccessfulParsing();
         } else {
             return false;
+        }
+    }
+
+    public List<Integer> getCIDList() {
+        if (this.font instanceof CFFCIDFontProgram) {
+            return ((CFFCIDFontProgram) this.font).getCIDList();
+        } else {
+            return Collections.emptyList();
         }
     }
 

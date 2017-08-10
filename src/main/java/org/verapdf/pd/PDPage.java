@@ -25,6 +25,7 @@ import org.verapdf.cos.*;
 import org.verapdf.pd.actions.PDPageAdditionalActions;
 import org.verapdf.pd.colors.PDColorSpace;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -79,8 +80,11 @@ public class PDPage extends PDPageTreeNode {
         if (!contents.empty() && contents.getType() == COSObjType.COS_STREAM) {
             this.content = new PDPageContentStream(contents);
         } else if (!contents.empty() && contents.getType() == COSObjType.COS_ARRAY) {
-            //TODO : add content streams concatenation
-            this.content = new PDPageContentStream(contents.at(0));
+            try {
+                this.content = new PDPageContentStream(COSStream.concatenateStreams((COSArray) contents.getDirectBase()));
+            } catch (IOException e) {
+                this.content = new PDPageContentStream(contents.at(0));
+            }
         }
     }
 
@@ -321,6 +325,14 @@ public class PDPage extends PDPageTreeNode {
         COSObject obj = getKey(ASAtom.METADATA);
         if (obj.getType() == COSObjType.COS_STREAM) {
             return new PDMetadata(obj);
+        }
+        return null;
+    }
+
+    public PDNavigationNode getPresSteps() {
+        COSObject cosPresSteps = getCOSPresSteps();
+        if (cosPresSteps != null) {
+            return new PDNavigationNode(cosPresSteps);
         }
         return null;
     }

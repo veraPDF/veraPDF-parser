@@ -23,10 +23,9 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.cos.*;
+import org.verapdf.exceptions.LoopedException;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Timur Kamalov
@@ -122,7 +121,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return this.children.get(lastIndex).findTerminal(index);
 	}
 
-	public boolean insertLeaf(final PDPage leaf, int insertAt) throws IOException {
+	public boolean insertLeaf(final PDPage leaf, int insertAt) {
 		insertAt = Math.min(insertAt, getChildCount());
 		incLeafCount();
 		return insertNode(leaf, insertAt);
@@ -133,9 +132,12 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 
 		COSObject kids = getObject().getKey(ASAtom.KIDS);
 		if (kids != null && !kids.empty()) {
+			Set<COSKey> keys = parentKeysForChildren();
 			for (int i = 0; i < kids.size(); i++) {
 				COSObject obj = kids.at(i);
-
+				if (keys.contains(obj.getObjectKey())) {
+					throw new LoopedException("Page tree loop found");
+				}
 				PDPageTreeNode kid_i;
 
 				if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGE) {
@@ -158,6 +160,21 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		if (leafCount != null) {
 			this.leafCount = leafCount.intValue();
 		}
+	}
+
+	private Set<COSKey> parentKeysForChildren() {
+		Set<COSKey> res = new HashSet<>();
+		PDPageTreeNode curr = this;
+		while (curr != null) {
+			COSObject object = curr.getObject();
+			COSKey objectKey = object.getObjectKey();
+			if (res.contains(objectKey)) {
+				throw new LoopedException("Page tree loop found");
+			}
+			res.add(objectKey);
+			curr = this.getParent();
+		}
+		return Collections.unmodifiableSet(res);
 	}
 
 	protected void updateToObject() {
