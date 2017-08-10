@@ -39,11 +39,13 @@ public abstract class ASInFilter extends ASInputStream {
 	 * @throws IOException
      */
 	protected ASInFilter(ASInputStream inputStream) {
+		inputStream.incrementResourceUsers();
 		this.storedInStream = inputStream;
 	}
 
 	protected ASInFilter(final ASInFilter filter) {
 		if (filter != null) {
+			filter.incrementResourceUsers();
 			this.storedInStream = filter;
 		}
 	}
@@ -103,7 +105,9 @@ public abstract class ASInFilter extends ASInputStream {
 	 */
 	@Override
 	public void close() throws IOException {
-		if (this.storedInStream != null) {
+		if (this.storedInStream != null && !isClosed) {
+			isClosed = true;
+			this.decrementResourceUsers();
 			this.storedInStream.close();
 		}
 	}
@@ -122,5 +126,10 @@ public abstract class ASInFilter extends ASInputStream {
 	@Override
 	public void incrementResourceUsers() {
 		this.storedInStream.incrementResourceUsers();
+	}
+
+	@Override
+	public void decrementResourceUsers() {
+		this.storedInStream.decrementResourceUsers();
 	}
 }

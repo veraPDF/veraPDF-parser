@@ -30,6 +30,7 @@ import org.verapdf.cos.visitor.IVisitor;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -355,18 +356,27 @@ public class COSStream extends COSDictionary {
 		return true;
 	}
 
-	public static COSObject concatenateStreams(COSArray streams) throws IOException {
+	public static COSObject concatenateStreams(COSArray streams, COSDocument document) throws IOException {
 		File mergedContentStream = File.createTempFile("verapdf_tmp_file", ".tmp");
+		mergedContentStream.deleteOnExit();
 		FileOutputStream outputStream = new FileOutputStream(mergedContentStream);
 		for (COSObject stream : streams) {
 			if (stream.getType() == COSObjType.COS_STREAM) {
 				ASInputStream streamData = stream.getData();
-				writeStreamToFile(outputStream, streamData);
+				try {
+					writeStreamToFile(outputStream, streamData);
+				} catch (IOException e) {
+					streamData.close();
+					outputStream.close();
+					throw e;
+				}
+				streamData.close();
 			}
 		}
 		outputStream.close();
 		ASInputStream inputContentStream = new InternalInputStream(mergedContentStream);
 		COSObject streamDict = COSDictionary.construct(ASAtom.LENGTH, mergedContentStream.length());
+		document.addFileResource(new ASFileStreamCloser(inputContentStream));
 		return COSStream.construct((COSDictionary) streamDict.get(), inputContentStream);
 	}
 

@@ -196,9 +196,12 @@ public class ASMemoryInStream extends SeekableInputStream {
      */
     @Override
     public void closeResource() throws IOException {
-        this.numOfBufferUsers.decrement();
-        if (numOfBufferUsers.equals(0)) {
-            buffer = null;
+        if (!isSourceClosed) {
+            isSourceClosed = true;
+            this.numOfBufferUsers.decrement();
+            if (numOfBufferUsers.equals(0)) {
+                buffer = null;
+            }
         }
     }
 

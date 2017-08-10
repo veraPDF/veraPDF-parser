@@ -83,6 +83,11 @@ public abstract class SeekableInputStream extends ASInputStream {
         this.resourceUsers.increment();
     }
 
+    @Override
+    public void decrementResourceUsers() {
+        this.resourceUsers.decrement();
+    }
+
     /**
      * @return true if end of stream is reached.
      */

@@ -38,7 +38,13 @@ public class NotSeekableBaseParser implements Closeable {
             throw new IOException("Stream in NotSeekableBaseParser can't be null.");
         }
         this.source = new ASBufferedInFilter(stream);
-        source.initialize();
+        try {
+            source.initialize();
+        } catch (IOException e) {   // Someone have to close source in case of
+            // initialization exception
+            source.close();
+            throw e;
+        }
     }
 
     /**

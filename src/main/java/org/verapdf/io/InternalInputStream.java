@@ -34,7 +34,6 @@ public class InternalInputStream extends SeekableInputStream {
 
 	private final static String READ_ONLY_MODE = "r";
 
-	private boolean isClosed = false;
 	private boolean isTempFile;
 	private IntReference numOfFileUsers;
 	private String fileName;
@@ -106,8 +105,8 @@ public class InternalInputStream extends SeekableInputStream {
 
     @Override
     public void closeResource() throws IOException {
-		if (!isClosed) {
-			isClosed = true;
+		if (!isSourceClosed) {
+			isSourceClosed = true;
 			this.numOfFileUsers.decrement();
 			if (this.numOfFileUsers.equals(0)) {
 				this.source.close();
@@ -222,12 +221,12 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	private void checkClosed(String streamUsage) throws IOException {
-		if (isClosed) {
+		if (isSourceClosed) {
 			throw new IOException(streamUsage + " can't be performed; stream is closed");
 		}
 	}
 
-	public boolean isClosed() {
-		return isClosed;
+	public boolean isSourceClosed() {
+		return isSourceClosed;
 	}
 }

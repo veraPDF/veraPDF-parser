@@ -120,19 +120,27 @@ public class ASFileInStream extends ASInputStream {
 
 	@Override
 	public void closeResource() throws IOException {
-        this.numOfFileUsers.decrement();
-        if (this.numOfFileUsers.equals(0)) {
-            this.stream.close();
-            if (isTempFile) {
-                File tmp = new File(filePath);
-                tmp.delete();
-            }
-        }
+		if (!isSourceClosed) {
+			isSourceClosed = true;
+			this.numOfFileUsers.decrement();
+			if (this.numOfFileUsers.equals(0)) {
+				this.stream.close();
+				if (isTempFile) {
+					File tmp = new File(filePath);
+					tmp.delete();
+				}
+			}
+		}
 	}
 
 	@Override
 	public void incrementResourceUsers() {
 		this.resourceUsers.increment();
+	}
+
+	@Override
+	public void decrementResourceUsers() {
+		this.resourceUsers.decrement();
 	}
 
 	@Override

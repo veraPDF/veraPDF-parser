@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -143,7 +143,7 @@ class Type1PrivateParser extends BaseParser {
     }
 
     private void decodeCharString() throws IOException {
-        if(glyphWidths == null) {
+        if (glyphWidths == null) {
             this.glyphWidths = new HashMap<>();
         }
         this.nextToken();
@@ -167,9 +167,9 @@ class Type1PrivateParser extends BaseParser {
         this.skipSpaces();
         long beginOffset = this.source.getOffset();
         this.source.skip((int) charstringLength);
-        try (ASInputStream chunk = this.source.getStream(beginOffset, charstringLength)) {
-            ASInputStream decodedCharString = new ASMemoryInStream(new EexecFilterDecode(
-                    chunk, true, this.getLenIV()));
+        try (ASInputStream chunk = this.source.getStream(beginOffset, charstringLength);
+             ASInputStream eexecDecode = new EexecFilterDecode(
+                     chunk, true, this.getLenIV()); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
             Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
             if (parser.getWidth() != null) {
                 if (!isDefaultFontMatrix) {

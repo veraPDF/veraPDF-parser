@@ -31,6 +31,8 @@ import java.io.InputStream;
 public abstract class ASInputStream extends InputStream {
 
 	protected int nPos = -1;
+	protected boolean isClosed = false;
+	protected boolean isSourceClosed = false;
 
 	protected IntReference resourceUsers = new IntReference(1);
 
@@ -41,10 +43,13 @@ public abstract class ASInputStream extends InputStream {
 	public abstract int skip(int size) throws IOException;
 
 	public void close() throws IOException {
-		if (!this.resourceUsers.equals(0)) {
-			this.resourceUsers.decrement();
+		if (!isClosed) {
+			isClosed = true;
+			if (!this.resourceUsers.equals(0)) {
+				this.resourceUsers.decrement();
+			}
 		}
-		if(this.resourceUsers.equals(0)) {
+		if (this.resourceUsers.equals(0)) {
 			closeResource();
 		}
 	}
@@ -55,8 +60,9 @@ public abstract class ASInputStream extends InputStream {
 
 	public abstract void incrementResourceUsers();
 
+	public abstract void decrementResourceUsers();
+
 	public static ASInputStream createStreamFromStream(ASInputStream stream) {
-		stream.incrementResourceUsers();
 		return new ASInputStreamWrapper(stream);
 	}
 }

@@ -70,9 +70,9 @@ public class PDPage extends PDPageTreeNode {
         this.pageNumber = 0;
         this.pagesTotal = 0;
 
-        initializeContents(obj);
-
         super.setObject(obj);
+
+        initializeContents(obj);
     }
 
     private void initializeContents(final COSObject pageDict) {
@@ -81,7 +81,8 @@ public class PDPage extends PDPageTreeNode {
             this.content = new PDPageContentStream(contents);
         } else if (!contents.empty() && contents.getType() == COSObjType.COS_ARRAY) {
             try {
-                this.content = new PDPageContentStream(COSStream.concatenateStreams((COSArray) contents.getDirectBase()));
+                this.content = new PDPageContentStream(COSStream.concatenateStreams((COSArray) contents.getDirectBase(),
+                        getPDDocument().getDocument()));
             } catch (IOException e) {
                 this.content = new PDPageContentStream(contents.at(0));
             }

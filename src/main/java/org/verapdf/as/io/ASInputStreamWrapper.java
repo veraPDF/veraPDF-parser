@@ -33,6 +33,7 @@ public class ASInputStreamWrapper extends ASInputStream {
     private ASInputStream stream;
 
     public ASInputStreamWrapper(ASInputStream stream) {
+        stream.incrementResourceUsers();
         this.stream = stream;
     }
 
@@ -68,11 +69,20 @@ public class ASInputStreamWrapper extends ASInputStream {
 
     @Override
     public void close() throws IOException {
-        this.stream.close();
+        if (!isClosed) {
+            decrementResourceUsers();
+            isClosed = true;
+            this.stream.close();
+        }
     }
 
     @Override
     public void incrementResourceUsers() {
         this.stream.incrementResourceUsers();
+    }
+
+    @Override
+    public void decrementResourceUsers() {
+        this.stream.decrementResourceUsers();
     }
 }
