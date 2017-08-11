@@ -43,6 +43,11 @@ public class InternalInputStream extends SeekableInputStream {
 		this(file, 1);
 	}
 
+	public InternalInputStream(final File file, boolean isTempFile) throws FileNotFoundException {
+		this(file);
+		this.isTempFile = isTempFile;
+	}
+
 	public InternalInputStream(final File file, int numOfFileUsers) throws FileNotFoundException {
 		this.isTempFile = false;
 		this.fileName = file.getAbsolutePath();

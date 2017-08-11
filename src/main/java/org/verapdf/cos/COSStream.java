@@ -374,7 +374,7 @@ public class COSStream extends COSDictionary {
 			}
 		}
 		outputStream.close();
-		ASInputStream inputContentStream = new InternalInputStream(mergedContentStream);
+		ASInputStream inputContentStream = new InternalInputStream(mergedContentStream, true);
 		COSObject streamDict = COSDictionary.construct(ASAtom.LENGTH, mergedContentStream.length());
 		document.addFileResource(new ASFileStreamCloser(inputContentStream));
 		return COSStream.construct((COSDictionary) streamDict.get(), inputContentStream);
