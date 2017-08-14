@@ -368,6 +368,7 @@ public class COSStream extends COSDictionary {
 				} catch (IOException e) {
 					streamData.close();
 					outputStream.close();
+					mergedContentStream.delete();
 					throw e;
 				}
 				streamData.close();
