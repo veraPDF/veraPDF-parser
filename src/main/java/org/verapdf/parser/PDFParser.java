@@ -256,7 +256,7 @@ public class PDFParser extends COSParser {
         }
         long generation = token.integer;
 
-        if ((source.readByte() != 32) || CharTable.isSpace(source.peek())) {
+        if (!CharTable.isSpace(source.read()) || CharTable.isSpace(source.peek())) {
             //check correct spacing (6.1.8 clause)
             headerFormatComplyPDFA = false;
         }
