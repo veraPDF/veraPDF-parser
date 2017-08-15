@@ -117,9 +117,11 @@ public class ColorSpaceFactory {
 
     private static PDColorSpace getColorSpaceFromArray(COSObject base, PDResources resources,
                                                        boolean wasDefault) {
-        if (base.size().intValue() < 2) {
+        if (base.size().intValue() < 1) {
             LOGGER.log(Level.FINE, "ColorSpace array can not contain less than two elements");
             return null;
+        } else if (base.size() == 1) {
+            return getColorSpace(base.at(0), resources, wasDefault);
         }
         ASAtom name = base.at(0).getName();
         if (ASAtom.CALGRAY.equals(name)) {
