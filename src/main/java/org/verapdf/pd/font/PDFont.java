@@ -275,7 +275,10 @@ public abstract class PDFont extends PDResource {
      * @return Unicode string
      */
     public String toUnicode(int code) {
+        return cMapToUnicode(code);
+    }
 
+    public String cMapToUnicode(int code) {
         if (toUnicodeCMap == null) {
             this.toUnicodeCMap = new PDCMap(this.dictionary.getKey(ASAtom.TO_UNICODE));
         }
