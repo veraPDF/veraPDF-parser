@@ -118,7 +118,7 @@ public class ColorSpaceFactory {
     private static PDColorSpace getColorSpaceFromArray(COSObject base, PDResources resources,
                                                        boolean wasDefault) {
         if (base.size().intValue() < 1) {
-            LOGGER.log(Level.FINE, "ColorSpace array can not contain less than two elements");
+            LOGGER.log(Level.FINE, "ColorSpace array can not contain less than one element");
             return null;
         } else if (base.size() == 1) {
             return getColorSpace(base.at(0), resources, wasDefault);
