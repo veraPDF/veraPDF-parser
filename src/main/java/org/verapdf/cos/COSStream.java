@@ -360,7 +360,7 @@ public class COSStream extends COSDictionary {
 		FileOutputStream outputStream = new FileOutputStream(mergedContentStream);
 		for (COSObject stream : streams) {
 			if (stream.getType() == COSObjType.COS_STREAM) {
-				ASInputStream streamData = stream.getData();
+				ASInputStream streamData = stream.getData(FilterFlags.DECODE);
 				writeStreamToFile(outputStream, streamData);
 			}
 		}
