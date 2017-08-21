@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -118,7 +118,7 @@ public class CMapParser extends BaseParser {
                         break;
                     case "Supplement":
                         nextToken();
-                        if(getToken().type == Token.Type.TT_INTEGER) {
+                        if (getToken().type == Token.Type.TT_INTEGER) {
                             this.cMap.setSupplement((int) getToken().integer);
                         } else {
                             throw new IOException("CMap contains invalid /Supplement value");
@@ -155,14 +155,14 @@ public class CMapParser extends BaseParser {
                         break;
                     default:
                 }
-            //$FALL-THROUGH$
-		default:
+                //$FALL-THROUGH$
+            default:
         }
     }
 
     private void processList(int listLength, String type) throws IOException {
-        if (! type.startsWith("begin")) {
-        	return;
+        if (!type.startsWith("begin")) {
+            return;
         }
         String key = type.substring(5); //skipping leading "begin"
         for (int i = 0; i < listLength; ++i) {
@@ -297,7 +297,7 @@ public class CMapParser extends BaseParser {
         long bfRangeEnd = getBfrangeEndFromBytes(getToken().getByteValue(), rangeBegin);
 
         nextToken();    // skip [
-        if(getToken().type == Token.Type.TT_OPENARRAY) {
+        if (getToken().type == Token.Type.TT_OPENARRAY) {
 
             for (long i = bfRangeBegin; i <= bfRangeEnd; ++i) {
                 this.cMap.addUnicodeMapping((int) i, readStringFromUnicodeSequenceToken());
@@ -349,11 +349,12 @@ public class CMapParser extends BaseParser {
         if (getToken().type == Token.Type.TT_NAME) {
             return this.getToken().getValue();
         } else if (getToken().type == Token.Type.TT_HEXSTRING) {
-            byte[] token = getToken().getByteValue();;
+            byte[] token = getToken().getByteValue();
+            ;
             if (token.length == 1) {
                 return new String(token, "ISO-8859-1");
             }
-			return new String(token, "UTF-16BE");
+            return new String(token, "UTF-16BE");
         }
         throw new IOException("CMap contains invalid entry in bfchar. Expected "
                 + Token.Type.TT_NAME + " or " + Token.Type.TT_HEXSTRING + " but got " + getToken().type);
