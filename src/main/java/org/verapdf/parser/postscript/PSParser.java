@@ -27,13 +27,9 @@ public class PSParser extends NotSeekableCOSParser {
         operandStack = new Stack<>();
     }
 
-    public void parse() throws PostScriptException {
-        try {
-            while (!this.source.isEOF()) {
-                PSObject.getPSObject(nextObject()).execute(operandStack, userDict);
-            }
-        } catch (IOException e) {
-            throw new PostScriptException("Can't parse post script stream", e);
+    public void executeObject(COSObject object) throws PostScriptException {
+        while (!this.source.isEOF()) {
+            PSObject.getPSObject(object).execute(operandStack, userDict);
         }
     }
 

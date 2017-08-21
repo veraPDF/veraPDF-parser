@@ -289,7 +289,7 @@ public class NotSeekableBaseParser implements Closeable {
                 return; // EOL == LF
             }
 
-            if (isCR(ch)) {
+            if (isEndOfComment(ch)) {
                 ch = this.source.readByte();
                 if (isLF(ch)) { // EOL == CR
                     this.source.unread();
@@ -298,6 +298,14 @@ public class NotSeekableBaseParser implements Closeable {
             }
             // else skip regular character
         }
+    }
+
+    protected boolean isEndOfComment(byte ch) {
+        return isCR(ch);
+    }
+
+    protected static boolean isFF(int c) {
+        return ASCII_FF == c;
     }
 
     protected static boolean isLF(int c) {

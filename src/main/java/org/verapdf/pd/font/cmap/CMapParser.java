@@ -20,14 +20,13 @@
  */
 package org.verapdf.pd.font.cmap;
 
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
-import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
+import org.verapdf.parser.postscript.PSParser;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +35,7 @@ import java.util.logging.Logger;
  *
  * @author Sergey Shemyakov
  */
-public class CMapParser extends BaseParser {
+public class CMapParser extends PSParser {
 
     private static final Logger LOGGER = Logger.getLogger(CMapParser.class.getCanonicalName());
     private COSObject lastCOSName;
@@ -46,15 +45,7 @@ public class CMapParser extends BaseParser {
     /**
      * {@inheritDoc}
      */
-    public CMapParser(String fileName) throws FileNotFoundException {
-        super(fileName);
-        cMap = new CMap();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public CMapParser(InputStream fileStream) throws IOException {
+    public CMapParser(ASInputStream fileStream) throws IOException {
         super(fileStream);
         cMap = new CMap();
     }
