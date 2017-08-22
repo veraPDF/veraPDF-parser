@@ -77,7 +77,9 @@ public class Token {
 		TT_CLOSEARRAY,
 		TT_OPENDICT,
 		TT_CLOSEDICT,
-		TT_EOF
+		TT_EOF,
+		TT_STARTPROC,
+		TT_ENDPROC
 	}
 
 	public enum Keyword {
