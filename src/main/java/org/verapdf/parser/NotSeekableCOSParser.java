@@ -99,7 +99,9 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
             case TT_NONE:
                 break;
             case TT_KEYWORD: {
-                if (token.keyword == null) {
+                if (token.keyword == null && isPSParser) {
+                    return PSObject.getPSObject(COSName.construct(token.getValue()), true);
+                } else if (token.keyword == null) {
                     break;
                 }
                 switch (token.keyword) {
@@ -123,9 +125,7 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
                     case KW_TRAILER:
                         break;
                     default:
-                        if (isPSParser) {
-                            return PSObject.getPSObject(COSName.construct(token.getValue()), true);
-                        }
+
                 }
                 break;
             }

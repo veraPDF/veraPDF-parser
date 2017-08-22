@@ -26,7 +26,7 @@ public class PSOperator extends PSObject {
     }
 
     @Override
-    void execute(Stack<COSObject> operandStack,
+    public void execute(Stack<COSObject> operandStack,
                  Map<ASAtom, COSObject> userDict) throws PostScriptException {
         this.operandStack = operandStack;
         this.userDict = userDict;
@@ -104,7 +104,9 @@ public class PSOperator extends PSObject {
                     break;
                 default:
                     COSObject dictEntry = userDict.get(ASAtom.getASAtom(operator));
-                    PSObject.getPSObject(dictEntry).execute(operandStack, userDict);
+                    if (dictEntry != null) {
+                        PSObject.getPSObject(dictEntry).execute(operandStack, userDict);
+                    }
             }
         }
     }

@@ -18,8 +18,8 @@ public class PSParser extends NotSeekableCOSParser {
 
     private static final Logger LOGGER = Logger.getLogger(PSParser.class.getCanonicalName());
 
-    private Map<ASAtom, COSObject> userDict = new HashMap<>();
-    private Stack<COSObject> operandStack = new Stack<>();
+    protected Map<ASAtom, COSObject> userDict = new HashMap<>();
+    protected Stack<COSObject> operandStack = new Stack<>();
 
     public PSParser(ASInputStream fileStream) throws IOException {
         super(fileStream, true);

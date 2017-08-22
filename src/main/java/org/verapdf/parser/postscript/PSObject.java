@@ -21,7 +21,7 @@ public abstract class PSObject extends COSObject {
         super(base);
     }
 
-    abstract void execute(Stack<COSObject> operandStack,
+    public abstract void execute(Stack<COSObject> operandStack,
                           Map<ASAtom, COSObject> userDict) throws PostScriptException;
 
     public static PSObject getPSObject(COSObject obj) {
@@ -43,8 +43,7 @@ public abstract class PSObject extends COSObject {
                 type == COSObjType.COS_NAME || type == COSObjType.COS_ARRAY) {
             return new PSLiteralObject(obj);
         } else {
-            // TODO: change SEVERE to FINE after testing
-            LOGGER.log(Level.SEVERE, "Can't get PSObject for COSType " + type);
+            LOGGER.log(Level.FINE, "Can't get PSObject for COSType " + type);
             return new PSLiteralObject(obj);
         }
     }

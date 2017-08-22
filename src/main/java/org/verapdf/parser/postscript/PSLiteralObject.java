@@ -21,7 +21,7 @@ public class PSLiteralObject extends PSObject {
     }
 
     @Override
-    void execute(Stack<COSObject> operandStack,
+    public void execute(Stack<COSObject> operandStack,
                  Map<ASAtom, COSObject> userDict) throws PostScriptException {
         if (!object.empty()) {
             operandStack.push(this.object);
