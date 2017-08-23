@@ -261,4 +261,27 @@ public class PDType1Font extends PDSimpleFont {
         return false;
     }
 
+    public String toUnicodePDFA1(int code) {
+        String unicodeString = super.cMapToUnicode(code);
+        if(unicodeString != null) {
+            return unicodeString;
+        }
+        Encoding fontEncoding = this.getEncodingMapping();
+        String glyphName =  null;
+        if (fontEncoding != null) {
+            glyphName = fontEncoding.getName(code);
+        }
+        if (glyphName == null && getFontProgram() != null) {
+            glyphName = fontProgram.getGlyphName(code);
+        }
+        if (glyphName != null) {
+            if (Arrays.asList(TrueTypePredefined.STANDARD_ENCODING).contains(glyphName) || SymbolSet.hasGlyphName(glyphName)) {
+                return " "; // indicates that toUnicode should not be checked.
+            }
+            return null;
+        }
+        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code" + code + " in font " + this.getName());
+        return null;
+    }
+
 }
