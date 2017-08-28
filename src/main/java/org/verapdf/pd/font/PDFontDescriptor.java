@@ -259,14 +259,14 @@ public class PDFontDescriptor extends PDObject {
                     if (obj.getType().isNumber()) {
                         res[i] = obj.getReal();
                     } else {
-                        LOGGER.log(Level.FINE, "Font bounding box array for font " + fontName +
+                        LOGGER.log(Level.SEVERE, "Font bounding box array for font " + fontName +
                                 " contains " + obj.getType());
                         return null;
                     }
                 }
                 fontBoundingBox = res;
             } else {
-                LOGGER.log(Level.FINE, "Font bounding box array for font " + fontName +
+                LOGGER.log(Level.SEVERE, "Font bounding box array for font " + fontName +
                         " is not an array of 4 elements");
                 return null;
             }

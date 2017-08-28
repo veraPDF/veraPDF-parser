@@ -20,18 +20,18 @@
  */
 package org.verapdf.pd;
 
+import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSBase;
+import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSBase;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
 
 /**
  * @author Maksim Bezrukov
@@ -58,7 +58,7 @@ public class PDMetadata extends PDObject {
                         if (elem.getType() == COSObjType.COS_NAME) {
                             res.add(elem.getName());
                         } else {
-                            LOGGER.log(Level.FINE, "Filter array contain non COSName element");
+                            LOGGER.log(Level.SEVERE, "Filter array contain non COSName element");
                         }
                     }
                     break;
@@ -73,7 +73,7 @@ public class PDMetadata extends PDObject {
         if (currentObject.getType() == COSObjType.COS_STREAM) {
             return (COSStream) currentObject;
         }
-		LOGGER.log(Level.FINE, "Current object is not a stream");
+		LOGGER.log(Level.SEVERE, "Metadata object is not a stream");
 		return null;
     }
 

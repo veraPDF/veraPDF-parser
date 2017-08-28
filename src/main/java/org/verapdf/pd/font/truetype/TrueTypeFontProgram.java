@@ -22,13 +22,14 @@ package org.verapdf.pd.font.truetype;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.PDFont;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Represents TrueTypeFontProgram.
@@ -263,10 +264,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             System.arraycopy(TrueTypePredefined.STANDARD_ENCODING, 0,
                     encodingMappingArray, 0, 256);
         }
-        COSArray differences = (COSArray) encoding.getKey(ASAtom.DIFFERENCES).getDirectBase();
-        if (differences != null) {
-            applyDiffsToEncoding(differences);
-        }
+
+        applyDiffsToEncoding(encoding);
+
         for (int i = 0; i < 256; ++i) {
             if (TrueTypePredefined.NOTDEF_STRING.equals(encodingMappingArray[i])) {
                 encodingMappingArray[i] = TrueTypePredefined.STANDARD_ENCODING[i];
@@ -274,16 +274,17 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         }
     }
 
-    private void applyDiffsToEncoding(COSArray differences) throws IOException {
-        int diffIndex = -1;
-        for (COSObject obj : differences) {
-            if (obj.getType() == COSObjType.COS_INTEGER) {
-                diffIndex = obj.getInteger().intValue();
-            } else if (obj.getType() == COSObjType.COS_NAME && diffIndex != -1) {
-                encodingMappingArray[diffIndex++] = obj.getString();
-            } else {
-                throw new IOException("Error in reading /Encoding entry in font dictionary");
+    private void applyDiffsToEncoding(COSDictionary encoding) throws IOException {
+        Map<Integer, String> differences = PDFont.getDifferencesFromCosEncoding(new COSObject(encoding));
+        if (differences != null) {
+            for (Map.Entry<Integer, String> entry : differences.entrySet()) {
+                int key = entry.getKey();
+                if (key < encodingMappingArray.length) {
+                    encodingMappingArray[key] = entry.getValue();
+                }
             }
+        } else {
+            throw new IOException("Error in reading /Encoding entry in font dictionary");
         }
     }
 
