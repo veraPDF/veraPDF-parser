@@ -80,7 +80,9 @@ public class ColorSpaceFactory {
         } else if (type != null && type.isDictionaryBased()) {
             return getPattern(base);
         } else {
-            LOGGER.log(Level.SEVERE, "Color space has to be a name or array, but it is not");
+            if (!base.empty()) {
+                LOGGER.log(Level.SEVERE, "Color space has to be a name or array, but it is not");
+            }
             return null;
         }
     }
