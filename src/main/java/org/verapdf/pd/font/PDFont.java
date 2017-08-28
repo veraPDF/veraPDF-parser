@@ -192,8 +192,14 @@ public abstract class PDFont extends PDResource {
      * @return map of differences as given in Differences key in Encoding.
      */
     public static Map<Integer, String> getDifferencesFromCosEncoding(COSObject e) {
-        COSArray differences = (COSArray)
-                e.getKey(ASAtom.DIFFERENCES).getDirectBase();
+        COSObject cosDifferences = e.getKey(ASAtom.DIFFERENCES);
+        COSArray differences;
+        if (cosDifferences.getType() == COSObjType.COS_ARRAY) {
+            differences = (COSArray) e.getKey(ASAtom.DIFFERENCES).getDirectBase();
+        } else {
+            LOGGER.log(Level.SEVERE, "Value of Differences key is not an array. Ignoring Difference");
+            differences = null;
+        }
         if (differences == null) {
             return null;
         }

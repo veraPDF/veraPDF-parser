@@ -73,12 +73,12 @@ public class PDExtGState extends PDResource {
         return getKey(ASAtom.BM);
     }
 
-    public Double getCA() {
-        return getRealKey(ASAtom.CA);
+    public COSObject getCA() {
+        return getKey(ASAtom.CA);
     }
 
-    public Double getCA_NS() {
-        return getRealKey(ASAtom.CA_NS);
+    public COSObject getCA_NS() {
+        return getKey(ASAtom.CA_NS);
     }
 
     public COSName getCOSRenderingIntentName() {
