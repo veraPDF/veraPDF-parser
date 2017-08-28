@@ -27,7 +27,7 @@ public class PSOperator extends PSObject {
 
     @Override
     public void execute(Stack<COSObject> operandStack,
-                 Map<ASAtom, COSObject> userDict) throws PostScriptException {
+                        Map<ASAtom, COSObject> userDict) throws PostScriptException {
         this.operandStack = operandStack;
         this.userDict = userDict;
         if (operator != null) {
@@ -93,6 +93,17 @@ public class PSOperator extends PSObject {
                     break;
 
                 //Dictionary Operators
+                case "dict":
+                    // we use this for correct stack handling, no real dictionary
+                    // processing is done
+                    getTopNumber();
+                    operandStack.push(COSDictionary.construct());
+                    break;
+                case "begin":
+                    if (operandStack.size() > 0) {
+                        operandStack.pop();
+                    }
+                    break;
                 case "length":
                     length();
                     break;
@@ -102,6 +113,20 @@ public class PSOperator extends PSObject {
                 case "load":
                     load();
                     break;
+
+                // Array Operators
+                case "array":
+                    array();
+                    break;
+                case "put":
+                    put();
+                    break;
+
+                // Control Operators
+                case "for":
+                    opFor();
+                    break;
+
                 default:
                     COSObject dictEntry = userDict.get(ASAtom.getASAtom(operator));
                     if (dictEntry != null) {
@@ -134,7 +159,7 @@ public class PSOperator extends PSObject {
     private void index() throws PostScriptException {
         try {
             COSObject n = getTopNumber();
-            if (operandStack.size() >= n.size()) {
+            if (operandStack.size() >= n.getInteger().intValue()) {
                 COSObject toCopy = operandStack.get(operandStack.size() - n.getInteger().intValue() - 1);
                 operandStack.push(psCopyObject(toCopy));
             } else {
@@ -268,6 +293,52 @@ public class PSOperator extends PSObject {
             return;
         }
         throw new PostScriptException("Can't execute load operator");
+    }
+
+    private void array() throws PostScriptException {
+        try {
+            COSObject arraySize = getTopNumber();
+            this.operandStack.push(COSArray.construct(arraySize.getInteger().intValue()));
+        } catch (PostScriptException e) {
+            throw new PostScriptException("Can't execute array operator", e);
+        }
+    }
+
+    private void put() throws PostScriptException {
+        try {
+            if (operandStack.size() >= 3) {
+                COSObject toPut = operandStack.pop();
+                COSObject index = getTopNumber();
+                COSObject array = operandStack.pop();
+                if (array.getType() == COSObjType.COS_ARRAY) {
+                    array.get().insert(index.getInteger().intValue(), toPut);
+                    return;
+                }
+            }
+            throw new PostScriptException("Problem with stack");
+        } catch (PostScriptException e) {
+            throw new PostScriptException("Can't execute put operator", e);
+        }
+    }
+
+    private void opFor() throws PostScriptException {
+        try {
+            COSObject proc = operandStack.pop();
+            if (!(proc instanceof PSProcedure)) {
+                throw new PostScriptException("Object is not a procedure");
+            }
+            COSObject limit = getTopNumber();
+            COSObject increment = getTopNumber();
+            COSObject initial = getTopNumber();
+            for (long i = initial.getInteger(); i <= limit.getInteger();
+                 i += increment.getInteger()) {
+                operandStack.push(COSInteger.construct(i));
+                ((PSProcedure) proc).executeProcedure(operandStack, userDict);
+            }
+
+        } catch (PostScriptException e) {
+            throw new PostScriptException("Can't execute for operator", e);
+        }
     }
 
     // keep in mind that first number to get from stack is result[0]

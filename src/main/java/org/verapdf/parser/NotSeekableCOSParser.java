@@ -171,7 +171,7 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
         this.flag = true;
 
         final Token token = getToken();
-        if (token.type != Token.Type.TT_OPENARRAY) {
+        if (token.type != Token.Type.TT_OPENARRAY && !(isPSParser && token.type == Token.Type.TT_STARTPROC)) {
             return new COSObject();
         }
 

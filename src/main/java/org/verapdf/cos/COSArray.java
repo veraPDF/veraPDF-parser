@@ -56,6 +56,11 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         this.entries.add(i, object);
     }
 
+    protected COSArray(final int size) {
+        super();
+        this.entries = new ArrayList<>(size);
+    }
+
     //! Object type
     public COSObjType getType() {
         return COSObjType.COS_ARRAY;
@@ -78,6 +83,10 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
     //! Returns COSObject wrapping a new COSArray instance constructed via given object at a given index
     public static COSObject construct(final int i, final COSObject obj) {
         return new COSObject(new COSArray(i, obj));
+    }
+
+    public static COSObject construct(final int size) {
+        return new COSObject(new COSArray(size));
     }
 
     public void accept(IVisitor visitor) {

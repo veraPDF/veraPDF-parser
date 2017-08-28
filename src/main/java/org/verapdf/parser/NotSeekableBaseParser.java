@@ -198,6 +198,9 @@ public class NotSeekableBaseParser implements Closeable {
                 }
                 break;
             case '}':
+                if (isPSParser) {
+                    this.token.type = Token.Type.TT_ENDPROC;
+                }
                 break;
             case '/':
                 this.token.type = Token.Type.TT_NAME;
@@ -474,7 +477,7 @@ public class NotSeekableBaseParser implements Closeable {
         }
     }
 
-    private static byte[] extendArray(byte[] array) {
+    public static byte[] extendArray(byte[] array) {
         byte[] res = new byte[array.length * 2];
         System.arraycopy(array, 0, res, 0, array.length);
         return res;

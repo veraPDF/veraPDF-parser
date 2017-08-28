@@ -19,11 +19,16 @@ public class PSProcedure extends PSObject {
         this.procedure = procedure;
     }
 
-    @Override
-    public void execute(Stack<COSObject> operandStack,
+    public void executeProcedure(Stack<COSObject> operandStack,
                  Map<ASAtom, COSObject> userDict) throws PostScriptException {
         for (COSObject obj : procedure) {
             PSObject.getPSObject(obj).execute(operandStack, userDict);
         }
+    }
+
+    @Override
+    public void execute(Stack<COSObject> operandStack,
+                        Map<ASAtom, COSObject> userDict) throws PostScriptException {
+        operandStack.push(this);
     }
 }

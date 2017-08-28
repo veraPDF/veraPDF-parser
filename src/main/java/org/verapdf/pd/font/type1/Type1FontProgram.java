@@ -20,22 +20,22 @@
  */
 package org.verapdf.pd.font.type1;
 
-import org.verapdf.as.CharTable;
+import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.parser.COSParser;
 import org.verapdf.parser.Token;
+import org.verapdf.parser.postscript.PSObject;
+import org.verapdf.parser.postscript.PSParser;
+import org.verapdf.parser.postscript.PostScriptException;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -43,13 +43,12 @@ import java.util.logging.Logger;
  *
  * @author Sergey Shemyakov
  */
-public class Type1FontProgram extends COSParser implements FontProgram {
+public class Type1FontProgram extends PSParser implements FontProgram {
 
     public static final Logger LOGGER =
             Logger.getLogger(Type1FontProgram.class.getCanonicalName());
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
 
-    private double[] fontMatrix = Arrays.copyOf(DEFAULT_FONT_MATRIX, DEFAULT_FONT_MATRIX.length);
     private String[] encoding;
     private Map<String, Integer> glyphWidths;
     private static final byte[] CLEAR_TO_MARK_BYTES =
@@ -60,15 +59,7 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     /**
      * {@inheritDoc}
      */
-    public Type1FontProgram(String fileName) throws IOException {
-        super(fileName);
-        encoding = new String[256];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Type1FontProgram(InputStream fileStream)
+    public Type1FontProgram(ASInputStream fileStream)
             throws IOException {
         super(fileStream);
         encoding = new String[256];
@@ -89,142 +80,44 @@ public class Type1FontProgram extends COSParser implements FontProgram {
                 skipSpaces(true);
 
                 while (getToken().type != Token.Type.TT_EOF) {
-                    nextToken();
-                    processToken();
+                    processObject(nextObject());
                 }
+                initializeEncoding();
                 if (glyphWidths == null) {
                     throw new IOException("Type 1 font doesn't contain charstrings.");
                 }
                 this.successfullyParsed = true;
+            } catch (PostScriptException e) {
+                throw new IOException("Error in PostScript parsing", e);
             } finally {
                 this.source.close();    // We close stream after first reading attempt
             }
         }
     }
 
-    @Override
-    protected void readName() throws IOException {
-        this.clearToken();
-        byte ch;
-        while (!this.source.isEOF()) {
-            ch = this.source.readByte();
-            if (CharTable.isTokenDelimiter(ch)) {
-                this.source.unread();
-                break;
+    private void processObject(COSObject nextObject) throws IOException, PostScriptException {
+        if (nextObject.getType() == COSObjType.COS_NAME &&
+                nextObject.getString().equals(Type1StringConstants.EEXEC_STRING)) {
+            this.skipSpaces();
+//                        long clearToMarkOffset = this.findOffsetCleartomark();
+            Type1PrivateParser parser = null;
+            try (ASInputStream eexecEncoded = this.source.getStreamUntilToken(
+                    CLEAR_TO_MARK_BYTES)) {
+                try (ASInputStream eexecDecoded = new EexecFilterDecode(
+                        eexecEncoded, false)) {
+                    parser = new Type1PrivateParser(
+                            eexecDecoded, getFontMatrix());
+                    parser.parse();
+                    this.glyphWidths = parser.getGlyphWidths();
+                } finally {
+                    if (parser != null) {
+                        parser.closeInputStream();
+                    }
+                }
             }
-
-            appendToToken(ch);
+        } else {
+            PSObject.getPSObject(nextObject).execute(operandStack, userDict);
         }
-    }
-
-    private void processToken() throws IOException {
-        switch (getToken().type) {
-            case TT_NAME:
-                switch (getToken().getValue()) {
-                    //Do processing of all necessary names like /FontName, /FamilyName, etc.
-                    case Type1StringConstants.FONT_MATRIX_STRING:
-                        this.skipSpaces();
-                        this.nextToken();
-                        if (this.getToken().type == Token.Type.TT_OPENARRAY) {
-                            this.source.unread();
-                            COSObject cosFontMatrix = this.nextObject();
-                            if (cosFontMatrix.size() == 6) {
-                                for (int i = 0; i < 6; ++i) {
-                                    fontMatrix[i] = cosFontMatrix.at(i).getReal();
-                                }
-                            }
-                        }
-                        break;
-                    case Type1StringConstants.ENCODING_STRING:
-                        if (isEncodingName()) {
-                            break;
-                        }
-                        do {
-                            nextToken();
-                        } while (!this.getToken().getValue().equals(
-                                Type1StringConstants.DUP_STRING) &&
-                                this.getToken().type != Token.Type.TT_EOF);
-                        if (this.getToken().type == Token.Type.TT_EOF) {
-                            throw new IOException("Can't parse Type 1 font program");
-                        }
-                        this.source.unread(3);
-
-                        while (true) {
-                            nextToken();
-                            String token = this.getToken().getValue();
-                            if (token.equals(Type1StringConstants.DEF_STRING) ||
-                                    token.equals(Type1StringConstants.READONLY_STRING)) {
-                                break;
-                            }
-                            if (this.getToken().type == Token.Type.TT_EOF) {
-                                throw new IOException("Can't parse Type 1 font program");
-                            }
-                            this.skipSpaces();
-                            this.readNumber();
-                            long key = this.getToken().integer;
-                            this.nextToken();
-                            if (key < 256) {
-                                encoding[(int) key] = this.getToken().getValue();
-                            } else {
-                                LOGGER.log(Level.FINE, "Found glyph with encoding "
-                                        + key + " in Type 1 font, value less than 256 expected.");
-                            }
-                            this.nextToken();
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case TT_KEYWORD:
-                switch (getToken().getValue()) {
-                    //Do processing of keywords like eexec
-                    case Type1StringConstants.EEXEC_STRING:
-                        this.skipSpaces();
-                        long clearToMarkOffset = this.findOffsetCleartomark();
-                        Type1PrivateParser parser = null;
-                        try (ASInputStream eexecEncoded = this.source.getStream(
-                                this.source.getOffset(),
-                                clearToMarkOffset - this.source.getOffset())) {
-                            try (ASInputStream eexecDecoded = new EexecFilterDecode(
-                                    eexecEncoded, false)) {
-                                parser = new Type1PrivateParser(
-                                        eexecDecoded, fontMatrix);
-                                parser.parse();
-                                this.glyphWidths = parser.getGlyphWidths();
-                            } finally {
-                                if (parser != null) {
-                                    parser.closeInputStream();
-                                }
-                            }
-                            this.source.seek(clearToMarkOffset);
-                            break;
-                        }
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    private long findOffsetCleartomark() throws IOException {
-        long startingOffset = this.source.getOffset();
-        int length = CLEAR_TO_MARK_BYTES.length;
-        this.source.seek(this.source.getStreamLength() - length);
-        byte[] buf = new byte[length];
-        this.source.read(buf, length);
-        while (!Arrays.equals(buf, CLEAR_TO_MARK_BYTES) && this.source.getOffset() > length) {
-            this.source.unread(length + 1);
-            this.source.read(buf, length);
-        }
-        if (this.source.getOffset() == length) {
-            LOGGER.log(Level.FINE, "cleartomark keyword can't be found while parsing Type1 font.");
-            this.source.seek(startingOffset);
-            return source.getStreamLength();
-        }
-        long res = this.source.getOffset() - length;
-        this.source.seek(startingOffset);
-        return res - 512;
     }
 
     @Override
@@ -284,6 +177,42 @@ public class Type1FontProgram extends COSParser implements FontProgram {
         return this.glyphWidths.keySet();
     }
 
+    private double[] getFontMatrix() {
+        COSObject fontMatrixObject = this.getObjectFromUserDict(ASAtom.getASAtom(
+                Type1StringConstants.FONT_MATRIX_STRING));
+        if (fontMatrixObject != null && fontMatrixObject.getType() != COSObjType.COS_ARRAY) {
+            double[] res = new double[6];
+            int pointer = 0;
+            for (COSObject obj : ((COSArray) fontMatrixObject.get())) {
+                if (obj.getType().isNumber()) {
+                    res[pointer++] = obj.getReal();
+                }
+            }
+            return res;
+        }
+        return DEFAULT_FONT_MATRIX;
+    }
+
+    private void initializeEncoding() {
+        COSObject encoding = this.getObjectFromUserDict(ASAtom.getASAtom(
+                Type1StringConstants.ENCODING_STRING));
+        if (encoding != null) {
+            if (encoding.getType() == COSObjType.COS_ARRAY) {
+                int pointer = 0;
+                for (COSObject obj : ((COSArray) encoding.get())) {
+                    if (pointer < 256) {
+                        String glyphName = obj.getString();
+                        this.encoding[pointer++] = glyphName == null ? "" : glyphName;
+                    }
+                }
+            } else if (encoding.getType() == COSObjType.COS_NAME) {
+                if (Type1StringConstants.STANDARD_ENCODING_STRING.equals(encoding.getString())) {
+                    this.encoding = TrueTypePredefined.STANDARD_ENCODING;
+                }
+            }
+        }
+    }
+
     @Override
     public String getGlyphName(int code) {
         if (code > 0 && code < encoding.length) {
@@ -291,24 +220,6 @@ public class Type1FontProgram extends COSParser implements FontProgram {
         } else {
             return null;
         }
-    }
-
-    private boolean isEncodingName() throws IOException {
-        long startOffset = this.source.getOffset();
-        nextToken();
-        String possibleEncodingName = getToken().getValue();
-        nextToken();
-        if (Type1StringConstants.DEF_STRING.equals(getToken().getValue())) {
-            if (Type1StringConstants.STANDARD_ENCODING_STRING.equals(possibleEncodingName)) {
-                this.encoding = TrueTypePredefined.STANDARD_ENCODING;
-                this.source.seek(startOffset);
-                return true;
-            } else {
-                throw new IOException("Can't get encoding " + possibleEncodingName + " as internal encoding of type 1 font program.");
-            }
-        }
-        this.source.seek(startOffset);
-        return false;
     }
 
     private String getGlyph(int code) {
@@ -320,10 +231,6 @@ public class Type1FontProgram extends COSParser implements FontProgram {
     }
 
     public ASFileStreamCloser getFontProgramResource() {
-        if (this.source instanceof ASMemoryInStream) {
-            return null;
-        } else {
-            return new ASFileStreamCloser(this.source);
-        }
+        return new ASFileStreamCloser(this.source);
     }
 }
