@@ -39,8 +39,8 @@ public class PDAcroForm extends PDObject {
 		super(obj);
 	}
 
-	public Boolean getNeedAppearances() {
-		return getBooleanKey(ASAtom.NEED_APPEARANCES);
+	public COSObject getNeedAppearances() {
+		return getKey(ASAtom.NEED_APPEARANCES);
 	}
 
 	public List<PDFormField> getFields() {
