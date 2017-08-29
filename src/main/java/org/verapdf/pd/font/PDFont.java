@@ -288,9 +288,7 @@ public abstract class PDFont extends PDResource {
         if (toUnicodeCMap == null) {
             this.toUnicodeCMap = new PDCMap(this.dictionary.getKey(ASAtom.TO_UNICODE));
         }
-
-        if (toUnicodeCMap.getCMapName() != null &&
-                toUnicodeCMap.getCMapName().startsWith("Identity-")) {
+        if (toUnicodeCMap.getCMapName() != null && toUnicodeCMap.isIdentity()) {
             return new String(new char[]{(char) code});
         }
         return this.toUnicodeCMap.toUnicode(code);
