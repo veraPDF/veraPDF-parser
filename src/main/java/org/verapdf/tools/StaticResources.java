@@ -1,6 +1,7 @@
 package org.verapdf.tools;
 
 import org.verapdf.cos.COSKey;
+import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.structure.PDStructureNameSpace;
 
@@ -15,8 +16,9 @@ import java.util.Map;
  */
 public class StaticResources {
 
-    private static Map<String, CMap> cMapCache = new HashMap<>();
-    private static Map<COSKey, PDStructureNameSpace> structureNameSpaceCache = new HashMap<>();
+    public static Map<String, CMap> cMapCache = new HashMap<>();
+    public static Map<COSKey, PDStructureNameSpace> structureNameSpaceCache = new HashMap<>();
+    public static Map<COSKey, FontProgram> cachedFonts = new HashMap<>();
 
     /**
      * Caches CMap object.
@@ -62,11 +64,20 @@ public class StaticResources {
     private StaticResources() {
     }
 
+    public static void cacheFontProgram(COSKey key, FontProgram font) {
+        cachedFonts.put(key, font);
+    }
+
+    public static FontProgram getCachedFont(COSKey key) {
+        return cachedFonts.get(key);
+    }
+
     /**
      * Clears all cached static resources.
      */
     public static void clear() {
         cMapCache.clear();
         structureNameSpaceCache.clear();
+        cachedFonts.clear();
     }
 }

@@ -23,10 +23,7 @@ package org.verapdf.pd.font.type1;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 import org.verapdf.parser.COSParser;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
@@ -37,6 +34,7 @@ import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetricsFactory;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
 import java.util.*;
@@ -115,37 +113,46 @@ public class PDType1Font extends PDSimpleFont {
      */
     @Override
     public FontProgram getFontProgram() {
-        if (this.isFontParsed) {
-            return this.fontProgram;
-        }
-        this.isFontParsed = true;
-        if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE)) {
-            COSStream type1FontFile = fontDescriptor.getFontFile();
-            try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
-                this.fontProgram = new Type1FontProgram(fontData);
-                return this.fontProgram;
-            } catch (IOException e) {
-                LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
-            }
-        } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
-            COSStream type1FontFile = fontDescriptor.getFontFile3();
-            ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
-            try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
-                if (subtype == ASAtom.TYPE1C) {
-
-                    this.fontProgram = new CFFFontProgram(fontData, null, this.isSubset());
-                    return this.fontProgram;
-                } else if (subtype == ASAtom.OPEN_TYPE) {
-                    this.fontProgram = new OpenTypeFontProgram(fontData, true, this.isSymbolic(),
-                            this.getEncoding(), null, this.isSubset());
-                    return this.fontProgram;
+        if (!this.isFontParsed) {
+            this.isFontParsed = true;
+            if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE)) {
+                COSStream type1FontFile = fontDescriptor.getFontFile();
+                COSKey key = type1FontFile.getObjectKey();
+                this.fontProgram = StaticResources.getCachedFont(key);
+                if (fontProgram == null) {
+                    try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
+                        this.fontProgram = new Type1FontProgram(fontData);
+                        StaticResources.cacheFontProgram(key, this.fontProgram);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
+                        return null;
+                    }
                 }
-            } catch (IOException e) {
-                LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
+            } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
+                COSStream type1FontFile = fontDescriptor.getFontFile3();
+                ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
+                COSKey key = type1FontFile.getObjectKey();
+                this.fontProgram = StaticResources.getCachedFont(key);
+                if (fontProgram == null) {
+                    try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
+                        if (subtype == ASAtom.TYPE1C) {
+
+                            this.fontProgram = new CFFFontProgram(fontData, null, this.isSubset());
+                        } else if (subtype == ASAtom.OPEN_TYPE) {
+                            this.fontProgram = new OpenTypeFontProgram(fontData, true, this.isSymbolic(),
+                                    this.getEncoding(), null, this.isSubset());
+                        }
+                        StaticResources.cacheFontProgram(key, this.fontProgram);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
+                        return null;
+                    }
+                }
+            } else {
+                this.fontProgram = null;
             }
         }
-        this.fontProgram = null;
-        return null;
+        return this.fontProgram;
     }
 
     /**
