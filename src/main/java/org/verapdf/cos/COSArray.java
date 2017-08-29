@@ -130,7 +130,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
     }
 
     public void remove(final int i) {
-        if (entries.size() < i) {
+        if (entries.size() > i) {
             this.entries.remove(i);
         }
     }

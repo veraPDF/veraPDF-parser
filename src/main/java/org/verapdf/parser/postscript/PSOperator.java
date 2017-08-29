@@ -311,7 +311,8 @@ public class PSOperator extends PSObject {
                 COSObject index = getTopNumber();
                 COSObject array = operandStack.pop();
                 if (array.getType() == COSObjType.COS_ARRAY) {
-                    array.get().insert(index.getInteger().intValue(), toPut);
+                    array.remove(index.getInteger().intValue());
+                    array.insert(index.getInteger().intValue(), toPut);
                     return;
                 }
             }
