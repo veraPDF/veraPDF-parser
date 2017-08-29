@@ -48,6 +48,7 @@ public class PDCMap extends PDObject {
     private CMap cMapFile = null;
     private PDCMap useCMap = null;
     private boolean parsedCMap = false;
+    private Boolean isIdentity;
 
     /**
      * Constructor from COSObject.
@@ -246,5 +247,12 @@ public class PDCMap extends PDObject {
             }
         }
         return res;
+    }
+
+    public boolean isIdentity() {
+        if (isIdentity == null) {
+            isIdentity = this.getCMapName().startsWith("Identity-");
+        }
+        return isIdentity;
     }
 }
