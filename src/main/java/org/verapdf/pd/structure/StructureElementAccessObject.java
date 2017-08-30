@@ -36,4 +36,10 @@ public class StructureElementAccessObject {
         return null;
     }
 
+    @Override
+    public int hashCode() {
+        int result = structParent != null ? structParent.hashCode() : 0;
+        result = 31 * result + (structParents != null ? structParents.hashCode() : 0);
+        return result;
+    }
 }
