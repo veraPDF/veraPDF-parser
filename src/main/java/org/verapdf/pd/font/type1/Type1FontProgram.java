@@ -144,14 +144,14 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     @Override
     public boolean containsCode(int code) {
         String glyphName = getGlyph(code);
-        return this.glyphWidths != null &&
-                this.glyphWidths.keySet().contains(glyphName);
+        return containsGlyph(glyphName);
     }
 
     @Override
     public boolean containsGlyph(String glyphName) {
         return this.glyphWidths != null &&
-                this.glyphWidths.keySet().contains(glyphName);
+                this.glyphWidths.keySet().contains(glyphName) &&
+                !glyphName.equals(TrueTypePredefined.NOTDEF_STRING);
     }
 
     @Override
