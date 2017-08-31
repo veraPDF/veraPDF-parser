@@ -49,6 +49,8 @@ public abstract class PDFont extends PDResource {
     protected FontProgram fontProgram;
     protected Encoding encoding = null;
     private boolean successfullyParsed = false;
+    String fontName;
+    ASAtom subtype;
 
     /**
      * Constructor from COSDictionary.
@@ -67,6 +69,8 @@ public abstract class PDFont extends PDResource {
         } else {
             fontDescriptor = new PDFontDescriptor(COSDictionary.construct());
         }
+        this.fontName = this.dictionary.getStringKey(ASAtom.BASE_FONT);
+        this.subtype = this.dictionary.getNameKey(ASAtom.SUBTYPE);
     }
 
     /**
@@ -95,7 +99,7 @@ public abstract class PDFont extends PDResource {
      * @return font subtype (Subtype entry).
      */
     public ASAtom getSubtype() {
-        return this.dictionary.getNameKey(ASAtom.SUBTYPE);
+        return this.subtype;
     }
 
     /**
@@ -162,7 +166,7 @@ public abstract class PDFont extends PDResource {
      * @return name of the font as specified in BaseFont key of font dictionary.
      */
     public String getName() {
-        return this.dictionary.getStringKey(ASAtom.BASE_FONT);
+        return this.fontName;
     }
 
     /**
