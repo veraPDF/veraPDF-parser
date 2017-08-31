@@ -49,8 +49,8 @@ public abstract class PDFont extends PDResource {
     protected FontProgram fontProgram;
     protected Encoding encoding = null;
     private boolean successfullyParsed = false;
-    String fontName;
-    ASAtom subtype;
+    private final String fontName;
+    private final ASAtom subtype;
 
     /**
      * Constructor from COSDictionary.
