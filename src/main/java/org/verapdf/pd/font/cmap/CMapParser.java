@@ -97,7 +97,6 @@ public class CMapParser extends PSParser {
                 }
                 break;
             case COS_NAME:
-                this.lastCOSName = object;
                 if (getToken().getValue().equals("usecmap")) {
                     CMap usedCMap = new PDCMap(lastCOSName).getCMapFile();
                     if (usedCMap != null) {
@@ -108,6 +107,7 @@ public class CMapParser extends PSParser {
                     }
                 } else {
                     PSObject.getPSObject(object).execute(operandStack, userDict);
+                    this.lastCOSName = object;
                 }
                 break;
             default:
