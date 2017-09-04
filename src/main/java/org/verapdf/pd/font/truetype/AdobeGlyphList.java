@@ -42,6 +42,7 @@ public class AdobeGlyphList {
     private static final String AGL_FILE = "/font/AdobeGlyphList.txt";
     private static final AGLUnicode EMPTY = new AGLUnicode(-1);
 
+    // initializes Adobe Glyph List with values from resource file.
     static {
         try {
             File aglFile;

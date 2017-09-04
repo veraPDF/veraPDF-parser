@@ -99,7 +99,6 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         if (nextObject.getType() == COSObjType.COS_NAME &&
                 nextObject.getString().equals(Type1StringConstants.EEXEC_STRING)) {
             this.skipSpaces();
-//                        long clearToMarkOffset = this.findOffsetCleartomark();
             Type1PrivateParser parser = null;
             try (ASInputStream eexecEncoded = this.source.getStreamUntilToken(
                     CLEAR_TO_MARK_BYTES)) {
@@ -169,10 +168,18 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         return this.successfullyParsed;
     }
 
+    /**
+     * @return encoding from embedded font program as array of strings.
+     * encoding[i] = glyphName <-> i has name glyphName.
+     */
     public String[] getEncoding() {
         return encoding;
     }
 
+    /**
+     * @return charset from embedded program, i. e. set of all glyph names
+     * defined in the embedded font program.
+     */
     public Set<String> getCharSet() {
         return this.glyphWidths.keySet();
     }
@@ -230,6 +237,10 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         }
     }
 
+    /**
+     * @return the closeable object that closes source stream of this font
+     * program.
+     */
     public ASFileStreamCloser getFontProgramResource() {
         return new ASFileStreamCloser(this.source);
     }

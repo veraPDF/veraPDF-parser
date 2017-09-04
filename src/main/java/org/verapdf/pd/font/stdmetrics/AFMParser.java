@@ -27,6 +27,8 @@ import org.verapdf.parser.Token;
 import java.io.IOException;
 
 /**
+ * Class that is used to parse Adobe Font Metrics files.
+ *
  * @author Sergey Shemyakov
  */
 public class AFMParser extends BaseParser {
@@ -52,7 +54,6 @@ public class AFMParser extends BaseParser {
     }
 
     public StandardFontMetrics parse() throws IOException {
-
         StandardFontMetrics res = new StandardFontMetrics();
         try {
             initializeToken();

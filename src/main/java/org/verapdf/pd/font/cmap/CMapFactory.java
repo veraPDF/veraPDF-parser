@@ -40,6 +40,13 @@ class CMapFactory {
         // Do nothing here
     }
 
+    /**
+     * Parses CMap from given stream with caching it.
+     *
+     * @param name is a string identifier of cMap that is used for caching.
+     * @param cMapStream is stream with cMap data.
+     * @return parsed cMap object.
+     */
     static CMap getCMap(String name, ASInputStream cMapStream) {
         CMap res;
         if (!name.isEmpty()) {

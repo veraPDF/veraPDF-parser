@@ -33,7 +33,6 @@ import java.io.IOException;
  */
 class CFFFileBaseParser {
 
-    private int offSize;
     protected SeekableInputStream source;
     protected CFFIndex definedNames;
 
@@ -86,7 +85,6 @@ class CFFFileBaseParser {
         readCard8();
         readCard8();
         int hdrSize = readCard8();
-        this.offSize = readCard8();
         this.source.seek(hdrSize);
     }
 

@@ -1,6 +1,8 @@
 package org.verapdf.pd.font.truetype;
 
 /**
+ * Represents pair of platform and encoding values for cmap table.
+ *
  * @author Sergey Shemyakov
  */
 public class PlatformEncodingPair {

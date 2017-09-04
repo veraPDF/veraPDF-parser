@@ -288,6 +288,12 @@ public abstract class PDFont extends PDResource {
         return cMapToUnicode(code);
     }
 
+    /**
+     * Gets toUnicode value just from toUnicode cMap.
+     *
+     * @param code is character code.
+     * @return Unicode value as specified in toUnicode cMap.
+     */
     public String cMapToUnicode(int code) {
         if (toUnicodeCMap == null) {
             this.toUnicodeCMap = new PDCMap(this.dictionary.getKey(ASAtom.TO_UNICODE));
