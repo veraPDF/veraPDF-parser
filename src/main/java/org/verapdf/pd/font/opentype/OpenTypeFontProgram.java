@@ -40,6 +40,7 @@ import java.io.IOException;
 public class OpenTypeFontProgram implements FontProgram {
 
     private static final long CFF = 1128678944;     // "CFF " read as 4-byte unsigned number
+    // See TrueTypeFontParser table logic
 
     private boolean isCFF;
     private boolean isSymbolic;

@@ -32,7 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents Type0 font on pd level.
+ * Represents Type0 font on pd level. Note that on the cos level object of this
+ * class is a COSDictionary of descendant font.
  *
  * @author Sergey Shemyakov
  */

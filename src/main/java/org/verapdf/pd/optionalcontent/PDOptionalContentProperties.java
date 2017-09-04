@@ -47,7 +47,8 @@ public class PDOptionalContentProperties extends PDObject {
 				COSObject obj = ocgs.at(i);
 				if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
 					COSDictionary ocgDict = (COSDictionary) obj.getDirectBase();
-					groups[i] = ocgDict.getStringKey(ASAtom.NAME);
+					String ocgName = ocgDict.getStringKey(ASAtom.NAME);
+					groups[i] = ocgName == null ? "" : ocgName;
 				}
 			}
 

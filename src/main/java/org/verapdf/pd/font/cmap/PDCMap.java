@@ -154,6 +154,9 @@ public class PDCMap extends PDObject {
         return this.getCIDSystemInfo().getIntegerKey(ASAtom.SUPPLEMENT);
     }
 
+    /**
+     * @return COSObject of the referenced cMap.
+     */
     public COSObject getUseCMap() {
         COSObject res = this.getObject().getKey(ASAtom.USE_CMAP);
         return res == null ? COSObject.getEmpty() : res;
@@ -231,6 +234,9 @@ public class PDCMap extends PDObject {
         }
     }
 
+    /**
+     * Gets Unicode value for this code.
+     */
     public String toUnicode(int code) {
         String res = null;
         if (this.getCMapFile() != null) {
@@ -245,6 +251,9 @@ public class PDCMap extends PDObject {
         return res;
     }
 
+    /**
+     * Checks if this cMap is identity.
+     */
     public boolean isIdentity() {
         if (isIdentity == null) {
             isIdentity = this.getCMapName().startsWith("Identity-");

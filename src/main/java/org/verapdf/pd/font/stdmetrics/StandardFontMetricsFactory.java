@@ -32,6 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Class that manages Adobe Font Metrics data loading.
+ *
  * @author Sergey Shemyakov
  */
 public class StandardFontMetricsFactory {
@@ -44,6 +46,9 @@ public class StandardFontMetricsFactory {
 
     private StandardFontMetricsFactory() {}
 
+    /**
+     * Gets font metrics for the font with given name.
+     */
     public static StandardFontMetrics getFontMetrics(String fontName) {
         StandardFontMetrics res = FONT_METRICS_MAP.get(fontName);
         if (res == null) {

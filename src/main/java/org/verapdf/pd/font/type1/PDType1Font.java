@@ -268,6 +268,14 @@ public class PDType1Font extends PDSimpleFont {
         return false;
     }
 
+    /**
+     * Get's Unicode value of character as it is described in PDF/A-1
+     * specification. The difference from usual toUnicode method is in standard
+     * encoding and symbol set lookups for the glyph name.
+     *
+     * @param code is code of character.
+     * @return Unicode value.
+     */
     public String toUnicodePDFA1(int code) {
         String unicodeString = super.cMapToUnicode(code);
         if(unicodeString != null) {
