@@ -72,11 +72,11 @@ public class ASFileInStream extends ASInputStream {
 
 	@Override
 	public int read(byte[] buffer, int sizeToRead) throws IOException {
-		if (sizeToRead == 0 || this.size != nPos && this.curPos >= this.size) {
+		if (sizeToRead == 0 && this.curPos >= this.size) {
 			return -1;
 		}
 
-		if (this.size != nPos && sizeToRead > this.size - this.curPos) {
+		if (sizeToRead > this.size - this.curPos) {
 			sizeToRead = (int) (this.size - this.curPos);
 		}
 
@@ -105,11 +105,11 @@ public class ASFileInStream extends ASInputStream {
 
 	@Override
 	public int skip(int size) throws IOException {
-		if (size == 0 || this.size != nPos && this.size <= this.curPos) {
+		if (size == 0 && this.size <= this.curPos) {
 			return 0;
 		}
 
-		if (this.size != nPos && size > this.size - this.curPos) {
+		if (size > this.size - this.curPos) {
 			size = (int) (this.size - this.curPos);
 		}
 

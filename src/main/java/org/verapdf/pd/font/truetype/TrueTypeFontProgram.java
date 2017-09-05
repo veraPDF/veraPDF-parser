@@ -39,7 +39,7 @@ import java.util.Map;
 public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProgram {
 
     private COSObject encoding;
-    protected boolean isSymbolic;
+    private boolean isSymbolic;
 
     /**
      * Constructor from stream containing font data, and encoding details.

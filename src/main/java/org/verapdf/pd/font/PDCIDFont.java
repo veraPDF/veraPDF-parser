@@ -180,7 +180,7 @@ public class PDCIDFont extends PDFont {
                             this.fontProgram = new CFFFontProgram(fontData, this.cMap, this.isSubset());
                             StaticResources.cacheFontProgram(key, this.fontProgram);
                         } else if (ASAtom.OPEN_TYPE == subtype.getName()) {
-                            ASAtom fontName = this.getFontName();
+                            ASAtom fontName = ASAtom.getASAtom(this.getName());
                             if (fontName == ASAtom.TRUE_TYPE || fontName == ASAtom.CID_FONT_TYPE2) {
                                 this.fontProgram = new OpenTypeFontProgram(
                                         fontData, false, this.isSymbolic(), this.getEncoding(),

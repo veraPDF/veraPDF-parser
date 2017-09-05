@@ -39,7 +39,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     private static final String NOTDEF_STRING = ".notdef";
 
-    private CMap externalCMap;  // in case if font is located in
+    private CMap externalCMap;  // in case if font is embedded into Type0 font
     private long encodingOffset;
     private int[] encoding;     // array with mapping code -> gid
     private boolean isStandardEncoding = false;

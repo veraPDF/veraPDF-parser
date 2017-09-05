@@ -51,7 +51,7 @@ public class EexecFilterDecode extends ASBufferedInFilter {
      * @param lenIV        is number of random bytes added to encoded data, value of
      *                     LenIV in Private dictionary.
      */
-    public EexecFilterDecode(ASInputStream stream, boolean isCharstring,
+    EexecFilterDecode(ASInputStream stream, boolean isCharstring,
                              int lenIV) throws IOException {
         super(stream);
         if (!isCharstring) {
@@ -69,7 +69,7 @@ public class EexecFilterDecode extends ASBufferedInFilter {
      * @param stream       is eexec-encoded stream.
      * @param isCharstring is true if passed stream is encoded charstring.
      */
-    public EexecFilterDecode(ASInputStream stream, boolean isCharstring) throws IOException {
+    EexecFilterDecode(ASInputStream stream, boolean isCharstring) throws IOException {
         this(stream, isCharstring, EEXEC_NUMBER_OF_RANDOM_BYTES);
     }
 
