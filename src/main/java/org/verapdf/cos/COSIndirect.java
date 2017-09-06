@@ -37,7 +37,7 @@ public class COSIndirect extends COSBase {
     private COSDocument document;
     private COSObject child;
 
-    protected COSIndirect() throws Exception {
+    protected COSIndirect() {
         super();
         this.key = new COSKey();
         this.document = new COSDocument(null);

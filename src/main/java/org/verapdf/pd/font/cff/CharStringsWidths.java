@@ -33,7 +33,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class handles obtaining glyph widths from cff charStrings.
+ * This class handles obtaining glyph widths from cff charStrings. If font is
+ * a subset, then all charstrings are parsed at initialization, else each
+ * charstring is parsed separately in getter.
  *
  * @author Sergey Shemyakov
  */
@@ -267,7 +269,7 @@ public class CharStringsWidths {
         return res;
     }
 
-    private boolean[] getIsDefaultFontMatrices(float[][] fontMatrices) {
+    private static boolean[] getIsDefaultFontMatrices(float[][] fontMatrices) {
         boolean[] res = new boolean[fontMatrices.length];
         for (int i = 0; i < fontMatrices.length; ++i) {
             res[i] = Arrays.equals(fontMatrices[i], CFFType1FontProgram.DEFAULT_FONT_MATRIX);

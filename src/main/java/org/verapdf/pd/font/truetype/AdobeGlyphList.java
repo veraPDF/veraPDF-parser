@@ -89,7 +89,7 @@ public class AdobeGlyphList {
                     line = stream.readLine();
                 } while (line != null);
             }
-            if (aglFile != null && isTempFile) {
+            if (isTempFile) {
                 aglFile.delete();
             }
         } catch (IOException e) {

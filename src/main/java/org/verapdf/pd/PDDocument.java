@@ -65,7 +65,7 @@ public class PDDocument {
 		this.document = new COSDocument(fileStream, this);
 	}
 
-	private void constructDocument() throws IOException {
+	private void constructDocument() {
 		document = new COSDocument(this);
 		document.setHeader(PDF_HEADER_DEFAULT);
 		//initialize catalog

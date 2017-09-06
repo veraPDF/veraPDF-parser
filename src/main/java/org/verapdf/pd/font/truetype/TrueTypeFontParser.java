@@ -141,7 +141,7 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         return postParser;
     }
 
-    public TrueTypeMaxpTable getMaxpParser() {
+    TrueTypeMaxpTable getMaxpParser() {
         return maxpParser;
     }
 

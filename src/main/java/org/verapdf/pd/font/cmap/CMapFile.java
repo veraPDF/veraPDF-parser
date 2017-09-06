@@ -57,7 +57,7 @@ public class CMapFile {
      * @return the value of the WMode entry in the embedded CMap file.
      * @throws IOException if problem with parsing CMap file occurs.
      */
-    public int getWMode() throws IOException {
+    public int getWMode() {
         if (cMap == null) {
             parseCMapFile();
         }

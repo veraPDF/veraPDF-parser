@@ -103,24 +103,6 @@ public abstract class PDFont extends PDResource {
     }
 
     /**
-     * @return font name defined by BaseFont entry in the font dictionary and
-     * FontName key in the font descriptor.
-     * @throws IllegalStateException if font names specified in font dictionary
-     *                               and font descriptor are different.
-     */
-    public ASAtom getFontName() {
-        ASAtom type = this.dictionary.getNameKey(ASAtom.BASE_FONT);
-        if (type != null) {
-            ASAtom typeFromDescriptor = fontDescriptor.getFontName();
-            if (type != typeFromDescriptor) {
-                LOGGER.log(Level.FINE, "Font names in font descriptor dictionary and in font dictionary are different for "
-                        + type.getValue());
-            }
-        }
-        return type;
-    }
-
-    /**
      * @return true if the font flags in the font descriptor dictionary mark
      * indicate that the font is symbolic (the entry /Flags has bit 3 set to 1
      * and bit 6 set to 0).
@@ -146,7 +128,7 @@ public abstract class PDFont extends PDResource {
      * @param e is value of Encoding key in font dictionary.
      * @return encoding object for given COSObject.
      */
-    public static Encoding getEncodingMappingFromCOSObject(COSObject e) {
+    private static Encoding getEncodingMappingFromCOSObject(COSObject e) {
         Encoding encodingObj;
         COSBase cosEncoding = e.getDirectBase();
         if (cosEncoding != null) {
@@ -175,13 +157,6 @@ public abstract class PDFont extends PDResource {
      */
     public COSObject getEncoding() {
         return this.dictionary.getKey(ASAtom.ENCODING);
-    }
-
-    /**
-     * @return COSStream with font file 2 taken from font descriptor.
-     */
-    public COSStream getFontFile2() {
-        return this.fontDescriptor.getFontFile2();
     }
 
     /**

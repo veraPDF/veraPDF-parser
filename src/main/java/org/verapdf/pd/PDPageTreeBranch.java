@@ -41,7 +41,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 	public PDPageTreeBranch() {
 		this.isTerminal = true;
 		this.leafCount = 0;
-		this.children = new ArrayList<PDPageTreeNode>();
+		this.children = new ArrayList<>();
 
 		super.setObject(new COSObject());
 	}
@@ -49,14 +49,14 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 	public PDPageTreeBranch(final COSObject obj) {
 		this.isTerminal = true;
 		this.leafCount = 0;
-		this.children = new ArrayList<PDPageTreeNode>();
+		this.children = new ArrayList<>();
 
 		super.setObject(obj);
 	}
 
 	private PDPageTreeBranch(final PDPageTreeBranch leftChild, final PDPageTreeBranch rightChild) {
 		this.isTerminal = false;
-		this.children = new ArrayList<PDPageTreeNode>();
+		this.children = new ArrayList<>();
 
 		initialize();
 		this.children.add(leftChild);
@@ -87,7 +87,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 
 	public PDPage findTerminalPDPage(int index) {
 		if (isTerminal) {
-			index = Math.min(index, (int) getLeafCount());
+			index = Math.min(index, leafCount);
 			return (PDPage) this.getChild(index);
 		}
 
@@ -105,7 +105,6 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 
 	public PDPageTreeBranch findTerminal(int index) {
 		if (isTerminal) {
-			index = Math.min(index, (int) getLeafCount());
 			return this;
 		}
 

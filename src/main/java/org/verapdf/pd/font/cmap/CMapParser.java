@@ -307,7 +307,6 @@ public class CMapParser extends PSParser {
             return this.getToken().getValue();
         } else if (getToken().type == Token.Type.TT_HEXSTRING) {
             byte[] token = getToken().getByteValue();
-            ;
             if (token.length == 1) {
                 return new String(token, "ISO-8859-1");
             }

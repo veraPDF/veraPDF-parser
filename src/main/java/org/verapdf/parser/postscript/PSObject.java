@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class represents executable PostScript object.
+ * This is the base class for PostScript object.
  *
  * @author Sergey Shemyakov
  */
@@ -17,18 +17,32 @@ public abstract class PSObject extends COSObject {
 
     private static final Logger LOGGER = Logger.getLogger(PSObject.class.getCanonicalName());
 
-    public PSObject(COSBase base) {
+    protected PSObject(COSBase base) {
         super(base);
     }
 
+    /**
+     * Executes PostScript object. For literal objects this execution means
+     * pushing object to operand stack, for operator and procedure objects
+     * execution mean execution of this operator or procedure.
+     *
+     * @param operandStack is stack for PostScript operands (see PostScript
+     *                     specification for further information).
+     * @param userDict is a dictionary that stores all key-value associated pair
+     *                 encountered during PostScript parsing. Full PostScript
+     *                 parser needs a dict stack, our implementation has only one
+     *                 dictionary.
+     */
     public abstract void execute(Stack<COSObject> operandStack,
                           Map<ASAtom, COSObject> userDict) throws PostScriptException;
 
+    /**
+     * Constructs PostScript object from COS object.
+     */
     public static PSObject getPSObject(COSObject obj) {
         return getPSObject(obj, false);
     }
 
-    // full PostScript parser needs a dict stack, our implementation has only one dict
     public static PSObject getPSObject(COSObject obj, boolean isExecutable) {
         if (obj instanceof PSObject) {
             return (PSObject) obj;

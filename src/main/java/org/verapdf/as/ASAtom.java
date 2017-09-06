@@ -32,8 +32,8 @@ import java.util.Map;
  */
 public class ASAtom implements Comparable<ASAtom> {
 
-    private static Map<String, ASAtom> predefinedPDFNames = new HashMap<>();
-    private static Map<String, ASAtom> cachedPDFNames = new HashMap<>();
+    private static final Map<String, ASAtom> PREDEFINED_PDF_NAMES = new HashMap<>();
+    private static final Map<String, ASAtom> CACHED_PDF_NAMES = new HashMap<>();
 
     // A
     public static final ASAtom A = new ASAtom("A");
@@ -606,10 +606,10 @@ public class ASAtom implements Comparable<ASAtom> {
     private ASAtom(String value, boolean predefinedValue) {
         this.value = value;
         if (predefinedValue) {
-            predefinedPDFNames.put(value, this);
+            PREDEFINED_PDF_NAMES.put(value, this);
         } else {
-            if (!cachedPDFNames.containsKey(value)) {
-                cachedPDFNames.put(value, this);
+            if (!CACHED_PDF_NAMES.containsKey(value)) {
+                CACHED_PDF_NAMES.put(value, this);
             }
         }
     }
@@ -625,14 +625,14 @@ public class ASAtom implements Comparable<ASAtom> {
             return null;
         }
 
-        if (predefinedPDFNames.containsKey(value)) {
-            return predefinedPDFNames.get(value);
-        } else if (cachedPDFNames.containsKey(value)) {
-            return cachedPDFNames.get(value);
+        if (PREDEFINED_PDF_NAMES.containsKey(value)) {
+            return PREDEFINED_PDF_NAMES.get(value);
+        } else if (CACHED_PDF_NAMES.containsKey(value)) {
+            return CACHED_PDF_NAMES.get(value);
         } else {
             ASAtom result = new ASAtom(value, false);
-            result.setValue(value);
-            cachedPDFNames.put(value, result);
+            result.value = value;
+            CACHED_PDF_NAMES.put(value, result);
             return result;
         }
     }
@@ -662,8 +662,8 @@ public class ASAtom implements Comparable<ASAtom> {
                 result += (char) c;
             } else {
                 result += '#';
-                result += (char) COSFilterASCIIHexEncode.asciiHexBig[c];
-                result += (char) COSFilterASCIIHexEncode.asciiHexLittle[c];
+                result += (char) COSFilterASCIIHexEncode.ASCII_HEX_BIG[c];
+                result += (char) COSFilterASCIIHexEncode.ASCII_HEX_LITTLE[c];
             }
         }
         return result;

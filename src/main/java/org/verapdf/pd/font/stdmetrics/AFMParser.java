@@ -46,7 +46,6 @@ public class AFMParser extends BaseParser {
     private static final String ITALIC_ANGLE_STRING = "ItalicAngle";
 
     private String fontName;
-    private int nGlyphs;
 
     public AFMParser(ASInputStream asInputStream, String fontName) throws IOException {
         super(asInputStream);
@@ -85,7 +84,7 @@ public class AFMParser extends BaseParser {
                 case START_CHAR_METRICS_STRING:
                     this.nextToken();
                     if (getToken().type == Token.Type.TT_INTEGER) {
-                        nGlyphs = (int) this.getToken().integer;
+                        int nGlyphs = (int) this.getToken().integer;
                         for (int i = 0; i < nGlyphs; ++i) {
                             readMetricsLine(res);
                         }

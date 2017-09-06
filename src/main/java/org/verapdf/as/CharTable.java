@@ -32,7 +32,7 @@ public class CharTable {
 	private static final byte NUMERIC = 4;
 	private static final byte OCTALDIGIT = 8;
 
-	private static final byte[] charAttributes = {
+	private static final byte[] CHAR_ATTRIBUTES = {
 		/*	0		NUL	*/	(0 | SPACE) ,
 		/*	1		SOH	*/	0 ,
 		/*	2		SIX	*/	0 ,
@@ -183,7 +183,7 @@ public class CharTable {
 	public static final byte ASCII_RIGHT_PAR = 41;
 
 	private static byte getAttributes(int c) {
-		return charAttributes[c];
+		return CHAR_ATTRIBUTES[c];
 	}
 
 	/**

@@ -9,14 +9,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
-import java.util.logging.Logger;
 
 /**
+ * PostScript parser that holds operand stack and user dictionary.
+ *
  * @author Sergey Shemyakov
  */
 public class PSParser extends NotSeekableCOSParser {
-
-    private static final Logger LOGGER = Logger.getLogger(PSParser.class.getCanonicalName());
 
     protected Map<ASAtom, COSObject> userDict = new HashMap<>();
     protected Stack<COSObject> operandStack = new Stack<>();
@@ -25,12 +24,6 @@ public class PSParser extends NotSeekableCOSParser {
         super(fileStream, true);
         userDict = new HashMap<>();
         operandStack = new Stack<>();
-    }
-
-    public void executeObject(COSObject object) throws PostScriptException {
-        while (!this.source.isEOF()) {
-            PSObject.getPSObject(object).execute(operandStack, userDict);
-        }
     }
 
     public COSObject getObjectFromUserDict(ASAtom key) {

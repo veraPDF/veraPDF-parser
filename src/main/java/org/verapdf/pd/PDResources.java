@@ -84,10 +84,7 @@ public class PDResources extends PDObject {
 
 	public boolean hasColorSpace(ASAtom name) {
 		COSObject colorSpace = getResource(ASAtom.COLORSPACE, name);
-		if (colorSpace != null && !colorSpace.empty()) {
-			return true;
-		}
-		return false;
+		return colorSpace != null && !colorSpace.empty();
 	}
 
 	public PDPattern getPattern(ASAtom name) {

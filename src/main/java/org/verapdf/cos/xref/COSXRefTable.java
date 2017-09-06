@@ -36,9 +36,9 @@ public class COSXRefTable {
     private int size;
 
     public COSXRefTable() {
-        this.all = new ArrayList<COSKey>();
-        this.n = new ArrayList<COSKey>();
-        this.f = new ArrayList<COSKey>();
+        this.all = new ArrayList<>();
+        this.n = new ArrayList<>();
+        this.f = new ArrayList<>();
         this.size = 1;
     }
 

@@ -73,8 +73,7 @@ public class ColorSpaceFactory {
         }
         COSObjType type = base.getType();
         if (type == COSObjType.COS_NAME) {
-            PDColorSpace cs = getColorSpaceFromName(base, resources, wasDefault);
-            return cs;
+            return getColorSpaceFromName(base, resources, wasDefault);
         } else if (type == COSObjType.COS_ARRAY) {
             return getColorSpaceFromArray(base, resources, wasDefault);
         } else if (type != null && type.isDictionaryBased()) {

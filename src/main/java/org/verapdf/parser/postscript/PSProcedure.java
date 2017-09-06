@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
+ * Class represents PostScript procedure. Notice that when it is read from
+ * PostScript program it is pushed to operand stack for later invocation.
+ *
  * @author Sergey Shemyakov
  */
 public class PSProcedure extends PSObject {

@@ -44,6 +44,10 @@ class Type1PrivateParser extends BaseParser {
 
     private static final Logger LOGGER = Logger.getLogger(Type1PrivateParser.class.getCanonicalName());
 
+    /**
+     * An integer specifying the number of random bytes at the beginning
+     * of charstrings for charstring encryption
+     */
     private int lenIV;
     private Map<String, Integer> glyphWidths;
     private double[] fontMatrix;
@@ -52,7 +56,7 @@ class Type1PrivateParser extends BaseParser {
     /**
      * {@inheritDoc}
      */
-    public Type1PrivateParser(InputStream stream, double[] fontMatrix) throws IOException {
+    Type1PrivateParser(InputStream stream, double[] fontMatrix) throws IOException {
         super(stream);
         this.fontMatrix = fontMatrix;
         isDefaultFontMatrix = Arrays.equals(this.fontMatrix,
@@ -134,14 +138,6 @@ class Type1PrivateParser extends BaseParser {
         }
     }
 
-    /**
-     * @return an integer specifying the number of random bytes at the beginning
-     * of charstrings for charstring encryption
-     */
-    public int getLenIV() {
-        return lenIV;
-    }
-
     private void decodeCharString() throws IOException {
         if (glyphWidths == null) {
             this.glyphWidths = new HashMap<>();
@@ -169,7 +165,7 @@ class Type1PrivateParser extends BaseParser {
         this.source.skip((int) charstringLength);
         try (ASInputStream chunk = this.source.getStream(beginOffset, charstringLength);
              ASInputStream eexecDecode = new EexecFilterDecode(
-                     chunk, true, this.getLenIV()); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
+                     chunk, true, this.lenIV); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
             Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
             if (parser.getWidth() != null) {
                 if (!isDefaultFontMatrix) {

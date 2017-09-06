@@ -34,7 +34,7 @@ public class COSXRefSection {
 	private Map<Integer, COSXRefEntry> entries;
 
 	public COSXRefSection() {
-		this.entries = new TreeMap<Integer, COSXRefEntry>();
+		this.entries = new TreeMap<>();
 		this.entries.put(0, new COSXRefEntry(0, 65535, 'f'));
 	}
 
@@ -79,7 +79,7 @@ public class COSXRefSection {
 	}
 
 	public List<COSXRefRange> getRange() {
-		List<COSXRefRange> result = new ArrayList<COSXRefRange>();
+		List<COSXRefRange> result = new ArrayList<>();
 
 		if (this.entries.isEmpty()) {
 			return result;
@@ -92,7 +92,6 @@ public class COSXRefSection {
 			nextSegment = iterator.next().getKey();
 			if (nextSegment == segment.next()) {
 				segment.count++;
-				continue;
 			} else {
 				result.add(segment);
 				segment = new COSXRefRange(nextSegment);
@@ -111,7 +110,7 @@ public class COSXRefSection {
 		this.entries.put(number, entry);
 	}
 
-	private void removeIfNumberEqual(final List<COSKey> keys, final int number) {
+	private static void removeIfNumberEqual(final List<COSKey> keys, final int number) {
 		for (COSKey key : keys) {
 			if (key.getNumber() == number) {
 				keys.remove(number);

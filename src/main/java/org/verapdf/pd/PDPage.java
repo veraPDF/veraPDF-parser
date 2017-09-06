@@ -143,7 +143,7 @@ public class PDPage extends PDPageTreeNode {
         return res;
     }
 
-    private double[] getDoubleArrayForBox(COSArray array) {
+    private static double[] getDoubleArrayForBox(COSArray array) {
         if (array == null) {
             return null;
         }

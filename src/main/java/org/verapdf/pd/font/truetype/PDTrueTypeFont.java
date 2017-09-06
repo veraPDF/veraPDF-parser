@@ -59,41 +59,42 @@ public class PDTrueTypeFont extends PDSimpleFont {
         if (!this.isFontParsed) {
             this.isFontParsed = true;
             if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE2)) {
-                COSStream trueTypeFontFile = fontDescriptor.getFontFile2();
-                COSKey key = trueTypeFontFile.getObjectKey();
-                this.fontProgram = StaticResources.getCachedFont(key);
-                if (fontProgram == null) {
-                    try (ASInputStream fontData = trueTypeFontFile.getData(
-                            COSStream.FilterFlags.DECODE)) {
-                        this.fontProgram = new TrueTypeFontProgram(fontData, this.isSymbolic(),
-                                this.getEncoding());
-                        StaticResources.cacheFontProgram(key, this.fontProgram);
-                    } catch (IOException e) {
-                        LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
-                    }
-                }
+                parseTrueTypeFontProgram(ASAtom.FONT_FILE2);
             } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
-                COSStream trueTypeFontFile = fontDescriptor.getFontFile3();
-                ASAtom subtype = trueTypeFontFile.getNameKey(ASAtom.SUBTYPE);
-                COSKey key = trueTypeFontFile.getObjectKey();
-                this.fontProgram = StaticResources.getCachedFont(key);
-                if (fontProgram == null) {
-                    if (subtype == ASAtom.OPEN_TYPE) {
-                        try (ASInputStream fontData = trueTypeFontFile.getData(
-                                COSStream.FilterFlags.DECODE)) {
-                            this.fontProgram = new OpenTypeFontProgram(fontData, false,
-                                    this.isSymbolic(), this.getEncoding(), null, this.isSubset());
-                            StaticResources.cacheFontProgram(key, this.fontProgram);
-                        } catch (IOException e) {
-                            LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
-                        }
-                    }
-                }
+                parseTrueTypeFontProgram(ASAtom.FONT_FILE3);
             } else {
                 this.fontProgram = null;
             }
         }
         return this.fontProgram;
+    }
+
+    private void parseTrueTypeFontProgram(ASAtom fontFileType) {
+        COSStream trueTypeFontFile = null;
+        if (fontFileType == ASAtom.FONT_FILE2) {
+            trueTypeFontFile = fontDescriptor.getFontFile2();
+        } else if (fontFileType == ASAtom.FONT_FILE3) {
+            trueTypeFontFile = fontDescriptor.getFontFile3();
+        }
+        if (trueTypeFontFile != null) {
+            COSKey key = trueTypeFontFile.getObjectKey();
+            this.fontProgram = StaticResources.getCachedFont(key);
+            if (fontProgram == null) {
+                try (ASInputStream fontData = trueTypeFontFile.getData(
+                        COSStream.FilterFlags.DECODE)) {
+                    if (fontFileType == ASAtom.FONT_FILE2) {
+                        this.fontProgram = new TrueTypeFontProgram(fontData, this.isSymbolic(),
+                                this.getEncoding());
+                    } else {    // fontFile3
+                        this.fontProgram = new OpenTypeFontProgram(fontData, false,
+                                this.isSymbolic(), this.getEncoding(), null, this.isSubset());
+                    }
+                    StaticResources.cacheFontProgram(key, this.fontProgram);
+                } catch (IOException e) {
+                    LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
+                }
+            }
+        }
     }
 
     @Override

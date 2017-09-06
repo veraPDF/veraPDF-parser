@@ -281,7 +281,7 @@ public class COSStream extends COSDictionary {
 		if(obj instanceof COSObject) {
 			return this.equals(((COSObject) obj).get());
 		}
-		List<COSBasePair> checkedObjects = new LinkedList<COSBasePair>();
+		List<COSBasePair> checkedObjects = new LinkedList<>();
 		return this.equals(obj, checkedObjects);
 	}
 

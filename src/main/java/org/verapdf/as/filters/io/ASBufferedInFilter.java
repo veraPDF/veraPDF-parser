@@ -31,6 +31,14 @@ import java.util.Arrays;
 
 /**
  * Class provides buffered input from input stream.
+ * It has two uses. If the ASBufferedInFilter object is used as a buffered
+ * stream (e. g. in unseekable parsers) then the buffer holds DECODED bytes read
+ * from inlaying stream.
+ * Before using the ASBufferedInFilter in this make sure to call initialize()
+ * method.
+ *
+ * In filter classes that are inherited from ASBufferedInFilter the buffer holds
+ * ENCODED bytes that are processed into decoded bytes on read() method calls.
  *
  * @author Sergey Shemyakov
  */
@@ -61,7 +69,7 @@ public class ASBufferedInFilter extends ASInFilter {
         this(stream, BF_BUFFER_SIZE);
     }
 
-    public ASBufferedInFilter(ASInputStream stream, int buffCapacity) throws IOException {
+    public ASBufferedInFilter(ASInputStream stream, int buffCapacity) {
         super(stream);
         this.bufferCapacity = buffCapacity;
         buffer = new byte[buffCapacity];
@@ -283,9 +291,6 @@ public class ASBufferedInFilter extends ASInFilter {
         System.arraycopy(one, 0, res, 0, lengthOne);
         System.arraycopy(two, 0, res, lengthOne, lengthTwo);
         return res;
-    }
-
-    protected void decode() throws IOException {
     }
 
     /**

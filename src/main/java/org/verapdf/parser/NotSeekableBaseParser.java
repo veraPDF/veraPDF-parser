@@ -88,7 +88,7 @@ public class NotSeekableBaseParser implements Closeable {
         return this.token;
     }
 
-    protected String getLine() throws IOException {
+    protected void readLine() throws IOException {
         initializeToken();
         this.token.clearValue();
         byte ch = this.source.readByte();
@@ -99,11 +99,10 @@ public class NotSeekableBaseParser implements Closeable {
             appendToToken(ch);
             ch = this.source.readByte();
         }
-        return this.token.getValue();
     }
 
     protected byte[] getLineBytes() throws IOException {
-        getLine();
+        readLine();
         return this.token.getByteValue();
     }
 
@@ -183,7 +182,7 @@ public class NotSeekableBaseParser implements Closeable {
                 if (ch == '>') {
                     this.token.type = Token.Type.TT_CLOSEDICT;
                 } else {
-                    // error
+                    throw new IOException("Unknown symbol " + ch + " after \'>\'");
                 }
                 break;
             case '[':
@@ -422,9 +421,7 @@ public class NotSeekableBaseParser implements Closeable {
         boolean odd = false;
         while (!this.source.isEOF()) {
             ch = this.source.readByte();
-            if (CharTable.isSpace(ch)) {
-                continue;
-            } else if (ch == '>') {
+            if (ch == '>') {
                 if (odd) {
                     uc <<= 4;
                     appendToToken(uc);
@@ -432,7 +429,7 @@ public class NotSeekableBaseParser implements Closeable {
                 this.token.setContainsOnlyHex(containsOnlyHex);
                 this.token.setHexCount(Long.valueOf(hexCount));
                 return;
-            } else {
+            } else if (!CharTable.isSpace(ch)) {
                 hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
                 hexCount++;
                 if (hex < 16 && hex > -1) { // skip all non-Hex characters
@@ -497,10 +494,10 @@ public class NotSeekableBaseParser implements Closeable {
                 byte ch1, ch2;
                 byte dc;
                 ch1 = this.source.readByte();
-                if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.er) {
+                if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.ER) {
                     dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
                     ch2 = this.source.readByte();
-                    if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.er) {
+                    if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.ER) {
                         dc = (byte) ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
                         appendToToken(dc);
                     } else {

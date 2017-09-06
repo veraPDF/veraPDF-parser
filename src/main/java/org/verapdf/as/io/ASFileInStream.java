@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
+ * Class for getting a stream as a part of a file without copying a file.
+ *
  * @author Timur Kamalov
  */
 public class ASFileInStream extends ASInputStream {
@@ -41,6 +43,19 @@ public class ASFileInStream extends ASInputStream {
 	private boolean isTempFile;
 	private String filePath;
 
+	/**
+	 * Creates ASFileInStream that is a substream of RandomAccessFile stream.
+	 *
+	 * @param stream is file stream.
+	 * @param offset is the offset ot the beginning of data.
+	 * @param size is the length of data chunk.
+	 * @param numOfFileUsers is amount of streams that use the passed
+	 *                       RandomAccessFile as a resource. It helps to
+	 *                       determine when the file stream should be closed.
+	 * @param filePath is the path to file that is a resource for stream.
+	 * @param isTempFile is true if the resource file is a temporary file and
+	 *                   should be deleted when closing resource.
+	 */
 	public ASFileInStream(RandomAccessFile stream, final long offset, final long size,
 						  IntReference numOfFileUsers, String filePath, boolean isTempFile) {
 		this.stream = stream;
@@ -72,11 +87,11 @@ public class ASFileInStream extends ASInputStream {
 
 	@Override
 	public int read(byte[] buffer, int sizeToRead) throws IOException {
-		if (sizeToRead == 0 || this.size != nPos && this.curPos >= this.size) {
+		if (sizeToRead == 0 || this.curPos >= this.size) {
 			return -1;
 		}
 
-		if (this.size != nPos && sizeToRead > this.size - this.curPos) {
+		if (sizeToRead > this.size - this.curPos) {
 			sizeToRead = (int) (this.size - this.curPos);
 		}
 
@@ -105,11 +120,11 @@ public class ASFileInStream extends ASInputStream {
 
 	@Override
 	public int skip(int size) throws IOException {
-		if (size == 0 || this.size != nPos && this.size <= this.curPos) {
+		if (size == 0 || this.size <= this.curPos) {
 			return 0;
 		}
 
-		if (this.size != nPos && size > this.size - this.curPos) {
+		if (size > this.size - this.curPos) {
 			size = (int) (this.size - this.curPos);
 		}
 

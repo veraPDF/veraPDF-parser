@@ -134,7 +134,7 @@ public class CIDToGIDMapping {
         }
     }
 
-    private List<Integer> readEndOfMapping(ASInputStream stream, int b) throws IOException {
+    private static List<Integer> readEndOfMapping(ASInputStream stream, int b) throws IOException {
         List<Integer> res = new ArrayList<>();
         while (b != -1) {
             int num = b;

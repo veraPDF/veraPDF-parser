@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 /**
- * This class binds the ASInputStream interface to a memory buffer.
+ * This class binds the SeekableInputStream interface to a memory buffer.
  *
  * @author Sergey Shemyakov
  */

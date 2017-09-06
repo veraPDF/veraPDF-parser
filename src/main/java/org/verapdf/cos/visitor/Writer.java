@@ -34,7 +34,6 @@ import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -77,8 +76,8 @@ public class Writer implements IVisitor {
 		this.os = new InternalOutputStream(filename);
 		this.info = new COSXRefInfo();
 
-		this.toWrite = new ArrayList<COSKey>();
-		this.written = new ArrayList<COSKey>();
+		this.toWrite = new ArrayList<>();
+		this.written = new ArrayList<>();
 
 		this.incrementalOffset = incrementalOffset;
 
@@ -192,7 +191,7 @@ public class Writer implements IVisitor {
 	}
 
 	public void visitFromStream(COSStream obj) {
-		long length = 0;
+		long length;
 
 		ASInputStream in = obj.getData();
 
@@ -216,7 +215,7 @@ public class Writer implements IVisitor {
 			length = getOffset();
 
 			byte[] buffer = new byte[1024];
-			long count = 0;
+			long count;
 
 			in.reset();
 
@@ -411,11 +410,7 @@ public class Writer implements IVisitor {
 			COSObject idString = COSString.construct(md5.digest(), true);
 			//TODO : convert to COSArray
 			this.info.getTrailer().setID(idString);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (NoSuchAlgorithmException | IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -428,7 +423,7 @@ public class Writer implements IVisitor {
 		this.info.getXRefSection().add(getKeyToWrite(key), offset, free);
 	}
 
-	public void addXRef(final COSKey key) throws IOException {
+	public void addXRef(final COSKey key) {
 		addXRef(key, getOffset() + incrementalOffset, 'n');
 	}
 
@@ -461,7 +456,7 @@ public class Writer implements IVisitor {
 		this.write(newKey.getNumber()); this.write(" "); this.write(newKey.getGeneration());
 	}
 
-	protected void write(final COSObject value) throws IOException {
+	protected void write(final COSObject value) {
 		value.accept(this);
 	}
 
@@ -482,9 +477,9 @@ public class Writer implements IVisitor {
 
 	protected void write(final COSXRefSection value) throws IOException {
 		List<COSXRefRange> range = value.getRange();
-		for (int i = 0; i < range.size(); i++) {
-			write(range.get(i));
-			for (int j = range.get(i).start; j < range.get(i).next(); j++) {
+		for (COSXRefRange entry : range) {
+			write(entry);
+			for (int j = entry.start; j < entry.next(); j++) {
 				this.write(value.getEntry(j));
 			}
 		}
