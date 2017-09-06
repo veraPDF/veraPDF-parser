@@ -145,7 +145,7 @@ public abstract class BaseCharStringParser {
      * @param num is amount of numbers to be popped.
      * @throws IOException if stream reading error occurs.
      */
-    protected void popStack(int num) throws IOException {
+    protected void popStack(int num) {
         for (int i = 0; i < num && !this.stack.empty(); ++i) {
             this.stack.pop();
         }

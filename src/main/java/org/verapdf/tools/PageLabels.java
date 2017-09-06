@@ -62,22 +62,22 @@ public class PageLabels {
 
 	private static class PageLabelDictionary {
 
-		private final static TreeMap<Integer, String> map = new TreeMap<>();
+		private final static TreeMap<Integer, String> MAP = new TreeMap<>();
 
 		static {
-			map.put(1000, "M");
-			map.put(900, "CM");
-			map.put(500, "D");
-			map.put(400, "CD");
-			map.put(100, "C");
-			map.put(90, "XC");
-			map.put(50, "L");
-			map.put(40, "XL");
-			map.put(10, "X");
-			map.put(9, "IX");
-			map.put(5, "V");
-			map.put(4, "IV");
-			map.put(1, "I");
+			MAP.put(1000, "M");
+			MAP.put(900, "CM");
+			MAP.put(500, "D");
+			MAP.put(400, "CD");
+			MAP.put(100, "C");
+			MAP.put(90, "XC");
+			MAP.put(50, "L");
+			MAP.put(40, "XL");
+			MAP.put(10, "X");
+			MAP.put(9, "IX");
+			MAP.put(5, "V");
+			MAP.put(4, "IV");
+			MAP.put(1, "I");
 		}
 
 		private final ASAtom type;
@@ -135,8 +135,8 @@ public class PageLabels {
 			int curr = pageNumber;
 			StringBuilder builder = new StringBuilder();
 			while (curr > 0) {
-				int floor =  map.floorKey(curr);
-				builder.append(map.get(floor));
+				int floor =  MAP.floorKey(curr);
+				builder.append(MAP.get(floor));
 				curr -= floor;
 			}
 			return builder.toString();

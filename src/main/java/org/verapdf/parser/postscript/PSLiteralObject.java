@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
- * Class for executing PostScript objects.
+ * Class for literal PostScript objects. These objects are just pushed to
+ * operand stack while executed.
  *
  * @author Sergey Shemyakov
  */

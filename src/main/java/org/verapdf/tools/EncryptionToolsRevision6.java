@@ -157,9 +157,9 @@ public class EncryptionToolsRevision6 {
 
     private static int getReminderByModulo3(byte[] array) {
         int res = 0;
-        for (int i = 0; i < array.length; ++i) {
+        for (byte b : array) {
             // 256 = 1 mod 3, so x * (256^n) = x mod 3
-            res += array[i] & 0xFF;
+            res += b & 0xFF;
         }
         return res % 3;
     }

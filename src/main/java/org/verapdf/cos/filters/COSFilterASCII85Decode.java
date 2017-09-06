@@ -71,7 +71,7 @@ public class COSFilterASCII85Decode extends ASBufferedInFilter {
             if (fiveBytes == null) {
                 break;
             }
-            int decoded = decodeFiveBytes(fiveBytes, fourBytes);
+            int decoded = decodeFiveBytes(fiveBytes);
             int availableBytes = size - pointer;
             int bytesToCopy = Math.min(availableBytes, decoded);
             System.arraycopy(fourBytes, 0, buffer, pointer, bytesToCopy);
@@ -94,10 +94,10 @@ public class COSFilterASCII85Decode extends ASBufferedInFilter {
         return bytesToRead;
     }
 
-    private int decodeFiveBytes(byte[] fiveBytes, byte[] fourBytes) {
+    private int decodeFiveBytes(byte[] fiveBytes) {
         long value = 0;
-        for (int i = 0; i < fiveBytes.length; ++i) {
-            value += fiveBytes[i] - '!';
+        for (byte b : fiveBytes) {
+            value += b - '!';
             value *= 85;
         }
         for (int i = 0; i < 5 - fiveBytes.length; ++i) { // This processes situation of last portion of bytes that can have length != 5.

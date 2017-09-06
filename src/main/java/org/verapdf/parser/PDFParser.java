@@ -181,9 +181,7 @@ public class PDFParser extends COSParser {
             while (!CharTable.isSpace(this.source.read())) {
                 source.unread(2);
             }
-
-            COSObject linDict = getObject(source.getOffset());
-            return linDict;
+            return getObject(source.getOffset());
         }
 		return null;
     }

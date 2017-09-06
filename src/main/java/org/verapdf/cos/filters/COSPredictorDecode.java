@@ -34,10 +34,10 @@ import java.io.IOException;
  */
 public class COSPredictorDecode extends ASBufferedInFilter {
 
-    public static final byte PREDICTOR_DEFAULT = 1;
-    public static final int COLORS_DEFAULT = 1;
-    public static final int BITS_PER_COMPONENT_DEFAULT = 8;
-    public static final int COLUMNS_DEFAULT = 1;
+    private static final byte PREDICTOR_DEFAULT = 1;
+    private static final int COLORS_DEFAULT = 1;
+    private static final int BITS_PER_COMPONENT_DEFAULT = 8;
+    private static final int COLUMNS_DEFAULT = 1;
 
     private int bitsPerComponent, bytesPerChar,
             lineLength;
@@ -214,7 +214,7 @@ public class COSPredictorDecode extends ASBufferedInFilter {
         return outputPointer;
     }
 
-    private byte predictorFromParams(COSDictionary decodeParams) {
+    private static byte predictorFromParams(COSDictionary decodeParams) {
         if (decodeParams.knownKey(ASAtom.PREDICTOR)) {
             return (byte) decodeParams.getIntegerKey(ASAtom.PREDICTOR).intValue();
         } else {
@@ -222,7 +222,7 @@ public class COSPredictorDecode extends ASBufferedInFilter {
         }
     }
 
-    private int colorsFromParams(COSDictionary decodeParams) {
+    private static int colorsFromParams(COSDictionary decodeParams) {
         if (decodeParams.knownKey(ASAtom.COLORS)) {
             return decodeParams.getIntegerKey(ASAtom.COLORS).intValue();
         } else {
@@ -230,7 +230,7 @@ public class COSPredictorDecode extends ASBufferedInFilter {
         }
     }
 
-    private int bitsFromParams(COSDictionary decodeParams) {
+    private static int bitsFromParams(COSDictionary decodeParams) {
         if (decodeParams.knownKey(ASAtom.BITS_PER_COMPONENT)) {
             return decodeParams.getIntegerKey(ASAtom.BITS_PER_COMPONENT).intValue();
         } else {
@@ -238,7 +238,7 @@ public class COSPredictorDecode extends ASBufferedInFilter {
         }
     }
 
-    private int columnsFromParams(COSDictionary decodeParams) {
+    private static int columnsFromParams(COSDictionary decodeParams) {
         if (decodeParams.knownKey(ASAtom.COLUMNS)) {
             return decodeParams.getIntegerKey(ASAtom.COLUMNS).intValue();
         } else {

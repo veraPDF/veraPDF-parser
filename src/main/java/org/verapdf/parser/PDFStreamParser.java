@@ -267,7 +267,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		skipSpaces();
 
 		//maximum possible length of an operator is 3 and we'll leave some space for invalid cases
-		StringBuffer buffer = new StringBuffer(5);
+		StringBuilder buffer = new StringBuilder(5);
 		byte nextByte = source.peek();
 		while (!source.isEOF() &&
 				!CharTable.isSpace(nextByte) && nextByte != ']' &&

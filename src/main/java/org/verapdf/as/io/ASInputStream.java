@@ -82,6 +82,9 @@ public abstract class ASInputStream extends InputStream {
 	 */
 	public abstract void decrementResourceUsers();
 
+	/**
+	 * Creates copy of stream. The two streams can be closed separately.
+	 */
 	public static ASInputStream createStreamFromStream(ASInputStream stream) {
 		return new ASInputStreamWrapper(stream);
 	}

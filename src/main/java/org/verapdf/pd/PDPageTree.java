@@ -33,7 +33,7 @@ public class PDPageTree {
 		this.root = new PDPageTreeBranch();
 	}
 
-	public PDPageTree(final COSObject object) throws Exception {
+	public PDPageTree(final COSObject object) {
 		this.root = new PDPageTreeBranch(object);
 	}
 
@@ -42,28 +42,27 @@ public class PDPageTree {
 	}
 
 	public COSObject getObject() {
-		return this.getRoot().getObject();
+		return this.root.getObject();
 	}
 
 	public void setObject(final COSObject object) {
-		this.getRoot().setObject(object);
+		this.root.setObject(object);
 	}
 
 	public boolean empty() {
-		return this.getRoot().empty();
+		return this.root.empty();
 	}
 
 	public int getPageCount() {
-		return this.getRoot().getLeafCount();
+		return this.root.getLeafCount();
 	}
 
 	public PDPage getPage(final int index) {
 		if (index < this.getPageCount()) {
-			final int totalIndex = index;
-			final PDPage page = this.getRoot().findTerminalPDPage(index);
+			final PDPage page = this.root.findTerminalPDPage(index);
 			if (page != null) {
 				page.pageNumber = index;
-				page.pagesTotal = totalIndex;
+				page.pagesTotal = index;
 			}
 			return page;
 		} else {
@@ -80,10 +79,10 @@ public class PDPageTree {
 	}
 
 	public boolean addPage(final PDPage page, final int insertAt) {
-		final PDPageTreeBranch branch = this.getRoot().findTerminal(insertAt);
+		final PDPageTreeBranch branch = this.root.findTerminal(insertAt);
 
 		if (branch.insertLeaf(page, insertAt)) {
-			this.root = this.getRoot().getParent();
+			this.root = this.root.getParent();
 			return true;
 		}
 		return false;

@@ -25,7 +25,7 @@ package org.verapdf.cos.filters;
  */
 public class COSFilterASCIIHexEncode {
 
-	public static char[] asciiHexBig = {
+	public static final char[] ASCII_HEX_BIG = {
 			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
 			'1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1',
 			'2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2',
@@ -44,7 +44,7 @@ public class COSFilterASCIIHexEncode {
 			'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F',
 	};
 
-	public static char[] asciiHexLittle = {
+	public static final char[] ASCII_HEX_LITTLE = {
 			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
 			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
 			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',

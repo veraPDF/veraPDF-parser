@@ -34,7 +34,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
 
     protected COSArray() {
         super();
-        this.entries = new ArrayList<COSObject>();
+        this.entries = new ArrayList<>();
     }
 
     protected COSArray(final int size, final COSObject[] values) {
@@ -44,7 +44,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
 
     protected COSArray(final int size, final double[] values) {
         super();
-        this.entries = new ArrayList<COSObject>();
+        this.entries = new ArrayList<>();
         for (double value : values) {
             this.entries.add(COSReal.construct(value));
         }
@@ -52,7 +52,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
 
     protected COSArray(final int i, final COSObject object) {
         super();
-        this.entries = new ArrayList<COSObject>();
+        this.entries = new ArrayList<>();
         this.entries.add(i, object);
     }
 
@@ -176,7 +176,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        List<COSBasePair> checkedObjects = new LinkedList<COSBasePair>();
+        List<COSBasePair> checkedObjects = new LinkedList<>();
         return this.equals(obj, checkedObjects);
 
     }

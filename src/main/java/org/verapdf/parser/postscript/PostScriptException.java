@@ -1,6 +1,8 @@
 package org.verapdf.parser.postscript;
 
 /**
+ * Exception that occurs during PostScript program parsing.
+ *
  * @author Sergey Shemyakov
  */
 public class PostScriptException extends Exception {

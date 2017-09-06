@@ -219,7 +219,7 @@ class XrefStreamParser {
      * @param num is byte array to be converted.
      * @return long obtained from given bytes.
      */
-    private long numberFromBytes(byte[] num) {
+    private static long numberFromBytes(byte[] num) {
         long res = 0;
         for (int i = 0; i < num.length; ++i) {
             res += (num[i] & 0x00FF) << ((num.length - i - 1) * 8);

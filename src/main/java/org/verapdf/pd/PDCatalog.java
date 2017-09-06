@@ -32,7 +32,6 @@ import org.verapdf.pd.optionalcontent.PDOptionalContentProperties;
 import org.verapdf.pd.structure.PDStructTreeRoot;
 import org.verapdf.tools.PageLabels;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +48,7 @@ public class PDCatalog extends PDObject {
 		this.pages = new PDPageTree();
 	}
 
-	public PDCatalog(final COSObject object) throws IOException {
+	public PDCatalog(final COSObject object) {
 		super(object);
 		this.pages = new PDPageTree();
 	}

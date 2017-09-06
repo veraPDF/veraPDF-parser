@@ -57,7 +57,6 @@ public class PDPageTreeNode extends PDObject {
 			return null;
 		}
 
-		index += this.parent.getIndex(this);
 		return parent;
 	}
 

@@ -36,7 +36,8 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 
 /**
- * This filter decrypts data using AES cipher.
+ * This filter decrypts data using AES cipher as described in Algorithm 1 of
+ * 7.6.2 of ISO 32000:2008.
  *
  * @author Sergey Shemyakov
  */

@@ -189,7 +189,7 @@ public class PSOperator extends PSObject {
         }
     }
 
-    private void counttomark() throws PostScriptException {
+    private void counttomark() {
         // check behaviour in case of missing mark
         long res = 0;
         for (int i = operandStack.size() - 1; i >= 0; --i) {
@@ -271,7 +271,7 @@ public class PSOperator extends PSObject {
         throw new PostScriptException("Can't execute length operator");
     }
 
-    private void def() throws PostScriptException {
+    private void def() {
         if (operandStack.size() > 1) {
             COSObject value = operandStack.pop();
             COSObject key = operandStack.pop();

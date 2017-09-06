@@ -28,6 +28,9 @@ import org.verapdf.tools.IntReference;
 import java.io.*;
 
 /**
+ * ASInputStream for reading data from file.
+ * It contains methods for file closing management.
+ *
  * @author Timur Kamalov
  */
 public class InternalInputStream extends SeekableInputStream {
@@ -169,7 +172,7 @@ public class InternalInputStream extends SeekableInputStream {
 		return this.source;
 	}
 
-	private File createTempFile(InputStream input) throws IOException {
+	private static File createTempFile(InputStream input) throws IOException {
 		FileOutputStream output = null;
 		try {
 			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
@@ -192,7 +195,7 @@ public class InternalInputStream extends SeekableInputStream {
 		}
 	}
 
-	private File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
+	private static File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
 		FileOutputStream output = null;
 		File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
 		tmpFile.deleteOnExit();

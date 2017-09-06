@@ -3,7 +3,8 @@ package org.verapdf.parser.postscript;
 import org.verapdf.cos.COSObject;
 
 /**
- * Object represents operand stack mark.
+ * Object represents operand stack mark. It is used for performing stack
+ * operators.
  *
  * @author Sergey Shemyakov
  */

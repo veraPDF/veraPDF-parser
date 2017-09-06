@@ -213,7 +213,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         }
     }
 
-    private void readWidths() throws IOException {
+    private void readWidths() {
         CFFCharStringsHandler charStrings = new CFFCharStringsHandler(
                 this.charStrings, this.charStringsOffset, this.source);
         this.widths = new CharStringsWidths(this.isSubset, this.charStringType,

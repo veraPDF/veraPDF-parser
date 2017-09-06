@@ -32,7 +32,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
- * Filter that decrypts data using RC4 cipher decryption.
+ * Filter that decrypts data using RC4 cipher decryption according to Algorithm
+ * 1 of 7.6.2 of ISO 32000:2008.
  *
  * @author Sergey Shemyakov
  */
