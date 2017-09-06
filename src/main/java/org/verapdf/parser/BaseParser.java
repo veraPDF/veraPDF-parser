@@ -487,7 +487,7 @@ public class BaseParser {
 				this.token.setContainsOnlyHex(containsOnlyHex);
 				this.token.setHexCount(Long.valueOf(hexCount));
 				return;
-			} else {
+			} else if (!CharTable.isSpace(ch)) {
 				hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
 				hexCount++;
 				if (hex < 16 && hex > -1) { // skip all non-Hex characters
