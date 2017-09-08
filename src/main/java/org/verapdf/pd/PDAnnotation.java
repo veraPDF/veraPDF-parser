@@ -21,11 +21,16 @@
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.exceptions.LoopedException;
 import org.verapdf.pd.actions.PDAction;
 import org.verapdf.pd.actions.PDAnnotationAdditionalActions;
 import org.verapdf.tools.TypeConverter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Maksim Bezrukov
@@ -61,7 +66,22 @@ public class PDAnnotation extends PDObject {
 	}
 
 	public ASAtom getFT() {
-		return getObject().getNameKey(ASAtom.FT);
+		Set<COSKey> visitedKeys = new HashSet<>();
+		COSObject curr = getObject();
+		while (curr != null && curr.getType().isDictionaryBased()) {
+			COSKey key = curr.getObjectKey();
+			if (key != null) {
+				if (visitedKeys.contains(key)) {
+					throw new LoopedException("Loop in field tree");
+				}
+				visitedKeys.add(key);
+			}
+			if (curr.knownKey(ASAtom.FT)) {
+				return curr.getNameKey(ASAtom.FT);
+			}
+			curr = curr.getKey(ASAtom.PARENT);
+		}
+		return null;
 	}
 
 	public double[] getRect() {
