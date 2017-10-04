@@ -25,7 +25,6 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.tools.IntReference;
 
 import java.io.*;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -68,22 +67,30 @@ public class StandardFontMetricsFactory {
     private static ASInputStream load(String fileName) {
         try {
             File afmFile;
-            URL res = StandardFontMetrics.class.getResource(fileName);
-            if (res.toString().startsWith("jar:")) {
-                InputStream input = StandardFontMetrics.class.getResourceAsStream(fileName);
-                afmFile = File.createTempFile("tempfile", ".tmp");
-                OutputStream out = new FileOutputStream(afmFile);
-                int read;
-                byte[] bytes = new byte[1024];
+            afmFile = new File(StandardFontMetricsFactory.class.getResource(fileName).getFile());
+            if (!afmFile.exists()) {
+                InputStream input = null;
+                OutputStream out = null;
+                try {
+                    input = StandardFontMetrics.class.getResourceAsStream(fileName);
+                    afmFile = File.createTempFile("tempfile", ".tmp");
+                    out = new FileOutputStream(afmFile);
+                    int read;
+                    byte[] bytes = new byte[1024];
 
-                while ((read = input.read(bytes)) != -1) {
-                    out.write(bytes, 0, read);
+                    while ((read = input.read(bytes)) != -1) {
+                        out.write(bytes, 0, read);
+                    }
+					afmFile.deleteOnExit();
+                } finally {
+                    if (input != null) {
+                        input.close();
+                    }
+
+                    if (out != null) {
+                        out.close();
+                    }
                 }
-                input.close();
-                out.close();
-                afmFile.deleteOnExit();
-            } else {
-                afmFile = new File(res.getFile());
             }
             if (!afmFile.exists()) {
                 throw new IOException("Error: File " + afmFile + " not found!");
