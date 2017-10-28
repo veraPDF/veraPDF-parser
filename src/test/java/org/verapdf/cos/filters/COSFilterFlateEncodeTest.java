@@ -48,6 +48,8 @@ public class COSFilterFlateEncodeTest {
         COSFilterFlateDecode decoder = new COSFilterFlateDecode(inputStream);
         PDDocument doc = new PDDocument(decoder);
         decoder.close();
+        doc.close();
+        encodedPDF.delete();
     }
 
     private byte[] getDataToEncode() throws IOException {

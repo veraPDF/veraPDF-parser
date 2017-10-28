@@ -81,8 +81,7 @@ public class PDPage extends PDPageTreeNode {
             this.content = new PDPageContentStream(contents);
         } else if (!contents.empty() && contents.getType() == COSObjType.COS_ARRAY) {
             try {
-                this.content = new PDPageContentStream(COSStream.concatenateStreams((COSArray) contents.getDirectBase(),
-                        getPDDocument().getDocument()));
+                this.content = new PDPageContentStream(COSStream.concatenateStreams((COSArray) contents.getDirectBase()));
             } catch (IOException e) {
                 this.content = new PDPageContentStream(contents.at(0));
             }

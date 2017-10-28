@@ -327,9 +327,9 @@ public class COSDocument {
 	}
 
 	public void saveTo(final OutputStream stream) {
+		File temp = null;
 		try {
-			File temp = File.createTempFile("tmp_pdf_file", ".pdf");
-			temp.deleteOnExit();
+			temp = File.createTempFile("tmp_pdf_file", ".pdf");
 			Writer pdfWriter = new Writer(this, temp.getAbsolutePath(),
 					this.getPDFSource().getStreamLength());
 			pdfWriter.writeIncrementalUpdate(changedObjects, addedObjects);
@@ -341,6 +341,10 @@ public class COSDocument {
 			pdf.close();
 		} catch (IOException e) {
 			LOGGER.log(Level.FINE, "Can't write COSDocument to stream", e);
+		} finally {
+			if (temp != null && !temp.delete()) {
+				temp.deleteOnExit();
+			}
 		}
 	}
 

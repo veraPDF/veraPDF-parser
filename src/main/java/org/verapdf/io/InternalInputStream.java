@@ -120,7 +120,9 @@ public class InternalInputStream extends SeekableInputStream {
 				this.source.close();
 				if (isTempFile) {
 					File tmp = new File(fileName);
-					tmp.delete();
+					if (!tmp.delete()) {
+						tmp.deleteOnExit();
+					}
 				}
 			}
 		}
@@ -176,7 +178,6 @@ public class InternalInputStream extends SeekableInputStream {
 		FileOutputStream output = null;
 		try {
 			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
-			tmpFile.deleteOnExit();
 			output = new FileOutputStream(tmpFile);
 
 			//copy stream content
@@ -198,7 +199,6 @@ public class InternalInputStream extends SeekableInputStream {
 	private static File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
 		FileOutputStream output = null;
 		File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
-		tmpFile.deleteOnExit();
 		try {
 			output = new FileOutputStream(tmpFile);
 			output.write(alreadyRead);

@@ -107,7 +107,6 @@ public abstract class ASInFilter extends ASInputStream {
 	public void close() throws IOException {
 		if (this.storedInStream != null && !isClosed) {
 			isClosed = true;
-			this.decrementResourceUsers();
 			this.storedInStream.close();
 		}
 	}
