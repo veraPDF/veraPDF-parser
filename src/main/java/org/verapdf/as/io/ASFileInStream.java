@@ -142,7 +142,9 @@ public class ASFileInStream extends ASInputStream {
 				this.stream.close();
 				if (isTempFile) {
 					File tmp = new File(filePath);
-					tmp.delete();
+					if (!tmp.delete()) {
+						tmp.deleteOnExit();
+					}
 				}
 			}
 		}

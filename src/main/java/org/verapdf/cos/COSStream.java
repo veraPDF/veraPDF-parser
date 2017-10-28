@@ -21,7 +21,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.CharTable;
+import org.verapdf.as.io.ASConcatenatedInputStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.as.io.ASOutputStream;
@@ -30,15 +30,10 @@ import org.verapdf.cos.visitor.IVisitor;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
-import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -173,7 +168,7 @@ public class COSStream extends COSDictionary {
 			ASOutputStream encoder = filters.getOutputStream(fileWithData);
 			encoder.write(stream);
 			File encodedDataFile = fileWithData.getFile();
-			return setData(new InternalInputStream(encodedDataFile), FilterFlags.RAW_DATA);
+			return setData(new InternalInputStream(encodedDataFile, true), FilterFlags.RAW_DATA);
 		} catch (IOException e) {
 			LOGGER.log(Level.FINE, "Can not set data", e);
 			return false;
@@ -234,7 +229,7 @@ public class COSStream extends COSDictionary {
 			encoder.write(unfilteredData);
 			File encodedDataFile = fileWithData.getFile();
 			fileWithData.close();
-			this.setData(new InternalInputStream(encodedDataFile), FilterFlags.RAW_DATA);
+			this.setData(new InternalInputStream(encodedDataFile, true), FilterFlags.RAW_DATA);
 		}
 	}
 
@@ -356,38 +351,16 @@ public class COSStream extends COSDictionary {
 		return true;
 	}
 
-	public static COSObject concatenateStreams(COSArray streams, COSDocument document) throws IOException {
-		File mergedContentStream = File.createTempFile("verapdf_tmp_file", ".tmp");
-		mergedContentStream.deleteOnExit();
-		FileOutputStream outputStream = new FileOutputStream(mergedContentStream);
+	public static COSObject concatenateStreams(COSArray streams) throws IOException {
+		List<ASInputStream> resList = new ArrayList<>();
 		for (COSObject stream : streams) {
 			if (stream.getType() == COSObjType.COS_STREAM) {
 				ASInputStream streamData = stream.getData(FilterFlags.DECODE);
-				try {
-					writeStreamToFile(outputStream, streamData);
-				} catch (IOException e) {
-					streamData.close();
-					outputStream.close();
-					mergedContentStream.delete();
-					throw e;
-				}
-				streamData.close();
+				resList.add(streamData);
 			}
 		}
-		outputStream.close();
-		ASInputStream inputContentStream = new InternalInputStream(mergedContentStream, true);
-		COSObject streamDict = COSDictionary.construct(ASAtom.LENGTH, mergedContentStream.length());
-		document.addFileResource(new ASFileStreamCloser(inputContentStream));
-		return COSStream.construct((COSDictionary) streamDict.get(), inputContentStream);
-	}
-
-	private static void writeStreamToFile(FileOutputStream file, ASInputStream stream) throws IOException {
-		byte[] tmp = new byte[2048];
-		int read = stream.read(tmp);
-		while (read != -1) {
-			file.write(tmp, 0, read);
-			read = stream.read(tmp);
-		}
-		file.write(CharTable.ASCII_CR);
+		ASInputStream[] asInputStreams = resList.toArray(new ASInputStream[resList.size()]);
+		ASInputStream inputContentStream = new ASConcatenatedInputStream(asInputStreams);
+		return COSStream.construct(inputContentStream);
 	}
 }

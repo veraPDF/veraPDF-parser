@@ -218,7 +218,6 @@ public class PDCMap extends PDObject {
                 }
                 input.close();
                 out.close();
-                cMapFile.deleteOnExit();
             } else {
                 cMapFile = new File(res.getFile());
             }

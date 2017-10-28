@@ -59,7 +59,6 @@ public class AdobeGlyphList {
                     while ((read = input.read(bytes)) != -1) {
                         out.write(bytes, 0, read);
                     }
-                    aglFile.deleteOnExit();
                 }
             } else {
                 aglFile = new File(res.getFile());
@@ -89,8 +88,8 @@ public class AdobeGlyphList {
                     line = stream.readLine();
                 } while (line != null);
             }
-            if (isTempFile) {
-                aglFile.delete();
+            if (isTempFile && !aglFile.delete()) {
+                aglFile.deleteOnExit();
             }
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Error in opening Adobe Glyph List file", e);
