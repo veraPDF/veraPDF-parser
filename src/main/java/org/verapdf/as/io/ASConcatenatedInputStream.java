@@ -107,6 +107,7 @@ public class ASConcatenatedInputStream extends ASInputStream {
 	@Override
 	public void close() throws IOException {
 		if (!isClosed) {
+			decrementResourceUsers();
 			isClosed = true;
 			for (ASInputStream as : streams) {
 				as.close();

@@ -70,6 +70,7 @@ public class ASInputStreamWrapper extends ASInputStream {
     @Override
     public void close() throws IOException {
         if (!isClosed) {
+            decrementResourceUsers();
             isClosed = true;
             this.stream.close();
         }
