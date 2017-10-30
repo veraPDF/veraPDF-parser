@@ -136,12 +136,11 @@ public class TaggedPDFHelper {
 			return isStandardType(type) ? type : null;
 		}
 		while (curr != null && !isVisited(curr)) {
-			addVisited(curr);
-			StructureType next = getEquivalent(curr, rootRoleMap);
-			if (next == null && isStandardType(curr)) {
+			if (isStandardType(curr)) {
 				return curr;
 			}
-			curr = next;
+			addVisited(curr);
+			curr = getEquivalent(curr, rootRoleMap);
 		}
 		return null;
 	}
