@@ -28,6 +28,7 @@ import org.verapdf.pd.font.cff.CFFType1FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.truetype.CIDFontType2Program;
+import org.verapdf.tools.FontProgramIDGenerator;
 import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
@@ -159,12 +160,14 @@ public class PDCIDFont extends PDFont {
                     this.getSubtype() == ASAtom.CID_FONT_TYPE2) {
                 COSStream trueTypeFontFile = fontDescriptor.getFontFile2();
                 COSKey key = trueTypeFontFile.getObjectKey();
-                this.fontProgram = StaticResources.getCachedFont(key);
+                COSObject cidToGIDMap = this.getCIDToGIDMap();
+                String fontProgramID = FontProgramIDGenerator.getCIDFontType2ProgramID(key, this.cMap, cidToGIDMap);
+                this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                 if (fontProgram == null) {
                     try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
                         this.fontProgram = new CIDFontType2Program(
-                                fontData, this.cMap, this.getCIDToGIDMap());
-                        StaticResources.cacheFontProgram(key, this.fontProgram);
+                                fontData, this.cMap, cidToGIDMap);
+                        StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                     } catch (IOException e) {
                         LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
                     }
@@ -173,28 +176,35 @@ public class PDCIDFont extends PDFont {
                 COSStream fontFile = fontDescriptor.getFontFile3();
                 COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).getDirectBase();
                 COSKey key = fontFile.getObjectKey();
-                this.fontProgram = StaticResources.getCachedFont(key);
-                if (fontProgram == null) {
-                    try (ASInputStream fontData = fontFile.getData(COSStream.FilterFlags.DECODE)) {
-                        if (ASAtom.CID_FONT_TYPE0C == subtype.getName()) {
-                            this.fontProgram = new CFFFontProgram(fontData, this.cMap, this.isSubset());
-                            StaticResources.cacheFontProgram(key, this.fontProgram);
-                        } else if (ASAtom.OPEN_TYPE == subtype.getName()) {
-                            ASAtom fontName = ASAtom.getASAtom(this.getName());
-                            if (fontName == ASAtom.TRUE_TYPE || fontName == ASAtom.CID_FONT_TYPE2) {
-                                this.fontProgram = new OpenTypeFontProgram(
-                                        fontData, false, this.isSymbolic(), this.getEncoding(),
-                                        this.cMap, this.isSubset());
-                                StaticResources.cacheFontProgram(key, this.fontProgram);
+                try {
+                    boolean isSubset = this.isSubset();
+                    if (ASAtom.CID_FONT_TYPE0C == subtype.getName()) {
+                        String fontProgramID = FontProgramIDGenerator.getCFFFontProgramID(key, this.cMap, isSubset);
+                        this.fontProgram = StaticResources.getCachedFont(fontProgramID);
+                        if (fontProgram == null) {
+                            try (ASInputStream fontData = fontFile.getData(COSStream.FilterFlags.DECODE)) {
+                                this.fontProgram = new CFFFontProgram(fontData, this.cMap, isSubset);
+                                StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                             }
-                            this.fontProgram = new OpenTypeFontProgram(
-                                    fontData, true, this.isSymbolic(), this.getEncoding(),
-                                    this.cMap, this.isSubset());
-                            StaticResources.cacheFontProgram(key, this.fontProgram);
                         }
-                    } catch (IOException e) {
-                        LOGGER.log(Level.FINE, "Can't read CFF font program.", e);
+                    } else if (ASAtom.OPEN_TYPE == subtype.getName()) {
+                        ASAtom fontName = ASAtom.getASAtom(this.getName());
+                        boolean isCFF = fontName != ASAtom.TRUE_TYPE && fontName != ASAtom.CID_FONT_TYPE2;
+                        boolean isSymbolic = this.isSymbolic();
+                        COSObject encoding = this.getEncoding();
+                        String fontProgramID = FontProgramIDGenerator.getOpenTypeFontProgramID(key, isCFF, isSymbolic, encoding, this.cMap, isSubset);
+                        this.fontProgram = StaticResources.getCachedFont(fontProgramID);
+                        if (fontProgram == null) {
+                            try (ASInputStream fontData = fontFile.getData(COSStream.FilterFlags.DECODE)) {
+                                this.fontProgram = new OpenTypeFontProgram(
+                                        fontData, isCFF, isSymbolic, encoding,
+                                        this.cMap, isSubset);
+                                StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
+                            }
+                        }
                     }
+                } catch (IOException e) {
+                    LOGGER.log(Level.FINE, "Can't read font program.", e);
                 }
             } else {
                 this.fontProgram = null;

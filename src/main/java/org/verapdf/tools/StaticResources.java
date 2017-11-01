@@ -18,7 +18,7 @@ public class StaticResources {
 
     public static Map<String, CMap> cMapCache = new HashMap<>();
     public static Map<COSKey, PDStructureNameSpace> structureNameSpaceCache = new HashMap<>();
-    public static Map<COSKey, FontProgram> cachedFonts = new HashMap<>();
+    public static Map<String, FontProgram> cachedFonts = new HashMap<>();
 
     /**
      * Caches CMap object.
@@ -64,11 +64,16 @@ public class StaticResources {
     private StaticResources() {
     }
 
-    public static void cacheFontProgram(COSKey key, FontProgram font) {
-        cachedFonts.put(key, font);
+    public static void cacheFontProgram(String key, FontProgram font) {
+        if (key != null) {
+            cachedFonts.put(key, font);
+        }
     }
 
-    public static FontProgram getCachedFont(COSKey key) {
+    public static FontProgram getCachedFont(String key) {
+        if (key == null) {
+            return null;
+        }
         return cachedFonts.get(key);
     }
 
