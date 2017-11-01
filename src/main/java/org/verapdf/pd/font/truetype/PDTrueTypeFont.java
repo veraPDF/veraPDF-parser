@@ -24,10 +24,12 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSKey;
+import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDSimpleFont;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
+import org.verapdf.tools.FontProgramIDGenerator;
 import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
@@ -78,21 +80,32 @@ public class PDTrueTypeFont extends PDSimpleFont {
         }
         if (trueTypeFontFile != null) {
             COSKey key = trueTypeFontFile.getObjectKey();
-            this.fontProgram = StaticResources.getCachedFont(key);
-            if (fontProgram == null) {
-                try (ASInputStream fontData = trueTypeFontFile.getData(
-                        COSStream.FilterFlags.DECODE)) {
-                    if (fontFileType == ASAtom.FONT_FILE2) {
-                        this.fontProgram = new TrueTypeFontProgram(fontData, this.isSymbolic(),
-                                this.getEncoding());
-                    } else {    // fontFile3
-                        this.fontProgram = new OpenTypeFontProgram(fontData, false,
-                                this.isSymbolic(), this.getEncoding(), null, this.isSubset());
+            boolean isSymbolic = this.isSymbolic();
+            COSObject encoding = this.getEncoding();
+            try {
+                if (fontFileType == ASAtom.FONT_FILE2) {
+                    String fontProgramID = FontProgramIDGenerator.getTrueTypeFontProgramID(key, isSymbolic, encoding);
+                    this.fontProgram = StaticResources.getCachedFont(fontProgramID);
+                    if (fontProgram == null) {
+                        try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
+                            this.fontProgram = new TrueTypeFontProgram(fontData, isSymbolic,
+                                    encoding);
+                            StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
+                        }
                     }
-                    StaticResources.cacheFontProgram(key, this.fontProgram);
-                } catch (IOException e) {
-                    LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
+                } else {    // fontFile3
+                    boolean isSubset = this.isSubset();
+                    String fontProgramID = FontProgramIDGenerator.getOpenTypeFontProgramID(key, false, isSymbolic, encoding, null, isSubset);
+                    this.fontProgram = StaticResources.getCachedFont(fontProgramID);
+                    if (fontProgram == null) {
+                        try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
+                            this.fontProgram = new OpenTypeFontProgram(fontData, false,
+                                    isSymbolic, encoding, null, isSubset);
+                        }
+                    }
                 }
+            } catch (IOException e) {
+                LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
             }
         }
     }
