@@ -285,7 +285,7 @@ public class COSParser extends BaseParser {
 
 		skipStreamSpaces();
 
-		long size = dict.getKey(ASAtom.LENGTH).getInteger().longValue();
+		Long size = dict.getKey(ASAtom.LENGTH).getInteger();
 		source.seek(streamStartOffset);
 
 		boolean streamLengthValid = checkStreamLength(size);
@@ -355,7 +355,11 @@ public class COSParser extends BaseParser {
 		}
 	}
 
-	private boolean checkStreamLength(long streamLength) throws IOException {
+	private boolean checkStreamLength(Long streamLength) throws IOException {
+		if (streamLength == null) {
+			LOGGER.log(Level.WARNING, "Stream length is missing");
+			return false;
+		}
 		boolean validLength = true;
 		long start = source.getOffset();
 		long expectedEndstreamOffset = start + streamLength;
@@ -378,19 +382,20 @@ public class COSParser extends BaseParser {
 		return validLength;
 	}
 
-	private void checkEndstreamSpacings(COSObject stream, long streamStartOffset, long expectedLength) throws IOException {
+	private void checkEndstreamSpacings(COSObject stream, long streamStartOffset, Long expectedLength) throws IOException {
 		skipSpaces();
 
 		byte eolCount = 0;
 		long approximateLength = source.getOffset() - streamStartOffset;
-		long diff = approximateLength - expectedLength;
+		long expected = expectedLength == null ? 0 : expectedLength;
+		long diff = approximateLength - expected;
 
 		source.unread(2);
 		int firstSymbol = source.readByte();
 		int secondSymbol = source.readByte();
 		if (secondSymbol == 10) {
 			if (firstSymbol == 13) {
-				eolCount = (byte) (diff == 1 ? 1 : 2);
+				eolCount = (byte) (diff > 1 ? 2 : 1);
 			} else {
 				eolCount = 1;
 			}

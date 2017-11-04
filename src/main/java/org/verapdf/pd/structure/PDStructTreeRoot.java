@@ -59,7 +59,7 @@ public class PDStructTreeRoot extends PDStructTreeNode {
 
 	public PDNumberTreeNode getParentTree() {
 		COSObject parentTree = getKey(ASAtom.PARENT_TREE);
-		if (parentTree != null && !parentTree.empty()) {
+		if (parentTree != null && parentTree.getType().isDictionaryBased()) {
 			return new PDNumberTreeNode(parentTree);
 		}
 		return null;
