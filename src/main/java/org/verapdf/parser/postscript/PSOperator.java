@@ -324,6 +324,9 @@ public class PSOperator extends PSObject {
 
     private void opFor() throws PostScriptException {
         try {
+            if (operandStack.empty()) {
+                throw new PostScriptException("Problem with stack");
+            }
             COSObject proc = operandStack.pop();
             if (!(proc instanceof PSProcedure)) {
                 throw new PostScriptException("Object is not a procedure");

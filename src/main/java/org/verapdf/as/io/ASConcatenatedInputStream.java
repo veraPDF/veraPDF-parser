@@ -77,8 +77,8 @@ public class ASConcatenatedInputStream extends ASInputStream {
 
 	@Override
 	public void reset() throws IOException {
-		for (int i = 0; i <= index; ++i) {
-			streams[i].reset();
+		for (ASInputStream as : streams) {
+			as.reset();
 		}
 		index = 0;
 	}
