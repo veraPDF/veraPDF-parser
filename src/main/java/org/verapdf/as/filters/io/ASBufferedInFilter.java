@@ -23,7 +23,6 @@ package org.verapdf.as.filters.io;
 import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.io.SeekableInputStream;
 import org.verapdf.parser.NotSeekableBaseParser;
 
 import java.io.IOException;
@@ -44,6 +43,7 @@ import java.util.Arrays;
  */
 public class ASBufferedInFilter extends ASInFilter {
 
+    public static final int START_BUFFER_SIZE = 10240;
     public static final int BF_BUFFER_SIZE = 2048;
 
     private int HALF;
@@ -393,7 +393,7 @@ public class ASBufferedInFilter extends ASInFilter {
      * @return new stream.
      */
     public ASInputStream getStream(int length) throws IOException {
-        byte[] buf = new byte[SeekableInputStream.MAX_BUFFER_SIZE];
+        byte[] buf = new byte[START_BUFFER_SIZE];
         int pointer = 0;
         byte readByte = this.readByte();
         while (pointer < length && !this.isEOF()) {
@@ -414,7 +414,7 @@ public class ASBufferedInFilter extends ASInFilter {
      * @return new stream.
      */
     public ASInputStream getStreamUntilToken(byte[] token) throws IOException {
-        byte[] buf = new byte[SeekableInputStream.MAX_BUFFER_SIZE];
+        byte[] buf = new byte[START_BUFFER_SIZE];
         int read = this.read(buf, token.length);
         byte readByte = this.readByte();
         int pointer = read;

@@ -22,9 +22,13 @@ package org.verapdf.pd.font.stdmetrics;
 
 import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.tools.IntReference;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -66,38 +70,16 @@ public class StandardFontMetricsFactory {
 
     private static ASInputStream load(String fileName) {
         try {
-            File afmFile;
-            afmFile = new File(StandardFontMetricsFactory.class.getResource(fileName).getFile());
-            if (!afmFile.exists()) {
-                InputStream input = null;
-                OutputStream out = null;
-                try {
-                    input = StandardFontMetrics.class.getResourceAsStream(fileName);
-                    afmFile = File.createTempFile("tempfile", ".tmp");
-                    out = new FileOutputStream(afmFile);
-                    int read;
-                    byte[] bytes = new byte[1024];
-
-                    while ((read = input.read(bytes)) != -1) {
-                        out.write(bytes, 0, read);
-                    }
-					afmFile.deleteOnExit();
-                } finally {
-                    if (input != null) {
-                        input.close();
-                    }
-
-                    if (out != null) {
-                        out.close();
-                    }
+            File afmFile = new File(StandardFontMetricsFactory.class.getResource(fileName).getFile());
+            if (afmFile.exists()) {
+                return new ASFileInStream(
+                        new RandomAccessFile(afmFile, "r"), 0, afmFile.length(),
+                        new IntReference(), afmFile.getAbsolutePath(), false);
+            } else {
+                try (InputStream input = StandardFontMetrics.class.getResourceAsStream(fileName)) {
+                    return SeekableInputStream.getSeekableStream(input);
                 }
             }
-            if (!afmFile.exists()) {
-                throw new IOException("Error: File " + afmFile + " not found!");
-            }
-            return new ASFileInStream(
-                    new RandomAccessFile(afmFile, "r"), 0, afmFile.length(),
-                    new IntReference(), afmFile.getAbsolutePath(), true);
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Error in opening predefined font metrics file " + fileName, e);
             return null;

@@ -69,13 +69,6 @@ public class InternalInputStream extends SeekableInputStream {
 		this.numOfFileUsers = new IntReference(numOfFileUsers);
 	}
 
-	public InternalInputStream(final InputStream fileStream) throws IOException {
-		this.isTempFile = true;
-		File tempFile = createTempFile(fileStream);
-		this.fileName = tempFile.getAbsolutePath();
-		this.source = new RandomAccessFile(tempFile, READ_ONLY_MODE);
-	}
-
 	/**
 	 * Constructor writes into temp file passed buffer, then passed stream.
 	 * After that, InternalInputStream from file is created.
@@ -174,28 +167,6 @@ public class InternalInputStream extends SeekableInputStream {
 		return this.source;
 	}
 
-	private static File createTempFile(InputStream input) throws IOException {
-		FileOutputStream output = null;
-		try {
-			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
-			output = new FileOutputStream(tmpFile);
-
-			//copy stream content
-			byte[] buffer = new byte[4096];
-			int n;
-			while ((n = input.read(buffer, 0, ASBufferedInFilter.BF_BUFFER_SIZE)) != -1) {
-				output.write(buffer, 0, n);
-			}
-
-			return tmpFile;
-		}
-		finally {
-			if (output != null) {
-				output.close();
-			}
-		}
-	}
-
 	private static File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
 		FileOutputStream output = null;
 		File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
@@ -212,7 +183,9 @@ public class InternalInputStream extends SeekableInputStream {
 
 			return tmpFile;
 		} catch (IOException e) {
-			tmpFile.delete();
+			if (!tmpFile.delete()) {
+				tmpFile.deleteOnExit();
+			}
 			throw e;
 		}
 		finally {
