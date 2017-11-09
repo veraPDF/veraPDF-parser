@@ -51,10 +51,7 @@ public abstract class BaseCharStringParser {
      * @throws IOException if parsing fails.
      */
     protected BaseCharStringParser(ASInputStream stream) throws IOException {
-        this.stream = stream;
-        this.stack = new Stack<>();
-        this.width = null;
-        parse();
+        this(stream, null, 0, null, 0);
     }
 
     /**
@@ -71,8 +68,25 @@ public abstract class BaseCharStringParser {
      */
     protected BaseCharStringParser(ASInputStream stream, CFFIndex localSubrs,
                                    int bias, CFFIndex globalSubrs, int gBias) throws IOException {
+        this(stream, localSubrs, bias, globalSubrs, gBias, new Stack<CFFNumber>());
+    }
+
+    /**
+     * Constructor that calls method parse(), so width is extracted right after
+     * object is created.
+     *
+     * @param stream     is stream with decoded CharString.
+     * @param localSubrs is local subroutines for this CharString.
+     * @param bias       is bias value for local subroutines as it is described
+     *                   in The Compact Font Format specification.
+     * @param gBias      is bias value for global subroutines as it is described
+     *                   in The Compact Font Format specification.
+     * @throws IOException if parsing fails.
+     */
+    protected BaseCharStringParser(ASInputStream stream, CFFIndex localSubrs,
+                                   int bias, CFFIndex globalSubrs, int gBias, Stack<CFFNumber> stack) throws IOException {
         this.stream = stream;
-        this.stack = new Stack<>();
+        this.stack = stack;
         this.width = null;
         this.globalSubrs = globalSubrs == null ? CFFIndex.getEmptyIndex() : globalSubrs;
         this.localSubrs = localSubrs == null ? CFFIndex.getEmptyIndex() : localSubrs;

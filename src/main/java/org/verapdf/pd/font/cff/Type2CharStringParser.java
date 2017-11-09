@@ -26,6 +26,7 @@ import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.type1.BaseCharStringParser;
 
 import java.io.IOException;
+import java.util.Stack;
 
 /**
  * This class does basic parsing of Type 2 CharString to extract width value
@@ -50,6 +51,11 @@ class Type2CharStringParser extends BaseCharStringParser {
     Type2CharStringParser(ASInputStream stream, CFFIndex localSubrs, int bias,
                           CFFIndex globalSubrs, int gBias) throws IOException {
         super(stream, localSubrs, bias, globalSubrs, gBias);
+    }
+
+    Type2CharStringParser(ASInputStream stream, CFFIndex localSubrs, int bias,
+                          CFFIndex globalSubrs, int gBias, Stack<CFFNumber> stack) throws IOException {
+        super(stream, localSubrs, bias, globalSubrs, gBias, stack);
     }
 
     /**
@@ -98,6 +104,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 23:    // vstemhm
                 if (this.stack.size() % 2 == 1) {
                     this.setWidth(this.stack.get(0));
+                    this.stack.clear();
                     return true;
                 }
                 this.stack.clear();
@@ -106,32 +113,9 @@ class Type2CharStringParser extends BaseCharStringParser {
                 this.stack.push(readNextNumber(nextByte));
                 return false;
             case 10:    // subrcall
-                int subrNum = (int) this.stack.pop().getInteger();
-                if(this.stack.empty() && localSubrs.size() > subrNum + bias) {
-                    CFFNumber subrWidth = getWidthFromSubroutine(localSubrs.get(subrNum + bias));
-                    if (subrWidth != null) {
-                        this.setWidth(subrWidth);
-                    } else if (!this.stack.empty()) {
-                        return false;
-                    }
-                } else if (!this.stack.empty()) {
-                    this.setWidth(this.stack.get(0));
-                }
-                return true;
+                return execSubr(localSubrs, bias);
             case 29:    // callgsubr
-                subrNum = (int) this.stack.pop().getInteger();
-                if(this.stack.empty() && globalSubrs.size() > subrNum + gBias) {
-                    CFFNumber subrWidth = getWidthFromSubroutine(globalSubrs.get(subrNum + gBias));
-                    if (subrWidth != null) {
-                        this.setWidth(subrWidth);
-                    } else if (!this.stack.empty()) {
-                        return false;
-                    }
-                } else if (!this.stack.empty()) {
-                    this.setWidth(this.stack.get(0));
-                    this.stack.clear();
-                }
-                return true;
+                return execSubr(globalSubrs, gBias);
             case 5:     // rlineto
             case 6:     // hlineto
             case 7:     // vlineto
@@ -153,18 +137,24 @@ class Type2CharStringParser extends BaseCharStringParser {
         return true;    // We can set width only by first operator.
     }
 
+    private boolean execSubr(CFFIndex subrs, int bias) throws IOException {
+        int subrNum = (int) this.stack.pop().getInteger();
+        if(subrs.size() > subrNum + bias) {
+            CFFNumber subrWidth = getWidthFromSubroutine(subrs.get(subrNum + bias));
+            if (subrWidth != null) {
+                this.setWidth(subrWidth);
+                this.stack.clear();
+                return true;
+            }
+        }
+        return false;
+    }
+
     private CFFNumber getWidthFromSubroutine(byte[] subr) throws IOException {
         ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
         Type2CharStringParser parser = new Type2CharStringParser(subrStream,
-                this.localSubrs, this.bias, this.globalSubrs, this.gBias);
-        if (parser.getWidth() != null) {
-            return parser.getWidth();
-        } else {
-            for (int i = 0; i < parser.stack.size(); ++i) {
-                this.stack.push(parser.stack.get(i));
-            }
-            return null;
-        }
+                this.localSubrs, this.bias, this.globalSubrs, this.gBias, this.stack);
+        return parser.getWidth();
     }
 
     @Override

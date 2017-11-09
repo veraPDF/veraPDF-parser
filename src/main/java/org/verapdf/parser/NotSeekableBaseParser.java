@@ -6,7 +6,6 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.filters.COSFilterASCII85Decode;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
-import org.verapdf.io.SeekableInputStream;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -452,7 +451,7 @@ public class NotSeekableBaseParser implements Closeable {
     }
 
     private void readASCII85() throws IOException {
-        byte[] buf = new byte[SeekableInputStream.MAX_BUFFER_SIZE];
+        byte[] buf = new byte[ASBufferedInFilter.START_BUFFER_SIZE];
         int pointer = 0;
         byte readByte = this.source.readByte();
         while (readByte != '~' && this.source.peek() != '>' && !this.source.isEOF()) {
