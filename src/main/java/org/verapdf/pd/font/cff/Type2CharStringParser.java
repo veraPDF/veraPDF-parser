@@ -26,7 +26,6 @@ import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.type1.BaseCharStringParser;
 
 import java.io.IOException;
-import java.util.Stack;
 
 /**
  * This class does basic parsing of Type 2 CharString to extract width value
@@ -51,11 +50,6 @@ class Type2CharStringParser extends BaseCharStringParser {
     Type2CharStringParser(ASInputStream stream, CFFIndex localSubrs, int bias,
                           CFFIndex globalSubrs, int gBias) throws IOException {
         super(stream, localSubrs, bias, globalSubrs, gBias);
-    }
-
-    Type2CharStringParser(ASInputStream stream, CFFIndex localSubrs, int bias,
-                          CFFIndex globalSubrs, int gBias, Stack<CFFNumber> stack) throws IOException {
-        super(stream, localSubrs, bias, globalSubrs, gBias, stack);
     }
 
     /**
@@ -140,31 +134,21 @@ class Type2CharStringParser extends BaseCharStringParser {
     private boolean execSubr(CFFIndex subrs, int bias) throws IOException {
         int subrNum = (int) this.stack.pop().getInteger();
         if(subrs.size() > subrNum + bias) {
-            CFFNumber subrWidth = getWidthFromSubroutine(subrs.get(subrNum + bias));
-            if (subrWidth != null) {
-                this.setWidth(subrWidth);
-                this.stack.clear();
-                return true;
-            }
+            byte[] subr = subrs.get(subrNum + bias);
+            ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
+            addStream(subrStream);
         }
         return false;
-    }
-
-    private CFFNumber getWidthFromSubroutine(byte[] subr) throws IOException {
-        ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
-        Type2CharStringParser parser = new Type2CharStringParser(subrStream,
-                this.localSubrs, this.bias, this.globalSubrs, this.gBias, this.stack);
-        return parser.getWidth();
     }
 
     @Override
     protected CFFNumber readNextNumber(int firstByte) throws IOException {
         byte[] buf = new byte[4];
         if (firstByte == 28) {
-            this.stream.read(buf, 2);
+            readStreams(buf, 2);
             return new CFFNumber((char) (((buf[0] & 0xFF) << 8) | (buf[1] & 0xFF)));
         } else {
-            this.stream.read(buf, 4);
+            readStreams(buf, 4);
             int integer = 0;
             for (int i = 0; i < 3; ++i) {
                 integer |= (buf[i] & 0xFF);

@@ -332,7 +332,7 @@ public class PDFParser extends COSParser {
     private Long findLastXRef() throws IOException {
         source.seekFromEnd(STARTXREF.length);
         byte[] buf = new byte[STARTXREF.length];
-        while (source.getStreamLength() - source.getOffset() < 256) {
+        while (source.getStreamLength() - source.getOffset() < 1024) {
             long res = source.getOffset();
             source.read(buf);
             if (Arrays.equals(buf, STARTXREF)) {
@@ -345,7 +345,7 @@ public class PDFParser extends COSParser {
     }
 
     private void calculatePostEOFDataSize() throws IOException {
-        final int lookupSize = 256;
+        final int lookupSize = 1024;
 
         source.seekFromEnd(lookupSize);
         byte[] buffer = new byte[lookupSize];

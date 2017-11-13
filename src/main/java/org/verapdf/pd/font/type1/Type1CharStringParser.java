@@ -84,7 +84,7 @@ public class Type1CharStringParser extends BaseCharStringParser {
             }
         } else {
             byte[] buf = new byte[1];
-            this.stream.read(buf, 1);
+            readStreams(buf, 1);
             switch (buf[0] & 0xFF) {
                 case 0:     // dotsection
                     break;
@@ -125,7 +125,7 @@ public class Type1CharStringParser extends BaseCharStringParser {
     @Override
     protected CFFNumber readNextNumber(int firstByte) throws IOException {
         byte[] buf = new byte[4];
-        this.stream.read(buf, 4);
+        readStreams(buf, 4);
         int res = 0;
         for (int i = 0; i < 3; ++i) {
             res |= (buf[i] & 0xFF);
