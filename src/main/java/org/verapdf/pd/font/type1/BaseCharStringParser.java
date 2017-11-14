@@ -129,12 +129,12 @@ public abstract class BaseCharStringParser {
                 this.stack.push(getNextInteger(nextByte));
             } else {
                 if (processNextOperator(nextByte)) {
-                    return;
+                    break;
                 }
             }
             cont = readStreams(buf, 1);
         }
-        this.stack.clear();
+        clear();
     }
 
     protected int readStreams(byte[] buffer, int size) throws IOException {
@@ -165,6 +165,13 @@ public abstract class BaseCharStringParser {
     protected void addStream(ASInputStream is) {
         if (is != null) {
             this.streams.push(is);
+        }
+    }
+
+    private void clear() throws IOException {
+        this.stack.clear();
+        while(!this.streams.empty()) {
+            this.streams.pop().close();
         }
     }
 

@@ -62,8 +62,6 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 20:    // hintmask
                 if (!this.stack.empty()) {
                     this.setWidth(this.stack.get(0));
-                    this.stack.clear();
-                    return true;
                 }
                 break;
             case 14:    // endchar
@@ -71,26 +69,18 @@ class Type2CharStringParser extends BaseCharStringParser {
                     // If endchar is proceeded with 4 numbers, they are arguments
                     // for "seac" operator from charsting type 1.
                     this.setWidth(this.stack.get(0));
-                    this.stack.clear();
-                    return true;
                 }
                 break;
             case 4:     // vmoveto
             case 22:    // hmoveto
                 if (this.stack.size() > 1) {
                     this.setWidth(this.stack.get(0));
-                    this.stack.clear();
-                    return true;
                 }
-                this.stack.pop();
                 break;
             case 21:    // rmoveto
                 if (this.stack.size() > 2) {
                     this.setWidth(this.stack.get(0));
-                    this.stack.clear();
-                    return true;
                 }
-                this.popStack(2);
                 break;
             case 1:     // hstem
             case 3:     // vstem
@@ -98,10 +88,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 23:    // vstemhm
                 if (this.stack.size() % 2 == 1) {
                     this.setWidth(this.stack.get(0));
-                    this.stack.clear();
-                    return true;
                 }
-                this.stack.clear();
                 break;
             case 28:    // actually not an operator but 2-byte number
                 this.stack.push(readNextNumber(nextByte));
@@ -120,12 +107,10 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 26:    // vvcurveto
             case 30:    // vhcurveto
             case 31:    // hvcurveto
-                this.stack.clear();     // this is perfectly correct handling of stack in case of these ops
                 break;
-            case 11:    // return, not clear stack
-                break;
+            case 11:    // return operator (may be founded in subroutines)
+                return false;
             default:
-                this.stack.clear();     // this is more of a hack. May not be fully correct, but correct enough
                 break;
         }
         return true;    // We can set width only by first operator.
