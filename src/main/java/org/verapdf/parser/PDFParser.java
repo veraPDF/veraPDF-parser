@@ -27,13 +27,16 @@ import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
+import org.verapdf.exceptions.LoopedException;
 import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -214,7 +217,7 @@ public class PDFParser extends COSParser {
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         calculatePostEOFDataSize();
-        this.getXRefInfo(infos, Long.valueOf(0L));
+        this.getXRefInfo(infos, new HashSet<Long>(), Long.valueOf(0L));
     }
 
     public COSObject getObject(final long offset) throws IOException {
@@ -485,13 +488,18 @@ public class PDFParser extends COSParser {
         }
     }
 
-	private void getXRefInfo(final List<COSXRefInfo> info, Long offset) throws IOException {
-		if (offset.longValue() == 0) {
+	private void getXRefInfo(final List<COSXRefInfo> info, Set<Long> processedOffsets, Long offset) throws IOException {
+        if (offset.longValue() == 0) {
 			offset = findLastXRef();
 			if (offset.longValue() == 0) {
 				throw new IOException("PDFParser::GetXRefInfo(...)" + StringExceptions.START_XREF_VALIDATION);
 			}
 		}
+
+        if (processedOffsets.contains(offset)) {
+            throw new LoopedException("XRef loop");
+        }
+        processedOffsets.add(offset);
 
 		clear();
 
@@ -514,7 +522,7 @@ public class PDFParser extends COSParser {
 			return;
 		}
 
-		getXRefInfo(info, offset);
+		getXRefInfo(info, processedOffsets, offset);
 	}
 
 	private void getTrailer(final COSTrailer trailer) throws IOException {
