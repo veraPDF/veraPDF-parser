@@ -290,19 +290,19 @@ public class BaseParser {
 	}
 
 	protected void skipStreamSpaces() throws IOException {
-		byte space = this.source.readByte();
+		byte ch = this.source.readByte();
 
 		//check for whitespace
-		while (space == ASCII_SPACE) {
-			space = this.source.readByte();
+		while (ch == ASCII_SPACE) {
+			ch = this.source.readByte();
 		}
 
-		if (space == ASCII_CR) {
-			space = this.source.readByte();
-			if (space != ASCII_LF) {
+		if (isCR(ch)) {
+			ch = this.source.readByte();
+			if (!isLF(ch)) {
 				this.source.unread();
 			}
-		} else if (space != ASCII_LF) {
+		} else if (!isLF(ch)) {
 			this.source.unread();
 		}
 	}
@@ -357,25 +357,25 @@ public class BaseParser {
 		byte ch;
 		while (!this.source.isEOF()) {
 			ch = this.source.readByte();
-			if (isLF(ch)) {
-				return; // EOL == LF
-			}
-
-			if (isEndOfComment(ch)) {
-				if (isCR(ch)) {
-					ch = this.source.readByte();
-					if (isLF(ch)) { // EOL == CR
-						this.source.unread();
-					} // else EOL == CRLF
-				}
+			if (isEOL(ch)) {
 				return;
 			}
 			// else skip regular character
 		}
 	}
 
-	protected static boolean isEndOfComment(byte ch) {
-		return isCR(ch);
+	protected boolean isEOL(byte ch) throws IOException {
+		if (isLF(ch)) {
+			return true; // EOL == LF
+		} else if (isCR(ch)) {
+			ch = this.source.readByte();
+			if (!isLF(ch)) { // EOL == CR
+				this.source.unread();
+			} // else EOL == CRLF
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private void readLitString() throws IOException {
