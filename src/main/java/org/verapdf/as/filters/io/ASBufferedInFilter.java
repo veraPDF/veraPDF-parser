@@ -361,7 +361,7 @@ public class ASBufferedInFilter extends ASInFilter {
         if (read < len) {
             // TODO: in fact, read may be less then len even if eof is not reached.
             // Fix problem for this case.
-            eod = offset + read;
+            eod = offset + (read == -1 ? 0 : read);
         }
     }
 
