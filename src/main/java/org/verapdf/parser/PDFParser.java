@@ -143,7 +143,7 @@ public class PDFParser extends COSParser {
                 headerVersion = Float.parseFloat(headerParts[1]);
             }
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.WARNING, "Can't parse the header version.", e);
+            LOGGER.log(Level.FINE, "Can't parse the document header.", e);
         }
 
         result.setVersion(headerVersion);
@@ -370,7 +370,7 @@ public class PDFParser extends COSParser {
                     if (postEOFDataSize > 0) {
                         if (buffer[currentBufferOffset + EOF_MARKER.length] == 0x0D) {
                             currentBufferOffset++;
-                            if (currentBufferOffset + EOF_MARKER.length < buffer.length && buffer[currentBufferOffset  + EOF_MARKER.length] == 0x0A) {
+                            if (currentBufferOffset + EOF_MARKER.length < buffer.length && buffer[currentBufferOffset + EOF_MARKER.length] == 0x0A) {
                                 postEOFDataSize -= 2;
                                 document.setPostEOFDataSize(postEOFDataSize);
                                 return;
@@ -468,16 +468,16 @@ public class PDFParser extends COSParser {
 
     private void parseXrefStream(final COSXRefInfo section) throws IOException {
         nextToken();
-        if(this.getToken().type != Token.Type.TT_INTEGER) {
+        if (this.getToken().type != Token.Type.TT_INTEGER) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         nextToken();
-        if(this.getToken().type != Token.Type.TT_KEYWORD ||
+        if (this.getToken().type != Token.Type.TT_KEYWORD ||
                 this.getToken().keyword != Token.Keyword.KW_OBJ) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         COSObject xrefCOSStream = getDictionary();
-        if(!(xrefCOSStream.getType() == COSObjType.COS_STREAM)) {
+        if (!(xrefCOSStream.getType() == COSObjType.COS_STREAM)) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.getDirectBase());
@@ -509,7 +509,7 @@ public class PDFParser extends COSParser {
         }
 
         //we will skip eol marker in any case
-        source.seek(offset.intValue() - 1);
+        source.seek(offset.longValue() - 1);
 
 		COSXRefInfo section = new COSXRefInfo();
 		info.add(0, section);
