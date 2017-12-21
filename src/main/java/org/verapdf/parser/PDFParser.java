@@ -143,7 +143,7 @@ public class PDFParser extends COSParser {
                 headerVersion = Float.parseFloat(headerParts[1]);
             }
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.FINE, "Can't parse the document header.");
+            LOGGER.log(Level.FINE, "Can't parse the document header.", e);
         }
 
         result.setVersion(headerVersion);
