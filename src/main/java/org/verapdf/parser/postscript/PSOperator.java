@@ -127,6 +127,19 @@ public class PSOperator extends PSObject {
                     opFor();
                     break;
 
+                // PS Font Encoding
+                case "StandardEncoding":
+                    if (operandStack.empty()) {
+                        break;
+                    }
+                    COSObject lastOperand = operandStack.peek();
+                    if (lastOperand.getType() == COSObjType.COS_NAME
+                            && lastOperand.getString().equals("Encoding")) {
+                        operandStack.pop();
+                        userDict.put(lastOperand.getName(), COSName.construct(ASAtom.STANDARD_ENCODING));
+                    }
+                    break;
+
                 default:
                     COSObject dictEntry = userDict.get(ASAtom.getASAtom(operator));
                     if (dictEntry != null) {
