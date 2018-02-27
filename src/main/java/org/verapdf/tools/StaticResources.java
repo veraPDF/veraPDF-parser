@@ -16,10 +16,15 @@ import java.util.Map;
  */
 public class StaticResources {
 
-    public static Map<String, CMap> cMapCache = new HashMap<>();
-    public static Map<COSKey, PDStructureNameSpace> structureNameSpaceCache = new HashMap<>();
-    public static Map<String, FontProgram> cachedFonts = new HashMap<>();
+    private static ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
+    private static ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
+    private static ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
 
+    static {
+        cMapCache.set(new HashMap<>());
+        structureNameSpaceCache.set(new HashMap<>());
+        cachedFonts.set(new HashMap<>());
+    }
     /**
      * Caches CMap object.
      *
@@ -27,7 +32,7 @@ public class StaticResources {
      * @param cMap is CMap object for caching.
      */
     public static void cacheCMap(String name, CMap cMap) {
-        cMapCache.put(name, cMap);
+        StaticResources.cMapCache.get().put(name, cMap);
     }
 
     /**
@@ -37,7 +42,7 @@ public class StaticResources {
      * @return cached CMap with this name or null if no CMap available.
      */
     public static CMap getCMap(String name) {
-        return cMapCache.get(name);
+        return StaticResources.cMapCache.get().get(name);
     }
 
     /**
@@ -48,7 +53,7 @@ public class StaticResources {
      */
     public static void cacheStructureNameSpace(PDStructureNameSpace nameSpace) {
         COSKey key = nameSpace.getObject().getObjectKey();
-        structureNameSpaceCache.put(key, nameSpace);
+        StaticResources.structureNameSpaceCache.get().put(key, nameSpace);
     }
 
     /**
@@ -58,7 +63,7 @@ public class StaticResources {
      * available.
      */
     public static PDStructureNameSpace getStructureNameSpace(COSKey key) {
-        return structureNameSpaceCache.get(key);
+        return StaticResources.structureNameSpaceCache.get().get(key);
     }
 
     private StaticResources() {
@@ -66,7 +71,7 @@ public class StaticResources {
 
     public static void cacheFontProgram(String key, FontProgram font) {
         if (key != null) {
-            cachedFonts.put(key, font);
+            StaticResources.cachedFonts.get().put(key, font);
         }
     }
 
@@ -74,15 +79,15 @@ public class StaticResources {
         if (key == null) {
             return null;
         }
-        return cachedFonts.get(key);
+        return StaticResources.cachedFonts.get().get(key);
     }
 
     /**
      * Clears all cached static resources.
      */
     public static void clear() {
-        cMapCache.clear();
-        structureNameSpaceCache.clear();
-        cachedFonts.clear();
+        StaticResources.cMapCache.get().clear();
+        StaticResources.structureNameSpaceCache.get().clear();
+        StaticResources.cachedFonts.get().clear();
     }
 }
