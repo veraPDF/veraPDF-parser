@@ -196,8 +196,6 @@ public class SignatureParser extends COSParser {
      */
     private long getOffsetOfNextEOF(long currentOffset) throws IOException {
         byte[] buffer = new byte[EOF_STRING.length];
-        byte[] streamBuffer = new byte[STREAM_STRING.length];
-        byte[] endstreamBuffer = new byte[ENDSTREAM_STRING.length];
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         source.read(buffer);
         source.unread(buffer.length - 1);
