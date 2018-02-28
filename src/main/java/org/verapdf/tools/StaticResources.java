@@ -20,11 +20,6 @@ public class StaticResources {
     private static ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
     private static ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
 
-    static {
-        cMapCache.set(new HashMap<>());
-        structureNameSpaceCache.set(new HashMap<>());
-        cachedFonts.set(new HashMap<>());
-    }
     /**
      * Caches CMap object.
      *
@@ -32,7 +27,8 @@ public class StaticResources {
      * @param cMap is CMap object for caching.
      */
     public static void cacheCMap(String name, CMap cMap) {
-        StaticResources.cMapCache.get().put(name, cMap);
+        checkForNull(cMapCache, new HashMap<String, CMap>());
+        cMapCache.get().put(name, cMap);
     }
 
     /**
@@ -42,6 +38,7 @@ public class StaticResources {
      * @return cached CMap with this name or null if no CMap available.
      */
     public static CMap getCMap(String name) {
+        checkForNull(cMapCache, new HashMap<String, CMap>());
         return StaticResources.cMapCache.get().get(name);
     }
 
@@ -52,17 +49,21 @@ public class StaticResources {
      * @param nameSpace is PD structure name space to cache.
      */
     public static void cacheStructureNameSpace(PDStructureNameSpace nameSpace) {
+        checkForNull(structureNameSpaceCache, new HashMap<COSKey, PDStructureNameSpace>());
+
         COSKey key = nameSpace.getObject().getObjectKey();
         StaticResources.structureNameSpaceCache.get().put(key, nameSpace);
     }
 
     /**
      * Gets cached pd structure name space.
+     *
      * @param key is COSKey of namespace to get.
      * @return cached namespace with this COSKey or null if no namespace
      * available.
      */
     public static PDStructureNameSpace getStructureNameSpace(COSKey key) {
+        checkForNull(structureNameSpaceCache, new HashMap<COSKey, PDStructureNameSpace>());
         return StaticResources.structureNameSpaceCache.get().get(key);
     }
 
@@ -70,12 +71,14 @@ public class StaticResources {
     }
 
     public static void cacheFontProgram(String key, FontProgram font) {
+        checkForNull(cachedFonts, new HashMap<String, FontProgram>());
         if (key != null) {
             StaticResources.cachedFonts.get().put(key, font);
         }
     }
 
     public static FontProgram getCachedFont(String key) {
+        checkForNull(cachedFonts, new HashMap<String, FontProgram>());
         if (key == null) {
             return null;
         }
@@ -86,8 +89,18 @@ public class StaticResources {
      * Clears all cached static resources.
      */
     public static void clear() {
-        StaticResources.cMapCache.get().clear();
-        StaticResources.structureNameSpaceCache.get().clear();
-        StaticResources.cachedFonts.get().clear();
+        if (cMapCache.get()!=null
+                && structureNameSpaceCache.get() != null
+                && cachedFonts.get() != null) {
+            StaticResources.cMapCache.get().clear();
+            StaticResources.structureNameSpaceCache.get().clear();
+            StaticResources.cachedFonts.get().clear();
+        }
+    }
+
+    private static void checkForNull(ThreadLocal variable, Map<?, ?> map) {
+        if (variable.get() == null) {
+            variable.set(map);
+        }
     }
 }
