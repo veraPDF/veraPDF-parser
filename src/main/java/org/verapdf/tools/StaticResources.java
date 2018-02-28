@@ -20,12 +20,6 @@ public class StaticResources {
     private static ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
     private static ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
 
-    static {
-        cMapCache.set(new HashMap<>());
-        structureNameSpaceCache.set(new HashMap<>());
-        cachedFonts.set(new HashMap<>());
-    }
-
     /**
      * Caches CMap object.
      *
