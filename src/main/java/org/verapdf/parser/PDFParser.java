@@ -348,7 +348,8 @@ public class PDFParser extends COSParser {
     }
 
     private void calculatePostEOFDataSize() throws IOException {
-        final int lookupSize = 1024;
+        long size = source.getStreamLength();
+        final int lookupSize = 1024 > size ? (int) size : 1024;
 
         source.seekFromEnd(lookupSize);
         byte[] buffer = new byte[lookupSize];
