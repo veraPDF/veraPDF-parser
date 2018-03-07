@@ -44,7 +44,10 @@ public class SignatureParser extends COSParser {
 
     private static final Logger LOGGER = Logger.getLogger(SignatureParser.class.getCanonicalName());
     private static final byte[] EOF_STRING = "%%EOF".getBytes();
+    private static final byte[] STREAM_STRING = "stream".getBytes();
+    private static final byte[] ENDSTREAM_STRING = "endstream".getBytes();
 
+    private boolean isStream = false;
     private long[] byteRange = new long[4];
     private int floatingBytesNumber = 0;
     private COSDocument document;
@@ -196,7 +199,14 @@ public class SignatureParser extends COSParser {
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         source.read(buffer);
         source.unread(buffer.length - 1);
-        while (!isEOFFound(buffer)) {
+        isStream = false;
+        while (isStream || !isEOFFound(buffer)) {
+            byte[] streamCheck = isStream ? ENDSTREAM_STRING : STREAM_STRING;
+            byte[] streamCheckBuff = new byte[streamCheck.length];
+            int unreadLength = source.read(streamCheckBuff);
+            isStream ^= Arrays.equals(streamCheckBuff, streamCheck);
+            source.unread(unreadLength);
+
             source.read(buffer);
             if (source.isEOF()) {
                 source.seek(currentOffset + document.getHeader().getHeaderOffset());
