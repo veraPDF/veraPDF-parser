@@ -86,6 +86,51 @@ public class StaticResources {
 	}
 
 	/**
+	 * @return the { @linkplain java.lang.ThreadLocal } CMap cache
+	 */
+	public static Map<String, CMap> getCMapCache() {
+		return StaticResources.cMapCache.get();
+	}
+
+	/**
+	 * Set the  { @linkplain java.lang.ThreadLocal } CMap cache
+	 * @param value the {@link java.util.Map} CMap cache value to use
+	 */
+	public static void setCMapCache(Map<String, CMap> value)  {
+		StaticResources.cMapCache.set(value);
+	}
+
+	/**
+	 * @return the { @linkplain java.lang.ThreadLocal } Structure Namespace cache
+	 */
+	public static Map<COSKey, PDStructureNameSpace> getStructureNameSpaceCache() {
+		return StaticResources.structureNameSpaceCache.get();
+	}
+
+	/**
+	 * Set the  { @linkplain java.lang.ThreadLocal } PDStructureNameSpace cache
+	 * @param value the {@link java.util.Map} PDStructureNameSpace cache value to use
+	 */
+	public static void setStructureNameSpaceCache(Map<COSKey, PDStructureNameSpace> value)  {
+		StaticResources.structureNameSpaceCache.set(value);
+	}
+
+	/**
+	 * @return the { @linkplain java.lang.ThreadLocal } FontProgram cache
+	 */
+	public static Map<String, FontProgram> getFontProgramCache() {
+		return StaticResources.cachedFonts.get();
+	}
+
+	/**
+	 * Set the  { @linkplain java.lang.ThreadLocal } FontProgram cache
+	 * @param value the {@link java.util.Map} FontProgram cache value to use
+	 */
+	public static void setFontProgramCache(Map<String, FontProgram> value)  {
+		StaticResources.cachedFonts.set(value);
+	}
+
+	/**
 	 * Clears all cached static resources.
 	 */
 	public static void clear() {
