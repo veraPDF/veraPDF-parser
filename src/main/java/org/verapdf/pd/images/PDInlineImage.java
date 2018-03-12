@@ -102,6 +102,15 @@ public class PDInlineImage extends PDResource {
 		return result;
 	}
 
+	public boolean getImageMask() {
+		COSObject im = getKey(ASAtom.IM);
+		if (im.empty()) {
+			im = getKey(ASAtom.IMAGE_MASK);
+		}
+		Boolean result = im.getBoolean();
+		return result != null ? result.booleanValue() : false;
+	}
+
 	private PDColorSpace getDefaultColorSpace(ASAtom name) {
 		if (isDeviceDependent(name)) {
 			if (imageResources != null) {
