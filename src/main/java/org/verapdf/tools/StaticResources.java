@@ -27,7 +27,7 @@ public class StaticResources {
 	 * @param cMap is CMap object for caching.
 	 */
 	public static void cacheCMap(String name, CMap cMap) {
-//		checkForNull(cMapCache, new HashMap<String, CMap>());
+		checkForNull(cMapCache, new HashMap<String, CMap>());
 		cMapCache.get().put(name, cMap);
 	}
 
@@ -38,7 +38,7 @@ public class StaticResources {
 	 * @return cached CMap with this name or null if no CMap available.
 	 */
 	public static CMap getCMap(String name) {
-//		checkForNull(cMapCache, new HashMap<String, CMap>());
+		checkForNull(cMapCache, new HashMap<String, CMap>());
 		return StaticResources.cMapCache.get().get(name);
 	}
 
@@ -49,7 +49,7 @@ public class StaticResources {
 	 * @param nameSpace is PD structure name space to cache.
 	 */
 	public static void cacheStructureNameSpace(PDStructureNameSpace nameSpace) {
-//		checkForNull(structureNameSpaceCache, new HashMap<COSKey, PDStructureNameSpace>());
+		checkForNull(structureNameSpaceCache, new HashMap<COSKey, PDStructureNameSpace>());
 
 		COSKey key = nameSpace.getObject().getObjectKey();
 		StaticResources.structureNameSpaceCache.get().put(key, nameSpace);
@@ -63,7 +63,7 @@ public class StaticResources {
 	 * available.
 	 */
 	public static PDStructureNameSpace getStructureNameSpace(COSKey key) {
-//		checkForNull(structureNameSpaceCache, new HashMap<COSKey, PDStructureNameSpace>());
+		checkForNull(structureNameSpaceCache, new HashMap<COSKey, PDStructureNameSpace>());
 		return StaticResources.structureNameSpaceCache.get().get(key);
 	}
 
@@ -71,14 +71,14 @@ public class StaticResources {
 	}
 
 	public static void cacheFontProgram(String key, FontProgram font) {
-//		checkForNull(cachedFonts, new HashMap<String, FontProgram>());
+		checkForNull(cachedFonts, new HashMap<String, FontProgram>());
 		if (key != null) {
 			StaticResources.cachedFonts.get().put(key, font);
 		}
 	}
 
 	public static FontProgram getCachedFont(String key) {
-//		checkForNull(cachedFonts, new HashMap<String, FontProgram>());
+		checkForNull(cachedFonts, new HashMap<String, FontProgram>());
 		if (key == null) {
 			return null;
 		}
@@ -98,11 +98,11 @@ public class StaticResources {
 		}
 	}
 
-//	private static void checkForNull(ThreadLocal variable, Map<?, ?> map) {
-//		if (variable.get() == null) {
-//			variable.set(map);
-//		}
-//	}
+	private static void checkForNull(ThreadLocal variable, Map<?, ?> map) {
+		if (variable.get() == null) {
+			variable.set(map);
+		}
+	}
 
 	public static Map<String, CMap> getcMapCache() {
 		return cMapCache.get();
