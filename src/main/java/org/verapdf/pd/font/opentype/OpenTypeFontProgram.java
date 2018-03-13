@@ -31,6 +31,7 @@ import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Represents OpenType font program.
@@ -151,7 +152,9 @@ public class OpenTypeFontProgram implements FontProgram {
     }
 
     private ASInputStream getCFFTable() throws IOException {
-        this.source = SeekableInputStream.getSeekableStream(this.source);
+        try (InputStream is = this.source) {
+            this.source = SeekableInputStream.getSeekableStream(is);
+        }
         this.readHeader();
         for (int i = 0; i < numTables; ++i) {
             long tabName = this.readULong();
