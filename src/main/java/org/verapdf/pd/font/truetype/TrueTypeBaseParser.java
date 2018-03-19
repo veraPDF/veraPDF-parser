@@ -37,7 +37,11 @@ class TrueTypeBaseParser {
     protected SeekableInputStream source;
 
     protected TrueTypeBaseParser(ASInputStream stream) throws IOException {
-        this.source = SeekableInputStream.getSeekableStream(stream);
+        try {
+            this.source = SeekableInputStream.getSeekableStream(stream);
+        } finally {
+            stream.close();
+        }
     }
 
     protected TrueTypeBaseParser(SeekableInputStream source) {
