@@ -37,7 +37,11 @@ class CFFFileBaseParser {
     protected CFFIndex definedNames;
 
     CFFFileBaseParser(ASInputStream source) throws IOException {
-        this.source = SeekableInputStream.getSeekableStream(source);
+        try {
+            this.source = SeekableInputStream.getSeekableStream(source);
+        } finally {
+            source.close();
+        }
     }
 
     CFFFileBaseParser(SeekableInputStream source) {

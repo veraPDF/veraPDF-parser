@@ -57,10 +57,11 @@ public class CIDToGIDMapping {
                 return;
             } else {
                 this.isIdentity = false;
-                ASInputStream stream = obj.getData(COSStream.FilterFlags.DECODE);
-                mapping = new
-                        int[(obj.getIntegerKey(ASAtom.LENGTH).intValue() + 1) / 2];
-                parseCIDToGIDStream(stream);
+                try (ASInputStream stream = obj.getData(COSStream.FilterFlags.DECODE)) {
+                    mapping = new
+                            int[(obj.getIntegerKey(ASAtom.LENGTH).intValue() + 1) / 2];
+                    parseCIDToGIDStream(stream);
+                }
                 return;
             }
         }
