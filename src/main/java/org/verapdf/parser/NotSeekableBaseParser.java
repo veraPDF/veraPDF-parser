@@ -454,7 +454,7 @@ public class NotSeekableBaseParser implements Closeable {
         byte[] buf = new byte[ASBufferedInFilter.START_BUFFER_SIZE];
         int pointer = 0;
         byte readByte = this.source.readByte();
-        while (readByte != '~' && this.source.peek() != '>' && !this.source.isEOF()) {
+        while (!this.source.isEOF() && (readByte != '~' || this.source.peek() != '>')) {
             buf[pointer++] = readByte;
             if (pointer == buf.length) {
                 buf = extendArray(buf);
@@ -469,7 +469,12 @@ public class NotSeekableBaseParser implements Closeable {
 
             this.token.setContainsOnlyHex(false);
             this.token.setHexCount(Long.valueOf(0));
-            this.token.setByteValue(Arrays.copyOf(res, read));
+            if (read == -1) {
+                LOGGER.log(Level.WARNING, "Invalid ASCII85 string");
+                this.token.clearValue();
+            } else {
+                this.token.setByteValue(Arrays.copyOf(res, read));
+            }
         }
     }
 
