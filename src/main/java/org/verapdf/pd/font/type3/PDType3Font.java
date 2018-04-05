@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
 import org.verapdf.pd.PDResources;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDSimpleFont;
@@ -138,7 +139,7 @@ public class PDType3Font extends PDSimpleFont {
     public float getWidthFromProgram(int code) {
         COSObject charProc = getCharProc(code);
         if (charProc.getType() == COSObjType.COS_STREAM) {
-            try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData())) {
+            try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData(COSStream.FilterFlags.DECODE))) {
                 parser.parse();
                 return (float) parser.getWidth();
             } catch (IOException e) {

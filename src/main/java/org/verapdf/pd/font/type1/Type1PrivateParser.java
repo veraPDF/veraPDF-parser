@@ -73,7 +73,7 @@ class Type1PrivateParser extends BaseParser {
         skipSpaces(true);
 
         while (getToken().type != Token.Type.TT_EOF &&
-                !Type1StringConstants.CLOSEFILE.equals(getToken().getValue())) {
+                (getToken().getValue() == null || !getToken().getValue().startsWith(Type1StringConstants.CLOSEFILE))) {
             nextToken();
             processToken();
         }
