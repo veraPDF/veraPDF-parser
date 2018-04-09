@@ -38,7 +38,10 @@ import org.verapdf.tools.FontProgramIDGenerator;
 import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -185,7 +188,7 @@ public class PDType1Font extends PDSimpleFont {
      */
     public Boolean isStandard() {
         if (this.isStandard == null) {
-            if (!containsDiffs() && !isEmbedded() && isNameStandard()) {
+            if (!isEmbedded() && isNameStandard()) {
                 isStandard = Boolean.valueOf(true);
                 return isStandard;
             }
@@ -193,26 +196,6 @@ public class PDType1Font extends PDSimpleFont {
             return isStandard;
         }
         return this.isStandard;
-    }
-
-    private boolean containsDiffs() {
-        if (this.dictionary.getKey(ASAtom.ENCODING).getType() ==
-                COSObjType.COS_DICT) {
-            Map<Integer, String> differences = this.getDifferences();
-            if (differences != null && differences.size() != 0) {
-                String[] baseEncoding = getBaseEncoding((COSDictionary)
-                        this.getEncoding().getDirectBase());
-                if (baseEncoding.length == 0) {
-                    return true;
-                }
-                for (Map.Entry<Integer, String> entry : differences.entrySet()) {
-                    if (!entry.getValue().equals(baseEncoding[entry.getKey().intValue()])) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     private static String[] getBaseEncoding(COSDictionary encoding) {
