@@ -20,10 +20,6 @@ public class StaticResources {
 	private static ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
 	private static ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
 
-//	private static Map<String, CMap> cMapCache = new HashMap<>();
-//	private static Map<COSKey, PDStructureNameSpace> structureNameSpaceCache = new HashMap<>();
-//	private static Map<String, FontProgram> cachedFonts = new HashMap<>();
-
 	private StaticResources() {
 	}
 
@@ -75,7 +71,7 @@ public class StaticResources {
 	}
 
 	public static void cacheFontProgram(String key, FontProgram font) {
-//		checkForNull(cachedFonts);
+		checkForNull(cachedFonts);
 		if (key != null) {
 			StaticResources.cachedFonts.get().put(key, font);
 		}
