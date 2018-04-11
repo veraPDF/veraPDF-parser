@@ -36,6 +36,7 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -75,6 +76,18 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         if (!attemptedParsing) {
             try {
                 attemptedParsing = true;
+
+                // PFB format check
+                byte first = this.source.readByte();
+                if (first == -128) {
+                    byte second = this.source.readByte();
+                    if (second == 1) {
+                        LOGGER.log(Level.WARNING, "Type 1 fonts in PFB format are not permitted");
+                    }
+                    this.source.unread();
+                }
+                this.source.unread();
+
                 initializeToken();
 
                 skipSpaces(true);
