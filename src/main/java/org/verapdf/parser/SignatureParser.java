@@ -50,6 +50,7 @@ public class SignatureParser extends COSParser {
     private boolean isStream = false;
     private long[] byteRange = new long[4];
     private int floatingBytesNumber = 0;
+    private boolean isStreamEnd = true;
     private COSDocument document;
 
     /**
@@ -129,6 +130,10 @@ public class SignatureParser extends COSParser {
 
     public int getFloatingBytesNumberForLastByteRangeObtained() {
         return this.floatingBytesNumber;
+    }
+
+    public boolean isStreamEnd() {
+        return isStreamEnd;
     }
 
     private boolean parseSignatureNameValuePair() throws IOException {
@@ -225,16 +230,24 @@ public class SignatureParser extends COSParser {
         long result = source.getOffset() - 1 + buffer.length;   // byte right after '%%EOF'
         this.source.skip(EOF_STRING.length - 1);
         this.floatingBytesNumber = 0;
-        if (isLF(this.source.peek())) { // allows single LF, CR or CR-LF after %%EOF
+        this.isStreamEnd = false;
+        int nextByte = this.source.read();
+        if (isLF(nextByte)) { // allows single LF, CR or CR-LF after %%EOF
             result++;
             this.floatingBytesNumber++;
-        } else if (isCR(this.source.read())) {
+            nextByte = this.source.peek();
+        } else if (isCR(nextByte)) {
             result++;
             this.floatingBytesNumber++;
-            if (isLF(this.source.peek())) {
+            nextByte = this.source.read();
+            if (isLF(nextByte)) {
                 result++;
                 this.floatingBytesNumber++;
+                nextByte = this.source.peek();
             }
+        }
+        if (nextByte == -1) {
+            this.isStreamEnd = true;
         }
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         return result;
