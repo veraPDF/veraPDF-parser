@@ -70,7 +70,11 @@ public class BaseParser {
 		if (fileStream instanceof SeekableInputStream) {
 			this.source = (SeekableInputStream) fileStream;
 		} else {
-			this.source = SeekableInputStream.getSeekableStream(fileStream);
+			try {
+				this.source = SeekableInputStream.getSeekableStream(fileStream);
+			} finally {
+				fileStream.close();
+			}
 		}
 	}
 

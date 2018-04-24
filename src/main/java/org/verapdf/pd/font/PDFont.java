@@ -28,6 +28,7 @@ import org.verapdf.pd.font.type3.PDType3Font;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -172,15 +173,20 @@ public abstract class PDFont extends PDResource {
      */
     public static Map<Integer, String> getDifferencesFromCosEncoding(COSObject e) {
         COSObject cosDifferences = e.getKey(ASAtom.DIFFERENCES);
+        if (cosDifferences == null) {
+            return Collections.emptyMap();
+        }
         COSArray differences;
         if (cosDifferences.getType() == COSObjType.COS_ARRAY) {
-            differences = (COSArray) e.getKey(ASAtom.DIFFERENCES).getDirectBase();
+            differences = (COSArray) cosDifferences.getDirectBase();
         } else {
-            LOGGER.log(Level.SEVERE, "Value of Differences key is not an array. Ignoring Difference");
+            if (!cosDifferences.empty()) {
+                LOGGER.log(Level.SEVERE, "Value of Differences key is not an array. Ignoring Difference");
+            }
             differences = null;
         }
         if (differences == null) {
-            return null;
+            return Collections.emptyMap();
         }
         Map<Integer, String> res = new HashMap<>();
         int diffIndex = 0;

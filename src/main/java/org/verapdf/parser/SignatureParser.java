@@ -50,6 +50,7 @@ public class SignatureParser extends COSParser {
     private boolean isStream = false;
     private long[] byteRange = new long[4];
     private int floatingBytesNumber = 0;
+    private boolean isStreamEnd = true;
     private COSDocument document;
 
     /**
@@ -131,6 +132,10 @@ public class SignatureParser extends COSParser {
         return this.floatingBytesNumber;
     }
 
+    public boolean isStreamEnd() {
+        return isStreamEnd;
+    }
+
     private boolean parseSignatureNameValuePair() throws IOException {
         COSObject key = getName();
         if (key.getType() != COSObjType.COS_NAME) {
@@ -204,29 +209,45 @@ public class SignatureParser extends COSParser {
             byte[] streamCheck = isStream ? ENDSTREAM_STRING : STREAM_STRING;
             byte[] streamCheckBuff = new byte[streamCheck.length];
             int unreadLength = source.read(streamCheckBuff);
-            isStream ^= Arrays.equals(streamCheckBuff, streamCheck);
-            source.unread(unreadLength);
+            if (Arrays.equals(streamCheck, streamCheckBuff)) {
+				isStream = !isStream;
+				System.arraycopy(streamCheckBuff, 0, buffer, 0, EOF_STRING.length);
+				unreadLength = -1;
+			} else {
+				source.unread(unreadLength);
+				source.read(buffer);
+				unreadLength = buffer.length - 1;
+			}
 
-            source.read(buffer);
             if (source.isEOF()) {
                 source.seek(currentOffset + document.getHeader().getHeaderOffset());
                 return source.getStreamLength();
             }
-            source.unread(buffer.length - 1);
+            if (unreadLength > 0) {
+				source.unread(unreadLength);
+			}
         }
         long result = source.getOffset() - 1 + buffer.length;   // byte right after '%%EOF'
         this.source.skip(EOF_STRING.length - 1);
         this.floatingBytesNumber = 0;
-        if (isLF(this.source.peek())) { // allows single LF, CR or CR-LF after %%EOF
+        this.isStreamEnd = false;
+        int nextByte = this.source.read();
+        if (isLF(nextByte)) { // allows single LF, CR or CR-LF after %%EOF
             result++;
             this.floatingBytesNumber++;
-        } else if (isCR(this.source.read())) {
+            nextByte = this.source.peek();
+        } else if (isCR(nextByte)) {
             result++;
             this.floatingBytesNumber++;
-            if (isLF(this.source.peek())) {
+            nextByte = this.source.read();
+            if (isLF(nextByte)) {
                 result++;
                 this.floatingBytesNumber++;
+                nextByte = this.source.peek();
             }
+        }
+        if (nextByte == -1) {
+            this.isStreamEnd = true;
         }
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         return result;
