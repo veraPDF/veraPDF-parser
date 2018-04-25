@@ -4,9 +4,13 @@ import org.verapdf.cos.COSKey;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.structure.PDStructureNameSpace;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class handles static resources that need to be reset with each parsing of
@@ -15,6 +19,8 @@ import java.util.Map;
  * @author Sergey Shemyakov
  */
 public class StaticResources {
+
+	private static final Logger LOGGER = Logger.getLogger(StaticResources.class.getCanonicalName());
 
 	private static ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
 	private static ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
@@ -74,6 +80,8 @@ public class StaticResources {
 		checkForNull(cachedFonts);
 		if (key != null) {
 			StaticResources.cachedFonts.get().put(key, font);
+		} else {
+			StaticResources.cachedFonts.get().put(String.valueOf(font.hashCode()), font);
 		}
 	}
 
@@ -89,6 +97,17 @@ public class StaticResources {
 	 * Clears all cached static resources.
 	 */
 	public static void clear() {
+		checkForNull(cachedFonts);
+		for (FontProgram fp : cachedFonts.get().values()) {
+			ASFileStreamCloser fpr = fp.getFontProgramResource();
+			if (fpr != null) {
+				try {
+					fpr.close();
+				} catch (IOException e) {
+					LOGGER.log(Level.WARNING, "Exception while closing font program", e);
+				}
+			}
+		}
 		StaticResources.cMapCache.set(new HashMap<>());
 		StaticResources.structureNameSpaceCache.set(new HashMap<>());
 		StaticResources.cachedFonts.set(new HashMap<>());
