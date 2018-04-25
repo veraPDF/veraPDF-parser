@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.*;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.parser.COSParser;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
@@ -157,8 +158,9 @@ public class PDType1Font extends PDSimpleFont {
                             String fontProgramID = FontProgramIDGenerator.getCFFFontProgramID(key, null, isSubset);
                             this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                             if (fontProgram == null) {
-                                try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
-                                    this.fontProgram = new CFFFontProgram(fontData, null, isSubset);
+                                try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE);
+                                     SeekableInputStream is = SeekableInputStream.getSeekableStream(fontData)) {
+                                    this.fontProgram = new CFFFontProgram(is, null, isSubset);
                                     StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                                 }
                             }
