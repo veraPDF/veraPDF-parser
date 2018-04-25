@@ -28,6 +28,7 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
+import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
@@ -136,12 +137,12 @@ public class OpenTypeFontProgram implements FontProgram {
                 this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
                 this.font.parseFont();
             } else {
-                try (ASInputStream cffTable = getCFFTable();
-                SeekableInputStream is = SeekableInputStream.getSeekableStream(cffTable)) {
-                    this.font = new CFFFontProgram(is, externalCMap, isSubset);
+                try (ASInputStream cffTable = getCFFTable()) {
+                    this.font = new CFFFontProgram(cffTable, externalCMap, isSubset);
                     this.font.parseFont();
                 }
             }
+            StaticResources.cacheFontProgram(null, this.font);
             this.successfullyParsed = true;
         }
     }

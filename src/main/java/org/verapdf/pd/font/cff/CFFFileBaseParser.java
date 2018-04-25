@@ -20,6 +20,7 @@
  */
 package org.verapdf.pd.font.cff;
 
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.CFFNumber;
 
@@ -34,6 +35,10 @@ class CFFFileBaseParser {
 
     protected SeekableInputStream source;
     protected CFFIndex definedNames;
+
+    CFFFileBaseParser(ASInputStream source) throws IOException {
+        this.source = SeekableInputStream.getSeekableStream(source);
+    }
 
     CFFFileBaseParser(SeekableInputStream source) {
         this.source = source;

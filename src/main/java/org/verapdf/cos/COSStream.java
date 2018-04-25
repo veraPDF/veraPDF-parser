@@ -220,9 +220,9 @@ public class COSStream extends COSDictionary {
 	}
 
 	public void setFilters(final COSFilters filters) throws IOException {
-		try (ASInputStream decoded = this.getData(COSStream.FilterFlags.DECODE)) {
-			SeekableInputStream unfilteredData =
-					SeekableInputStream.getSeekableStream(decoded);
+		try (ASInputStream decoded = this.getData(COSStream.FilterFlags.DECODE);
+			 SeekableInputStream unfilteredData =
+					 SeekableInputStream.getSeekableStream(decoded)) {
 			InternalOutputStream fileWithData = InternalOutputStream.getInternalOutputStream();
 			setKey(ASAtom.FILTER, filters.getObject());
 			ASOutputStream encoder = filters.getOutputStream(fileWithData);

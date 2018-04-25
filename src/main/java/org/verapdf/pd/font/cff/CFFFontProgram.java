@@ -20,8 +20,8 @@
  */
 package org.verapdf.pd.font.cff;
 
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.tools.resource.ASFileStreamCloser;
@@ -52,8 +52,8 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
      * @param stream is stream with CFF program.
      * @throws IOException if creation of @{link SeekableStream} fails.
      */
-    public CFFFontProgram(SeekableInputStream stream, CMap cMap,
-                          boolean isSubset) {
+    public CFFFontProgram(ASInputStream stream, CMap cMap,
+                          boolean isSubset) throws IOException {
         super(stream);
         this.externalCMap = cMap;
         this.isSubset = isSubset;
