@@ -21,10 +21,13 @@
 package org.verapdf.pd.font.cmap;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSStream;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class represents CMap file embedded into COSStream.
@@ -32,6 +35,8 @@ import java.util.List;
  * @author Sergey Shemyakov
  */
 public class CMapFile {
+
+    private static final Logger LOGGER = Logger.getLogger(CMapFile.class.getCanonicalName());
 
     private CMap cMap;
     private COSStream parentStream;
@@ -80,7 +85,10 @@ public class CMapFile {
 
     private void parseCMapFile() {
         String cMapName = parentStream.getStringKey(ASAtom.CMAPNAME);
-        cMap = CMapFactory.getCMap(cMapName == null ? "" : cMapName,
-                this.parentStream.getData(COSStream.FilterFlags.DECODE));
+        try (ASInputStream data = this.parentStream.getData(COSStream.FilterFlags.DECODE)) {
+            cMap = CMapFactory.getCMap(cMapName == null ? "" : cMapName, data);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Exception while parsing cmap file", e);
+        }
     }
 }

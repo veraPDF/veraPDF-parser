@@ -23,6 +23,7 @@ package org.verapdf.pd.font;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cff.CFFType1FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
@@ -182,8 +183,9 @@ public class PDCIDFont extends PDFont {
                         String fontProgramID = FontProgramIDGenerator.getCFFFontProgramID(key, this.cMap, isSubset);
                         this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                         if (fontProgram == null) {
-                            try (ASInputStream fontData = fontFile.getData(COSStream.FilterFlags.DECODE)) {
-                                this.fontProgram = new CFFFontProgram(fontData, this.cMap, isSubset);
+                            try (ASInputStream fontData = fontFile.getData(COSStream.FilterFlags.DECODE);
+                                 SeekableInputStream is = SeekableInputStream.getSeekableStream(fontData)) {
+                                this.fontProgram = new CFFFontProgram(is, this.cMap, isSubset);
                                 StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                             }
                         }
