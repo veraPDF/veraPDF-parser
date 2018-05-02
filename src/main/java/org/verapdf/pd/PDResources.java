@@ -108,7 +108,7 @@ public class PDResources extends PDObject {
 			return shadingMap.get(name);
 		}
 		COSObject rawShading = getResource(ASAtom.SHADING, name);
-		PDShading shading = new PDShading(rawShading);
+		PDShading shading = new PDShading(rawShading, this);
 		shadingMap.put(name, shading);
 		return shading;
 	}
