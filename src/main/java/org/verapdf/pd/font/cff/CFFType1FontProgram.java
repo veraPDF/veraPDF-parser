@@ -307,7 +307,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     }
 
     private void initializeCharSet(String[] charSetArray) {
-        for (int i = 0; i < charSetArray.length; ++i) {
+        for (int i = 0; i < this.nGlyphs; ++i) {
             charSet.put(charSetArray[i], i);
             inverseCharSet.put(i, charSetArray[i]);
         }
