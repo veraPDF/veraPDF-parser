@@ -77,7 +77,7 @@ public class ColorSpaceFactory {
         } else if (type == COSObjType.COS_ARRAY) {
             return getColorSpaceFromArray(base, resources, wasDefault);
         } else if (type != null && type.isDictionaryBased()) {
-            return getPattern(base);
+            return getPattern(base, resources);
         } else {
             if (!base.empty()) {
                 LOGGER.log(Level.SEVERE, "Color space has to be a name or array, but it is not");
@@ -151,7 +151,7 @@ public class ColorSpaceFactory {
         }
     }
 
-    private static PDPattern getPattern(COSObject base) {
+    private static PDPattern getPattern(COSObject base, PDResources resources) {
         Long patternType = base.getIntegerKey(ASAtom.PATTERN_TYPE);
         if (patternType != null) {
             int simplePatternType = patternType.intValue();
@@ -159,7 +159,7 @@ public class ColorSpaceFactory {
                 case PDPattern.TYPE_TILING_PATTERN:
                     return new PDTilingPattern(base);
                 case PDPattern.TYPE_SHADING_PATTERN:
-                    return new PDShadingPattern(base);
+                    return new PDShadingPattern(base, resources);
                 default:
                     LOGGER.log(Level.FINE, "PatternType value is not correct");
                     return null;
