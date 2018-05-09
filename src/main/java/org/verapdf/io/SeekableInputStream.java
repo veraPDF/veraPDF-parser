@@ -36,7 +36,7 @@ import java.io.InputStream;
  */
 public abstract class SeekableInputStream extends ASInputStream {
 
-    public static final int MAX_BUFFER_SIZE = 10240;
+    private static final int MAX_BUFFER_SIZE = 10240;
 
     /**
      * Goes to a particular byte in stream.
@@ -81,6 +81,11 @@ public abstract class SeekableInputStream extends ASInputStream {
     @Override
     public void incrementResourceUsers() {
         this.resourceUsers.increment();
+    }
+
+    @Override
+    public void decrementResourceUsers() {
+        this.resourceUsers.decrement();
     }
 
     /**
@@ -149,7 +154,7 @@ public abstract class SeekableInputStream extends ASInputStream {
         int totalRead = 0;
         byte[] buffer = new byte[0];
         byte[] temp = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
-        while (totalRead < MAX_BUFFER_SIZE) {
+        while (MAX_BUFFER_SIZE < 0 || totalRead < MAX_BUFFER_SIZE) {
             int read = stream.read(temp);
             if (read == -1) {
                 return new ASMemoryInStream(buffer, buffer.length, false);

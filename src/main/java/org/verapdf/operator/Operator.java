@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class Operator {
 
-	private static final Map<String, Operator> cachedOperators = new HashMap<>();
+	private static final Map<String, Operator> CACHED_OPERATORS = new HashMap<>();
 
 	private String operator;
 
@@ -41,11 +41,11 @@ public class Operator {
 		if (operator.equals("BI") || operator.equals("ID")) {
 			return new InlineImageOperator(operator);
 		} else {
-			if (cachedOperators.containsKey(operator)) {
-				return cachedOperators.get(operator);
+			if (CACHED_OPERATORS.containsKey(operator)) {
+				return CACHED_OPERATORS.get(operator);
 			} else {
 				Operator result = new Operator(operator);
-				cachedOperators.put(operator, result);
+				CACHED_OPERATORS.put(operator, result);
 				return result;
 			}
 		}

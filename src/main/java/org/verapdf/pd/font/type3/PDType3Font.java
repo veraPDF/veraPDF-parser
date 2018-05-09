@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSStream;
 import org.verapdf.pd.PDResources;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDSimpleFont;
@@ -45,6 +46,9 @@ public class PDType3Font extends PDSimpleFont {
         this.setSuccessfullyParsed(true);
     }
 
+    /**
+     * @return dictionary with char proc values.
+     */
     public COSDictionary getCharProcDict() {
         return (COSDictionary) this.dictionary.getKey(ASAtom.CHAR_PROCS).getDirectBase();
     }
@@ -54,6 +58,9 @@ public class PDType3Font extends PDSimpleFont {
         return null;
     }
 
+    /**
+     * @return resources as presented in type 3 font dictionary.
+     */
     public PDResources getResources() {
         COSObject resources = this.dictionary.getKey(ASAtom.RESOURCES);
         if (!resources.empty() && resources.getType() == COSObjType.COS_DICT) {
@@ -71,6 +78,13 @@ public class PDType3Font extends PDSimpleFont {
         return this.dictionary.getStringKey(ASAtom.NAME);
     }
 
+    /**
+     * Checks if char proc dictionary contains char proc for glyph with given
+     * code.
+     *
+     * @param code is the code of glyph.
+     * @return true if char proc for this glyph is present.
+     */
     public boolean containsCharString(int code) {
         return !getCharProc(code).empty();
     }
@@ -125,7 +139,7 @@ public class PDType3Font extends PDSimpleFont {
     public float getWidthFromProgram(int code) {
         COSObject charProc = getCharProc(code);
         if (charProc.getType() == COSObjType.COS_STREAM) {
-            try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData())) {
+            try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData(COSStream.FilterFlags.DECODE))) {
                 parser.parse();
                 return (float) parser.getWidth();
             } catch (IOException e) {

@@ -77,7 +77,9 @@ public class Token {
 		TT_CLOSEARRAY,
 		TT_OPENDICT,
 		TT_CLOSEDICT,
-		TT_EOF
+		TT_EOF,
+		TT_STARTPROC,
+		TT_ENDPROC
 	}
 
 	public enum Keyword {
@@ -97,27 +99,27 @@ public class Token {
 		KW_TRAILER
 	}
 
-	private static final Map<String, Keyword> keywords = new HashMap<>();
+	private static final Map<String, Keyword> KEYWORDS = new HashMap<>();
 
 	static {
-		keywords.put("null", Keyword.KW_NULL);
-		keywords.put("true", Keyword.KW_TRUE);
-		keywords.put("false", Keyword.KW_FALSE);
-		keywords.put("stream", Keyword.KW_STREAM);
-		keywords.put("endstream", Keyword.KW_ENDSTREAM);
-		keywords.put("obj", Keyword.KW_OBJ );
-		keywords.put("endobj", Keyword.KW_ENDOBJ);
-		keywords.put("R", Keyword.KW_R );
-		keywords.put("n", Keyword.KW_N);
-		keywords.put("f", Keyword.KW_F);
-		keywords.put("xref", Keyword.KW_XREF);
-		keywords.put("startxref", Keyword.KW_STARTXREF);
-		keywords.put("trailer", Keyword.KW_TRAILER);
-		keywords.put(null, Keyword.KW_NONE);
+		KEYWORDS.put("null", Keyword.KW_NULL);
+		KEYWORDS.put("true", Keyword.KW_TRUE);
+		KEYWORDS.put("false", Keyword.KW_FALSE);
+		KEYWORDS.put("stream", Keyword.KW_STREAM);
+		KEYWORDS.put("endstream", Keyword.KW_ENDSTREAM);
+		KEYWORDS.put("obj", Keyword.KW_OBJ );
+		KEYWORDS.put("endobj", Keyword.KW_ENDOBJ);
+		KEYWORDS.put("R", Keyword.KW_R );
+		KEYWORDS.put("n", Keyword.KW_N);
+		KEYWORDS.put("f", Keyword.KW_F);
+		KEYWORDS.put("xref", Keyword.KW_XREF);
+		KEYWORDS.put("startxref", Keyword.KW_STARTXREF);
+		KEYWORDS.put("trailer", Keyword.KW_TRAILER);
+		KEYWORDS.put(null, Keyword.KW_NONE);
 	}
 
 	public static Keyword getKeyword(final String keyword) {
-		return keywords.get(keyword);
+		return KEYWORDS.get(keyword);
 	}
 
 	//GETTERS & SETTERS

@@ -70,7 +70,11 @@ public class BaseParser {
 		if (fileStream instanceof SeekableInputStream) {
 			this.source = (SeekableInputStream) fileStream;
 		} else {
-			this.source = SeekableInputStream.getSeekableStream(fileStream);
+			try {
+				this.source = SeekableInputStream.getSeekableStream(fileStream);
+			} finally {
+				fileStream.close();
+			}
 		}
 	}
 
@@ -196,7 +200,7 @@ public class BaseParser {
 				if (ch == '>') {
 					this.token.type = Token.Type.TT_CLOSEDICT;
 				} else {
-					// error
+					throw new IOException("Unknown symbol " + ch + " after \'>\'");
 				}
 				break;
 			case '[':
@@ -290,19 +294,19 @@ public class BaseParser {
 	}
 
 	protected void skipStreamSpaces() throws IOException {
-		byte space = this.source.readByte();
+		byte ch = this.source.readByte();
 
 		//check for whitespace
-		while (space == ASCII_SPACE) {
-			space = this.source.readByte();
+		while (ch == ASCII_SPACE) {
+			ch = this.source.readByte();
 		}
 
-		if (space == ASCII_CR) {
-			space = this.source.readByte();
-			if (space != ASCII_LF) {
+		if (isCR(ch)) {
+			ch = this.source.readByte();
+			if (!isLF(ch)) {
 				this.source.unread();
 			}
-		} else if (space != ASCII_LF) {
+		} else if (!isLF(ch)) {
 			this.source.unread();
 		}
 	}
@@ -315,7 +319,7 @@ public class BaseParser {
 		return c >= ASCII_ZERO && c <= ASCII_NINE;
 	}
 
-	protected boolean isHexDigit(byte ch) {
+	protected static boolean isHexDigit(byte ch) {
 		return isDigit(ch)
 				|| (ch >= 'a' && ch <= 'f')
 				|| (ch >= 'A' && ch <= 'F');
@@ -357,25 +361,25 @@ public class BaseParser {
 		byte ch;
 		while (!this.source.isEOF()) {
 			ch = this.source.readByte();
-			if (isLF(ch)) {
-				return; // EOL == LF
-			}
-
-			if (isEndOfComment(ch)) {
-				if (isCR(ch)) {
-					ch = this.source.readByte();
-					if (isLF(ch)) { // EOL == CR
-						this.source.unread();
-					} // else EOL == CRLF
-				}
+			if (isEOL(ch)) {
 				return;
 			}
 			// else skip regular character
 		}
 	}
 
-	protected boolean isEndOfComment(byte ch) {
-		return isCR(ch);
+	protected boolean isEOL(byte ch) throws IOException {
+		if (isLF(ch)) {
+			return true; // EOL == LF
+		} else if (isCR(ch)) {
+			ch = this.source.readByte();
+			if (!isLF(ch)) { // EOL == CR
+				this.source.unread();
+			} // else EOL == CRLF
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private void readLitString() throws IOException {
@@ -479,9 +483,7 @@ public class BaseParser {
 		boolean odd = false;
 		while (!this.source.isEOF()) {
 			ch = this.source.readByte();
-			if (CharTable.isSpace(ch)) {
-				continue;
-			} else if (ch == '>') {
+			if (ch == '>') {
 				if (odd) {
 					uc <<= 4;
 					appendToToken(uc);
@@ -489,7 +491,7 @@ public class BaseParser {
 				this.token.setContainsOnlyHex(containsOnlyHex);
 				this.token.setHexCount(Long.valueOf(hexCount));
 				return;
-			} else {
+			} else if (!CharTable.isSpace(ch)) {
 				hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
 				hexCount++;
 				if (hex < 16 && hex > -1) { // skip all non-Hex characters
@@ -548,10 +550,10 @@ public class BaseParser {
 				byte ch1, ch2;
 				byte dc;
 				ch1 = this.source.readByte();
-				if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.er) {
+				if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.ER) {
 					dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
 					ch2 = this.source.readByte();
-					if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.er) {
+					if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.ER) {
 						dc = (byte) ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
 						appendToToken(dc);
 					} else {

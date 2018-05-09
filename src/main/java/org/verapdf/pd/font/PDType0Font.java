@@ -32,7 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents Type0 font on pd level.
+ * Represents Type0 font on pd level. Note that on the cos level object of this
+ * class is a COSDictionary of descendant font.
  *
  * @author Sergey Shemyakov
  */
@@ -57,10 +58,9 @@ public class PDType0Font extends PDCIDFont {
      * @param dictionary
      */
     public PDType0Font(COSDictionary dictionary) {
-        super(getDedcendantCOSDictionary(dictionary));
+        super(getDescendantCOSDictionary(dictionary));
         type0FontDict = dictionary == null ?
                 (COSDictionary) COSDictionary.construct().get() : dictionary;
-
         this.cMap = getCMap().getCMapFile();
     }
 
@@ -68,7 +68,7 @@ public class PDType0Font extends PDCIDFont {
      * @return PD CMap associated with this Type 0 font as specified by Encoding
      * key in font dictionary.
      */
-    public org.verapdf.pd.font.cmap.PDCMap getCMap() {
+    public PDCMap getCMap() {
         if (this.pdcMap == null) {
             COSObject cMap = this.type0FontDict.getKey(ASAtom.ENCODING);
             if (!cMap.empty()) {
@@ -81,7 +81,7 @@ public class PDType0Font extends PDCIDFont {
         return this.pdcMap;
     }
 
-    private static COSDictionary getDedcendantCOSDictionary(COSDictionary dict) {
+    private static COSDictionary getDescendantCOSDictionary(COSDictionary dict) {
         if (dict != null) {
             COSArray array =
                     (COSArray) dict.getKey(ASAtom.DESCENDANT_FONTS).getDirectBase();
@@ -109,7 +109,7 @@ public class PDType0Font extends PDCIDFont {
      * @return COSDictionary that is font dictionary for descendant font.
      */
     public COSDictionary getDescendantFont() {
-        return getDedcendantCOSDictionary(this.type0FontDict);
+        return getDescendantCOSDictionary(this.type0FontDict);
     }
 
     /**

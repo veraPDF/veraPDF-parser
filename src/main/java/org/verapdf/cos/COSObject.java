@@ -32,7 +32,7 @@ import java.util.Set;
  */
 public class COSObject {
 
-	private final static COSObject empty = new COSObject();
+	private final static COSObject EMPTY = new COSObject();
 
 	private COSBase base;
 
@@ -66,7 +66,7 @@ public class COSObject {
 	}
 
 	public void assign(COSObject object) {
-		if (object == null && object.get() == null) {
+		if (object == null || object.get() == null) {
 			return;
 		}
 
@@ -457,7 +457,7 @@ public class COSObject {
 	}
 
 	public static COSObject getEmpty() {
-		return empty;
+		return EMPTY;
 	}
 
 	//GETTERS & SETTERS

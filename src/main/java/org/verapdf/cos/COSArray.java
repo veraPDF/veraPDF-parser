@@ -34,7 +34,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
 
     protected COSArray() {
         super();
-        this.entries = new ArrayList<COSObject>();
+        this.entries = new ArrayList<>();
     }
 
     protected COSArray(final int size, final COSObject[] values) {
@@ -44,7 +44,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
 
     protected COSArray(final int size, final double[] values) {
         super();
-        this.entries = new ArrayList<COSObject>();
+        this.entries = new ArrayList<>();
         for (double value : values) {
             this.entries.add(COSReal.construct(value));
         }
@@ -52,8 +52,13 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
 
     protected COSArray(final int i, final COSObject object) {
         super();
-        this.entries = new ArrayList<COSObject>();
+        this.entries = new ArrayList<>();
         this.entries.add(i, object);
+    }
+
+    protected COSArray(final int size) {
+        super();
+        this.entries = new ArrayList<>(size);
     }
 
     //! Object type
@@ -78,6 +83,10 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
     //! Returns COSObject wrapping a new COSArray instance constructed via given object at a given index
     public static COSObject construct(final int i, final COSObject obj) {
         return new COSObject(new COSArray(i, obj));
+    }
+
+    public static COSObject construct(final int size) {
+        return new COSObject(new COSArray(size));
     }
 
     public void accept(IVisitor visitor) {
@@ -121,7 +130,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
     }
 
     public void remove(final int i) {
-        if (entries.size() < i) {
+        if (entries.size() > i) {
             this.entries.remove(i);
         }
     }
@@ -167,7 +176,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        List<COSBasePair> checkedObjects = new LinkedList<COSBasePair>();
+        List<COSBasePair> checkedObjects = new LinkedList<>();
         return this.equals(obj, checkedObjects);
 
     }

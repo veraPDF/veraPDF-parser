@@ -43,6 +43,14 @@ public class TypeConverter {
 		if (toParse != null
 				&& toParse.startsWith("D:")) {
 
+			if (toParse.endsWith("'")) {
+				if (toParse.endsWith("''")) {
+					return getErrorDateFormat("Trailing apostrophe duplication");
+				} else {
+					toParse = toParse.substring(0, toParse.length() - 1);
+				}
+			}
+
 			if (!isDigits(toParse, 2, 4)) {
 				return getErrorDateFormat("Incorrect year data.");
 			}
@@ -115,7 +123,7 @@ public class TypeConverter {
 
 			if (length > 19) {
 				if (!"'".equals(toParse.substring(19, 20))) {
-					return getErrorDateFormat("Missing apostroph delimiter.");
+					return getErrorDateFormat("Missing apostrophe delimiter.");
 				}
 			}
 
@@ -127,14 +135,7 @@ public class TypeConverter {
 				}
 			}
 
-			// date format from PDF 1.4 spec
 			if (length > 22) {
-				if (!"'".equals(toParse.substring(22, 23))) {
-					return getErrorDateFormat("Incorrect ending.");
-				}
-			}
-
-			if (length > 23) {
 				return getErrorDateFormat("Incorrect ending.");
 			}
 

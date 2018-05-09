@@ -57,10 +57,11 @@ public class CIDToGIDMapping {
                 return;
             } else {
                 this.isIdentity = false;
-                ASInputStream stream = obj.getData(COSStream.FilterFlags.DECODE);
-                mapping = new
-                        int[(obj.getIntegerKey(ASAtom.LENGTH).intValue() + 1) / 2];
-                parseCIDToGIDStream(stream);
+                try (ASInputStream stream = obj.getData(COSStream.FilterFlags.DECODE)) {
+                    mapping = new
+                            int[(obj.getIntegerKey(ASAtom.LENGTH).intValue() + 1) / 2];
+                    parseCIDToGIDStream(stream);
+                }
                 return;
             }
         }
@@ -134,7 +135,7 @@ public class CIDToGIDMapping {
         }
     }
 
-    private List<Integer> readEndOfMapping(ASInputStream stream, int b) throws IOException {
+    private static List<Integer> readEndOfMapping(ASInputStream stream, int b) throws IOException {
         List<Integer> res = new ArrayList<>();
         while (b != -1) {
             int num = b;

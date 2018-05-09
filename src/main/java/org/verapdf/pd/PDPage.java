@@ -70,9 +70,9 @@ public class PDPage extends PDPageTreeNode {
         this.pageNumber = 0;
         this.pagesTotal = 0;
 
-        initializeContents(obj);
-
         super.setObject(obj);
+
+        initializeContents(obj);
     }
 
     private void initializeContents(final COSObject pageDict) {
@@ -142,7 +142,7 @@ public class PDPage extends PDPageTreeNode {
         return res;
     }
 
-    private double[] getDoubleArrayForBox(COSArray array) {
+    private static double[] getDoubleArrayForBox(COSArray array) {
         if (array == null) {
             return null;
         }

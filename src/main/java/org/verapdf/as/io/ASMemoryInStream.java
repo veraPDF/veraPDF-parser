@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 /**
- * This class binds the ASInputStream interface to a memory buffer.
+ * This class binds the SeekableInputStream interface to a memory buffer.
  *
  * @author Sergey Shemyakov
  */
@@ -196,9 +196,12 @@ public class ASMemoryInStream extends SeekableInputStream {
      */
     @Override
     public void closeResource() throws IOException {
-        this.numOfBufferUsers.decrement();
-        if (numOfBufferUsers.equals(0)) {
-            buffer = null;
+        if (!isSourceClosed) {
+            isSourceClosed = true;
+            this.numOfBufferUsers.decrement();
+            if (numOfBufferUsers.equals(0)) {
+                buffer = null;
+            }
         }
     }
 

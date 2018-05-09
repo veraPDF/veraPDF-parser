@@ -113,8 +113,8 @@ public class COSFilters extends PDObject {
 
 		filters.clearArray();
 
-		for (int i = 0; i < this.entries.size(); i++) {
-			filters.add(COSName.construct(this.entries.get(i)));
+		for (ASAtom entry : this.entries) {
+			filters.add(COSName.construct(entry));
 		}
 	}
 

@@ -29,12 +29,12 @@
     <parent>
       <artifactId>verapdf-parent</artifactId>
       <groupId>org.verapdf</groupId>
-      <version>1.4.1</version>
+      <version>1.12.2</version>
     </parent>
 
     <groupId>org.verapdf</groupId>
     <artifactId>parser</artifactId>
-    <version>1.8.0</version>
+    <version>1.12.0</version>
 
     <name>veraPDF Parser</name>
     <description>veraPDF tools for parsing, modifying and creating PDF documents.</description>
@@ -71,6 +71,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -110,7 +111,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.4</version>
           <configuration>
             <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
             <dependencyLocationsEnabled>false</dependencyLocationsEnabled>

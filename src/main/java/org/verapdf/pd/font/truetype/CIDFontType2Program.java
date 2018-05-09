@@ -104,6 +104,9 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
         return false;
     }
 
+    /**
+     * @return a list of CIDs used in this font.
+     */
     public List<Integer> getCIDList() {
         if (!cidToGID.isIdentity()) {
             int size = cidToGID.getMappingSize();

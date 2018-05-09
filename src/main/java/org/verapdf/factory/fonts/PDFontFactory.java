@@ -67,7 +67,7 @@ public class PDFontFactory {
                 return null;
             }
         }
-		LOGGER.log(Level.FINE, "Expected COSDictionary");
+		LOGGER.log(Level.SEVERE, "Font object is not a dictionary");
 		return null;
     }
 }

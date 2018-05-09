@@ -27,10 +27,14 @@ import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
+import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.PDObject;
 import org.verapdf.tools.IntReference;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +52,7 @@ public class PDCMap extends PDObject {
     private CMap cMapFile = null;
     private PDCMap useCMap = null;
     private boolean parsedCMap = false;
+    private Boolean isIdentity;
 
     /**
      * Constructor from COSObject.
@@ -100,11 +105,7 @@ public class PDCMap extends PDObject {
             parsedCMap = true;
             if (this.getObject().getType() == COSObjType.COS_STREAM) {
                 try (ASInputStream cMapStream = this.getObject().getData(COSStream.FilterFlags.DECODE)) {
-                    String cMapName = getCMapName();
-                    if (cMapName == null) {
-                        cMapName = getCMapID();
-                    }
-                    this.cMapFile = CMapFactory.getCMap(cMapName , cMapStream);
+                    this.cMapFile = CMapFactory.getCMap(getCMapID(), cMapStream);
                 } catch (IOException e) {
                     LOGGER.log(Level.FINE, "Can't close stream", e);
                 }
@@ -112,7 +113,7 @@ public class PDCMap extends PDObject {
                 String name = this.getObject().getString();
                 String cMapPath = "/font/cmap/" + name;
                 try (ASInputStream cMapStream = loadCMap(cMapPath)) {
-                    this.cMapFile = CMapFactory.getCMap(getCMapName(), cMapStream);
+                    this.cMapFile = CMapFactory.getCMap(getCMapID(), cMapStream);
                 } catch (IOException e) {
                     LOGGER.log(Level.FINE, "Can't close stream", e);
                 }
@@ -157,6 +158,9 @@ public class PDCMap extends PDObject {
         return this.getCIDSystemInfo().getIntegerKey(ASAtom.SUPPLEMENT);
     }
 
+    /**
+     * @return COSObject of the referenced cMap.
+     */
     public COSObject getUseCMap() {
         COSObject res = this.getObject().getKey(ASAtom.USE_CMAP);
         return res == null ? COSObject.getEmpty() : res;
@@ -201,39 +205,29 @@ public class PDCMap extends PDObject {
 
     private static ASInputStream loadCMap(String cMapName) {
         try {
-            File cMapFile;
-            URL res = PDCMap.class.getResource(cMapName);
-            if (res == null) {
+            URL resURL = PDCMap.class.getResource(cMapName);
+            if (resURL == null) {
                 throw new IOException("CMap " + cMapName + " can't be found.");
             }
-            if (res.toString().startsWith("jar:")) {
-                cMapFile = File.createTempFile("tempfile", ".tmp");
-                InputStream input = PDCMap.class.getResourceAsStream(cMapName);
-                OutputStream out = new FileOutputStream(cMapFile);
-                int read;
-                byte[] bytes = new byte[1024];
-
-                while ((read = input.read(bytes)) != -1) {
-                    out.write(bytes, 0, read);
-                }
-                input.close();
-                out.close();
-                cMapFile.deleteOnExit();
+            File cMapFile = new File(resURL.getFile());
+            if (cMapFile.exists()) {
+                return new ASFileInStream(
+                        new RandomAccessFile(cMapFile, "r"), 0, cMapFile.length(),
+                        new IntReference(), cMapFile.getAbsolutePath(), false);
             } else {
-                cMapFile = new File(res.getFile());
+                try (InputStream input = PDCMap.class.getResourceAsStream(cMapName)) {
+                    return SeekableInputStream.getSeekableStream(input);
+                }
             }
-            if (!cMapFile.exists()) {
-                throw new IOException("Error: File " + cMapFile + " not found!");
-            }
-            return new ASFileInStream(
-                    new RandomAccessFile(cMapFile, "r"), 0, cMapFile.length(),
-                    new IntReference(), cMapFile.getAbsolutePath(), true);
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Error in opening predefined CMap " + cMapName, e);
             return null;
         }
     }
 
+    /**
+     * Gets Unicode value for this code.
+     */
     public String toUnicode(int code) {
         String res = null;
         if (this.getCMapFile() != null) {
@@ -246,5 +240,15 @@ public class PDCMap extends PDObject {
             }
         }
         return res;
+    }
+
+    /**
+     * Checks if this cMap is identity.
+     */
+    public boolean isIdentity() {
+        if (isIdentity == null) {
+            isIdentity = this.getCMapName().startsWith("Identity-");
+        }
+        return isIdentity;
     }
 }

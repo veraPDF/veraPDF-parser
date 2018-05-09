@@ -39,7 +39,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     private static final String NOTDEF_STRING = ".notdef";
 
-    private CMap externalCMap;  // in case if font is located in
+    private CMap externalCMap;  // in case if font is embedded into Type0 font
     private long encodingOffset;
     private int[] encoding;     // array with mapping code -> gid
     private boolean isStandardEncoding = false;
@@ -213,7 +213,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         }
     }
 
-    private void readWidths() throws IOException {
+    private void readWidths() {
         CFFCharStringsHandler charStrings = new CFFCharStringsHandler(
                 this.charStrings, this.charStringsOffset, this.source);
         this.widths = new CharStringsWidths(this.isSubset, this.charStringType,
@@ -307,7 +307,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     }
 
     private void initializeCharSet(String[] charSetArray) {
-        for (int i = 0; i < charSetArray.length; ++i) {
+        for (int i = 0; i < this.nGlyphs; ++i) {
             charSet.put(charSetArray[i], i);
             inverseCharSet.put(i, charSetArray[i]);
         }

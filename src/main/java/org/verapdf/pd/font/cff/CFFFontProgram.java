@@ -53,8 +53,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
      * @throws IOException if creation of @{link SeekableStream} fails.
      */
     public CFFFontProgram(ASInputStream stream, CMap cMap,
-                          boolean isSubset)
-            throws IOException {
+                          boolean isSubset) throws IOException {
         super(stream);
         this.externalCMap = cMap;
         this.isSubset = isSubset;
@@ -82,14 +81,13 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                         topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
                         this.externalCMap, this.isSubset);
-                font.parseFont();
             } else {
                 font = new CFFType1FontProgram(this.source, this.definedNames, globalSubrs,
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                         topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
                         this.externalCMap, this.isSubset);
-                font.parseFont();
             }
+            font.parseFont();
         }
     }
 
@@ -167,20 +165,12 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
     @Override
     public boolean isAttemptedParsing() {
-        if (font != null) {
-            return this.font.isAttemptedParsing();
-        } else {
-            return false;
-        }
+        return font != null && font.isAttemptedParsing();
     }
 
     @Override
     public boolean isSuccessfulParsing() {
-        if (font != null) {
-            return this.font.isSuccessfulParsing();
-        } else {
-            return false;
-        }
+        return font != null && font.isSuccessfulParsing();
     }
 
     public List<Integer> getCIDList() {

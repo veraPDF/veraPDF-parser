@@ -22,17 +22,28 @@ package org.verapdf.as.filters.io;
 
 import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.parser.NotSeekableBaseParser;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 /**
  * Class provides buffered input from input stream.
+ * It has two uses. If the ASBufferedInFilter object is used as a buffered
+ * stream (e. g. in unseekable parsers) then the buffer holds DECODED bytes read
+ * from inlaying stream.
+ * Before using the ASBufferedInFilter in this make sure to call initialize()
+ * method.
+ *
+ * In filter classes that are inherited from ASBufferedInFilter the buffer holds
+ * ENCODED bytes that are processed into decoded bytes on read() method calls.
  *
  * @author Sergey Shemyakov
  */
 public class ASBufferedInFilter extends ASInFilter {
 
+    public static final int START_BUFFER_SIZE = 10240;
     public static final int BF_BUFFER_SIZE = 2048;
 
     private int HALF;
@@ -58,14 +69,13 @@ public class ASBufferedInFilter extends ASInFilter {
         this(stream, BF_BUFFER_SIZE);
     }
 
-    public ASBufferedInFilter(ASInputStream stream, int buffCapacity) throws IOException {
+    public ASBufferedInFilter(ASInputStream stream, int buffCapacity) {
         super(stream);
         this.bufferCapacity = buffCapacity;
         buffer = new byte[buffCapacity];
         bufferEnd = bufferBegin = 0;
         this.HALF = buffCapacity / 2;
         this.BUFFER_FEED_THRESHOLD = 3 * buffCapacity / 4;
-        stream.incrementResourceUsers();
     }
 
     /**
@@ -98,8 +108,8 @@ public class ASBufferedInFilter extends ASInFilter {
             }
             // adding read data to buffer
             shiftBuffer(copied + read);
-            int sourceBeginOffset = Math.max(0, copied + read - buffer.length);
-            int destBeginOffset = Math.max(0, buffer.length - copied - read);
+            int sourceBeginOffset = Math.max(0, copied + read - this.buffer.length);
+            int destBeginOffset = Math.max(0, this.buffer.length - copied - read);
             int readSize = Math.min(buffer.length, copied + read);
             System.arraycopy(buffer, sourceBeginOffset, this.buffer, destBeginOffset,
                     readSize);
@@ -283,9 +293,6 @@ public class ASBufferedInFilter extends ASInFilter {
         return res;
     }
 
-    protected void decode() throws IOException {
-    }
-
     /**
      * Skips given number of decoded bytes in stream.
      *
@@ -350,10 +357,11 @@ public class ASBufferedInFilter extends ASInFilter {
 
     private void readFromStreamToBuffer(int offset, int len) throws IOException {
         int read = getInputStream().read(buffer, offset, len);
+        this.bufferEnd = read;
         if (read < len) {
             // TODO: in fact, read may be less then len even if eof is not reached.
             // Fix problem for this case.
-            eod = offset + read;
+            eod = offset + (read == -1 ? 0 : read);
         }
     }
 
@@ -375,5 +383,51 @@ public class ASBufferedInFilter extends ASInFilter {
         if (this.eod != -1) {
             this.eod -= length;
         }
+    }
+
+    /**
+     * Gets a stream that is a piece of this stream. The next length bytes will
+     * be the data in the new stream.
+     *
+     * @param length is the length of new stream.
+     * @return new stream.
+     */
+    public ASInputStream getStream(int length) throws IOException {
+        byte[] buf = new byte[START_BUFFER_SIZE];
+        int pointer = 0;
+        byte readByte = this.readByte();
+        while (pointer < length && !this.isEOF()) {
+            buf[pointer++] = readByte;
+            if (pointer == buf.length) {
+                buf = NotSeekableBaseParser.extendArray(buf);
+            }
+            readByte = this.readByte();
+        }
+        return new ASMemoryInStream(buf, buf.length, false);
+    }
+
+    /**
+     * Gets a stream that is a piece of this stream. The data is taken from the
+     * current buffer position until the given token is not found.
+     *
+     * @param token is the byte array that means the end of stream.
+     * @return new stream.
+     */
+    public ASInputStream getStreamUntilToken(byte[] token) throws IOException {
+        byte[] buf = new byte[START_BUFFER_SIZE];
+        int read = this.read(buf, token.length);
+        byte readByte = this.readByte();
+        int pointer = read;
+        if (pointer != token.length) {
+            throw new IOException("Stream is shorter than finishing token");
+        }
+        while (!this.isEOF() && !Arrays.equals(token, Arrays.copyOfRange(buf, pointer - token.length, pointer))) {
+            buf[pointer++] = readByte;
+            if (pointer == buf.length) {
+                buf = NotSeekableBaseParser.extendArray(buf);
+            }
+            readByte = this.readByte();
+        }
+        return new ASMemoryInStream(buf, buf.length, false);
     }
 }

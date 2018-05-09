@@ -215,7 +215,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
 
     }
 
-    private void readWidths() throws IOException {
+    private void readWidths() {
         CFFCharStringsHandler charStrings = new CFFCharStringsHandler(
                 this.charStrings, this.charStringsOffset, this.source);
         this.widths = new CharStringsWidths(this.isSubset, this.charStringType,
@@ -229,7 +229,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
      * @param cid is character ID.
      * @return glyph ID or null if character is not in font.
      */
-    public Integer getGid(int cid) {
+    private Integer getGid(int cid) {
         if (isDefaultCharSet) {
             return cid;
         }

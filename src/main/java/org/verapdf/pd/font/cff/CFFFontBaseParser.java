@@ -83,7 +83,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                 this.stack.add(readNumber());
             } else {
                 this.source.readByte();
-                if (next > -1 && next < 22) {
+                if (next < 22) {
                     switch (next) {
                         case 15:    // charset
                             this.charSetOffset =
@@ -137,7 +137,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
         this.stack.clear();
     }
 
-    protected void readTopDictOneByteOps(int lastRead) throws IOException {
+    protected void readTopDictOneByteOps(int lastRead) {
         this.stack.clear();
     }
 
@@ -152,7 +152,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
             this.stack.add(readNumber());
         } else {
             this.source.readByte();
-            if (next > -1 && next < 22) {
+            if (next < 22) {
                 switch (next) {
                     case 20:    // defaultWidthX
                         this.defaultWidthX = (int)

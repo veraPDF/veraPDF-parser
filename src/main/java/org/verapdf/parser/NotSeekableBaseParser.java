@@ -3,10 +3,13 @@ package org.verapdf.parser;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.filters.COSFilterASCII85Decode;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +29,9 @@ public class NotSeekableBaseParser implements Closeable {
     private static final byte ASCII_ZERO = 48;
     private static final byte ASCII_NINE = 57;
 
+    // indicates if this parser is a postscript parser
+    protected boolean isPSParser = false;
+
     protected ASBufferedInFilter source;
     private Token token;
 
@@ -38,8 +44,21 @@ public class NotSeekableBaseParser implements Closeable {
             throw new IOException("Stream in NotSeekableBaseParser can't be null.");
         }
         this.source = new ASBufferedInFilter(stream);
-        source.initialize();
+        try {
+            source.initialize();
+        } catch (IOException e) {   // Someone have to close source in case of
+            // initialization exception
+            source.close();
+            throw e;
+        }
     }
+
+
+    public NotSeekableBaseParser(ASInputStream fileStream, boolean isPSParser) throws IOException {
+        this(fileStream);
+        this.isPSParser = isPSParser;
+    }
+
 
     /**
      * Closes source stream.
@@ -68,7 +87,7 @@ public class NotSeekableBaseParser implements Closeable {
         return this.token;
     }
 
-    protected String getLine() throws IOException {
+    protected void readLine() throws IOException {
         initializeToken();
         this.token.clearValue();
         byte ch = this.source.readByte();
@@ -79,11 +98,10 @@ public class NotSeekableBaseParser implements Closeable {
             appendToToken(ch);
             ch = this.source.readByte();
         }
-        return this.token.getValue();
     }
 
     protected byte[] getLineBytes() throws IOException {
-        getLine();
+        readLine();
         return this.token.getByteValue();
     }
 
@@ -149,6 +167,9 @@ public class NotSeekableBaseParser implements Closeable {
                 ch = source.readByte();
                 if (ch == '<') {
                     this.token.type = Token.Type.TT_OPENDICT;
+                } else if (ch == '~') {
+                    this.token.type = Token.Type.TT_HEXSTRING;
+                    readASCII85();
                 } else {
                     this.source.unread();
                     this.token.type = Token.Type.TT_HEXSTRING;
@@ -160,7 +181,7 @@ public class NotSeekableBaseParser implements Closeable {
                 if (ch == '>') {
                     this.token.type = Token.Type.TT_CLOSEDICT;
                 } else {
-                    // error
+                    throw new IOException("Unknown symbol " + ch + " after \'>\'");
                 }
                 break;
             case '[':
@@ -170,8 +191,14 @@ public class NotSeekableBaseParser implements Closeable {
                 this.token.type = Token.Type.TT_CLOSEARRAY;
                 break;
             case '{': // as delimiter in PostScript calculator functions 181
+                if (isPSParser) {
+                    this.token.type = Token.Type.TT_STARTPROC;
+                }
                 break;
             case '}':
+                if (isPSParser) {
+                    this.token.type = Token.Type.TT_ENDPROC;
+                }
                 break;
             case '/':
                 this.token.type = Token.Type.TT_NAME;
@@ -263,7 +290,7 @@ public class NotSeekableBaseParser implements Closeable {
                 return; // EOL == LF
             }
 
-            if (isCR(ch)) {
+            if (isEndOfComment(ch)) {
                 ch = this.source.readByte();
                 if (isLF(ch)) { // EOL == CR
                     this.source.unread();
@@ -272,6 +299,14 @@ public class NotSeekableBaseParser implements Closeable {
             }
             // else skip regular character
         }
+    }
+
+    protected boolean isEndOfComment(byte ch) {
+        return isCR(ch);
+    }
+
+    protected static boolean isFF(int c) {
+        return ASCII_FF == c;
     }
 
     protected static boolean isLF(int c) {
@@ -337,17 +372,19 @@ public class NotSeekableBaseParser implements Closeable {
                         case '5':
                         case '6':
                         case '7': {
-                            // look for 1, 2, or 3 octal characters
-                            char ch1 = (char) (ch - '0');
-                            for (int i = 1; i < 3; i++) {
-                                ch = this.source.readByte();
-                                if (ch < '0' || ch > '7') {
-                                    this.source.unread();
-                                    break;
+                            if (!isPSParser) {
+                                // look for 1, 2, or 3 octal characters
+                                char ch1 = (char) (ch - '0');
+                                for (int i = 1; i < 3; i++) {
+                                    ch = this.source.readByte();
+                                    if (ch < '0' || ch > '7') {
+                                        this.source.unread();
+                                        break;
+                                    }
+                                    ch1 = (char) ((ch1 << 3) + (ch - '0'));
                                 }
-                                ch1 = (char) ((ch1 << 3) + (ch - '0'));
+                                appendToToken(ch1);
                             }
-                            appendToToken(ch1);
                             break;
                         }
                         case ASCII_LF:
@@ -383,9 +420,7 @@ public class NotSeekableBaseParser implements Closeable {
         boolean odd = false;
         while (!this.source.isEOF()) {
             ch = this.source.readByte();
-            if (CharTable.isSpace(ch)) {
-                continue;
-            } else if (ch == '>') {
+            if (ch == '>') {
                 if (odd) {
                     uc <<= 4;
                     appendToToken(uc);
@@ -393,7 +428,7 @@ public class NotSeekableBaseParser implements Closeable {
                 this.token.setContainsOnlyHex(containsOnlyHex);
                 this.token.setHexCount(Long.valueOf(hexCount));
                 return;
-            } else {
+            } else if (!CharTable.isSpace(ch)) {
                 hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
                 hexCount++;
                 if (hex < 16 && hex > -1) { // skip all non-Hex characters
@@ -415,6 +450,40 @@ public class NotSeekableBaseParser implements Closeable {
         this.token.setHexCount(Long.valueOf(hexCount));
     }
 
+    private void readASCII85() throws IOException {
+        byte[] buf = new byte[ASBufferedInFilter.START_BUFFER_SIZE];
+        int pointer = 0;
+        byte readByte = this.source.readByte();
+        while (!this.source.isEOF() && (readByte != '~' || this.source.peek() != '>')) {
+            buf[pointer++] = readByte;
+            if (pointer == buf.length) {
+                buf = extendArray(buf);
+            }
+            readByte = this.source.readByte();
+        }
+        this.source.readByte();
+        try (ASMemoryInStream ascii85Data = new ASMemoryInStream(Arrays.copyOf(buf, pointer));
+             COSFilterASCII85Decode decoder = new COSFilterASCII85Decode(ascii85Data)) {
+            byte[] res = new byte[buf.length];
+            int read = decoder.read(res);
+
+            this.token.setContainsOnlyHex(false);
+            this.token.setHexCount(Long.valueOf(0));
+            if (read == -1) {
+                LOGGER.log(Level.WARNING, "Invalid ASCII85 string");
+                this.token.clearValue();
+            } else {
+                this.token.setByteValue(Arrays.copyOf(res, read));
+            }
+        }
+    }
+
+    public static byte[] extendArray(byte[] array) {
+        byte[] res = new byte[array.length * 2];
+        System.arraycopy(array, 0, res, 0, array.length);
+        return res;
+    }
+
     private void readName() throws IOException {
         this.token.clearValue();
         byte ch;
@@ -425,14 +494,14 @@ public class NotSeekableBaseParser implements Closeable {
                 break;
             }
 
-            if (ch == '#') {
+            if (ch == '#' && !isPSParser) {
                 byte ch1, ch2;
                 byte dc;
                 ch1 = this.source.readByte();
-                if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.er) {
+                if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.ER) {
                     dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
                     ch2 = this.source.readByte();
-                    if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.er) {
+                    if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.ER) {
                         dc = (byte) ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
                         appendToToken(dc);
                     } else {
@@ -466,6 +535,7 @@ public class NotSeekableBaseParser implements Closeable {
 
     protected void readNumber() throws IOException {
         try {
+            int radix = 10;
             initializeToken();
             this.token.clearValue();
             this.token.type = Token.Type.TT_INTEGER;
@@ -481,13 +551,16 @@ public class NotSeekableBaseParser implements Closeable {
                 } else if (ch == '.') {
                     this.token.type = Token.Type.TT_REAL;
                     appendToToken(ch);
+                } else if (ch == '#' && isPSParser) {
+                    radix = (int) this.token.integer;
+                    token.clearValue();
                 } else {
                     this.source.unread();
                     break;
                 }
             }
             if (this.token.type == Token.Type.TT_INTEGER) {
-                long value = Long.valueOf(this.token.getValue()).longValue();
+                long value = Long.valueOf(this.token.getValue(), radix).longValue();
                 this.token.integer = value;
                 this.token.real = value;
             } else {

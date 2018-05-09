@@ -23,10 +23,7 @@ package org.verapdf.pd.font.type1;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 import org.verapdf.parser.COSParser;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
@@ -37,9 +34,14 @@ import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetricsFactory;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
+import org.verapdf.tools.FontProgramIDGenerator;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,7 +53,7 @@ import java.util.logging.Logger;
 public class PDType1Font extends PDSimpleFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDType1Font.class.getCanonicalName());
-    public static final ASAtom[] STANDARD_FONT_NAMES = {
+    private static final ASAtom[] STANDARD_FONT_NAMES = {
             ASAtom.COURIER_BOLD,
             ASAtom.COURIER_BOLD_OBLIQUE,
             ASAtom.COURIER,
@@ -115,37 +117,70 @@ public class PDType1Font extends PDSimpleFont {
      */
     @Override
     public FontProgram getFontProgram() {
-        if (this.isFontParsed) {
-            return this.fontProgram;
-        }
-        this.isFontParsed = true;
-        if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE)) {
-            COSStream type1FontFile = fontDescriptor.getFontFile();
-            try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
-                this.fontProgram = new Type1FontProgram(fontData);
-                return this.fontProgram;
-            } catch (IOException e) {
-                LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
+        if (!this.isFontParsed) {
+            this.isFontParsed = true;
+            if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE)) {
+                parseType1FontProgram(ASAtom.FONT_FILE);
+            } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
+                parseType1FontProgram(ASAtom.FONT_FILE3);
+            } else {
+                this.fontProgram = null;
             }
-        } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
-            COSStream type1FontFile = fontDescriptor.getFontFile3();
-            ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
-            try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
-                if (subtype == ASAtom.TYPE1C) {
+        }
+        return this.fontProgram;
+    }
 
-                    this.fontProgram = new CFFFontProgram(fontData, null, this.isSubset());
-                    return this.fontProgram;
-                } else if (subtype == ASAtom.OPEN_TYPE) {
-                    this.fontProgram = new OpenTypeFontProgram(fontData, true, this.isSymbolic(),
-                            this.getEncoding(), null, this.isSubset());
-                    return this.fontProgram;
+    private void parseType1FontProgram(ASAtom fontFileType) {
+        if (fontDescriptor.canParseFontFile(fontFileType)) {
+            COSStream type1FontFile = null;
+            if (fontFileType == ASAtom.FONT_FILE) {
+                type1FontFile = fontDescriptor.getFontFile();
+            } else if (fontFileType == ASAtom.FONT_FILE3) {
+                type1FontFile = fontDescriptor.getFontFile3();
+            }
+            if (type1FontFile != null) {
+                COSKey key = type1FontFile.getObjectKey();
+                try {
+                    if (fontFileType == ASAtom.FONT_FILE) {
+                        String fontProgramID = FontProgramIDGenerator.getType1FontProgramID(key);
+                        this.fontProgram = StaticResources.getCachedFont(fontProgramID);
+                        if (fontProgram == null) {
+                            try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
+                                this.fontProgram = new Type1FontProgram(fontData);
+                                StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
+                            }
+                        }
+                    } else {    // fontFile3
+                        ASAtom subtype = type1FontFile.getNameKey(ASAtom.SUBTYPE);
+                        boolean isSubset = this.isSubset();
+                        if (subtype == ASAtom.TYPE1C) {
+                            String fontProgramID = FontProgramIDGenerator.getCFFFontProgramID(key, null, isSubset);
+                            this.fontProgram = StaticResources.getCachedFont(fontProgramID);
+                            if (fontProgram == null) {
+                                try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
+                                    this.fontProgram = new CFFFontProgram(fontData, null, isSubset);
+                                    StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
+                                }
+                            }
+                        } else if (subtype == ASAtom.OPEN_TYPE) {
+                            boolean isSymbolic = this.isSymbolic();
+                            COSObject encoding = this.getEncoding();
+                            String fontProgramID = FontProgramIDGenerator.getOpenTypeFontProgramID(key, true, isSymbolic, encoding, null, isSubset);
+                            this.fontProgram = StaticResources.getCachedFont(fontProgramID);
+                            if (fontProgram == null) {
+                                try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
+                                    this.fontProgram = new OpenTypeFontProgram(fontData, true, isSymbolic,
+                                            encoding, null, isSubset);
+                                    StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
+                                }
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
                 }
-            } catch (IOException e) {
-                LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
             }
         }
-        this.fontProgram = null;
-        return null;
     }
 
     /**
@@ -153,7 +188,7 @@ public class PDType1Font extends PDSimpleFont {
      */
     public Boolean isStandard() {
         if (this.isStandard == null) {
-            if (!containsDiffs() && !isEmbedded() && isNameStandard()) {
+            if (!isEmbedded() && isNameStandard()) {
                 isStandard = Boolean.valueOf(true);
                 return isStandard;
             }
@@ -161,26 +196,6 @@ public class PDType1Font extends PDSimpleFont {
             return isStandard;
         }
         return this.isStandard;
-    }
-
-    private boolean containsDiffs() {
-        if (this.dictionary.getKey(ASAtom.ENCODING).getType() ==
-                COSObjType.COS_DICT) {
-            Map<Integer, String> differences = this.getDifferences();
-            if (differences != null && differences.size() != 0) {
-                String[] baseEncoding = getBaseEncoding((COSDictionary)
-                        this.dictionary.getKey(ASAtom.ENCODING).getDirectBase());
-                if (baseEncoding.length == 0) {
-                    return true;
-                }
-                for (Map.Entry<Integer, String> entry : differences.entrySet()) {
-                    if (!entry.getValue().equals(baseEncoding[entry.getKey().intValue()])) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     private static String[] getBaseEncoding(COSDictionary encoding) {
@@ -252,13 +267,44 @@ public class PDType1Font extends PDSimpleFont {
     }
 
     private boolean isNameStandard() {
-        ASAtom fontName = this.getDictionary().getNameKey(ASAtom.BASE_FONT);
+        ASAtom fontName = ASAtom.getASAtom(getName());
         for (ASAtom standard : STANDARD_FONT_NAMES) {
             if (standard == fontName) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Get's Unicode value of character as it is described in PDF/A-1
+     * specification. The difference from usual toUnicode method is in standard
+     * encoding and symbol set lookups for the glyph name.
+     *
+     * @param code is code of character.
+     * @return Unicode value.
+     */
+    public String toUnicodePDFA1(int code) {
+        String unicodeString = super.cMapToUnicode(code);
+        if(unicodeString != null) {
+            return unicodeString;
+        }
+        Encoding fontEncoding = this.getEncodingMapping();
+        String glyphName =  null;
+        if (fontEncoding != null) {
+            glyphName = fontEncoding.getName(code);
+        }
+        if (glyphName == null && getFontProgram() != null) {
+            glyphName = fontProgram.getGlyphName(code);
+        }
+        if (glyphName != null) {
+            if (Arrays.asList(TrueTypePredefined.STANDARD_ENCODING).contains(glyphName) || SymbolSet.hasGlyphName(glyphName)) {
+                return " "; // indicates that toUnicode should not be checked.
+            }
+            return null;
+        }
+        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code" + code + " in font " + this.getName());
+        return null;
     }
 
 }

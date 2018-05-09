@@ -34,7 +34,7 @@ import java.util.Stack;
  */
 public abstract class BaseCharStringParser {
 
-    protected ASInputStream stream;
+    private Stack<ASInputStream> streams;
     protected Stack<CFFNumber> stack;
     private CFFNumber width;
 
@@ -51,10 +51,7 @@ public abstract class BaseCharStringParser {
      * @throws IOException if parsing fails.
      */
     protected BaseCharStringParser(ASInputStream stream) throws IOException {
-        this.stream = stream;
-        this.stack = new Stack<>();
-        this.width = null;
-        parse();
+        this(stream, null, 0, null, 0);
     }
 
     /**
@@ -71,7 +68,8 @@ public abstract class BaseCharStringParser {
      */
     protected BaseCharStringParser(ASInputStream stream, CFFIndex localSubrs,
                                    int bias, CFFIndex globalSubrs, int gBias) throws IOException {
-        this.stream = stream;
+        this.streams = new Stack<>();
+        this.streams.push(stream);
         this.stack = new Stack<>();
         this.width = null;
         this.globalSubrs = globalSubrs == null ? CFFIndex.getEmptyIndex() : globalSubrs;
@@ -105,11 +103,11 @@ public abstract class BaseCharStringParser {
         if (firstByte > 31 && firstByte < 247) {
             return new CFFNumber(firstByte - 139);
         } else if (firstByte > 246 && firstByte < 251) {
-            this.stream.read(buf, 1);
+            readStreams(buf, 1);
             return new CFFNumber(((firstByte - 247) << 8)
                     + (buf[0] & 0xFF) + 108);
         } else if (firstByte > 250 && firstByte < 255) {
-            this.stream.read(buf, 1);
+            readStreams(buf, 1);
             return new CFFNumber(-((firstByte - 251) << 8) -
                     (buf[0] & 0xFF) - 108);
         } else {
@@ -124,19 +122,57 @@ public abstract class BaseCharStringParser {
      */
     private void parse() throws IOException {
         byte[] buf = new byte[1];
-        int cont = this.stream.read(buf, 1);
+        int cont = readStreams(buf, 1);
         while (cont != -1) {
             int nextByte = buf[0] & 0xFF;
             if (nextByte > 31) {
                 this.stack.push(getNextInteger(nextByte));
             } else {
                 if (processNextOperator(nextByte)) {
-                    return;
+                    break;
                 }
             }
-            cont = this.stream.read(buf, 1);
+            cont = readStreams(buf, 1);
         }
+        clear();
+    }
+
+    protected int readStreams(byte[] buffer, int size) throws IOException {
+        if (buffer.length < size) {
+            throw new IOException("Can't write bytes into passed buffer: too small.");
+        }
+        if (this.streams.empty()) {
+            return -1;
+        }
+        int bufferIndex = 0;
+        int left = size;
+        while(left != 0 && !this.streams.empty()) {
+            byte[] temp = new byte[left];
+            int read = this.streams.peek().read(temp, left);
+            if (read > 0) {
+                System.arraycopy(temp, 0, buffer, bufferIndex, read);
+                bufferIndex += read;
+                left -= read;
+            } else if (read == -1) {
+                this.streams.pop().close();
+            }
+        }
+
+        int read = size - left;
+        return read == 0 ? -1 : read;
+    }
+
+    protected void addStream(ASInputStream is) {
+        if (is != null) {
+            this.streams.push(is);
+        }
+    }
+
+    private void clear() throws IOException {
         this.stack.clear();
+        while(!this.streams.empty()) {
+            this.streams.pop().close();
+        }
     }
 
     /**
@@ -145,7 +181,7 @@ public abstract class BaseCharStringParser {
      * @param num is amount of numbers to be popped.
      * @throws IOException if stream reading error occurs.
      */
-    protected void popStack(int num) throws IOException {
+    protected void popStack(int num) {
         for (int i = 0; i < num && !this.stack.empty(); ++i) {
             this.stack.pop();
         }

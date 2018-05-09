@@ -44,7 +44,6 @@ public class InternalOutputStream implements ASOutputStream, Closeable {
 	 */
 	public static InternalOutputStream getInternalOutputStream() throws IOException {
 		File tempFile = File.createTempFile("tmp_pdf_file", ".pdf");
-		tempFile.deleteOnExit();
 		return new InternalOutputStream(tempFile);
 	}
 
@@ -143,7 +142,7 @@ public class InternalOutputStream implements ASOutputStream, Closeable {
 		return this.file;
 	}
 
-	private static File getFileFromString(String fileName) throws FileNotFoundException {
+	private static File getFileFromString(String fileName) {
 		File file = new File(fileName);
 		//check if file already exists and delete it
 		if (file.exists()) {

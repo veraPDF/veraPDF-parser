@@ -26,7 +26,6 @@ import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.io.COSXRefTableReader;
 import org.verapdf.io.IReader;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -37,15 +36,15 @@ public abstract class XRefReader implements IReader {
 	private COSXRefTableReader xref;
 
 	//CONSTRUCTORS
-	public XRefReader() throws IOException {
+	public XRefReader() {
 		this.xref = new COSXRefTableReader();
 	}
 
-	public XRefReader(final List<COSXRefInfo> infos) throws IOException {
+	public XRefReader(final List<COSXRefInfo> infos) {
 		this.xref = new COSXRefTableReader(infos);
 	}
 
-	public XRefReader(final COSXRefInfo info) throws IOException {
+	public XRefReader(final COSXRefInfo info) {
 		this.xref = new COSXRefTableReader(info);
 	}
 

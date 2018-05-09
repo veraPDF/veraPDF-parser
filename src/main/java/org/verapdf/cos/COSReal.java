@@ -31,7 +31,7 @@ import java.text.NumberFormat;
  */
 public class COSReal extends COSNumber {
 
-    private static final NumberFormat formatter = new DecimalFormat("#0.000000");
+    private static final NumberFormat FORMATTER = new DecimalFormat("#0.000000");
 
     private double value;
 
@@ -62,9 +62,8 @@ public class COSReal extends COSNumber {
         return (long) get();
     }
 
-    public boolean setInteger(final int value) {
+    public void setInteger(final int value) {
         set(value);
-        return true;
     }
 
     public Double getReal() {
@@ -85,7 +84,7 @@ public class COSReal extends COSNumber {
     }
 
     public String toString() {
-        String stringValue = formatter.format(this.value);
+        String stringValue = FORMATTER.format(this.value);
         // remove fraction digit "0" only
         if (stringValue.indexOf('.') > -1 && !stringValue.endsWith(".0"))
         {

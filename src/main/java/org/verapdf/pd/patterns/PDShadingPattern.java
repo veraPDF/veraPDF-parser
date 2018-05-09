@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDExtGState;
+import org.verapdf.pd.PDResources;
 import org.verapdf.tools.TypeConverter;
 
 /**
@@ -31,8 +32,11 @@ import org.verapdf.tools.TypeConverter;
  */
 public class PDShadingPattern extends PDPattern {
 
-    public PDShadingPattern(COSObject obj) {
+    private final PDResources resources;
+
+    public PDShadingPattern(COSObject obj, PDResources resources) {
         super(obj);
+        this.resources = resources;
     }
 
     @Override
@@ -43,7 +47,7 @@ public class PDShadingPattern extends PDPattern {
     public PDShading getShading() {
         COSObject obj = getKey(ASAtom.SHADING);
         if (obj != null && obj.getType().isDictionaryBased()) {
-            return new PDShading(obj);
+            return new PDShading(obj, this.resources);
         } else {
             return null;
         }

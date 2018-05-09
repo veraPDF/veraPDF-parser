@@ -3,6 +3,7 @@ package org.verapdf.parser;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
+import org.verapdf.parser.postscript.PSObject;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
@@ -30,11 +31,15 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
 
     protected boolean flag = true;
 
-    NotSeekableCOSParser(ASInputStream stream) throws IOException {
+    public NotSeekableCOSParser(ASInputStream stream) throws IOException {
         super(stream);
     }
 
-    NotSeekableCOSParser(ASInputStream stream, COSDocument document) throws IOException {
+    public NotSeekableCOSParser(ASInputStream stream, boolean isPSParser) throws IOException {
+        super(stream, isPSParser);
+    }
+
+    public NotSeekableCOSParser(ASInputStream stream, COSDocument document) throws IOException {
         super(stream);
         this.document = document;
     }
@@ -94,7 +99,9 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
             case TT_NONE:
                 break;
             case TT_KEYWORD: {
-                if (token.keyword == null) {
+                if (token.keyword == null && isPSParser) {
+                    return PSObject.getPSObject(COSName.construct(token.getValue()), true);
+                } else if (token.keyword == null) {
                     break;
                 }
                 switch (token.keyword) {
@@ -117,6 +124,8 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
                     case KW_STARTXREF:
                     case KW_TRAILER:
                         break;
+                    default:
+
                 }
                 break;
             }
@@ -147,6 +156,10 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
                 return new COSObject();
             case TT_EOF:
                 return new COSObject();
+            case TT_STARTPROC:
+                this.flag = false;
+                COSObject proc =  getArray();
+                return PSObject.getPSObject(proc, true);
         }
         return new COSObject();
     }
@@ -158,7 +171,7 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
         this.flag = true;
 
         final Token token = getToken();
-        if (token.type != Token.Type.TT_OPENARRAY) {
+        if (token.type != Token.Type.TT_OPENARRAY && !(isPSParser && token.type == Token.Type.TT_STARTPROC)) {
             return new COSObject();
         }
 
@@ -170,7 +183,7 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
             obj = nextObject();
         }
 
-        if (token.type != Token.Type.TT_CLOSEARRAY) {
+        if (token.type != Token.Type.TT_CLOSEARRAY && !(isPSParser && token.type == Token.Type.TT_ENDPROC)) {
             // TODO : replace with ASException
             throw new IOException("PDFParser::GetArray()" + StringExceptions.INVALID_PDF_ARRAY);
         }

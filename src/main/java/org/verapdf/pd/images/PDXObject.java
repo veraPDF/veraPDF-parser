@@ -61,15 +61,16 @@ public abstract class PDXObject extends PDResource {
 	}
 
 	public static PDXObject getTypedPDXObject(COSObject object, PDResources resources) {
-		ASAtom type = object.getNameKey(ASAtom.SUBTYPE);
-		if (ASAtom.IMAGE.equals(type)) {
-			return new PDXImage(object, resources);
-		} else if (ASAtom.FORM.equals(type)) {
-			return new PDXForm(object);
-		} else if (ASAtom.PS.equals(type)) {
-			return new PDXPostScript(object);
-		} else {
-			return null;
+		if (object != null) {
+			ASAtom type = object.getNameKey(ASAtom.SUBTYPE);
+			if (ASAtom.IMAGE.equals(type)) {
+				return new PDXImage(object, resources);
+			} else if (ASAtom.FORM.equals(type)) {
+				return new PDXForm(object);
+			} else if (ASAtom.PS.equals(type)) {
+				return new PDXPostScript(object);
+			}
 		}
+		return null;
 	}
 }

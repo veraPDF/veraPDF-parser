@@ -27,6 +27,7 @@ import org.verapdf.tools.PDFDocEncoding;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -131,9 +132,7 @@ public class COSString extends COSDirect {
                 this.value = new byte[utfValue.length + 2];
                 this.value[0] = (byte) 0xFE;
                 this.value[1] = (byte) 0xFF;
-                for(int i = 0; i < utfValue.length; ++i) {
-                    this.value[i + 2] = utfValue[i];
-                }
+                System.arraycopy(utfValue, 0, this.value, 2, utfValue.length);
             } catch (UnsupportedEncodingException e) {
                 LOGGER.log(Level.FINE, "Can't find encoding UTF-16BE", e);
                 return false;
@@ -146,10 +145,9 @@ public class COSString extends COSDirect {
         isHex = hex;
     }
 
-    public boolean setString(final byte[] value, final boolean isHex) {
+    public void setString(final byte[] value, final boolean isHex) {
         this.value = value;
         this.isHex = isHex;
-        return true;
     }
 
     public byte[] get() {
@@ -170,10 +168,10 @@ public class COSString extends COSDirect {
 
     public String getHexString() {
         StringBuilder result = new StringBuilder();
-        for (int i = 0; i < this.value.length; i++) {
-            final int c = this.value[i] & 0xFF;
-            result.append(COSFilterASCIIHexEncode.asciiHexBig[c]);
-            result.append(COSFilterASCIIHexEncode.asciiHexLittle[c]);
+        for (byte b : this.value) {
+            final int c = b & 0xFF;
+            result.append(COSFilterASCIIHexEncode.ASCII_HEX_BIG[c]);
+            result.append(COSFilterASCIIHexEncode.ASCII_HEX_LITTLE[c]);
         }
         return result.toString();
     }
@@ -187,10 +185,10 @@ public class COSString extends COSDirect {
         StringBuilder result = new StringBuilder();
 
         result.append('<');
-        for (int i = 0; i < this.value.length; i++) {
-            final int c = this.value[i] & 0xFF;
-            result.append(COSFilterASCIIHexEncode.asciiHexBig[c]);
-            result.append(COSFilterASCIIHexEncode.asciiHexLittle[c]);
+        for (byte b : this.value) {
+            final int c = b & 0xFF;
+            result.append(COSFilterASCIIHexEncode.ASCII_HEX_BIG[c]);
+            result.append(COSFilterASCIIHexEncode.ASCII_HEX_LITTLE[c]);
         }
         result.append('>');
 
@@ -200,8 +198,7 @@ public class COSString extends COSDirect {
     protected String toLitString() {
         StringBuilder result = new StringBuilder();
         result.append('(');
-        for (int i = 0; i < this.value.length; i++) {
-            final byte ch = this.value[i];
+        for (byte ch : this.value) {
             switch (ch) {
                 case '(':
                     result.append("\\(");
@@ -271,13 +268,13 @@ public class COSString extends COSDirect {
         if (isHex != cosString.isHex) return false;
         if (containsOnlyHex != cosString.containsOnlyHex) return false;
         if (hexCount != cosString.hexCount) return false;
-        return value != null ? value.equals(cosString.value) : cosString.value == null;
+        return value != null ? Arrays.equals(value, cosString.value) : cosString.value == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = value != null ? value.hashCode() : 0;
+        int result = value != null ? Arrays.hashCode(value) : 0;
         result = 31 * result + (isHex ? 1 : 0);
         result = 31 * result + (containsOnlyHex ? 1 : 0);
         result = 31 * result + (int) (hexCount ^ (hexCount >>> 32));

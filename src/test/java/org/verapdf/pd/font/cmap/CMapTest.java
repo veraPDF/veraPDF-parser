@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.io.InternalInputStream;
+import org.verapdf.parser.postscript.PostScriptException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,6 +57,9 @@ public class CMapTest {
         } catch (IOException ex) {
             System.out.println("Parsing error: ");
             ex.printStackTrace();
+        } catch (PostScriptException e) {
+            System.out.println("PostScript parsing exception :");
+            e.printStackTrace();
         }
     }
 
@@ -108,6 +112,9 @@ public class CMapTest {
         } catch (IOException ex) {
             System.out.println("Parsing error: ");
             ex.printStackTrace();
+        } catch (PostScriptException e) {
+            System.out.println("PostScript parsing exception :");
+            e.printStackTrace();
         }
     }
 }

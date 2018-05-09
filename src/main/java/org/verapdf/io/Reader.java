@@ -55,8 +55,14 @@ public class Reader extends XRefReader {
 	public Reader(final COSDocument document, final String fileName) throws IOException {
 		super();
 		this.parser = new PDFParser(document, fileName);
-		this.objectStreams = new HashMap<>();
-		init();
+		try {
+			this.objectStreams = new HashMap<>();
+			init();
+		} catch (IOException e) {	// If exception is thrown in init() someone
+			// should close document stream
+			this.parser.closeInputStream();
+			throw e;
+		}
 	}
 
 	public Reader(final COSDocument document, final InputStream fileStream) throws IOException {
@@ -169,14 +175,14 @@ public class Reader extends XRefReader {
 				return false;
 			}
 			StandardSecurityHandler ssh = new StandardSecurityHandler(encryption,
-					this.getTrailer().getID());
+					this.getTrailer().getID(), this.parser.getDocument());
 			boolean res = ssh.isEmptyStringPassword();
 			if (res) {
 				this.parser.getDocument().setStandardSecurityHandler(ssh);
 			}
 			return res;
 		} catch (IOException e) {
-			LOGGER.log(Level.FINE, "Cannot read object " + this.parser.getEncryption().getKey(), e);
+			LOGGER.log(Level.FINE, "Cannot read object " + this.parser.getEncryption().getObjectKey(), e);
 			return false;
 		}
 	}

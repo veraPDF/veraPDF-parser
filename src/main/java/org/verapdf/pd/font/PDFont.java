@@ -28,6 +28,7 @@ import org.verapdf.pd.font.type3.PDType3Font;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -49,6 +50,8 @@ public abstract class PDFont extends PDResource {
     protected FontProgram fontProgram;
     protected Encoding encoding = null;
     private boolean successfullyParsed = false;
+    private final String fontName;
+    private final ASAtom subtype;
 
     /**
      * Constructor from COSDictionary.
@@ -67,6 +70,8 @@ public abstract class PDFont extends PDResource {
         } else {
             fontDescriptor = new PDFontDescriptor(COSDictionary.construct());
         }
+        this.fontName = this.dictionary.getStringKey(ASAtom.BASE_FONT);
+        this.subtype = this.dictionary.getNameKey(ASAtom.SUBTYPE);
     }
 
     /**
@@ -95,25 +100,7 @@ public abstract class PDFont extends PDResource {
      * @return font subtype (Subtype entry).
      */
     public ASAtom getSubtype() {
-        return this.dictionary.getNameKey(ASAtom.SUBTYPE);
-    }
-
-    /**
-     * @return font name defined by BaseFont entry in the font dictionary and
-     * FontName key in the font descriptor.
-     * @throws IllegalStateException if font names specified in font dictionary
-     *                               and font descriptor are different.
-     */
-    public ASAtom getFontName() {
-        ASAtom type = this.dictionary.getNameKey(ASAtom.BASE_FONT);
-        if (type != null) {
-            ASAtom typeFromDescriptor = fontDescriptor.getFontName();
-            if (type != typeFromDescriptor) {
-                LOGGER.log(Level.FINE, "Font names in font descriptor dictionary and in font dictionary are different for "
-                        + type.getValue());
-            }
-        }
-        return type;
+        return this.subtype;
     }
 
     /**
@@ -142,7 +129,7 @@ public abstract class PDFont extends PDResource {
      * @param e is value of Encoding key in font dictionary.
      * @return encoding object for given COSObject.
      */
-    public static Encoding getEncodingMappingFromCOSObject(COSObject e) {
+    private static Encoding getEncodingMappingFromCOSObject(COSObject e) {
         Encoding encodingObj;
         COSBase cosEncoding = e.getDirectBase();
         if (cosEncoding != null) {
@@ -162,7 +149,7 @@ public abstract class PDFont extends PDResource {
      * @return name of the font as specified in BaseFont key of font dictionary.
      */
     public String getName() {
-        return this.dictionary.getStringKey(ASAtom.BASE_FONT);
+        return this.fontName;
     }
 
     /**
@@ -171,13 +158,6 @@ public abstract class PDFont extends PDResource {
      */
     public COSObject getEncoding() {
         return this.dictionary.getKey(ASAtom.ENCODING);
-    }
-
-    /**
-     * @return COSStream with font file 2 taken from font descriptor.
-     */
-    public COSStream getFontFile2() {
-        return this.fontDescriptor.getFontFile2();
     }
 
     /**
@@ -192,10 +172,21 @@ public abstract class PDFont extends PDResource {
      * @return map of differences as given in Differences key in Encoding.
      */
     public static Map<Integer, String> getDifferencesFromCosEncoding(COSObject e) {
-        COSArray differences = (COSArray)
-                e.getKey(ASAtom.DIFFERENCES).getDirectBase();
+        COSObject cosDifferences = e.getKey(ASAtom.DIFFERENCES);
+        if (cosDifferences == null) {
+            return Collections.emptyMap();
+        }
+        COSArray differences;
+        if (cosDifferences.getType() == COSObjType.COS_ARRAY) {
+            differences = (COSArray) cosDifferences.getDirectBase();
+        } else {
+            if (!cosDifferences.empty()) {
+                LOGGER.log(Level.SEVERE, "Value of Differences key is not an array. Ignoring Difference");
+            }
+            differences = null;
+        }
         if (differences == null) {
-            return null;
+            return Collections.emptyMap();
         }
         Map<Integer, String> res = new HashMap<>();
         int diffIndex = 0;
@@ -275,13 +266,20 @@ public abstract class PDFont extends PDResource {
      * @return Unicode string
      */
     public String toUnicode(int code) {
+        return cMapToUnicode(code);
+    }
 
+    /**
+     * Gets toUnicode value just from toUnicode cMap.
+     *
+     * @param code is character code.
+     * @return Unicode value as specified in toUnicode cMap.
+     */
+    public String cMapToUnicode(int code) {
         if (toUnicodeCMap == null) {
             this.toUnicodeCMap = new PDCMap(this.dictionary.getKey(ASAtom.TO_UNICODE));
         }
-
-        if (toUnicodeCMap.getCMapName() != null &&
-                toUnicodeCMap.getCMapName().startsWith("Identity-")) {
+        if (toUnicodeCMap.getCMapName() != null && toUnicodeCMap.isIdentity()) {
             return new String(new char[]{(char) code});
         }
         return this.toUnicodeCMap.toUnicode(code);

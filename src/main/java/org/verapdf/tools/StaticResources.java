@@ -1,11 +1,16 @@
 package org.verapdf.tools;
 
 import org.verapdf.cos.COSKey;
+import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.structure.PDStructureNameSpace;
+import org.verapdf.tools.resource.ASFileStreamCloser;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class handles static resources that need to be reset with each parsing of
@@ -15,58 +20,126 @@ import java.util.Map;
  */
 public class StaticResources {
 
-    private static Map<String, CMap> cMapCache = new HashMap<>();
-    private static Map<COSKey, PDStructureNameSpace> structureNameSpaceCache = new HashMap<>();
+	private static final Logger LOGGER = Logger.getLogger(StaticResources.class.getCanonicalName());
 
-    /**
-     * Caches CMap object.
-     *
-     * @param name is string key for cached CMap.
-     * @param cMap is CMap object for caching.
-     */
-    public static void cacheCMap(String name, CMap cMap) {
-        cMapCache.put(name, cMap);
-    }
+	private static ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
+	private static ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
+	private static ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
 
-    /**
-     * Gets CMap for this string key.
-     *
-     * @param name is key for CMap.
-     * @return cached CMap with this name or null if no CMap available.
-     */
-    public static CMap getCMap(String name) {
-        return cMapCache.get(name);
-    }
+	private StaticResources() {
+	}
 
-    /**
-     * Caches structure name space. Key is chosen to be indirect reference key
-     * of this namespace dictionary.
-     *
-     * @param nameSpace is PD structure name space to cache.
-     */
-    public static void cacheStructureNameSpace(PDStructureNameSpace nameSpace) {
-        COSKey key = nameSpace.getObject().getObjectKey();
-        structureNameSpaceCache.put(key, nameSpace);
-    }
+	/**
+	 * Caches CMap object.
+	 *
+	 * @param name is string key for cached CMap.
+	 * @param cMap is CMap object for caching.
+	 */
+	public static void cacheCMap(String name, CMap cMap) {
+		checkForNull(cMapCache);
+		cMapCache.get().put(name, cMap);
+	}
 
-    /**
-     * Gets cached pd structure name space.
-     * @param key is COSKey of namespace to get.
-     * @return cached namespace with this COSKey or null if no namespace
-     * available.
-     */
-    public static PDStructureNameSpace getStructureNameSpace(COSKey key) {
-        return structureNameSpaceCache.get(key);
-    }
+	/**
+	 * Gets CMap for this string key.
+	 *
+	 * @param name is key for CMap.
+	 * @return cached CMap with this name or null if no CMap available.
+	 */
+	public static CMap getCMap(String name) {
+		checkForNull(cMapCache);
+		return StaticResources.cMapCache.get().get(name);
+	}
 
-    private StaticResources() {
-    }
+	/**
+	 * Caches structure name space. Key is chosen to be indirect reference key
+	 * of this namespace dictionary.
+	 *
+	 * @param nameSpace is PD structure name space to cache.
+	 */
+	public static void cacheStructureNameSpace(PDStructureNameSpace nameSpace) {
+		checkForNull(structureNameSpaceCache);
 
-    /**
-     * Clears all cached static resources.
-     */
-    public static void clear() {
-        cMapCache.clear();
-        structureNameSpaceCache.clear();
-    }
+		COSKey key = nameSpace.getObject().getObjectKey();
+		StaticResources.structureNameSpaceCache.get().put(key, nameSpace);
+	}
+
+	/**
+	 * Gets cached pd structure name space.
+	 *
+	 * @param key is COSKey of namespace to get.
+	 * @return cached namespace with this COSKey or null if no namespace
+	 * available.
+	 */
+	public static PDStructureNameSpace getStructureNameSpace(COSKey key) {
+		checkForNull(structureNameSpaceCache);
+		return StaticResources.structureNameSpaceCache.get().get(key);
+	}
+
+	public static void cacheFontProgram(String key, FontProgram font) {
+		checkForNull(cachedFonts);
+		if (key != null) {
+			StaticResources.cachedFonts.get().put(key, font);
+		} else {
+			StaticResources.cachedFonts.get().put(String.valueOf(font.hashCode()), font);
+		}
+	}
+
+	public static FontProgram getCachedFont(String key) {
+		checkForNull(cachedFonts);
+		if (key == null) {
+			return null;
+		}
+		return StaticResources.cachedFonts.get().get(key);
+	}
+
+	/**
+	 * Clears all cached static resources.
+	 */
+	public static void clear() {
+		checkForNull(cachedFonts);
+		for (FontProgram fp : cachedFonts.get().values()) {
+			ASFileStreamCloser fpr = fp.getFontProgramResource();
+			if (fpr != null) {
+				try {
+					fpr.close();
+				} catch (IOException e) {
+					LOGGER.log(Level.WARNING, "Exception while closing font program", e);
+				}
+			}
+		}
+		StaticResources.cMapCache.set(new HashMap<>());
+		StaticResources.structureNameSpaceCache.set(new HashMap<>());
+		StaticResources.cachedFonts.set(new HashMap<>());
+	}
+
+	private static void checkForNull(ThreadLocal variable) {
+		if (variable.get() == null) {
+			variable.set(new HashMap<>());
+		}
+	}
+
+	public static Map<String, CMap> getcMapCache() {
+		return cMapCache.get();
+	}
+
+	public static void setcMapCache(Map<String, CMap> cMapCache) {
+		StaticResources.cMapCache.set(cMapCache);
+	}
+
+	public static Map<COSKey, PDStructureNameSpace> getStructureNameSpaceCache() {
+		return structureNameSpaceCache.get();
+	}
+
+	public static void setStructureNameSpaceCache(Map<COSKey, PDStructureNameSpace> structureNameSpaceCache) {
+		StaticResources.structureNameSpaceCache.set(structureNameSpaceCache);
+	}
+
+	public static Map<String, FontProgram> getCachedFonts() {
+		return cachedFonts.get();
+	}
+
+	public static void setCachedFonts(Map<String, FontProgram> cachedFonts) {
+		StaticResources.cachedFonts.set(cachedFonts);
+	}
 }

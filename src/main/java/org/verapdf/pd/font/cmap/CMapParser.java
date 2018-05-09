@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- *
+ * <p>
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- *
+ * <p>
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- *
+ * <p>
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -20,14 +20,15 @@
  */
 package org.verapdf.pd.font.cmap;
 
-import org.verapdf.cos.COSName;
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSObject;
-import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
+import org.verapdf.parser.postscript.PSObject;
+import org.verapdf.parser.postscript.PSParser;
+import org.verapdf.parser.postscript.PostScriptException;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,25 +37,24 @@ import java.util.logging.Logger;
  *
  * @author Sergey Shemyakov
  */
-public class CMapParser extends BaseParser {
+public class CMapParser extends PSParser {
 
     private static final Logger LOGGER = Logger.getLogger(CMapParser.class.getCanonicalName());
     private COSObject lastCOSName;
 
     private CMap cMap;
 
-    /**
-     * {@inheritDoc}
-     */
-    public CMapParser(String fileName) throws FileNotFoundException {
-        super(fileName);
-        cMap = new CMap();
-    }
+    private static final String WMODE_STRING = "WMode";
+    private static final String REGISTRY_SRTRING = "Registry";
+    private static final String ORDERING_STRING = "Ordering";
+    private static final String CMAP_NAME_STRING = "CMapName";
+    private static final String SUPPLEMENT_STRING = "Supplement";
+    private static final String CID_COUNT_STRING = "CIDCount";
 
     /**
      * {@inheritDoc}
      */
-    public CMapParser(InputStream fileStream) throws IOException {
+    public CMapParser(ASInputStream fileStream) throws IOException {
         super(fileStream);
         cMap = new CMap();
     }
@@ -69,100 +69,55 @@ public class CMapParser extends BaseParser {
     /**
      * Method parses CMap from given source.
      */
-    public void parse() throws IOException {
+    public void parse() throws IOException, PostScriptException {
         try {
             initializeToken();
             //Skipping starting comments
             skipSpaces(true);
             while (getToken().type != Token.Type.TT_EOF) {
-                nextToken();
-                processToken();
+                COSObject nextObject = nextObject();
+                processObject(nextObject);
             }
         } finally {
             this.source.close();    // We close stream after first reading attempt
         }
+        setValuesFromUserDict(this.cMap);
     }
 
-    private void processToken() throws IOException {
-        switch (getToken().type) {
-            case TT_NAME:
-                switch (getToken().getValue()) {
-                    case "WMode":
-                        skipSpaces();
-                        readNumber();
-                        this.cMap.setwMode((int) getToken().integer);
-                        break;
-                    case "Registry":
-                        nextToken();
-                        if (getToken().type.equals(Token.Type.TT_LITSTRING)) {
-                            this.cMap.setRegistry(getToken().getValue());
-                        } else {
-                            throw new IOException("CMap contains invalid /Registry value");
-                        }
-                        break;
-                    case "Ordering":
-                        nextToken();
-                        if (getToken().type.equals(Token.Type.TT_LITSTRING)) {
-                            this.cMap.setOrdering(getToken().getValue());
-                        } else {
-                            throw new IOException("CMap contains invalid /Ordering value");
-                        }
-                        break;
-                    case "CMapName":
-                        nextToken();
-                        if (getToken().type.equals(Token.Type.TT_NAME)) {
-                            this.cMap.setName(getToken().getValue());
-                        } else {
-                            throw new IOException("CMap contains invalid /CMapName value");
-                        }
-                        break;
-                    case "Supplement":
-                        nextToken();
-                        if(getToken().type == Token.Type.TT_INTEGER) {
-                            this.cMap.setSupplement((int) getToken().integer);
-                        } else {
-                            throw new IOException("CMap contains invalid /Supplement value");
-                        }
-                        break;
-                    case "CIDCount":
-                        nextToken();
-                        checkTokenType(Token.Type.TT_INTEGER, "CIDCount");
-                        nextToken();
-                        checkTokenType(Token.Type.TT_KEYWORD, "CIDCount");
-                        break;
-                    default:
-                        this.lastCOSName = COSName.construct(getToken().getValue());
-                }
-                break;
-            case TT_INTEGER:
+    private void processObject(COSObject object) throws IOException, PostScriptException {
+        switch (object.getType()) {
+            case COS_INTEGER:
                 int listLength = (int) getToken().integer;
-                nextToken();
-                if (getToken().type != Token.Type.TT_KEYWORD) {
+                COSObject nextObject = nextObject();
+                if (getToken().type != Token.Type.TT_KEYWORD ||
+                        !processList(listLength, getToken().getValue())) {
+                    PSObject.getPSObject(object).execute(operandStack, userDict);
+                    PSObject.getPSObject(nextObject).execute(operandStack, userDict);
                     break;
                 }
-                processList(listLength, getToken().getValue());
                 break;
-            case TT_KEYWORD:
-                switch (getToken().getValue()) {
-                    case "usecmap":
-                        CMap usedCMap = new PDCMap(lastCOSName).getCMapFile();
-                        if (usedCMap != null) {
-                            this.cMap.useCMap(usedCMap);
-                        } else {
-                            this.cMap.setUsesNonPredefinedCMap(true);
-                            LOGGER.log(Level.FINE, "Can't load predefined CMap with name " + lastCOSName);
-                        }
-                        break;
-                    default:
+            case COS_NAME:
+                if (getToken().getValue().equals("usecmap")) {
+                    CMap usedCMap = new PDCMap(lastCOSName).getCMapFile();
+                    if (usedCMap != null) {
+                        this.cMap.useCMap(usedCMap);
+                    } else {
+                        this.cMap.setUsesNonPredefinedCMap(true);
+                        LOGGER.log(Level.FINE, "Can't load predefined CMap with name " + lastCOSName);
+                    }
+                } else {
+                    PSObject.getPSObject(object).execute(operandStack, userDict);
+                    this.lastCOSName = object;
                 }
-            //$FALL-THROUGH$
-		default:
+                break;
+            default:
+                PSObject.getPSObject(object).execute(operandStack, userDict);
         }
     }
 
-    private void processList(int listLength, String type) throws IOException {
-        if (! type.startsWith("begin")) {
-        	return;
+    private boolean processList(int listLength, String type) throws IOException {
+        if (!type.startsWith("begin")) {
+            return false;
         }
         String key = type.substring(5); //skipping leading "begin"
         for (int i = 0; i < listLength; ++i) {
@@ -189,12 +144,14 @@ public class CMapParser extends BaseParser {
                     readLineBFRange();
                     break;
                 default:
+                    return false;
             }
         }
         nextToken();
         if (!getToken().getValue().equals("end" + key)) {
             LOGGER.log(Level.FINE, "Unexpected end of " + key + " in CMap");
         }
+        return true;
     }
 
     private void readLineCodeSpaceRange() throws IOException {
@@ -297,7 +254,7 @@ public class CMapParser extends BaseParser {
         long bfRangeEnd = getBfrangeEndFromBytes(getToken().getByteValue(), rangeBegin);
 
         nextToken();    // skip [
-        if(getToken().type == Token.Type.TT_OPENARRAY) {
+        if (getToken().type == Token.Type.TT_OPENARRAY) {
 
             for (long i = bfRangeBegin; i <= bfRangeEnd; ++i) {
                 this.cMap.addUnicodeMapping((int) i, readStringFromUnicodeSequenceToken());
@@ -349,11 +306,11 @@ public class CMapParser extends BaseParser {
         if (getToken().type == Token.Type.TT_NAME) {
             return this.getToken().getValue();
         } else if (getToken().type == Token.Type.TT_HEXSTRING) {
-            byte[] token = getToken().getByteValue();;
+            byte[] token = getToken().getByteValue();
             if (token.length == 1) {
                 return new String(token, "ISO-8859-1");
             }
-			return new String(token, "UTF-16BE");
+            return new String(token, "UTF-16BE");
         }
         throw new IOException("CMap contains invalid entry in bfchar. Expected "
                 + Token.Type.TT_NAME + " or " + Token.Type.TT_HEXSTRING + " but got " + getToken().type);
@@ -369,5 +326,27 @@ public class CMapParser extends BaseParser {
     @Override
     protected boolean isEndOfComment(byte ch) {
         return isCR(ch) || isFF(ch);
+    }
+
+    private void setValuesFromUserDict(CMap cMap) {
+        cMap.setName(getStringFromUserDict(CMAP_NAME_STRING));
+        cMap.setRegistry(getStringFromUserDict(REGISTRY_SRTRING));
+        cMap.setOrdering(getStringFromUserDict(ORDERING_STRING));
+        cMap.setwMode((int) getLongFromUserDict(WMODE_STRING));
+        cMap.setSupplement((int) getLongFromUserDict(SUPPLEMENT_STRING));
+    }
+
+    private String getStringFromUserDict(String key) {
+        COSObject string = userDict.get(ASAtom.getASAtom(key));
+        return string == null ? null : string.getString();
+    }
+
+    private long getLongFromUserDict(String key) {
+        COSObject number = userDict.get(ASAtom.getASAtom(key));
+        if (number == null) {
+            return 0;
+        }
+        Long res = number.getInteger();
+        return res == null ? 0 : res;
     }
 }

@@ -28,13 +28,15 @@ import org.verapdf.tools.IntReference;
 import java.io.*;
 
 /**
+ * ASInputStream for reading data from file.
+ * It contains methods for file closing management.
+ *
  * @author Timur Kamalov
  */
 public class InternalInputStream extends SeekableInputStream {
 
 	private final static String READ_ONLY_MODE = "r";
 
-	private boolean isClosed = false;
 	private boolean isTempFile;
 	private IntReference numOfFileUsers;
 	private String fileName;
@@ -42,6 +44,11 @@ public class InternalInputStream extends SeekableInputStream {
 
 	public InternalInputStream(final File file) throws FileNotFoundException {
 		this(file, 1);
+	}
+
+	public InternalInputStream(final File file, boolean isTempFile) throws FileNotFoundException {
+		this(file);
+		this.isTempFile = isTempFile;
 	}
 
 	public InternalInputStream(final File file, int numOfFileUsers) throws FileNotFoundException {
@@ -60,13 +67,6 @@ public class InternalInputStream extends SeekableInputStream {
 		this.fileName = fileName;
 		this.source = new RandomAccessFile(fileName, READ_ONLY_MODE);
 		this.numOfFileUsers = new IntReference(numOfFileUsers);
-	}
-
-	public InternalInputStream(final InputStream fileStream) throws IOException {
-		this.isTempFile = true;
-		File tempFile = createTempFile(fileStream);
-		this.fileName = tempFile.getAbsolutePath();
-		this.source = new RandomAccessFile(tempFile, READ_ONLY_MODE);
 	}
 
 	/**
@@ -106,14 +106,16 @@ public class InternalInputStream extends SeekableInputStream {
 
     @Override
     public void closeResource() throws IOException {
-		if (!isClosed) {
-			isClosed = true;
+		if (!isSourceClosed) {
+			isSourceClosed = true;
 			this.numOfFileUsers.decrement();
 			if (this.numOfFileUsers.equals(0)) {
 				this.source.close();
 				if (isTempFile) {
 					File tmp = new File(fileName);
-					tmp.delete();
+					if (!tmp.delete()) {
+						tmp.deleteOnExit();
+					}
 				}
 			}
 		}
@@ -165,33 +167,9 @@ public class InternalInputStream extends SeekableInputStream {
 		return this.source;
 	}
 
-	private File createTempFile(InputStream input) throws IOException {
-		FileOutputStream output = null;
-		try {
-			File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
-			tmpFile.deleteOnExit();
-			output = new FileOutputStream(tmpFile);
-
-			//copy stream content
-			byte[] buffer = new byte[4096];
-			int n;
-			while ((n = input.read(buffer, 0, ASBufferedInFilter.BF_BUFFER_SIZE)) != -1) {
-				output.write(buffer, 0, n);
-			}
-
-			return tmpFile;
-		}
-		finally {
-			if (output != null) {
-				output.close();
-			}
-		}
-	}
-
-	private File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
+	private static File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
 		FileOutputStream output = null;
 		File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
-		tmpFile.deleteOnExit();
 		try {
 			output = new FileOutputStream(tmpFile);
 			output.write(alreadyRead);
@@ -205,7 +183,9 @@ public class InternalInputStream extends SeekableInputStream {
 
 			return tmpFile;
 		} catch (IOException e) {
-			tmpFile.delete();
+			if (!tmpFile.delete()) {
+				tmpFile.deleteOnExit();
+			}
 			throw e;
 		}
 		finally {
@@ -222,12 +202,12 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	private void checkClosed(String streamUsage) throws IOException {
-		if (isClosed) {
+		if (isSourceClosed) {
 			throw new IOException(streamUsage + " can't be performed; stream is closed");
 		}
 	}
 
-	public boolean isClosed() {
-		return isClosed;
+	public boolean isSourceClosed() {
+		return isSourceClosed;
 	}
 }

@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Class provides access to width of 14 standard fonts.
+ * Class provides access to metrics of a standard font.
  *
  * @author Sergey Shemyakov
  */
@@ -47,7 +47,7 @@ public class StandardFontMetrics {
     private Double descend;
     private Double italicAngle;
 
-    public StandardFontMetrics() {
+    StandardFontMetrics() {
         this.widths = new HashMap<>();
     }
 
@@ -71,7 +71,7 @@ public class StandardFontMetrics {
         return fontName;
     }
 
-    public void setFontName(String fontName) {
+    void setFontName(String fontName) {
         this.fontName = fontName;
     }
 
@@ -79,7 +79,7 @@ public class StandardFontMetrics {
         return familyName;
     }
 
-    public void setFamilyName(String familyName) {
+    void setFamilyName(String familyName) {
         this.familyName = familyName;
     }
 
@@ -87,7 +87,7 @@ public class StandardFontMetrics {
         return fontBBox;
     }
 
-    public void setFontBBox(double[] fontBBox) {
+    void setFontBBox(double[] fontBBox) {
         this.fontBBox = fontBBox;
     }
 
@@ -95,7 +95,7 @@ public class StandardFontMetrics {
         return encodingScheme;
     }
 
-    public void setEncodingScheme(String encodingScheme) {
+    void setEncodingScheme(String encodingScheme) {
         this.encodingScheme = encodingScheme;
     }
 
@@ -103,7 +103,7 @@ public class StandardFontMetrics {
         return charSet;
     }
 
-    public void setCharSet(String charSet) {
+    void setCharSet(String charSet) {
         this.charSet = charSet;
     }
 
@@ -111,7 +111,7 @@ public class StandardFontMetrics {
         return capHeight;
     }
 
-    public void setCapHeight(Double capHeight) {
+    void setCapHeight(Double capHeight) {
         this.capHeight = capHeight;
     }
 
@@ -127,7 +127,7 @@ public class StandardFontMetrics {
         return ascend;
     }
 
-    public void setAscend(Double ascend) {
+    void setAscend(Double ascend) {
         this.ascend = ascend;
     }
 
@@ -135,7 +135,7 @@ public class StandardFontMetrics {
         return descend;
     }
 
-    public void setDescend(Double descend) {
+    void setDescend(Double descend) {
         this.descend = descend;
     }
 
@@ -143,7 +143,7 @@ public class StandardFontMetrics {
         return italicAngle;
     }
 
-    public void setItalicAngle(Double italicAngle) {
+    void setItalicAngle(Double italicAngle) {
         this.italicAngle = italicAngle;
     }
 

@@ -28,6 +28,7 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
+import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ import java.io.IOException;
 public class OpenTypeFontProgram implements FontProgram {
 
     private static final long CFF = 1128678944;     // "CFF " read as 4-byte unsigned number
+    // See TrueTypeFontParser table logic
 
     private boolean isCFF;
     private boolean isSymbolic;
@@ -135,9 +137,12 @@ public class OpenTypeFontProgram implements FontProgram {
                 this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
                 this.font.parseFont();
             } else {
-                this.font = new CFFFontProgram(getCFFTable(), externalCMap, isSubset);
-                this.font.parseFont();
+                try (ASInputStream cffTable = getCFFTable()) {
+                    this.font = new CFFFontProgram(cffTable, externalCMap, isSubset);
+                    this.font.parseFont();
+                }
             }
+            StaticResources.cacheFontProgram(null, this.font);
             this.successfullyParsed = true;
         }
     }
@@ -150,35 +155,36 @@ public class OpenTypeFontProgram implements FontProgram {
     }
 
     private ASInputStream getCFFTable() throws IOException {
-        this.source = SeekableInputStream.getSeekableStream(this.source);
-        this.readHeader();
-        for (int i = 0; i < numTables; ++i) {
-            long tabName = this.readULong();
-            this.readULong();   // checksum
-            long offset = this.readULong();
-            long length = this.readULong();   // length
-            if (tabName == CFF) {
-                return ((SeekableInputStream) this.source).getStream(offset, length);
+        try (SeekableInputStream is = SeekableInputStream.getSeekableStream(this.source)) {
+            this.readHeader(is);
+            for (int i = 0; i < numTables; ++i) {
+                long tabName = this.readULong(is);
+                this.readULong(is);   // checksum
+                long offset = this.readULong(is);
+                long length = this.readULong(is);   // length
+                if (tabName == CFF) {
+                    return is.getStream(offset, length);
+                }
             }
         }
         throw new IOException("Can't locate \"CFF \" table in CFF OpenType font program.");
     }
 
-    private void readHeader() throws IOException {
-        this.source.skip(4);   // version
-        this.numTables = this.readUShort();
-        this.source.skip(6);
+    private void readHeader(ASInputStream is) throws IOException {
+        is.skip(4);   // version
+        this.numTables = this.readUShort(is);
+        is.skip(6);
     }
 
-    private int readUShort() throws IOException {
-        int highOrder = (this.source.read() & 0xFF) << 8;
-        return highOrder | (this.source.read() & 0xFF);
+    private int readUShort(ASInputStream is) throws IOException {
+        int highOrder = (is.read() & 0xFF) << 8;
+        return highOrder | (is.read() & 0xFF);
     }
 
-    private long readULong() throws IOException {
-        long res = readUShort();
+    private long readULong(ASInputStream is) throws IOException {
+        long res = readUShort(is);
         res = res << 16;
-        return res | readUShort();
+        return res | readUShort(is);
     }
 
     /**

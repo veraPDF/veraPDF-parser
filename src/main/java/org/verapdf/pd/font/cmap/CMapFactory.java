@@ -21,6 +21,7 @@
 package org.verapdf.pd.font.cmap;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.parser.postscript.PostScriptException;
 import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
@@ -39,6 +40,13 @@ class CMapFactory {
         // Do nothing here
     }
 
+    /**
+     * Parses CMap from given stream with caching it.
+     *
+     * @param name is a string identifier of cMap that is used for caching.
+     * @param cMapStream is stream with cMap data.
+     * @return parsed cMap object.
+     */
     static CMap getCMap(String name, ASInputStream cMapStream) {
         CMap res;
         if (!name.isEmpty()) {
@@ -54,6 +62,9 @@ class CMapFactory {
             res = parser.getCMap();
         } catch (IOException e) {
             LOGGER.log(Level.FINE, "Can't parse CMap " + name + ", using default", e);
+            res = new CMap();
+        } catch (PostScriptException e) {
+            LOGGER.log(Level.FINE, "PostScript exception while parsing CMap " + name);
             res = new CMap();
         }
 

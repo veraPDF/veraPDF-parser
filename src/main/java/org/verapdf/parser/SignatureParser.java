@@ -44,8 +44,13 @@ public class SignatureParser extends COSParser {
 
     private static final Logger LOGGER = Logger.getLogger(SignatureParser.class.getCanonicalName());
     private static final byte[] EOF_STRING = "%%EOF".getBytes();
+    private static final byte[] STREAM_STRING = "stream".getBytes();
+    private static final byte[] ENDSTREAM_STRING = "endstream".getBytes();
 
+    private boolean isStream = false;
     private long[] byteRange = new long[4];
+    private int floatingBytesNumber = 0;
+    private boolean isStreamEnd = true;
     private COSDocument document;
 
     /**
@@ -123,6 +128,14 @@ public class SignatureParser extends COSParser {
         return byteRange;
     }
 
+    public int getFloatingBytesNumberForLastByteRangeObtained() {
+        return this.floatingBytesNumber;
+    }
+
+    public boolean isStreamEnd() {
+        return isStreamEnd;
+    }
+
     private boolean parseSignatureNameValuePair() throws IOException {
         COSObject key = getName();
         if (key.getType() != COSObjType.COS_NAME) {
@@ -191,23 +204,50 @@ public class SignatureParser extends COSParser {
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         source.read(buffer);
         source.unread(buffer.length - 1);
-        while (!isEOFFound(buffer)) {
-            source.read(buffer);
+        isStream = false;
+        while (isStream || !isEOFFound(buffer)) {
+            byte[] streamCheck = isStream ? ENDSTREAM_STRING : STREAM_STRING;
+            byte[] streamCheckBuff = new byte[streamCheck.length];
+            int unreadLength = source.read(streamCheckBuff);
+            if (Arrays.equals(streamCheck, streamCheckBuff)) {
+				isStream = !isStream;
+				System.arraycopy(streamCheckBuff, 0, buffer, 0, EOF_STRING.length);
+				unreadLength = -1;
+			} else {
+				source.unread(unreadLength);
+				source.read(buffer);
+				unreadLength = buffer.length - 1;
+			}
+
             if (source.isEOF()) {
                 source.seek(currentOffset + document.getHeader().getHeaderOffset());
                 return source.getStreamLength();
             }
-            source.unread(buffer.length - 1);
+            if (unreadLength > 0) {
+				source.unread(unreadLength);
+			}
         }
         long result = source.getOffset() - 1 + buffer.length;   // byte right after '%%EOF'
         this.source.skip(EOF_STRING.length - 1);
-        if (isLF(this.source.peek())) { // allows single LF, CR or CR-LF after %%EOF
+        this.floatingBytesNumber = 0;
+        this.isStreamEnd = false;
+        int nextByte = this.source.read();
+        if (isLF(nextByte)) { // allows single LF, CR or CR-LF after %%EOF
             result++;
-        } else if (isCR(this.source.read())) {
+            this.floatingBytesNumber++;
+            nextByte = this.source.peek();
+        } else if (isCR(nextByte)) {
             result++;
-            if (isLF(this.source.peek())) {
+            this.floatingBytesNumber++;
+            nextByte = this.source.read();
+            if (isLF(nextByte)) {
                 result++;
+                this.floatingBytesNumber++;
+                nextByte = this.source.peek();
             }
+        }
+        if (nextByte == -1) {
+            this.isStreamEnd = true;
         }
         source.seek(currentOffset + document.getHeader().getHeaderOffset());
         return result;

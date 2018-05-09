@@ -22,13 +22,14 @@ package org.verapdf.pd.font.truetype;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.pd.font.PDFont;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Represents TrueTypeFontProgram.
@@ -38,7 +39,7 @@ import java.io.IOException;
 public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProgram {
 
     private COSObject encoding;
-    protected boolean isSymbolic;
+    private boolean isSymbolic;
 
     /**
      * Constructor from stream containing font data, and encoding details.
@@ -83,14 +84,12 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             int gid = getGidFromCMaps(glyph);
             return gid >= 0 && gid < getNGlyphs();
         } else {
-            int gid = getGIDFrom30(code);
-            if (gid >= 0 && gid < getNGlyphs()) {
+            if (cMap30containsGlyph(code)) {
                 return true;
             }
             TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
             if (cmap10 != null) {
-                int gid10 = cmap10.getGlyph(code);
-                return gid10 >= 0 && gid < getNGlyphs();
+                return cmap10.containsCID(code);
             }
         }
         return false;
@@ -224,6 +223,19 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         return 0;
     }
 
+    private boolean cMap30containsGlyph(int code) {
+        TrueTypeCmapSubtable cmap30 = this.parser.getCmapTable(3, 0);
+        if (cmap30 != null) {
+            int sampleCode = cmap30.getSampleCharCode();
+            int highByteMask = sampleCode & 0x0000FF00;
+            if (highByteMask == 0x00000000 || highByteMask == 0x0000F000 ||
+                    highByteMask == 0x0000F100 || highByteMask == 0x0000F200) { // should we check this at all?
+                return cmap30.containsCID(highByteMask + code);     // we suppose that code is in fact 1-byte value
+            }
+        }
+        return false;
+    }
+
     private void createCIDToNameTable() throws IOException {
         this.encodingMappingArray = new String[256];
         if (this.encoding.getType() == COSObjType.COS_NAME) {
@@ -263,10 +275,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             System.arraycopy(TrueTypePredefined.STANDARD_ENCODING, 0,
                     encodingMappingArray, 0, 256);
         }
-        COSArray differences = (COSArray) encoding.getKey(ASAtom.DIFFERENCES).getDirectBase();
-        if (differences != null) {
-            applyDiffsToEncoding(differences);
-        }
+
+        applyDiffsToEncoding(encoding);
+
         for (int i = 0; i < 256; ++i) {
             if (TrueTypePredefined.NOTDEF_STRING.equals(encodingMappingArray[i])) {
                 encodingMappingArray[i] = TrueTypePredefined.STANDARD_ENCODING[i];
@@ -274,16 +285,17 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         }
     }
 
-    private void applyDiffsToEncoding(COSArray differences) throws IOException {
-        int diffIndex = -1;
-        for (COSObject obj : differences) {
-            if (obj.getType() == COSObjType.COS_INTEGER) {
-                diffIndex = obj.getInteger().intValue();
-            } else if (obj.getType() == COSObjType.COS_NAME && diffIndex != -1) {
-                encodingMappingArray[diffIndex++] = obj.getString();
-            } else {
-                throw new IOException("Error in reading /Encoding entry in font dictionary");
+    private void applyDiffsToEncoding(COSDictionary encoding) throws IOException {
+        Map<Integer, String> differences = PDFont.getDifferencesFromCosEncoding(new COSObject(encoding));
+        if (differences != null) {
+            for (Map.Entry<Integer, String> entry : differences.entrySet()) {
+                int key = entry.getKey();
+                if (key < encodingMappingArray.length) {
+                    encodingMappingArray[key] = entry.getValue();
+                }
             }
+        } else {
+            throw new IOException("Error in reading /Encoding entry in font dictionary");
         }
     }
 

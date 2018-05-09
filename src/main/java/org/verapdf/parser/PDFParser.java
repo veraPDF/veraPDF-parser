@@ -27,13 +27,16 @@ import org.verapdf.cos.*;
 import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
+import org.verapdf.exceptions.LoopedException;
 import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -140,7 +143,7 @@ public class PDFParser extends COSParser {
                 headerVersion = Float.parseFloat(headerParts[1]);
             }
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.WARNING, "Can't parse the header version.", e);
+            LOGGER.log(Level.FINE, "Can't parse the document header.", e);
         }
 
         result.setVersion(headerVersion);
@@ -181,9 +184,7 @@ public class PDFParser extends COSParser {
             while (!CharTable.isSpace(this.source.read())) {
                 source.unread(2);
             }
-
-            COSObject linDict = getObject(source.getOffset());
-            return linDict;
+            return getObject(source.getOffset());
         }
 		return null;
     }
@@ -216,7 +217,7 @@ public class PDFParser extends COSParser {
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         calculatePostEOFDataSize();
-        this.getXRefInfo(infos, Long.valueOf(0L));
+        this.getXRefInfo(infos, new HashSet<Long>(), Long.valueOf(0L));
     }
 
     public COSObject getObject(final long offset) throws IOException {
@@ -256,7 +257,7 @@ public class PDFParser extends COSParser {
         }
         long generation = token.integer;
 
-        if ((source.readByte() != 32) || CharTable.isSpace(source.peek())) {
+        if (!CharTable.isSpace(source.read()) || CharTable.isSpace(source.peek())) {
             //check correct spacing (6.1.8 clause)
             headerFormatComplyPDFA = false;
         }
@@ -334,7 +335,7 @@ public class PDFParser extends COSParser {
     private Long findLastXRef() throws IOException {
         source.seekFromEnd(STARTXREF.length);
         byte[] buf = new byte[STARTXREF.length];
-        while (source.getStreamLength() - source.getOffset() < 256) {
+        while (source.getStreamLength() - source.getOffset() < 1024) {
             long res = source.getOffset();
             source.read(buf);
             if (Arrays.equals(buf, STARTXREF)) {
@@ -347,7 +348,8 @@ public class PDFParser extends COSParser {
     }
 
     private void calculatePostEOFDataSize() throws IOException {
-        final int lookupSize = 256;
+        long size = source.getStreamLength();
+        final int lookupSize = 1024 > size ? (int) size : 1024;
 
         source.seekFromEnd(lookupSize);
         byte[] buffer = new byte[lookupSize];
@@ -369,7 +371,7 @@ public class PDFParser extends COSParser {
                     if (postEOFDataSize > 0) {
                         if (buffer[currentBufferOffset + EOF_MARKER.length] == 0x0D) {
                             currentBufferOffset++;
-                            if (currentBufferOffset + EOF_MARKER.length < buffer.length && buffer[currentBufferOffset  + EOF_MARKER.length] == 0x0A) {
+                            if (currentBufferOffset + EOF_MARKER.length < buffer.length && buffer[currentBufferOffset + EOF_MARKER.length] == 0x0A) {
                                 postEOFDataSize -= 2;
                                 document.setPostEOFDataSize(postEOFDataSize);
                                 return;
@@ -467,16 +469,16 @@ public class PDFParser extends COSParser {
 
     private void parseXrefStream(final COSXRefInfo section) throws IOException {
         nextToken();
-        if(this.getToken().type != Token.Type.TT_INTEGER) {
+        if (this.getToken().type != Token.Type.TT_INTEGER) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         nextToken();
-        if(this.getToken().type != Token.Type.TT_KEYWORD ||
+        if (this.getToken().type != Token.Type.TT_KEYWORD ||
                 this.getToken().keyword != Token.Keyword.KW_OBJ) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         COSObject xrefCOSStream = getDictionary();
-        if(!(xrefCOSStream.getType() == COSObjType.COS_STREAM)) {
+        if (!(xrefCOSStream.getType() == COSObjType.COS_STREAM)) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.getDirectBase());
@@ -487,13 +489,18 @@ public class PDFParser extends COSParser {
         }
     }
 
-	private void getXRefInfo(final List<COSXRefInfo> info, Long offset) throws IOException {
-		if (offset.longValue() == 0) {
+	private void getXRefInfo(final List<COSXRefInfo> info, Set<Long> processedOffsets, Long offset) throws IOException {
+        if (offset.longValue() == 0) {
 			offset = findLastXRef();
 			if (offset.longValue() == 0) {
 				throw new IOException("PDFParser::GetXRefInfo(...)" + StringExceptions.START_XREF_VALIDATION);
 			}
 		}
+
+        if (processedOffsets.contains(offset)) {
+            throw new LoopedException("XRef loop");
+        }
+        processedOffsets.add(offset);
 
 		clear();
 
@@ -503,7 +510,7 @@ public class PDFParser extends COSParser {
         }
 
         //we will skip eol marker in any case
-        source.seek(offset.intValue() - 1);
+        source.seek(offset.longValue() - 1);
 
 		COSXRefInfo section = new COSXRefInfo();
 		info.add(0, section);
@@ -516,7 +523,7 @@ public class PDFParser extends COSParser {
 			return;
 		}
 
-		getXRefInfo(info, offset);
+		getXRefInfo(info, processedOffsets, offset);
 	}
 
 	private void getTrailer(final COSTrailer trailer) throws IOException {

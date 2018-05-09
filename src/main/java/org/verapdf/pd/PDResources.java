@@ -84,10 +84,7 @@ public class PDResources extends PDObject {
 
 	public boolean hasColorSpace(ASAtom name) {
 		COSObject colorSpace = getResource(ASAtom.COLORSPACE, name);
-		if (colorSpace != null && !colorSpace.empty()) {
-			return true;
-		}
-		return false;
+		return colorSpace != null && !colorSpace.empty();
 	}
 
 	public PDPattern getPattern(ASAtom name) {
@@ -111,7 +108,7 @@ public class PDResources extends PDObject {
 			return shadingMap.get(name);
 		}
 		COSObject rawShading = getResource(ASAtom.SHADING, name);
-		PDShading shading = new PDShading(rawShading);
+		PDShading shading = new PDShading(rawShading, this);
 		shadingMap.put(name, shading);
 		return shading;
 	}

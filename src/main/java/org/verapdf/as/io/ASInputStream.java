@@ -26,11 +26,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * Base class for stream hierarchy. Has methods for resource management.
+ * Please don't forget to close all the opened streams.
+ *
  * @author Timur Kamalov
  */
 public abstract class ASInputStream extends InputStream {
 
-	protected int nPos = -1;
+	protected boolean isClosed = false;
+	protected boolean isSourceClosed = false;
 
 	protected IntReference resourceUsers = new IntReference(1);
 
@@ -40,23 +44,48 @@ public abstract class ASInputStream extends InputStream {
 
 	public abstract int skip(int size) throws IOException;
 
+	@Override
 	public void close() throws IOException {
-		if (!this.resourceUsers.equals(0)) {
-			this.resourceUsers.decrement();
+		if (!isClosed) {
+			isClosed = true;
+			if (!this.resourceUsers.equals(0)) {
+				this.resourceUsers.decrement();
+			}
 		}
-		if(this.resourceUsers.equals(0)) {
+		if (this.resourceUsers.equals(0)) {
 			closeResource();
 		}
 	}
 
+	@Override
 	public abstract void reset() throws IOException;
 
+	/**
+	 * Closes stream resource. There is a difference between closing stream and
+	 * closing it's resource. Several streams may have the same resource (e. g.
+	 * the same file stream) and resource should be closed only after all
+	 * streams using it are closed.
+	 */
 	public abstract void closeResource() throws IOException;
 
+	/**
+	 * Method increments number of resource users.
+	 *
+	 * {@see closeResource}
+	 */
 	public abstract void incrementResourceUsers();
 
+	/**
+	 * Method decrements number of resource users.
+	 *
+	 * {@see closeResource}
+	 */
+	public abstract void decrementResourceUsers();
+
+	/**
+	 * Creates copy of stream. The two streams can be closed separately.
+	 */
 	public static ASInputStream createStreamFromStream(ASInputStream stream) {
-		stream.incrementResourceUsers();
 		return new ASInputStreamWrapper(stream);
 	}
 }
