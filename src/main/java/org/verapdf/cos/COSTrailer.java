@@ -59,6 +59,18 @@ public class COSTrailer extends PDObject {
 		}
 	}
 
+	public Long getXRefStm() {
+		return getObject().getIntegerKey(ASAtom.XREF_STM);
+	}
+
+	public void setXRefStm(final Long prev) {
+		if (prev != 0) {
+			getObject().setIntegerKey(ASAtom.XREF_STM, prev);
+		} else {
+			removeKey(ASAtom.XREF_STM);
+		}
+	}
+
 	public COSObject getRoot() {
 		return getKey(ASAtom.ROOT);
 	}

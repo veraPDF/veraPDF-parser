@@ -518,12 +518,17 @@ public class PDFParser extends COSParser {
 		section.setStartXRef(offset.longValue());
         getXRefSectionAndTrailer(section);
 
-        offset = section.getTrailer().getPrev();
-		if (offset == null || offset.longValue() == 0) {
-			return;
-		}
+        COSTrailer trailer = section.getTrailer();
 
-		getXRefInfo(info, processedOffsets, offset);
+        offset = trailer.getXRefStm();
+        if (offset != null && offset.longValue() != 0) {
+            getXRefInfo(info, processedOffsets, offset);
+        }
+
+        offset = trailer.getPrev();
+		if (offset != null && offset.longValue() != 0) {
+            getXRefInfo(info, processedOffsets, offset);
+		}
 	}
 
 	private void getTrailer(final COSTrailer trailer) throws IOException {
