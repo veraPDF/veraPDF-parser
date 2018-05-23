@@ -160,7 +160,7 @@ class Type1PrivateParser extends BaseParser {
         checkTokenType(Token.Type.TT_INTEGER);
         long charstringLength = this.getToken().integer;
         this.skipRD();
-        this.skipSpaces();
+        this.skipSingleSpace();
         long beginOffset = this.source.getOffset();
         this.source.skip((int) charstringLength);
         try (ASInputStream chunk = this.source.getStream(beginOffset, charstringLength);
