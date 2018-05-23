@@ -276,21 +276,28 @@ public class BaseParser {
 		this.skipSpaces(false);
 	}
 
-	protected void skipSpaces(boolean skipComment) throws IOException {
-		byte ch;
-		while (!this.source.isEOF()) {
-			ch = this.source.readByte();
-			if (CharTable.isSpace(ch)) {
-				continue;
-			}
-			if (ch == '%' && skipComment) {
-				skipComment();
-				continue;
-			}
+	protected void skipSingleSpace() throws IOException {
+		this.skipSingleSpace(false);
+	}
 
-			this.source.unread();
-			break;
+	protected void skipSpaces(boolean skipComment) throws IOException {
+		while (skipSingleSpace(skipComment));
+	}
+
+	protected boolean skipSingleSpace(boolean skipComment) throws IOException {
+		if (this.source.isEOF()) {
+			return false;
 		}
+		byte ch = this.source.readByte();
+		if (CharTable.isSpace(ch)) {
+			return true;
+		}
+		if (ch == '%' && skipComment) {
+			skipComment();
+			return true;
+		}
+		this.source.unread();
+		return false;
 	}
 
 	protected void skipStreamSpaces() throws IOException {
