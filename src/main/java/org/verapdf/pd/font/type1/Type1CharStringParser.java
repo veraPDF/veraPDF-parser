@@ -99,8 +99,10 @@ public class Type1CharStringParser extends BaseCharStringParser {
                     popStack(6);
                     break;
                 case 16:    // callothersubr
+                    // TODO: implement call other subr
+                    break;
                 case 17:    // pop
-                    //TODO: should we parse this?
+                    popStack(1);
                     break;
                 case 7:     // sbw
                     popStack(1);
