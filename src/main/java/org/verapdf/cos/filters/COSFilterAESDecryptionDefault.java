@@ -94,15 +94,15 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
             this.getInputStream().skip(16);
             this.haveReadStream = true;
         }
-        int readDecrypted = this.readFromDecryptedBytes(buffer, size);
-        if (readDecrypted == -1) {
+        int readDecrypted = this.readFromDecryptedBytes(buffer, 0, size);
+        if (readDecrypted >= size) {
             return readDecrypted;
         }
 
         if (this.bufferSize() <= 0) {
             int bytesFed = (int) this.feedBuffer(getBufferCapacity());
             if (bytesFed == -1) {
-                return -1;
+                return readDecrypted;
             }
         }
         byte[] encData = new byte[BF_BUFFER_SIZE];
@@ -112,7 +112,11 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
             byte[] fin = this.aes.doFinal();
             this.decryptedBytes = concatenate(this.decryptedBytes,
                     decryptedBytes.length, fin, fin.length);
-            return this.readFromDecryptedBytes(buffer, size);
+            if (readDecrypted == -1) {
+                return this.readFromDecryptedBytes(buffer, 0, size);
+            } else {
+                return readDecrypted + this.readFromDecryptedBytes(buffer, readDecrypted, size - readDecrypted);
+            }
         } catch (GeneralSecurityException e) {
             throw new IOException("Can't decrypt AES data.");
         }
@@ -159,12 +163,12 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
         return initVector;
     }
 
-    private int readFromDecryptedBytes(byte[] buffer, int size) {
+    private int readFromDecryptedBytes(byte[] buffer, int from, int size) {
         if (decryptedBytes.length == decryptedPointer) {
             return -1;
         }
         int actualRead = Math.min(size, decryptedBytes.length - decryptedPointer);
-        System.arraycopy(decryptedBytes, decryptedPointer, buffer, 0, actualRead);
+        System.arraycopy(decryptedBytes, decryptedPointer, buffer, from, actualRead);
         decryptedPointer += actualRead;
         return actualRead;
     }
