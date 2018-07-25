@@ -241,13 +241,9 @@ public class PDType1Font extends PDSimpleFont {
     @Override
     public float getWidthFromProgram(int code) {
         Encoding pdEncoding = this.getEncodingMapping();
-        if (pdEncoding != null) {
-            String glyphName = pdEncoding.getName(code);
-            if (glyphName != null) {
-                return this.getFontProgram().getWidth(glyphName);
-            }
-        }
-        return this.getFontProgram().getWidth(code);
+        String glyphName = pdEncoding.getName(code);
+        FontProgram fontProgram = this.getFontProgram();
+        return glyphName != null ? fontProgram.getWidth(glyphName) : fontProgram.getWidth(code);
     }
 
     @Override

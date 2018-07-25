@@ -142,7 +142,7 @@ public abstract class PDFont extends PDResource {
                 return encodingObj;
             }
         }
-        return null;
+        return Encoding.empty();
     }
 
     /**
