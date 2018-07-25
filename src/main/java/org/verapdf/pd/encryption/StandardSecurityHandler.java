@@ -28,7 +28,7 @@ import org.verapdf.cos.*;
 import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
 import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
 import org.verapdf.tools.EncryptionToolsRevision4;
-import org.verapdf.tools.EncryptionToolsRevision6;
+import org.verapdf.tools.EncryptionToolsRevision5_6;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
@@ -97,8 +97,8 @@ public class StandardSecurityHandler {
                             o, p.intValue(), id, revision.intValue(), encMetadata,
                             length, u);
                 } else if (revision >= 5) {    //   Revision 5 should not be used
-                    this.encryptionKey = EncryptionToolsRevision6.getFileEncryptionKey("".getBytes(), o, u,
-                            getOE(), getUE());
+                    this.encryptionKey = EncryptionToolsRevision5_6.getFileEncryptionKey("".getBytes(), o, u,
+                            getOE(), getUE(), revision);
                 }
                 this.isEmptyStringPassword =
                         Boolean.valueOf(this.encryptionKey != null);

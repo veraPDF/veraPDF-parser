@@ -24,7 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSKey;
-import org.verapdf.tools.EncryptionToolsRevision6;
+import org.verapdf.tools.EncryptionToolsRevision5_6;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -155,7 +155,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
 
     private void initAES256(byte[] encryptionKey) throws IOException,
             GeneralSecurityException {
-        EncryptionToolsRevision6.enableAES256();
+        EncryptionToolsRevision5_6.enableAES256();
         SecretKey key = new SecretKeySpec(
                 Arrays.copyOf(encryptionKey, 32), "AES");
         IvParameterSpec initializingVector = new
