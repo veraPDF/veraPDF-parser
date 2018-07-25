@@ -7,6 +7,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -15,7 +16,7 @@ import java.util.Arrays;
 /**
  * @author Sergey Shemyakov
  */
-public class EncryptionToolsRevision6 {
+public class EncryptionToolsRevision5_6 {
 
     /**
      * Implementation of algorithm 2.A: Retrieving the file encryption key from
@@ -32,15 +33,13 @@ public class EncryptionToolsRevision6 {
      *                                  AES-256 happens.
      */
     public static byte[] getFileEncryptionKey(byte[] password, byte[] o, byte[] u,
-                                              byte[] oe, byte[] ue) throws GeneralSecurityException {
-
-
-        byte[] hash = computeHashRevision6(password, o, u, true);
+                                              byte[] oe, byte[] ue, long revision) throws GeneralSecurityException {
+        byte[] hash = computeHash(password, o, u, true, revision);
         boolean isUser = false;
 
         if (!Arrays.equals(hash, getHashValueFromString(o))) {
             isUser = true;
-            hash = computeHashRevision6(password, u, u, false);
+            hash = computeHash(password, u, u, false, revision);
             if (!Arrays.equals(hash, getHashValueFromString(u))) {
                 throw new GeneralSecurityException("Incorrect password: failed check of owner hash.");
             }
@@ -48,7 +47,7 @@ public class EncryptionToolsRevision6 {
 
         byte[] res = null;
         if (oe != null && !isUser) {
-            byte[] aesKey = computeHashRevision6(password, o, u, true);
+            byte[] aesKey = computeHash(password, o, u, true, revision);
             enableAES256();
             SecretKey key = new SecretKeySpec(aesKey, "AES");
             Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
@@ -57,7 +56,7 @@ public class EncryptionToolsRevision6 {
         }
 
         if (ue != null && isUser) {
-            byte[] aesKey = computeHashRevision6(password, u, u, false);
+            byte[] aesKey = computeHash(password, u, u, false, revision);
             enableAES256();
             SecretKey key = new SecretKeySpec(aesKey, "AES");
             Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
@@ -70,6 +69,7 @@ public class EncryptionToolsRevision6 {
         return res;
     }
 
+
     /**
      * Implements algorithm 2.B: Computing a hash (revision 6 and later),
      * introduced in PDF-2.0.
@@ -81,8 +81,8 @@ public class EncryptionToolsRevision6 {
      *                                the owner key.
      * @return computed hash.
      */
-    public static byte[] computeHashRevision6(byte[] password, byte[] string, byte[] u,
-                                              boolean isCheckingOwnerPassword)
+    private static byte[] computeHash(byte[] password, byte[] string, byte[] u,
+                                               boolean isCheckingOwnerPassword, long revision)
             throws GeneralSecurityException {
         byte[] hashInput = ASBufferedInFilter.concatenate(password,
                 password.length, getValSaltFromString(string), 8);
@@ -91,25 +91,27 @@ public class EncryptionToolsRevision6 {
         }
         int rounds = 0;
         byte[] k = getSHAHash(256, hashInput);
-        while (true) {
-            byte[] sequence = ASBufferedInFilter.concatenate(password, password.length, k, k.length);
-            if (isCheckingOwnerPassword) {
-                sequence = ASBufferedInFilter.concatenate(sequence, sequence.length, u, u.length);
-            }
-            byte[] k1 = repeatString(sequence, 64);
+        if (revision > 5) {
+            while (true) {
+                byte[] sequence = ASBufferedInFilter.concatenate(password, password.length, k, k.length);
+                if (isCheckingOwnerPassword) {
+                    sequence = ASBufferedInFilter.concatenate(sequence, sequence.length, u, u.length);
+                }
+                byte[] k1 = repeatString(sequence, 64);
 
-            IvParameterSpec initializingVector = new IvParameterSpec(Arrays.copyOfRange(k, 16, 32));
-            SecretKey key = new SecretKeySpec(Arrays.copyOf(k, 16), "AES");
-            Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
-            aes.init(Cipher.ENCRYPT_MODE, key, initializingVector);
-            byte[] e = aes.doFinal(k1);
-            int shaType = getReminderByModulo3(Arrays.copyOf(e, 16));
-            k = shaType == 0 ? getSHAHash(256, e) :
-                    shaType == 1 ? getSHAHash(384, e) : getSHAHash(512, e);
-            if (rounds >= 63 && (e[e.length - 1] & 0xFF) <= rounds - 32) {
-                break;
+                IvParameterSpec initializingVector = new IvParameterSpec(Arrays.copyOfRange(k, 16, 32));
+                SecretKey key = new SecretKeySpec(Arrays.copyOf(k, 16), "AES");
+                Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
+                aes.init(Cipher.ENCRYPT_MODE, key, initializingVector);
+                byte[] e = aes.doFinal(k1);
+                int shaType = getReminderByModulo3(Arrays.copyOf(e, 16));
+                k = shaType == 0 ? getSHAHash(256, e) :
+                        shaType == 1 ? getSHAHash(384, e) : getSHAHash(512, e);
+                if (rounds >= 63 && (e[e.length - 1] & 0xFF) <= rounds - 32) {
+                    break;
+                }
+                rounds++;
             }
-            rounds++;
         }
         return Arrays.copyOf(k, 32);
     }
@@ -118,6 +120,12 @@ public class EncryptionToolsRevision6 {
         try {   // Allow using of AES with 256-bit key.
             Field field = Class.forName("javax.crypto.JceSecurity").
                     getDeclaredField("isRestricted");
+
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            modifiersField.setAccessible(false);
+
             field.setAccessible(true);
             field.set(null, Boolean.FALSE);
         } catch (Exception ex) {
