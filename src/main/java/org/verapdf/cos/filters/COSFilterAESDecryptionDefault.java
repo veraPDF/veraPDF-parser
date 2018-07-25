@@ -2,16 +2,16 @@
  * This file is part of veraPDF Parser, a module of the veraPDF project.
  * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
- * <p>
+ *
  * veraPDF Parser is free software: you can redistribute it and/or modify
  * it under the terms of either:
- * <p>
+ *
  * The GNU General public license GPLv3+.
  * You should have received a copy of the GNU General Public License
  * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
  * tree.  If not, see http://www.gnu.org/licenses/ or
  * https://www.gnu.org/licenses/gpl-3.0.en.html.
- * <p>
+ *
  * The Mozilla Public License MPLv2+.
  * You should have received a copy of the Mozilla Public License along with
  * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
@@ -46,6 +46,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
     private static final byte[] SALT_BYTES = new byte[]{0x73, 0x41, 0x6C, 0x54};
 
     private Cipher aes;
+    private boolean isDecryptFinished;
     private int decryptedPointer;
     private byte[] decryptedBytes;
     private boolean decryptingCOSStream;
@@ -99,19 +100,28 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
             return readDecrypted;
         }
 
-        if (this.bufferSize() <= 0) {
-            int bytesFed = (int) this.feedBuffer(getBufferCapacity());
-            if (bytesFed == -1) {
-                return readDecrypted;
-            }
-        }
-        byte[] encData = new byte[BF_BUFFER_SIZE];
-        int encDataLength = this.bufferPopArray(encData, BF_BUFFER_SIZE);
         try {
-            this.decryptedBytes = this.aes.update(encData, 0, encDataLength);
-            byte[] fin = this.aes.doFinal();
-            this.decryptedBytes = concatenate(this.decryptedBytes,
-                    decryptedBytes.length, fin, fin.length);
+            boolean bufferFinished = false;
+            if (this.bufferSize() <= 0) {
+                int bytesFed = (int) this.feedBuffer(getBufferCapacity());
+                bufferFinished = bytesFed == -1;
+                if (bufferFinished && isDecryptFinished) {
+                    return readDecrypted;
+                }
+            }
+
+            if (bufferFinished) {
+                isDecryptFinished = true;
+                byte[] fin = this.aes.doFinal();
+                this.decryptedBytes = concatenate(this.decryptedBytes,
+                        decryptedBytes.length, fin, fin.length);
+            } else {
+                byte[] encData = new byte[BF_BUFFER_SIZE];
+                int encDataLength = this.bufferPopArray(encData, BF_BUFFER_SIZE);
+                this.decryptedBytes = this.aes.update(encData, 0, encDataLength);
+                this.decryptedPointer = 0;
+            }
+
             if (readDecrypted == -1) {
                 return this.readFromDecryptedBytes(buffer, 0, size);
             } else {
@@ -140,6 +150,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
                 IvParameterSpec(getAESInitializingVector());
         this.aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
         this.aes.init(Cipher.DECRYPT_MODE, key, initializingVector);
+        this.isDecryptFinished = false;
     }
 
     private void initAES256(byte[] encryptionKey) throws IOException,
@@ -151,6 +162,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
                 IvParameterSpec(getAESInitializingVector());
         this.aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
         this.aes.init(Cipher.DECRYPT_MODE, key, initializingVector);
+        this.isDecryptFinished = false;
     }
 
     private byte[] getAESInitializingVector() throws IOException {
