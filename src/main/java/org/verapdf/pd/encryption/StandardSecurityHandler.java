@@ -33,6 +33,7 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -158,6 +159,7 @@ public class StandardSecurityHandler {
         }
         byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
         byte[] res = new byte[0];
+        filter.reset();
         int read = filter.read(buf, buf.length);
         while (read != -1) {
             res = ASBufferedInFilter.concatenate(res, res.length, buf, read);
@@ -175,17 +177,51 @@ public class StandardSecurityHandler {
      */
     public void decryptStream(COSStream stream, COSKey key)
             throws IOException, GeneralSecurityException {
-        ASInputStream encStream = stream.getData();
-        ASInputStream filter;
-        if (isRC4Decryption) {
-            filter = new COSFilterRC4DecryptionDefault(encStream, key,
-                    this.encryptionKey);
-        } else {
-            filter = new COSFilterAESDecryptionDefault(encStream, key,
-                    this.encryptionKey, true, method);
+        if (decryptRequired(stream)) {
+            ASInputStream encStream = stream.getData();
+            ASInputStream filter;
+            if (isRC4Decryption) {
+                filter = new COSFilterRC4DecryptionDefault(encStream, key,
+                        this.encryptionKey);
+            } else {
+                filter = new COSFilterAESDecryptionDefault(encStream, key,
+                        this.encryptionKey, true, method);
+            }
+            document.addFileResource(new ASFileStreamCloser(filter));
+            stream.setData(filter, COSStream.FilterFlags.RAW_DATA);
         }
-        document.addFileResource(new ASFileStreamCloser(filter));
-        stream.setData(filter, COSStream.FilterFlags.RAW_DATA);
+    }
+
+    private boolean decryptRequired(COSStream stream) {
+        boolean res = true;
+        List<ASAtom> filters = stream.getFilters().getFilters();
+        for (int i = 0; i < filters.size(); ++i) {
+            if (ASAtom.CRYPT == filters.get(i)) {
+                COSObject paramsObj = stream.getKey(ASAtom.DECODE_PARMS);
+                if (paramsObj.empty() || paramsObj.getType() == COSObjType.COS_NULL) {
+                    res = false;
+                    continue;
+                } else if (paramsObj.getType().isDictionaryBased()
+                        && (i != 0 || paramsObj.getNameKey(ASAtom.NAME) == ASAtom.IDENTITY)) {
+                    res = false;
+                    continue;
+                } else if (paramsObj.getType() == COSObjType.COS_ARRAY) {
+                    if (paramsObj.size() - 1 < i) {
+                        res = false;
+                        continue;
+                    } else {
+                        COSObject params = paramsObj.at(i);
+                        if (params == null || params.empty() || params.getType() == COSObjType.COS_NULL ||
+                                (params.getType().isDictionaryBased() && paramsObj.getNameKey(ASAtom.NAME) == ASAtom.IDENTITY)) {
+                            res = false;
+                            continue;
+                        }
+                    }
+                }
+                res = true;
+            }
+        }
+        return res;
     }
 
     /**

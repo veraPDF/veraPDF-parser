@@ -45,11 +45,13 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
 
     private static final byte[] SALT_BYTES = new byte[]{0x73, 0x41, 0x6C, 0x54};
 
+    private SecretKey key;
+    private IvParameterSpec initializingVector;
     private Cipher aes;
     private boolean isDecryptFinished;
     private int decryptedPointer;
     private byte[] decryptedBytes;
-    private boolean decryptingCOSStream;
+    private final boolean decryptingCOSStream;
     private boolean haveReadStream;
 
     /**
@@ -70,16 +72,23 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
                                          ASAtom method)
             throws IOException, GeneralSecurityException {
         super(stream);
+        this.decryptingCOSStream = decryptingCOSStream;
         if (method == ASAtom.AESV2) {
-            initAES128(objectKey, encryptionKey);
+            prepareInitAES128(objectKey, encryptionKey);
         } else if (method == ASAtom.AESV3) {
-            initAES256(encryptionKey);
+            prepareInitAES256(encryptionKey);
         } else {
             throw new IllegalStateException("Unknown version of AES encryption algorithm");
         }
-        decryptedBytes = new byte[0];
-        decryptedPointer = 0;
-        this.decryptingCOSStream = decryptingCOSStream;
+        this.aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        init();
+    }
+
+    private void init() throws GeneralSecurityException {
+        this.aes.init(Cipher.DECRYPT_MODE, key, initializingVector);
+        this.isDecryptFinished = false;
+        this.decryptedBytes = new byte[0];
+        this.decryptedPointer = 0;
         this.haveReadStream = false;
     }
 
@@ -95,44 +104,35 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
             this.getInputStream().skip(16);
             this.haveReadStream = true;
         }
-        int readDecrypted = this.readFromDecryptedBytes(buffer, 0, size);
-        if (readDecrypted >= size) {
+        int readDecrypted = this.readFromDecryptedBytes(buffer, size);
+        if (readDecrypted != -1 || isDecryptFinished) {
             return readDecrypted;
         }
 
         try {
-            boolean bufferFinished = false;
             if (this.bufferSize() <= 0) {
                 int bytesFed = (int) this.feedBuffer(getBufferCapacity());
-                bufferFinished = bytesFed == -1;
-                if (bufferFinished && isDecryptFinished) {
-                    return readDecrypted;
+                if (bytesFed == -1) {
+                    isDecryptFinished = true;
+                    this.decryptedBytes = this.aes.doFinal();
                 }
             }
 
-            if (bufferFinished) {
-                isDecryptFinished = true;
-                byte[] fin = this.aes.doFinal();
-                this.decryptedBytes = concatenate(this.decryptedBytes,
-                        decryptedBytes.length, fin, fin.length);
-            } else {
+            if (!isDecryptFinished) {
                 byte[] encData = new byte[BF_BUFFER_SIZE];
                 int encDataLength = this.bufferPopArray(encData, BF_BUFFER_SIZE);
                 this.decryptedBytes = this.aes.update(encData, 0, encDataLength);
-                this.decryptedPointer = 0;
             }
+            this.decryptedPointer = 0;
 
-            if (readDecrypted == -1) {
-                return this.readFromDecryptedBytes(buffer, 0, size);
-            } else {
-                return readDecrypted + this.readFromDecryptedBytes(buffer, readDecrypted, size - readDecrypted);
-            }
+            int read = this.readFromDecryptedBytes(buffer, size);
+            return Math.max(read, 0);
         } catch (GeneralSecurityException e) {
             throw new IOException("Can't decrypt AES data.");
         }
     }
 
-    private void initAES128(COSKey objectKey, byte[] encryptionKey)
+    private void prepareInitAES128(COSKey objectKey, byte[] encryptionKey)
             throws IOException, GeneralSecurityException {
         byte[] objectKeyDigest =
                 COSFilterRC4DecryptionDefault.getObjectKeyDigest(objectKey);
@@ -144,25 +144,19 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
         byte[] resultEncryptionKey = md5.digest();
         int keyLength = Math.min(COSFilterRC4DecryptionDefault.MAXIMAL_KEY_LENGTH,
                 resultEncryptionKey.length);
-        SecretKey key = new SecretKeySpec(
+        this.key = new SecretKeySpec(
                 Arrays.copyOf(resultEncryptionKey, keyLength), "AES");
-        IvParameterSpec initializingVector = new
+        this.initializingVector = new
                 IvParameterSpec(getAESInitializingVector());
-        this.aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        this.aes.init(Cipher.DECRYPT_MODE, key, initializingVector);
-        this.isDecryptFinished = false;
     }
 
-    private void initAES256(byte[] encryptionKey) throws IOException,
+    private void prepareInitAES256(byte[] encryptionKey) throws IOException,
             GeneralSecurityException {
         EncryptionToolsRevision5_6.enableAES256();
-        SecretKey key = new SecretKeySpec(
+        this.key = new SecretKeySpec(
                 Arrays.copyOf(encryptionKey, 32), "AES");
-        IvParameterSpec initializingVector = new
+        this.initializingVector = new
                 IvParameterSpec(getAESInitializingVector());
-        this.aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        this.aes.init(Cipher.DECRYPT_MODE, key, initializingVector);
-        this.isDecryptFinished = false;
     }
 
     private byte[] getAESInitializingVector() throws IOException {
@@ -175,13 +169,25 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
         return initVector;
     }
 
-    private int readFromDecryptedBytes(byte[] buffer, int from, int size) {
+    private int readFromDecryptedBytes(byte[] buffer, int size) {
         if (decryptedBytes.length == decryptedPointer) {
             return -1;
         }
         int actualRead = Math.min(size, decryptedBytes.length - decryptedPointer);
-        System.arraycopy(decryptedBytes, decryptedPointer, buffer, from, actualRead);
+        System.arraycopy(decryptedBytes, decryptedPointer, buffer, 0, actualRead);
         decryptedPointer += actualRead;
         return actualRead;
+    }
+
+    @Override
+    public void reset() throws IOException {
+        try {
+            init();
+        } catch (GeneralSecurityException e) {
+            throw new IOException("Security exception during reset", e);
+        }
+        super.reset();
+        this.getInputStream().skip(16);
+        this.haveReadStream = this.decryptingCOSStream;
     }
 }

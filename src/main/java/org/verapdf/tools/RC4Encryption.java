@@ -40,9 +40,7 @@ public class RC4Encryption {
     public RC4Encryption(byte[] key) {
         this.key = new int[key.length];
         arraysCopy(key, this.key);
-        this.i = 0;
-        this.j = 0;
-        keySchedulingAlgorithm();
+        reset();
     }
 
     /**
