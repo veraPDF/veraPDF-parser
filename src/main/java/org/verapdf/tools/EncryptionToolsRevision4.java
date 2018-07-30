@@ -84,6 +84,7 @@ public class EncryptionToolsRevision4 {
                 res = md5.digest();
             }
         }
+        //todo: discuss cutting for 5 bits
         return Arrays.copyOf(res, length / 8);
     }
 

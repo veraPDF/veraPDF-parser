@@ -34,34 +34,35 @@ public class EncryptionToolsRevision5_6 {
      */
     public static byte[] getFileEncryptionKey(byte[] password, byte[] o, byte[] u,
                                               byte[] oe, byte[] ue, long revision) throws GeneralSecurityException {
-        byte[] hash = computeHash(password, o, u, true, revision);
+        byte[] hash = computeHash(password, getValSaltFromString(o), u, true, revision);
         boolean isUser = false;
 
         if (!Arrays.equals(hash, getHashValueFromString(o))) {
             isUser = true;
-            hash = computeHash(password, u, u, false, revision);
+            hash = computeHash(password, getValSaltFromString(u), u, false, revision);
             if (!Arrays.equals(hash, getHashValueFromString(u))) {
                 throw new GeneralSecurityException("Incorrect password: failed check of owner hash.");
             }
         }
 
         byte[] res = null;
-        if (oe != null && !isUser) {
-            byte[] aesKey = computeHash(password, o, u, true, revision);
-            enableAES256();
-            SecretKey key = new SecretKeySpec(aesKey, "AES");
-            Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
-            aes.init(Cipher.ENCRYPT_MODE, key);
-            res = aes.doFinal(oe);
+        byte[] e;
+        byte[] stringForSalt;
+        if (isUser) {
+            stringForSalt = u;
+            e = ue;
+        } else {
+            stringForSalt = o;
+            e = oe;
         }
 
-        if (ue != null && isUser) {
-            byte[] aesKey = computeHash(password, u, u, false, revision);
+        if (e != null) {
+            byte[] aesKey = computeHash(password, getKeySaltFromString(stringForSalt), u, !isUser, revision);
             enableAES256();
             SecretKey key = new SecretKeySpec(aesKey, "AES");
             Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
-            aes.init(Cipher.ENCRYPT_MODE, key);
-            res = aes.doFinal(ue);
+            aes.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[16]));
+            res = aes.doFinal(e);
         }
 
         // Maybe checking Perms should be added.
@@ -74,18 +75,18 @@ public class EncryptionToolsRevision5_6 {
      * Implements algorithm 2.B: Computing a hash (revision 6 and later),
      * introduced in PDF-2.0.
      *
-     * @param string                  is UTF-8 password hashInput string.
+     * @param salt                    is UTF-8 salt
      * @param u                       is 48 byte user key.
      * @param isCheckingOwnerPassword is true if hash is being calculated for
      *                                checking the owner password or creating
      *                                the owner key.
      * @return computed hash.
      */
-    private static byte[] computeHash(byte[] password, byte[] string, byte[] u,
+    private static byte[] computeHash(byte[] password, byte[] salt, byte[] u,
                                                boolean isCheckingOwnerPassword, long revision)
             throws GeneralSecurityException {
         byte[] hashInput = ASBufferedInFilter.concatenate(password,
-                password.length, getValSaltFromString(string), 8);
+                password.length, salt, 8);
         if (isCheckingOwnerPassword) {
             hashInput = ASBufferedInFilter.concatenate(hashInput, hashInput.length, u, u.length);
         }
