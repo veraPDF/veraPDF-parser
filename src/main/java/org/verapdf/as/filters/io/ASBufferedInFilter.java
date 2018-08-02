@@ -46,10 +46,10 @@ public class ASBufferedInFilter extends ASInFilter {
     public static final int START_BUFFER_SIZE = 10240;
     public static final int BF_BUFFER_SIZE = 2048;
 
-    private int HALF;
+    private final int HALF;
 
     // when pos reaches this value buffer should be fed
-    private int BUFFER_FEED_THRESHOLD = 3 * ASBufferedInFilter.BF_BUFFER_SIZE / 4;
+    private final int BUFFER_FEED_THRESHOLD;
 
     /*
     pos is a pointer to data that will be read next. Preferably it should not
@@ -59,9 +59,11 @@ public class ASBufferedInFilter extends ASInFilter {
     private int pos = 0;
     private int eod = -1;
 
+    private boolean initialized = false;
+
     private int readCounter = 0;
 
-    private int bufferCapacity;
+    private final int bufferCapacity;
     protected byte[] buffer;
     private int bufferBegin, bufferEnd;
 
@@ -83,6 +85,7 @@ public class ASBufferedInFilter extends ASInFilter {
      * stream.
      */
     public void initialize() throws IOException {
+        this.initialized = true;
         readFromStreamToBuffer(HALF, HALF);
         pos = HALF;
     }
@@ -271,7 +274,12 @@ public class ASBufferedInFilter extends ASInFilter {
     @Override
     public void reset() throws IOException {
         super.reset();
-        bufferEnd = bufferBegin = 0;
+        this.buffer = new byte[this.bufferCapacity];
+        bufferEnd = bufferBegin = pos = readCounter = 0;
+        eod = -1;
+        if (initialized) {
+            initialize();
+        }
     }
 
     public static byte[] concatenate(byte[] one, int lengthOne, byte[] two, int lengthTwo) {

@@ -248,7 +248,6 @@ public class BaseParser {
 	}
 
 	public ASInputStream getRandomAccess(final long length) throws IOException {
-		skipEOL();
 		ASInputStream result =
 				this.source.getStream(this.source.getOffset(), length);
 		source.seekFromCurrentPosition(length);
@@ -298,24 +297,6 @@ public class BaseParser {
 		}
 		this.source.unread();
 		return false;
-	}
-
-	protected void skipStreamSpaces() throws IOException {
-		byte ch = this.source.readByte();
-
-		//check for whitespace
-		while (ch == ASCII_SPACE) {
-			ch = this.source.readByte();
-		}
-
-		if (isCR(ch)) {
-			ch = this.source.readByte();
-			if (!isLF(ch)) {
-				this.source.unread();
-			}
-		} else if (!isLF(ch)) {
-			this.source.unread();
-		}
 	}
 
 	protected boolean isDigit() throws IOException {
