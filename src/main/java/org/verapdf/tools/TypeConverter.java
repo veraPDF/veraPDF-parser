@@ -108,9 +108,6 @@ public class TypeConverter {
 				if (!sign.matches("^[Z+-]$")) {
 					return getErrorDateFormat("Incorrect time zone beginning.");
 				}
-				if ("Z".equals(sign) && length > 17) {
-					return getErrorDateFormat("Incorrect ending with Z time zone.");
-				}
 			}
 
 			if (length > 17) {
@@ -143,8 +140,10 @@ public class TypeConverter {
 			if (!sign.equals("Z")) {
 				zone = TimeZone.getTimeZone(String.format(
 						"GMT%s%d:%02d", sign, timeZoneHours, timeZoneMins));
-			} else {
+			} else if (timeZoneHours == 0 && timeZoneMins == 0) {
 				zone = TimeZone.getTimeZone("GMT");
+			} else {
+				return getErrorDateFormat("Incorrect time zone data.");
 			}
 			Calendar res = new GregorianCalendar(zone);
 			res.set(year, month, day, hour, minutes, seconds);

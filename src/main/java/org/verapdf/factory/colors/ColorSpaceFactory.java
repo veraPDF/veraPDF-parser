@@ -143,7 +143,7 @@ public class ColorSpaceFactory {
             return PDPattern.INSTANCE;
         } else if (ASAtom.CALCMYK == name) {
             return getColorSpaceFromName(COSName.construct(ASAtom.DEVICECMYK), resources,
-                    false);
+                    wasDefault);
         }
         else {
             LOGGER.log(Level.FINE, "Unknown ColorSpace name");
