@@ -108,6 +108,9 @@ public class PDResources extends PDObject {
 			return shadingMap.get(name);
 		}
 		COSObject rawShading = getResource(ASAtom.SHADING, name);
+		if (rawShading == null || rawShading.empty()) {
+			return null;
+		}
 		PDShading shading = new PDShading(rawShading, this);
 		shadingMap.put(name, shading);
 		return shading;
@@ -128,6 +131,9 @@ public class PDResources extends PDObject {
 			return extGStateMap.get(name);
 		}
 		COSObject rawExtGState = getResource(ASAtom.EXT_G_STATE, name);
+		if (rawExtGState == null || rawExtGState.empty()) {
+			return null;
+		}
 		PDExtGState extGState = new PDExtGState(rawExtGState);
 		extGStateMap.put(name, extGState);
 		return extGState;
@@ -148,6 +154,9 @@ public class PDResources extends PDObject {
 			return propertiesMap.get(name);
 		}
 		COSObject rawProperties = getResource(ASAtom.PROPERTIES, name);
+		if (rawProperties == null || rawProperties.empty()) {
+			return null;
+		}
 		PDResource properties = new PDResource(rawProperties);
 		propertiesMap.put(name, properties);
 		return properties;
