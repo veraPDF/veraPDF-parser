@@ -50,7 +50,7 @@ public class PDFontFactory {
      * @return PDFont that corresponds to this dictionary.
      */
     public static PDFont getPDFont(COSObject fontDictionary) {
-        if (fontDictionary != null) {
+        if (fontDictionary != null && !fontDictionary.empty()) {
             if (fontDictionary.getType() == COSObjType.COS_DICT) {
                 COSDictionary dict = (COSDictionary) fontDictionary.getDirectBase();
                 ASAtom subtype = fontDictionary.getNameKey(ASAtom.SUBTYPE);
@@ -64,7 +64,6 @@ public class PDFontFactory {
                 } else if (subtype == ASAtom.TYPE0) {
                     return new PDType0Font(dict);
                 } else {
-                    LOGGER.log(Level.FINE, "Invalid value of Subtype in font dictionary");
                     return null;
                 }
             }

@@ -61,7 +61,7 @@ public abstract class PDXObject extends PDResource {
 	}
 
 	public static PDXObject getTypedPDXObject(COSObject object, PDResources resources) {
-		if (object != null) {
+		if (object != null && !object.empty()) {
 			ASAtom type = object.getNameKey(ASAtom.SUBTYPE);
 			if (ASAtom.IMAGE.equals(type)) {
 				return new PDXImage(object, resources);
