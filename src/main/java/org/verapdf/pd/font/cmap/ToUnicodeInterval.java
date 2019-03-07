@@ -83,10 +83,7 @@ public class ToUnicodeInterval {
             return fffe;
         }
         try {
-            if (unicode[0] == 0) {
-                return String.valueOf((char)unicode[1]);
-            }
-            return new String(unicode, "UTF-16BE");
+            return  (unicode[0] == 0) ? String.valueOf(unicode[1]) : new String(unicode, "UTF-16BE");
         } catch (UnsupportedEncodingException e) {
             LOGGER.log(Level.FINE, "Can't find String encoding UTF-16BE", e);
             return null;    // I'm sure this won't be reached
