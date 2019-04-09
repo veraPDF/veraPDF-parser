@@ -33,6 +33,7 @@ import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetricsFactory;
+import org.verapdf.pd.font.truetype.AdobeGlyphList;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
 import org.verapdf.tools.FontProgramIDGenerator;
 import org.verapdf.tools.StaticResources;
@@ -294,7 +295,7 @@ public class PDType1Font extends PDSimpleFont {
             glyphName = fontProgram.getGlyphName(code);
         }
         if (glyphName != null) {
-            if (Arrays.asList(TrueTypePredefined.STANDARD_ENCODING).contains(glyphName) || SymbolSet.hasGlyphName(glyphName)) {
+            if (AdobeGlyphList.contains(glyphName) || SymbolSet.hasGlyphName(glyphName)) {
                 return " "; // indicates that toUnicode should not be checked.
             }
             return null;
