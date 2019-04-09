@@ -290,7 +290,7 @@ public class CMapParser extends PSParser {
                 byte endRangeByte = endRange[i];
                 byte beginRangeByte = beginRange[i];
                 if (endRangeByte != beginRangeByte) {
-                    LOGGER.log(Level.FINE, "Incorrect bfrange in toUnicode CMap: " +
+                    LOGGER.log(Level.WARNING, "Incorrect bfrange in toUnicode CMap: " +
                             "bfrange contains more than 256 code.");
                 }
                 res += (beginRangeByte & 0x00FF) << ((endRange.length - i - 1) * 8);
