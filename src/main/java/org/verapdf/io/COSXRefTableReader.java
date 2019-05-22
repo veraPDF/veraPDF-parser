@@ -61,6 +61,7 @@ public class COSXRefTableReader {
 		this.startXRef = 0;
 		this.offsets.clear();
 		this.trailer.clear();
+		this.startXRefs.clear();
 
 		if (infos == null || infos.isEmpty()) {
 			return;
@@ -87,7 +88,7 @@ public class COSXRefTableReader {
 		}
 
 		Set<Long> offsets = trailers.keySet();
-		this.startXRefs = new TreeSet<>(offsets);
+		this.startXRefs.addAll(offsets);
 		this.firstTrailer = trailers.get(this.startXRefs.first());
 		this.lastTrailer = trailers.get(this.startXRefs.last());
 	}
