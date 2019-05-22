@@ -38,10 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -431,5 +428,9 @@ public class COSDocument {
 
 	public FileResourceHandler getResourceHandler() {
 		return resourceHandler;
+	}
+
+	public SortedSet<Long> getStartXRefs() {
+		return this.reader.getStartXRefs();
 	}
 }
