@@ -103,11 +103,7 @@ public class COSXRefTableReader {
 	}
 
 	public List<COSKey> getKeys() {
-		List<COSKey> result = new ArrayList<>();
-		for (Map.Entry<COSKey, Long> entry : this.offsets.entrySet()) {
-			result.add(entry.getKey());
-		}
-		return result;
+		return new ArrayList<>(offsets.keySet());
 	}
 
 	public long getOffset(final COSKey key) {

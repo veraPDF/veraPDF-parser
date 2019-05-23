@@ -20,10 +20,7 @@
  */
 package org.verapdf.cos;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Timur Kamalov
@@ -37,14 +34,7 @@ public class COSBody {
 	}
 
 	public List<COSObject> getAll() {
-		List<COSObject> result = new ArrayList<>();
-		for (Map.Entry<COSKey, COSObject> entry : table.entrySet()) {
-			COSObject value = entry.getValue();
-			if (value != null) {
-				result.add(value);
-			}
-		}
-		return result;
+		return new ArrayList<>(table.values());
 	}
 
 	public COSObject get(final COSKey key) {
