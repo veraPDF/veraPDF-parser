@@ -162,6 +162,6 @@ public abstract class SeekableInputStream extends ASInputStream {
             buffer = ASBufferedInFilter.concatenate(buffer, buffer.length, temp, read);
             totalRead += read;
         }
-        return new InternalInputStream(buffer, stream);
+        return InternalInputStream.createConcatenated(buffer, stream);
     }
 }
