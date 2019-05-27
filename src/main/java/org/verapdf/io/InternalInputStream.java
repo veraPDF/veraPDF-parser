@@ -249,10 +249,8 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	private static File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
-		FileOutputStream output = null;
 		File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
-		try {
-			output = new FileOutputStream(tmpFile);
+		try (FileOutputStream output = new FileOutputStream(tmpFile)) {
 			output.write(alreadyRead);
 
 			//copy stream content
@@ -268,11 +266,6 @@ public class InternalInputStream extends SeekableInputStream {
 				tmpFile.deleteOnExit();
 			}
 			throw e;
-		}
-		finally {
-			if (output != null) {
-				output.close();
-			}
 		}
 	}
 }
