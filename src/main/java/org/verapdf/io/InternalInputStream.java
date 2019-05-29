@@ -50,35 +50,36 @@ public class InternalInputStream extends SeekableInputStream {
 	private long fromOffset;
 	private long size;
 
-	public InternalInputStream(final File file) throws FileNotFoundException {
+	public InternalInputStream(final File file) throws IOException {
 		this(file, false);
 	}
 
-	public InternalInputStream(final File file, boolean isTempFile) throws FileNotFoundException {
+	public InternalInputStream(final File file, boolean isTempFile) throws IOException {
 		this(file, 0, isTempFile);
 	}
 
-	public InternalInputStream(final File file, int numOfFileUsers, boolean isTempFile) throws FileNotFoundException {
+	public InternalInputStream(final File file, int numOfFileUsers, boolean isTempFile) throws IOException {
 		this(new RandomAccessFile(file, READ_ONLY_MODE), 0, Long.MAX_VALUE,
 		     new IntReference(numOfFileUsers), file.getAbsolutePath(), isTempFile);
 	}
 
-	public InternalInputStream(final String fileName) throws FileNotFoundException {
+	public InternalInputStream(final String fileName) throws IOException {
 		this(fileName, 0);
 	}
 
-	public InternalInputStream(final String fileName, int numOfFileUsers) throws FileNotFoundException {
+	public InternalInputStream(final String fileName, int numOfFileUsers) throws IOException {
 		this(new RandomAccessFile(fileName, READ_ONLY_MODE), 0, Long.MAX_VALUE,
 		     new IntReference(numOfFileUsers), fileName, false);
 	}
 
 	public InternalInputStream(final RandomAccessFile stream, long fromOffset, long size,
-	                           IntReference numOfFileUsers, String filePath, boolean isTempFile) {
+	                           IntReference numOfFileUsers, String filePath, boolean isTempFile) throws IOException {
 		this(stream, fromOffset, size, numOfFileUsers, filePath, isTempFile, DEFAULT_BUFFER_SIZE);
 	}
 
 	public InternalInputStream(final RandomAccessFile stream, long fromOffset, long size,
-	                           IntReference numOfFileUsers, String filePath, boolean isTempFile, int bufferSize) {
+	                           IntReference numOfFileUsers, String filePath,
+	                           boolean isTempFile, int bufferSize) throws IOException {
 		this.stream = stream;
 		this.buffer = new byte[bufferSize];
 		this.bufferFrom = 0;
@@ -90,7 +91,12 @@ public class InternalInputStream extends SeekableInputStream {
 		this.numOfFileUsers.increment();
 		this.filePath = filePath;
 		this.fromOffset = fromOffset;
-		this.size = size;
+
+		long streamLeft = stream.length() - fromOffset;
+		if (streamLeft < 0) {
+			throw new IOException("Offset is greater than full stream size");
+		}
+		this.size = size < 0 ? streamLeft : Math.min(size, streamLeft);
 	}
 
 	/**
@@ -191,7 +197,7 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	@Override
-	public ASInputStream getStream(long startOffset, long length) {
+	public ASInputStream getStream(long startOffset, long length) throws IOException {
 		return new InternalInputStream(this.stream, startOffset, length, numOfFileUsers, filePath, isTempFile);
 	}
 
@@ -245,7 +251,7 @@ public class InternalInputStream extends SeekableInputStream {
     @Override
 	public long getStreamLength() throws IOException {
 		checkClosed("Stream length obtaining");
-		return Math.min(size, this.stream.length() - fromOffset);
+		return size;
 	}
 
 	private static File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
