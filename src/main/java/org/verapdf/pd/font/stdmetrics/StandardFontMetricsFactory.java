@@ -20,15 +20,13 @@
  */
 package org.verapdf.pd.font.stdmetrics;
 
-import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
-import org.verapdf.tools.IntReference;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -72,9 +70,7 @@ public class StandardFontMetricsFactory {
         try {
             File afmFile = new File(StandardFontMetricsFactory.class.getResource(fileName).getFile());
             if (afmFile.exists()) {
-                return new ASFileInStream(
-                        new RandomAccessFile(afmFile, "r"), 0, afmFile.length(),
-                        new IntReference(), afmFile.getAbsolutePath(), false);
+                return new InternalInputStream(afmFile);
             } else {
                 try (InputStream input = StandardFontMetrics.class.getResourceAsStream(fileName)) {
                     return SeekableInputStream.getSeekableStream(input);

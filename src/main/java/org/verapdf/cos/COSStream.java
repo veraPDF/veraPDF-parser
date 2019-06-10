@@ -145,7 +145,7 @@ public class COSStream extends COSDictionary {
 		try {
 			if (filterFlags == FilterFlags.RAW_DATA || this.flags != FilterFlags.RAW_DATA) {
 				this.stream.reset();
-				return this.stream;
+				return ASInputStream.createStreamFromStream(this.stream);
 			}
 			ASInputStream result = getFilters().getInputStream(
 					ASInputStream.createStreamFromStream(stream),

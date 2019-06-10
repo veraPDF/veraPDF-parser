@@ -72,7 +72,9 @@ public class ASInputStreamWrapper extends ASInputStream {
         if (!isClosed) {
             decrementResourceUsers();
             isClosed = true;
-            this.stream.close();
+            if (this.stream.resourceUsers.equals(0)) {
+                this.stream.close();
+            }
         }
     }
 

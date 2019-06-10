@@ -20,10 +20,10 @@
  */
 package org.verapdf.as.io;
 
-import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.tools.IntReference;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -60,14 +60,14 @@ public class ASMemoryInStream extends SeekableInputStream {
     public ASMemoryInStream(InputStream stream) throws IOException {
         this.currentPosition = 0;
         this.copiedBuffer = true;
-        this.buffer = new byte[0];
-        byte[] temp = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
-        int read = stream.read(temp);
-        while (read != -1) {
-            buffer = ASBufferedInFilter.concatenate(buffer, buffer.length, temp, read);
-            read = stream.read(temp);
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        while ((bytesRead = stream.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
         }
-        bufferSize = buffer.length;
+        this.buffer = output.toByteArray();
+        bufferSize = this.buffer.length;
         this.numOfBufferUsers = new IntReference(1);
     }
 

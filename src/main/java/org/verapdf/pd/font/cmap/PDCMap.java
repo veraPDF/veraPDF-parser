@@ -21,20 +21,18 @@
 package org.verapdf.pd.font.cmap;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
+import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.PDObject;
-import org.verapdf.tools.IntReference;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -211,9 +209,7 @@ public class PDCMap extends PDObject {
             }
             File cMapFile = new File(resURL.getFile());
             if (cMapFile.exists()) {
-                return new ASFileInStream(
-                        new RandomAccessFile(cMapFile, "r"), 0, cMapFile.length(),
-                        new IntReference(), cMapFile.getAbsolutePath(), false);
+                return new InternalInputStream(cMapFile);
             } else {
                 try (InputStream input = PDCMap.class.getResourceAsStream(cMapName)) {
                     return SeekableInputStream.getSeekableStream(input);

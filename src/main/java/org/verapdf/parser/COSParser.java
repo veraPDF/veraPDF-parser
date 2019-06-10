@@ -22,9 +22,9 @@ package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.as.io.ASFileInStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
+import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
 import org.verapdf.tools.resource.ASFileStreamCloser;
@@ -292,7 +292,7 @@ public class COSParser extends BaseParser {
 			dict.setRealStreamSize(size);
 			ASInputStream stm = super.getRandomAccess(size);
 			dict.setData(stm);
-			if (stm instanceof ASFileInStream) {
+			if (stm instanceof InternalInputStream) {
 				this.document.addFileResource(new ASFileStreamCloser(stm));
 			}
 		} else {
@@ -318,7 +318,7 @@ public class COSParser extends BaseParser {
 							ASInputStream stm = super.getRandomAccess(realStreamSize);
 							dict.setData(stm);
 							source.seek(possibleEndStreamOffset);
-							if (stm instanceof ASFileInStream) {
+							if (stm instanceof InternalInputStream) {
 								this.document.addFileResource(new ASFileStreamCloser(stm));
 							}
 							break;

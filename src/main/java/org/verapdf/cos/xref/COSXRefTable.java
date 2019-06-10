@@ -30,42 +30,33 @@ import java.util.List;
  */
 public class COSXRefTable {
 
-    private List<COSKey> all;
-    private List<COSKey> n;
-    private List<COSKey> f;
-    private int size;
+	private List<COSKey> all;
+	private int size;
 
-    public COSXRefTable() {
-        this.all = new ArrayList<>();
-        this.n = new ArrayList<>();
-        this.f = new ArrayList<>();
-        this.size = 1;
-    }
+	public COSXRefTable() {
+		this.all = new ArrayList<>();
+		this.size = 1;
+	}
 
-    public void set(final List<COSKey> keys) {
-        this.all = keys;
-        n.clear();
-        f.clear();
-        int lastIndex = keys.size() - 1;
-        this.size = keys.isEmpty() ? 1 : keys.get(lastIndex).getNumber() + 1;
-    }
+	public void set(final List<COSKey> keys) {
+		this.all = keys;
+		int lastIndex = keys.size() - 1;
+		this.size = keys.isEmpty() ? 1 : keys.get(lastIndex).getNumber() + 1;
+	}
 
-    public COSKey next() {
-        return new COSKey(this.size++);
-    }
+	public COSKey next() {
+		return new COSKey(this.size++);
+	}
 
-    public void newKey(final COSKey key) {
-        this.all.add(key);
-        this.n.add(key);
-    }
+	public void newKey(final COSKey key) {
+		this.all.add(key);
+	}
 
-    public void newKey(final List<COSKey> key) {
-        this.all.addAll(key);
-        this.n.addAll(key);
-    }
+	public void newKey(final List<COSKey> key) {
+		this.all.addAll(key);
+	}
 
-    public List<COSKey> getAllKeys() {
-        return this.all;
-    }
-
+	public List<COSKey> getAllKeys() {
+		return this.all;
+	}
 }
