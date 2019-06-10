@@ -27,6 +27,7 @@ import org.verapdf.io.COSXRefTableReader;
 import org.verapdf.io.IReader;
 
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * @author Timur Kamalov
@@ -55,6 +56,10 @@ public abstract class XRefReader implements IReader {
 
 	public long getStartXRef() {
 		return this.xref.getStartXRef();
+	}
+
+	public SortedSet<Long> getStartXRefs() {
+		return this.xref.getStartXRefs();
 	}
 
 	public COSTrailer getTrailer() {

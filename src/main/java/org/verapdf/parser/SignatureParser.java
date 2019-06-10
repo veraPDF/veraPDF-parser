@@ -124,7 +124,7 @@ public class SignatureParser extends COSParser {
         skipID();
         byteRange[0] = 0;
         parseDictionary();
-        byteRange[3] = getOffsetOfNextEOF(byteRange[2]) - byteRange[2];
+        byteRange[3] = getOffsetOfNextEOF(getOffsetOfNextXRef(byteRange[2])) - byteRange[2];
         return byteRange;
     }
 
@@ -190,6 +190,14 @@ public class SignatureParser extends COSParser {
         } else {
             throw new IOException("\"R\" or \"obj\" expected, but \'" + (char) c + "\' found.");
         }
+    }
+
+    private long getOffsetOfNextXRef(long currentOffset) {
+        return this.document.getStartXRefs()
+                            .stream()
+                            .filter(offset -> offset > currentOffset)
+                            .findFirst()
+                            .orElse(currentOffset);
     }
 
     /**

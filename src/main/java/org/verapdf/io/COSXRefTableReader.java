@@ -35,6 +35,8 @@ public class COSXRefTableReader {
 	private Map<COSKey, Long> offsets;
 	private COSTrailer trailer;
 
+	private SortedSet<Long> startXRefs;
+
 	private COSTrailer firstTrailer;
 	private COSTrailer lastTrailer;
 
@@ -42,6 +44,7 @@ public class COSXRefTableReader {
 		this.startXRef = 0;
 		this.offsets = new HashMap<>();
 		this.trailer = new COSTrailer();
+		this.startXRefs = new TreeSet<>();
 	}
 
 	public COSXRefTableReader(final List<COSXRefInfo> info) {
@@ -58,6 +61,7 @@ public class COSXRefTableReader {
 		this.startXRef = 0;
 		this.offsets.clear();
 		this.trailer.clear();
+		this.startXRefs.clear();
 
 		if (infos == null || infos.isEmpty()) {
 			return;
@@ -73,20 +77,20 @@ public class COSXRefTableReader {
 			info.getXRefSection().addTo(this.offsets);
 		}
 
-		setFirstLastTrailers(trailers);
+		setFirstLastTrailersAndStartXRefs(trailers);
 
 		infos.clear();
 	}
 
-	public void setFirstLastTrailers(Map<Long, COSTrailer> trailers) {
+	public void setFirstLastTrailersAndStartXRefs(Map<Long, COSTrailer> trailers) {
 		if (trailers.isEmpty()) {
 			return;
 		}
 
 		Set<Long> offsets = trailers.keySet();
-		SortedSet<Long> sortedOffset = new TreeSet<>(offsets);
-		this.firstTrailer = trailers.get(sortedOffset.first());
-		this.lastTrailer = trailers.get(sortedOffset.last());
+		this.startXRefs.addAll(offsets);
+		this.firstTrailer = trailers.get(this.startXRefs.first());
+		this.lastTrailer = trailers.get(this.startXRefs.last());
 	}
 
 	public void set(final COSXRefInfo info) {
@@ -103,11 +107,7 @@ public class COSXRefTableReader {
 	}
 
 	public List<COSKey> getKeys() {
-		List<COSKey> result = new ArrayList<>();
-		for (Map.Entry<COSKey, Long> entry : this.offsets.entrySet()) {
-			result.add(entry.getKey());
-		}
-		return result;
+		return new ArrayList<>(offsets.keySet());
 	}
 
 	public long getOffset(final COSKey key) {
@@ -131,4 +131,7 @@ public class COSXRefTableReader {
 		return this.lastTrailer;
 	}
 
+	public SortedSet<Long> getStartXRefs() {
+		return Collections.unmodifiableSortedSet(this.startXRefs);
+	}
 }

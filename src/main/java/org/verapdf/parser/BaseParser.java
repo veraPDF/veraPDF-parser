@@ -56,7 +56,7 @@ public class BaseParser {
 		this.source = stream;
 	}
 
-	public BaseParser(String fileName) throws FileNotFoundException {
+	public BaseParser(String fileName) throws IOException {
 		if(fileName == null) {
 			throw new FileNotFoundException("Can't create SeekableStream from file, filename is null");
 		}

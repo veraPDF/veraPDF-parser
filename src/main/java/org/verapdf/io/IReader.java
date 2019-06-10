@@ -28,6 +28,7 @@ import org.verapdf.cos.COSTrailer;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * @author Timur Kamalov
@@ -47,6 +48,8 @@ public interface IReader extends Closeable {
 	Long getOffset(final COSKey key);
 
 	long getStartXRef();
+
+	SortedSet<Long> getStartXRefs();
 
 	boolean isLinearized();
 
