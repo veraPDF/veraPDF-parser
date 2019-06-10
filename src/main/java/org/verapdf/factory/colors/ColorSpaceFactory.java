@@ -140,7 +140,7 @@ public class ColorSpaceFactory {
         } else if (ASAtom.INDEXED.equals(name)) {
             return new PDIndexed(base, resources);
         } else if (ASAtom.PATTERN == name) {
-            return PDPattern.INSTANCE;
+            return PDPattern.createPattern(base.at(1), resources);
         } else if (ASAtom.CALCMYK == name) {
             return getColorSpaceFromName(COSName.construct(ASAtom.DEVICECMYK), resources,
                     wasDefault);
