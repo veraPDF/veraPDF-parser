@@ -23,6 +23,8 @@ package org.verapdf.pd.patterns;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
+import org.verapdf.factory.colors.ColorSpaceFactory;
+import org.verapdf.pd.PDResources;
 import org.verapdf.pd.colors.PDColorSpace;
 
 /**
@@ -36,8 +38,22 @@ public class PDPattern extends PDColorSpace {
     public static final int TYPE_TILING_PATTERN = 1;
     public static final int TYPE_SHADING_PATTERN = 2;
 
+    private PDColorSpace underlyingColorSpace = null;
+
     protected PDPattern(COSObject obj) {
         super(obj);
+    }
+
+    private PDPattern(COSObject obj, PDColorSpace underlyingColorSpace) {
+        super(obj);
+        this.underlyingColorSpace = underlyingColorSpace;
+    }
+
+    public static PDPattern createPattern(COSObject underlyingColorSpace, PDResources resources) {
+        if (underlyingColorSpace == null || underlyingColorSpace.empty()) {
+            return PDPattern.INSTANCE;
+        }
+        return new PDPattern(COSName.construct(ASAtom.PATTERN), ColorSpaceFactory.getColorSpace(underlyingColorSpace, resources));
     }
 
     @Override
@@ -54,4 +70,7 @@ public class PDPattern extends PDColorSpace {
         return TYPE_PATTERN;
     }
 
+    public PDColorSpace getUnderlyingColorSpace() {
+        return underlyingColorSpace;
+    }
 }
