@@ -39,6 +39,7 @@ import org.verapdf.tools.FontProgramIDGenerator;
 import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -94,7 +95,7 @@ public class PDType1Font extends PDSimpleFont {
         if (descriptorCharSetString != null) {
             try {
                 ASMemoryInStream stream =
-                        new ASMemoryInStream(descriptorCharSetString.getBytes());
+                        new ASMemoryInStream(descriptorCharSetString.getBytes(StandardCharsets.ISO_8859_1));
                 Set<String> descriptorCharSet = new TreeSet<>();
                 COSParser parser = new COSParser(stream);
                 COSObject glyphName = parser.nextObject();

@@ -26,6 +26,7 @@ import org.verapdf.io.SeekableInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -52,10 +53,10 @@ public class AdobeGlyphList {
             Scanner scanner;
             File aglFile = new File(AdobeGlyphList.class.getResource(AGL_FILE).getFile());
             if (aglFile.exists()) {
-                scanner = new Scanner(aglFile);
+                scanner = new Scanner(aglFile, "ISO-8859-1");
             } else {
                 try (InputStream input = AdobeGlyphList.class.getResourceAsStream(AGL_FILE)) {
-                    scanner = new Scanner(SeekableInputStream.getSeekableStream(input));
+                    scanner = new Scanner(SeekableInputStream.getSeekableStream(input), "ISO-8859-1");
                 }
             }
             try {

@@ -21,6 +21,7 @@
 package org.verapdf.external;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -302,7 +303,7 @@ public class JPEG2000 {
             return null;
         }
 
-        String type = new String(profile, 16, 4);
+        String type = new String(profile, 16, 4, StandardCharsets.ISO_8859_1);
         int nrOfComp;
         switch (type) {
             case "GRAY":

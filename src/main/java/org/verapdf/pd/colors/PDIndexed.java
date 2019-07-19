@@ -20,6 +20,8 @@
  */
 package org.verapdf.pd.colors;
 
+import java.nio.charset.StandardCharsets;
+
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
@@ -59,7 +61,7 @@ public class PDIndexed extends PDSpecialColorSpace {
         if (object != null) {
             COSObjType type = object.getType();
             if (type == COSObjType.COS_STRING) {
-                return new ASMemoryInStream(object.getString().getBytes());
+                return new ASMemoryInStream(object.getString().getBytes(StandardCharsets.ISO_8859_1));
             } else if (type == COSObjType.COS_STREAM) {
                 return object.getData(COSStream.FilterFlags.DECODE);
             }

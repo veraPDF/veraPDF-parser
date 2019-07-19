@@ -221,7 +221,7 @@ public class ICCProfile extends PDObject {
 		if (start + length <= bytes.length) {
 			byte[] buffer = Arrays.copyOfRange(bytes, start, start + length);
 			if (isNotAllZero(buffer)) {
-				return new String(buffer);
+				return new String(buffer, StandardCharsets.ISO_8859_1);
 			} else {
 				return null;
 			}
@@ -316,7 +316,7 @@ public class ICCProfile extends PDObject {
 		while (tagsNumberRemained-- > 0) {
 			int prevOffset = currentOffset;
 			currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
-			String tag = new String(temp);
+			String tag = new String(temp, StandardCharsets.ISO_8859_1);
 			if (tag.equals("desc")) {
 				currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 				descOffset = byteArrayToInt(temp);
@@ -355,7 +355,7 @@ public class ICCProfile extends PDObject {
 		if (currOffset != tagOffset + REQUIRED_LENGTH) {
 			return null;
 		}
-		String type = new String(temp);
+		String type = new String(temp, StandardCharsets.ISO_8859_1);
 		if ("mluc".equals(type)) {
 			int prevOffset = currOffset;
 

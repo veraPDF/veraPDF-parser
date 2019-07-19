@@ -20,6 +20,7 @@
  */
 package org.verapdf.parser;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class Token {
 	}
 
 	public String getValue() {
-		return new String(getByteValue());
+		return new String(getByteValue(), StandardCharsets.ISO_8859_1);
 	}
 
 	public byte[] getByteValue() {

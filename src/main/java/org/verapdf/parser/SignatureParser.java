@@ -29,6 +29,7 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,9 +44,9 @@ public class SignatureParser extends COSParser {
 
 
     private static final Logger LOGGER = Logger.getLogger(SignatureParser.class.getCanonicalName());
-    private static final byte[] EOF_STRING = "%%EOF".getBytes();
-    private static final byte[] STREAM_STRING = "stream".getBytes();
-    private static final byte[] ENDSTREAM_STRING = "endstream".getBytes();
+    private static final byte[] EOF_STRING = "%%EOF".getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] STREAM_STRING = "stream".getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] ENDSTREAM_STRING = "endstream".getBytes(StandardCharsets.ISO_8859_1);
 
     private boolean isStream = false;
     private long[] byteRange = new long[4];
