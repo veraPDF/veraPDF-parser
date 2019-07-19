@@ -20,20 +20,8 @@
  */
 package org.verapdf.cos.visitor;
 
-import org.verapdf.as.ASAtom;
-import org.verapdf.as.ASCharsets;
-import org.verapdf.as.exceptions.StringExceptions;
-import org.verapdf.as.filters.io.ASBufferedInFilter;
-import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.*;
-import org.verapdf.cos.xref.COSXRefEntry;
-import org.verapdf.cos.xref.COSXRefInfo;
-import org.verapdf.cos.xref.COSXRefRange;
-import org.verapdf.cos.xref.COSXRefSection;
-import org.verapdf.io.InternalOutputStream;
-import org.verapdf.io.SeekableInputStream;
-
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -44,6 +32,31 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.verapdf.as.ASAtom;
+import org.verapdf.as.exceptions.StringExceptions;
+import org.verapdf.as.filters.io.ASBufferedInFilter;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSBoolean;
+import org.verapdf.cos.COSDictionary;
+import org.verapdf.cos.COSDocument;
+import org.verapdf.cos.COSIndirect;
+import org.verapdf.cos.COSInteger;
+import org.verapdf.cos.COSKey;
+import org.verapdf.cos.COSName;
+import org.verapdf.cos.COSNull;
+import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSReal;
+import org.verapdf.cos.COSStream;
+import org.verapdf.cos.COSString;
+import org.verapdf.cos.COSTrailer;
+import org.verapdf.cos.xref.COSXRefEntry;
+import org.verapdf.cos.xref.COSXRefInfo;
+import org.verapdf.cos.xref.COSXRefRange;
+import org.verapdf.cos.xref.COSXRefSection;
+import org.verapdf.io.InternalOutputStream;
+import org.verapdf.io.SeekableInputStream;
+
 /**
  * @author Timur Kamalov
  */
@@ -52,7 +65,7 @@ public class Writer implements IVisitor {
 	private static final Logger LOGGER = Logger.getLogger(Writer.class.getCanonicalName());
 
 	protected InternalOutputStream os;
-	private long incrementalOffset;
+	private final long incrementalOffset;
 	protected COSXRefInfo info;
 
 	protected COSDocument document;
@@ -66,12 +79,12 @@ public class Writer implements IVisitor {
 	public static final String EOL = "\r\n";
 
 	public Writer(final COSDocument document, final String filename,
-				  long incrementalOffset) throws IOException {
+				  final long incrementalOffset) throws IOException {
 		this(document, filename, true, incrementalOffset);
 	}
 
 	public Writer(final COSDocument document, final String filename,
-				  final boolean append, long incrementalOffset) throws IOException {
+				  final boolean append, final long incrementalOffset) throws IOException {
 		this.document = document;
 		this.os = new InternalOutputStream(filename);
 		this.info = new COSXRefInfo();
@@ -86,33 +99,33 @@ public class Writer implements IVisitor {
 		}
 	}
 
-	public void writeIncrementalUpdate(List<COSObject> changedObjects,
-									   List<COSObject> addedObjects) {
-		List<COSKey> objectsToWrite = new ArrayList<>();
-		for (COSObject obj : changedObjects) {
-			COSKey key = obj.getObjectKey();
+	public void writeIncrementalUpdate(final List<COSObject> changedObjects,
+									   final List<COSObject> addedObjects) {
+		final List<COSKey> objectsToWrite = new ArrayList<>();
+		for (final COSObject obj : changedObjects) {
+			final COSKey key = obj.getObjectKey();
 			if (key != null) {
 				objectsToWrite.add(obj.getObjectKey());
 			}
 		}
 		changedObjects.clear();
-		objectsToWrite.addAll(prepareAddedObjects(addedObjects));
+		objectsToWrite.addAll(this.prepareAddedObjects(addedObjects));
 		this.addToWrite(objectsToWrite);
 		this.writeBody();
-		COSTrailer trailer = document.getTrailer();
+		final COSTrailer trailer = this.document.getTrailer();
 
 		// document.getLastTrailerOffset() + 1 point EXACTLY at first byte of xref
-		this.setTrailer(trailer, document.getLastTrailerOffset() + 1);
+		this.setTrailer(trailer, this.document.getLastTrailerOffset() + 1);
 		this.writeXRefInfo();
 		this.clear();
 	}
 
-	private List<COSKey> prepareAddedObjects(List<COSObject> addedObjects) {
-		int cosKeyNumber = this.document.getLastKeyNumber() + 1;
-		List<COSKey> res = new ArrayList<>();
-		for (COSObject obj : addedObjects) {
+	private List<COSKey> prepareAddedObjects(final List<COSObject> addedObjects) {
+		final int cosKeyNumber = this.document.getLastKeyNumber() + 1;
+		final List<COSKey> res = new ArrayList<>();
+		for (final COSObject obj : addedObjects) {
 			if (!obj.isIndirect()) {
-				COSObject indirect = COSIndirect.construct(obj, this.document);
+				final COSObject indirect = COSIndirect.construct(obj, this.document);
 				res.add(indirect.getObjectKey());
 			} else {
 				res.add(obj.getObjectKey());
@@ -122,47 +135,53 @@ public class Writer implements IVisitor {
 		return res;
 	}
 
-	public void visitFromBoolean(COSBoolean obj) {
+	@Override
+    public void visitFromBoolean(final COSBoolean obj) {
 		try {
 			this.write(String.valueOf(obj.get()));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void visitFromInteger(COSInteger obj) {
+	@Override
+    public void visitFromInteger(final COSInteger obj) {
 		try {
 			this.write(obj.toString());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void visitFromReal(COSReal obj) {
+	@Override
+    public void visitFromReal(final COSReal obj) {
 		try {
 			this.write(obj.toString());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void visitFromString(COSString obj) {
+	@Override
+    public void visitFromString(final COSString obj) {
 		try {
 			this.write(obj.getPrintableString());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void visitFromName(COSName obj) {
+	@Override
+    public void visitFromName(final COSName obj) {
 		try {
 			this.write(obj.toString());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void visitFromArray(COSArray obj) {
+	@Override
+    public void visitFromArray(final COSArray obj) {
 		try {
 			this.write("[");
 			for (int i = 0; i < obj.size(); i++) {
@@ -170,30 +189,32 @@ public class Writer implements IVisitor {
 				this.write(" ");
 			}
 			this.write("]");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void visitFromDictionary(COSDictionary obj) {
+	@Override
+    public void visitFromDictionary(final COSDictionary obj) {
 		try {
 			this.write("<<");
-			for (Map.Entry<ASAtom, COSObject> entry : obj.getEntrySet()) {
+			for (final Map.Entry<ASAtom, COSObject> entry : obj.getEntrySet()) {
 				this.write(entry.getKey());
 				this.write(" ");
 				this.write(entry.getValue());
 				this.write(" ");
 			}
 			this.write(">>");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void visitFromStream(COSStream obj) {
+	@Override
+    public void visitFromStream(final COSStream obj) {
 		long length;
 
-		ASInputStream in = obj.getData();
+		final ASInputStream in = obj.getData();
 
 		if (obj.getFilterFlags() == COSStream.FilterFlags.DECODE ||
 				obj.getFilterFlags() == COSStream.FilterFlags.DECRYPT_AND_DECODE) {
@@ -201,20 +222,20 @@ public class Writer implements IVisitor {
 		}
 		try {
 			obj.setIntegerKey(ASAtom.LENGTH, getASInputStreamLength(in));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.log(Level.FINE, "Can't calculate length of ASInputStream", e);
 		}
 
-		visitFromDictionary(obj);
+		this.visitFromDictionary(obj);
 
 		try {
 			this.write(EOL);
 			this.write("stream");
 			this.write(EOL);
 
-			length = getOffset();
+			length = this.getOffset();
 
-			byte[] buffer = new byte[1024];
+			final byte[] buffer = new byte[1024];
 			long count;
 
 			in.reset();
@@ -227,17 +248,17 @@ public class Writer implements IVisitor {
 				this.os.write(buffer, (int) count);
 			}
 
-			length = getOffset() - length;
+			length = this.getOffset() - length;
 			obj.setLength(length);
 
 			this.write(EOL);
 			this.write("endstream");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(StringExceptions.WRITE_ERROR);
 		}
 	}
 
-	private static long getASInputStreamLength(ASInputStream stream) throws IOException {
+	private static long getASInputStreamLength(final ASInputStream stream) throws IOException {
 		if (stream instanceof SeekableInputStream) {
 			// That is the case of unfiltered stream
 			return ((SeekableInputStream) stream).getStreamLength();
@@ -245,7 +266,7 @@ public class Writer implements IVisitor {
 			// That is the case of fitered stream. Optimization can be reached
 			// if decoded data is stored in memory and not thrown away.
 			stream.reset();
-			byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
+			final byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
 			long res = 0;
 			int read = stream.read(buf);
 			while (read != -1) {
@@ -256,28 +277,30 @@ public class Writer implements IVisitor {
 		}
 	}
 
-	public void visitFromNull(COSNull obj) {
+	@Override
+    public void visitFromNull(final COSNull obj) {
 		try {
 			this.write("null");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void visitFromIndirect(COSIndirect obj) {
+	@Override
+    public void visitFromIndirect(final COSIndirect obj) {
 		try {
 			COSKey key = obj.getKey();
 
 			if (key.equals(new COSKey())) {
-				COSObject direct = obj.getDirect();
+				final COSObject direct = obj.getDirect();
 				key = this.document.setObject(direct);
 				obj.setKey(key, this.document);
-				addToWrite(key);
+				this.addToWrite(key);
 			}
 
 			this.write(key);
 			this.write(" R");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
@@ -287,10 +310,10 @@ public class Writer implements IVisitor {
 			this.write(header);
 			this.write(EOL);
 
-			String comment = new String(new char[] { '%', 0xE2, 0xE3, 0xCF, 0xD3 });
+			final String comment = new String(new char[] { '%', 0xE2, 0xE3, 0xCF, 0xD3 });
 			this.write(comment);
 			this.write(EOL);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -311,26 +334,26 @@ public class Writer implements IVisitor {
 				this.toWrite.remove(0);
 				this.written.add(key);
 
-				write(key, this.document.getObject(key));
+				this.write(key, this.document.getObject(key));
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(StringExceptions.WRITE_ERROR);
 		}
 	}
 
 	public void freeObjects(final Map<COSKey, Long> keys) {
-		for (Map.Entry<COSKey, Long> entry : keys.entrySet()) {
-			addXRef(entry.getKey(), entry.getValue(), 'f');
+		for (final Map.Entry<COSKey, Long> entry : keys.entrySet()) {
+			this.addXRef(entry.getKey(), entry.getValue(), 'f');
 		}
 	}
 
 	public void setTrailer(final COSTrailer trailer) {
-		setTrailer(trailer, 0);
+		this.setTrailer(trailer, 0);
 	}
 
 	public void setTrailer(final COSTrailer trailer, final long prev) {
-		COSObject element = new COSObject();
-		COSCopier copier = new COSCopier(element);
+		final COSObject element = new COSObject();
+		final COSCopier copier = new COSCopier(element);
 		trailer.getObject().accept(copier);
 
 		this.info.getTrailer().setObject(element);
@@ -344,15 +367,15 @@ public class Writer implements IVisitor {
 
 	public void writeXRefInfo() {
 		try {
-			this.info.setStartXRef(getOffset() + incrementalOffset);
+			this.info.setStartXRef(this.getOffset() + this.incrementalOffset);
 
 			this.info.getTrailer().setSize(this.info.getXRefSection().next());
 
-			this.write("xref"); this.write(EOL); this.write(info.getXRefSection());
+			this.write("xref"); this.write(EOL); this.write(this.info.getXRefSection());
 			this.write("trailer"); this.write(EOL); this.write(this.info.getTrailer().getObject()); this.write(EOL);
 			this.write("startxref"); this.write(EOL); this.write(this.info.getStartXRef()); this.write(EOL);
 			this.write("%%EOF"); this.write(EOL);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -367,7 +390,7 @@ public class Writer implements IVisitor {
 
 			this.toWrite.clear();
 			this.written.clear();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -375,7 +398,7 @@ public class Writer implements IVisitor {
 	public void close() {
 		try {
 			this.os.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -383,14 +406,14 @@ public class Writer implements IVisitor {
 	protected long getOffset() {
 		try {
 			return this.os.getOffset();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			return 0;
 		}
 	}
 
 	protected void write(final COSKey key, final COSObject object) throws IOException {
-		addXRef(key);
+		this.addXRef(key);
 		this.write(key);
 		this.write(" obj");
 		this.write(EOL);
@@ -402,12 +425,12 @@ public class Writer implements IVisitor {
 
 	protected void generateID() {
 		// TODO : finish this method
-		Long idTime = System.currentTimeMillis();
+		final Long idTime = System.currentTimeMillis();
 		MessageDigest md5;
 		try	{
 			md5 = MessageDigest.getInstance("MD5");
 			md5.update(Long.toString(idTime).getBytes("ISO-8859-1"));
-			COSObject idString = COSString.construct(md5.digest(), true);
+			final COSObject idString = COSString.construct(md5.digest(), true);
 			//TODO : convert to COSArray
 			this.info.getTrailer().setID(idString);
 		} catch (NoSuchAlgorithmException | IOException e) {
@@ -420,11 +443,11 @@ public class Writer implements IVisitor {
 	}
 
 	protected void addXRef(final COSKey key, final long offset, final char free) {
-		this.info.getXRefSection().add(getKeyToWrite(key), offset, free);
+		this.info.getXRefSection().add(this.getKeyToWrite(key), offset, free);
 	}
 
 	public void addXRef(final COSKey key) {
-		addXRef(key, getOffset() + incrementalOffset, 'n');
+		this.addXRef(key, this.getOffset() + this.incrementalOffset, 'n');
 	}
 
 	protected void write(final boolean value) throws IOException {
@@ -452,7 +475,7 @@ public class Writer implements IVisitor {
 	}
 
 	protected void write(final COSKey value) throws IOException {
-		final COSKey newKey = getKeyToWrite(value);
+		final COSKey newKey = this.getKeyToWrite(value);
 		this.write(newKey.getNumber()); this.write(" "); this.write(newKey.getGeneration());
 	}
 
@@ -461,24 +484,24 @@ public class Writer implements IVisitor {
 	}
 
 	protected void write(final COSXRefRange value) throws IOException {
-		os.write(String.valueOf(value.start)).write(" ").write(String.valueOf(value.count)).write(EOL);
+		this.os.write(String.valueOf(value.start)).write(" ").write(String.valueOf(value.count)).write(EOL);
 	}
 
 	protected void write(final COSXRefEntry value) throws IOException {
-		String offset = formatXrefOffset.format(value.offset);
-		String generation = formatXrefGeneration.format(value.generation);
-		os.write(offset.getBytes(ASCharsets.ISO_8859_1));
-		os.write(" ");
-		os.write(generation.getBytes(ASCharsets.ISO_8859_1));
-		os.write(" ");
-		os.write(String.valueOf(value.free).getBytes(ASCharsets.US_ASCII));
-		os.write(EOL);
+		final String offset = this.formatXrefOffset.format(value.offset);
+		final String generation = this.formatXrefGeneration.format(value.generation);
+		this.os.write(offset.getBytes(StandardCharsets.ISO_8859_1));
+		this.os.write(" ");
+		this.os.write(generation.getBytes(StandardCharsets.ISO_8859_1));
+		this.os.write(" ");
+		this.os.write(String.valueOf(value.free).getBytes(StandardCharsets.US_ASCII));
+		this.os.write(EOL);
 	}
 
 	protected void write(final COSXRefSection value) throws IOException {
-		List<COSXRefRange> range = value.getRange();
-		for (COSXRefRange entry : range) {
-			write(entry);
+		final List<COSXRefRange> range = value.getRange();
+		for (final COSXRefRange entry : range) {
+			this.write(entry);
 			for (int j = entry.start; j < entry.next(); j++) {
 				this.write(value.getEntry(j));
 			}
