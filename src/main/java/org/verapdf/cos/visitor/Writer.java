@@ -429,11 +429,11 @@ public class Writer implements IVisitor {
 		MessageDigest md5;
 		try	{
 			md5 = MessageDigest.getInstance("MD5");
-			md5.update(Long.toString(idTime).getBytes("ISO-8859-1"));
+			md5.update(Long.toString(idTime).getBytes(StandardCharsets.ISO_8859_1));
 			final COSObject idString = COSString.construct(md5.digest(), true);
 			//TODO : convert to COSArray
 			this.info.getTrailer().setID(idString);
-		} catch (NoSuchAlgorithmException | IOException e) {
+		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 	}

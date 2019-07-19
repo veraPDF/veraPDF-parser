@@ -29,6 +29,7 @@ import org.verapdf.parser.postscript.PSParser;
 import org.verapdf.parser.postscript.PostScriptException;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -308,9 +309,9 @@ public class CMapParser extends PSParser {
         } else if (getToken().type == Token.Type.TT_HEXSTRING) {
             byte[] token = getToken().getByteValue();
             if (token.length == 1) {
-                return new String(token, "ISO-8859-1");
+                return new String(token, StandardCharsets.ISO_8859_1);
             }
-            return new String(token, "UTF-16BE");
+            return new String(token, StandardCharsets.UTF_16BE);
         }
         throw new IOException("CMap contains invalid entry in bfchar. Expected "
                 + Token.Type.TT_NAME + " or " + Token.Type.TT_HEXSTRING + " but got " + getToken().type);
