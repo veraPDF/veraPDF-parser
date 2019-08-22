@@ -175,6 +175,8 @@ public class PDType1Font extends PDSimpleFont {
                                     StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                                 }
                             }
+                        } else {
+                            LOGGER.warning("Invalid subtype of the embedded font stream");
                         }
                     }
                 } catch (IOException e) {

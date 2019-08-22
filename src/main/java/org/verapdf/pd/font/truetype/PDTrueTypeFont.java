@@ -94,6 +94,10 @@ public class PDTrueTypeFont extends PDSimpleFont {
                         }
                     }
                 } else {    // fontFile3
+                    ASAtom subType = trueTypeFontFile.getNameKey(ASAtom.SUBTYPE);
+                    if (subType != null && subType != ASAtom.OPEN_TYPE) {
+                        LOGGER.warning("Invalid subtype of the embedded font stream");
+                    }
                     boolean isSubset = this.isSubset();
                     String fontProgramID = FontProgramIDGenerator.getOpenTypeFontProgramID(key, false, isSymbolic, encoding, null, isSubset);
                     this.fontProgram = StaticResources.getCachedFont(fontProgramID);
@@ -101,6 +105,7 @@ public class PDTrueTypeFont extends PDSimpleFont {
                         try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
                             this.fontProgram = new OpenTypeFontProgram(fontData, false,
                                     isSymbolic, encoding, null, isSubset);
+                            StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                         }
                     }
                 }

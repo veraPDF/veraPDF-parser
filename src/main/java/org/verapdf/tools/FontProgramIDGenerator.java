@@ -64,7 +64,7 @@ public class FontProgramIDGenerator {
 			if (mapObjectKey != null) {
 				return mapObjectKey.toString();
 			} else {
-				return String.valueOf(cosObject.hashCode());
+				return "direct";
 			}
 		}
 		return NULL;
