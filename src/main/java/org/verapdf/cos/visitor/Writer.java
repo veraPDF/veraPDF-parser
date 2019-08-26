@@ -21,7 +21,6 @@
 package org.verapdf.cos.visitor;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.ASCharsets;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
@@ -34,6 +33,7 @@ import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -406,11 +406,11 @@ public class Writer implements IVisitor {
 		MessageDigest md5;
 		try	{
 			md5 = MessageDigest.getInstance("MD5");
-			md5.update(Long.toString(idTime).getBytes("ISO-8859-1"));
+			md5.update(Long.toString(idTime).getBytes(StandardCharsets.ISO_8859_1));
 			COSObject idString = COSString.construct(md5.digest(), true);
 			//TODO : convert to COSArray
 			this.info.getTrailer().setID(idString);
-		} catch (NoSuchAlgorithmException | IOException e) {
+		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 	}
@@ -467,11 +467,11 @@ public class Writer implements IVisitor {
 	protected void write(final COSXRefEntry value) throws IOException {
 		String offset = formatXrefOffset.format(value.offset);
 		String generation = formatXrefGeneration.format(value.generation);
-		os.write(offset.getBytes(ASCharsets.ISO_8859_1));
+		os.write(offset.getBytes(StandardCharsets.ISO_8859_1));
 		os.write(" ");
-		os.write(generation.getBytes(ASCharsets.ISO_8859_1));
+		os.write(generation.getBytes(StandardCharsets.ISO_8859_1));
 		os.write(" ");
-		os.write(String.valueOf(value.free).getBytes(ASCharsets.US_ASCII));
+		os.write(String.valueOf(value.free).getBytes(StandardCharsets.US_ASCII));
 		os.write(EOL);
 	}
 

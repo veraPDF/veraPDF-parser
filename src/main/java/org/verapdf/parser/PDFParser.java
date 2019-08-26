@@ -32,6 +32,7 @@ import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ public class PDFParser extends COSParser {
 
     private static final String HEADER_PATTERN = "%PDF-";
     private static final String PDF_DEFAULT_VERSION = "1.4";
-    private static final byte[] STARTXREF = "startxref".getBytes();
+    private static final byte[] STARTXREF = "startxref".getBytes(StandardCharsets.ISO_8859_1);
 
     //%%EOF marker byte representation
     private static final byte[] EOF_MARKER = new byte[]{37, 37, 69, 79, 70};
@@ -461,10 +462,38 @@ public class PDFParser extends COSParser {
                 nextToken();
                 xref.free = getToken().getValue().charAt(0);
                 xrefs.addEntry(number + i, xref);
+
+                checkXrefTableEntryLastBytes();
             }
             nextToken();
         }
         this.source.seekFromCurrentPosition(-7);
+    }
+
+    /**
+     * Checks that last bytes in the entry of Xref table should be:
+     * EOL(CRLF), or Space and LF, or Space and CR
+     *
+     * @throws IOException - incorrect reading from file
+     */
+    private void checkXrefTableEntryLastBytes() throws IOException {
+        byte ch = this.source.readByte();
+
+        if(isCR(ch)){
+            ch = this.source.readByte();
+            this.source.unread();
+            if(!isLF(ch)){
+                LOGGER.log(Level.WARNING, "Incorrect end of the line in cross-reference table.");
+            }
+            return;
+        } else if(ch == CharTable.ASCII_SPACE) {
+            ch = this.source.readByte();
+            if (isLF(ch) || isCR(ch)) {
+                return;
+            }
+        }
+
+        LOGGER.log(Level.WARNING, "Incorrect end of the line in cross-reference table.");
     }
 
     private void parseXrefStream(final COSXRefInfo section) throws IOException {

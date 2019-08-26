@@ -20,6 +20,8 @@
  */
 package org.verapdf.parser;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ public class Token {
 	public long integer;
 	public double real;
 
-	private StringBuilder token = new StringBuilder();
+	private ByteArrayOutputStream token = new ByteArrayOutputStream();
 
 	//fields specific for pdf/a validation of strings
 	private boolean containsOnlyHex = true;
@@ -45,24 +47,20 @@ public class Token {
 		this.keyword = getKeyword(token.toString());
 	}
 
-	public void append(char c) {
-		this.token.append(c);
+	public void append(int c) {
+		this.token.write(c);
 	}
 
 	public String getValue() {
-		return new String(getByteValue());
+		return new String(getByteValue(), StandardCharsets.ISO_8859_1);
 	}
 
 	public byte[] getByteValue() {
-		byte[] res = new byte[this.token.length()];
-		for (int i = 0; i < token.length(); i++) {
-			res[i] = (byte) token.charAt(i);
-		}
-		return res;
+		return this.token.toByteArray();
 	}
 
 	public void clearValue() {
-		this.token.setLength(0);
+		this.token.reset();
 	}
 
 	public enum Type {
@@ -141,9 +139,6 @@ public class Token {
 
 	public void setByteValue(byte[] array) {
 		clearValue();
-		for (byte b : array) {
-			this.token.append((char) b);
-		}
+		this.token.write(array, 0, array.length);
 	}
-
 }

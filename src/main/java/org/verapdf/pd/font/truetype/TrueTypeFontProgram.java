@@ -84,15 +84,15 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             int gid = getGidFromCMaps(glyph);
             return gid >= 0 && gid < getNGlyphs();
         } else {
-            if (cMap30containsGlyph(code)) {
-                return true;
+            if (isCmapPresent(3, 0)) {
+                //No need to look at cmap(1, 0) if cmap(3, 0) exist
+                //GID 0 is considered to be .notdef
+                return cMap30containsGlyph(code) && getGIDFrom30(code) != 0;
             }
             TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
-            if (cmap10 != null) {
-                return cmap10.containsCID(code);
-            }
+            //GID 0 is considered to be .notdef
+            return cmap10 != null && cmap10.containsCID(code) && cmap10.getGlyph(code) != 0;
         }
-        return false;
     }
 
     /**

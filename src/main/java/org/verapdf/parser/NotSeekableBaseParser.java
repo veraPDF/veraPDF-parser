@@ -75,12 +75,8 @@ public class NotSeekableBaseParser implements Closeable {
         }
     }
 
-    private void appendToToken(final byte ch) {
-        this.token.append((char) (ch & 0xff));
-    }
-
     private void appendToToken(final int ch) {
-        this.token.append((char) ch);
+        this.token.append(ch);
     }
 
     protected Token getToken() {

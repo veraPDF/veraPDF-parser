@@ -25,10 +25,8 @@ import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 import org.verapdf.tools.PDFDocEncoding;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -103,12 +101,12 @@ public class COSString extends COSDirect {
     public String getString() {
         if (value.length > 2) {
             if ((value[0] & 0xff) == 0xFE && (value[1] & 0xff) == 0xFF) {
-                return new String(value, 2, value.length - 2, Charset.forName("UTF-16BE"));
+                return new String(value, 2, value.length - 2, StandardCharsets.UTF_16BE);
             }
         }
         if (value.length > 3) {
             if ((value[0] & 0xff) == 0xEF && (value[1] & 0xff) == 0xBB && (value[2] & 0xff) == 0xBF) {
-                return new String(value, 3, value.length - 3, Charset.forName("UTF-8"));
+                return new String(value, 3, value.length - 3, StandardCharsets.UTF_8);
             }
         }
         return PDFDocEncoding.getStringFromBytes(value);
@@ -127,16 +125,11 @@ public class COSString extends COSDirect {
             }
         }
         if (utf16) {
-            try {
-                byte[] utfValue = value.getBytes("UTF-16BE");
-                this.value = new byte[utfValue.length + 2];
-                this.value[0] = (byte) 0xFE;
-                this.value[1] = (byte) 0xFF;
-                System.arraycopy(utfValue, 0, this.value, 2, utfValue.length);
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.log(Level.FINE, "Can't find encoding UTF-16BE", e);
-                return false;
-            }
+            byte[] utfValue = value.getBytes(StandardCharsets.UTF_16BE);
+            this.value = new byte[utfValue.length + 2];
+            this.value[0] = (byte) 0xFE;
+            this.value[1] = (byte) 0xFF;
+            System.arraycopy(utfValue, 0, this.value, 2, utfValue.length);
         }
         return true;
     }

@@ -25,6 +25,7 @@ import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.CFFNumber;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class does low-level parsing of CFF file.
@@ -163,7 +164,7 @@ class CFFFileBaseParser {
                 return CFFPredefined.STANDARD_STRINGS[sid];
             } else {
                 return new String(this.definedNames.get(sid -
-                        CFFPredefined.N_STD_STRINGS));
+                        CFFPredefined.N_STD_STRINGS), StandardCharsets.ISO_8859_1);
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new IOException("Can't get string with given SID", e);

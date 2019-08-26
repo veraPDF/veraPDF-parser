@@ -28,6 +28,8 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.pd.PDResources;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * @author Maksim Bezrukov
  */
@@ -59,7 +61,7 @@ public class PDIndexed extends PDSpecialColorSpace {
         if (object != null) {
             COSObjType type = object.getType();
             if (type == COSObjType.COS_STRING) {
-                return new ASMemoryInStream(object.getString().getBytes());
+                return new ASMemoryInStream(object.getString().getBytes(StandardCharsets.ISO_8859_1));
             } else if (type == COSObjType.COS_STREAM) {
                 return object.getData(COSStream.FilterFlags.DECODE);
             }
