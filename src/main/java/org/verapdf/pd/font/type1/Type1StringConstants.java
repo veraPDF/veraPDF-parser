@@ -38,4 +38,5 @@ public class Type1StringConstants {
     static final String CLOSEFILE = "closefile";
     static final String SUBRS = "Subrs";
     static final String STANDARD_ENCODING_STRING = "StandardEncoding";
+    static final String NOACCESS = "noaccess";
 }
