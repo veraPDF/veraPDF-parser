@@ -97,12 +97,12 @@ public class TaggedPDFHelper {
 		pdf_1_7.add("Reference");
 		pdf_1_7.add("BibEntry");
 		pdf_1_7.add("Code");
-		tempSet.add("H1");
-		tempSet.add("H2");
-		tempSet.add("H3");
-		tempSet.add("H4");
-		tempSet.add("H5");
-		tempSet.add("H6");
+		pdf_1_7.add("H1");
+		pdf_1_7.add("H2");
+		pdf_1_7.add("H3");
+		pdf_1_7.add("H4");
+		pdf_1_7.add("H5");
+		pdf_1_7.add("H6");
 
 		Set<String> pdf_2_0 = new HashSet<>(tempSet);
 
@@ -234,7 +234,7 @@ public class TaggedPDFHelper {
 
 		COSObject children = parent.getKey(ASAtom.K);
 		if (children != null) {
-			if (children.getType() == COSObjType.COS_DICT && isStructElem(children, checkType)) {
+			if (isStructElem(children, checkType)) {
 				List<PDStructElem> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
 				list.add(new PDStructElem(children, roleMap));
 				return Collections.unmodifiableList(list);
@@ -256,7 +256,7 @@ public class TaggedPDFHelper {
 			List<PDStructElem> list = new ArrayList<>();
 			for (int i = 0; i < children.size().intValue(); ++i) {
 				COSObject elem = children.at(i);
-				if (elem.getType() == COSObjType.COS_DICT && isStructElem(elem, checkType)) {
+				if (isStructElem(elem, checkType)) {
 					list.add(new PDStructElem(elem, roleMap));
 				}
 			}
@@ -271,5 +271,19 @@ public class TaggedPDFHelper {
 		}
 		ASAtom type = dictionary.getNameKey(ASAtom.TYPE);
 		return !checkType || type == null || type.equals(ASAtom.STRUCT_ELEM);
+	}
+
+	public static boolean isContentItem(COSObject obj) {
+		if (obj == null || obj.empty()) {
+			return false;
+		}
+		if (obj.getType() == COSObjType.COS_INTEGER) {
+			return true;
+		}
+		if (!obj.getType().isDictionaryBased()) {
+			return false;
+		}
+		ASAtom type = obj.getNameKey(ASAtom.TYPE);
+		return type == ASAtom.getASAtom("MCR") || type == ASAtom.getASAtom("OBJR");
 	}
 }

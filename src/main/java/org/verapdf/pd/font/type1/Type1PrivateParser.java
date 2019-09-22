@@ -130,6 +130,10 @@ class Type1PrivateParser extends BaseParser {
                             this.skipSpaces();
                             this.source.skip(toSkip);
                             this.nextToken();   // reading "NP"
+                            // some fonts have 'noaccess put' instead of 'NP'. Supporting this case as well
+                            if (this.getToken().getValue().equals(Type1StringConstants.NOACCESS)) {
+                                this.nextToken(); // try to read in line put
+                            }
                         }
                         break;
                     default:
