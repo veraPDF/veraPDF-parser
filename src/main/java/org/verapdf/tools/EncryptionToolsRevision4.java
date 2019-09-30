@@ -20,7 +20,7 @@
  */
 package org.verapdf.tools;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -220,12 +220,7 @@ public class EncryptionToolsRevision4 {
         if (password == null) {
             password = "";
         }
-        byte[] psw;
-        try {
-            psw = password.getBytes("ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            psw = password.getBytes();
-        }
+        byte[] psw = password.getBytes(StandardCharsets.ISO_8859_1);
         byte[] res = new byte[PADDED_PASSWORD_LENGTH];
         if (psw.length > PADDED_PASSWORD_LENGTH) {
             System.arraycopy(psw, 0, res, 0, PADDED_PASSWORD_LENGTH);

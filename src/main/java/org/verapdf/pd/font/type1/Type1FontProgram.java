@@ -34,6 +34,7 @@ import org.verapdf.pd.font.truetype.TrueTypePredefined;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -53,7 +54,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     private String[] encoding;
     private Map<String, Integer> glyphWidths;
     private static final byte[] CLEAR_TO_MARK_BYTES =
-            Type1StringConstants.CLEARTOMARK_STRING.getBytes();
+            Type1StringConstants.CLEARTOMARK_STRING.getBytes(StandardCharsets.ISO_8859_1);
     private boolean attemptedParsing = false;
     private boolean successfullyParsed = false;
 
