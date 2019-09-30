@@ -32,6 +32,7 @@ import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ public class PDFParser extends COSParser {
 
     private static final String HEADER_PATTERN = "%PDF-";
     private static final String PDF_DEFAULT_VERSION = "1.4";
-    private static final byte[] STARTXREF = "startxref".getBytes();
+    private static final byte[] STARTXREF = "startxref".getBytes(StandardCharsets.ISO_8859_1);
 
     //%%EOF marker byte representation
     private static final byte[] EOF_MARKER = new byte[]{37, 37, 69, 79, 70};

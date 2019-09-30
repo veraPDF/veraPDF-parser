@@ -26,6 +26,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
@@ -39,14 +40,14 @@ public class COSStreamTest {
 
     @Test
     public void test() throws IOException {
-        byte[] asciiHexData = "4a75737420736f6d652067656e657269632064617461".getBytes();    //"Just some generic data" in hex form
+        byte[] asciiHexData = "4a75737420736f6d652067656e657269632064617461".getBytes(StandardCharsets.ISO_8859_1);    //"Just some generic data" in hex form
         ASInputStream asciiHexStream = new ASMemoryInStream(asciiHexData);
         COSObject cosStream = COSStream.construct(asciiHexStream);
         cosStream.setKey(ASAtom.FILTER, COSName.construct(ASAtom.ASCII_HEX_DECODE));
         ((COSStream) cosStream.get()).setFilters(new COSFilters(COSName.construct(ASAtom.FLATE_DECODE)));
         byte[] buf = new byte[100];
         int read = cosStream.getData(COSStream.FilterFlags.DECODE).read(buf, 100);
-        String message = new String(Arrays.copyOf(buf, read));
+        String message = new String(Arrays.copyOf(buf, read), StandardCharsets.ISO_8859_1);
         assertEquals(message, SAMPLE_DATA);
     }
 

@@ -534,7 +534,8 @@ public class BaseParser {
 				break;
 			}
 
-			if (ch == '#') {
+			// if ch == # (0x23)
+			if (ch == 0x23) {
 				byte ch1, ch2;
 				byte dc;
 				ch1 = this.source.readByte();
@@ -621,12 +622,8 @@ public class BaseParser {
 		this.token.clearValue();
 	}
 
-	protected void appendToToken(final byte ch) {
-		this.token.append((char) (ch & 0xff));
-	}
-
-	private void appendToToken(final int ch) {
-		this.token.append((char) ch);
+	protected void appendToToken(final int ch) {
+		this.token.append(ch);
 	}
 
 	public static byte[] getRawBytes(String string) {
