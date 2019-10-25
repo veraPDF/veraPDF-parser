@@ -17,7 +17,7 @@ notifications:
 
 before_install:
   - sudo apt-get install jq
-  - wget -O ~/codacy-coverage-reporter-assembly-latest.jar http://resources.openpreservation.org/codacy-coverage-reporter-assembly-latest.jar
+  - wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://resources.openpreservation.org/codacy-coverage-reporter-assembly-latest.jar
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
