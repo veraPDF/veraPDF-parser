@@ -461,10 +461,31 @@ public class PDFParser extends COSParser {
                 nextToken();
                 xref.free = getToken().getValue().charAt(0);
                 xrefs.addEntry(number + i, xref);
+
+                if(!checkXrefTableLineLastTwoBytes()) {
+                    LOGGER.log(Level.FINE,
+                            "Incorrect end of the line in cross-reference table.");
+                }
+
             }
             nextToken();
         }
         this.source.seekFromCurrentPosition(-7);
+    }
+
+    private boolean checkXrefTableLineLastTwoBytes() throws IOException {
+        //check on EOL, space then LF, space then CR
+        byte ch = this.source.readByte();
+
+        if(isCR(ch)){
+            ch = this.source.readByte();
+            return isLF(ch);
+        } else if(CharTable.isSpace(ch)) {
+            ch = this.source.readByte();
+            return (isLF(ch) || isCR(ch));
+        }
+
+        return false;
     }
 
     private void parseXrefStream(final COSXRefInfo section) throws IOException {
