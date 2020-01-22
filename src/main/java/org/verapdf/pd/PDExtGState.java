@@ -21,17 +21,23 @@
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSNumber;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
 import org.verapdf.factory.fonts.PDFontFactory;
 import org.verapdf.pd.font.PDFont;
+import org.verapdf.pd.function.PDFunction;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Maksim Bezrukov
  */
 public class PDExtGState extends PDResource {
+
+    private static final Logger LOGGER = Logger.getLogger(PDExtGState.class.getCanonicalName());
+
     public PDExtGState(COSObject obj) {
         super(obj);
     }
@@ -124,5 +130,36 @@ public class PDExtGState extends PDResource {
             }
         }
         return null;
+    }
+
+    public List<PDFunction> getTRFunctions() {
+        return getFunctions(ASAtom.TR);
+    }
+
+    public List<PDFunction> getTR2Functions() {
+        return getFunctions(ASAtom.TR2);
+    }
+
+    private List<PDFunction> getFunctions(ASAtom atom) {
+        COSObject functions = getKey(atom);
+        if (functions.getType() == COSObjType.COS_STREAM) {
+            PDFunction function = PDFunction.createFunction(functions);
+            if (function != null) {
+                return Collections.singletonList(function);
+            }
+        } else if (functions.getType() == COSObjType.COS_ARRAY) {
+            if (functions.size() != 4) {
+                LOGGER.warning("Transfer function array must contain exactly 4 elements");
+            }
+            List<PDFunction> resultList = new ArrayList<>();
+            for (int i = 0; i < functions.size(); i++) {
+                PDFunction function = PDFunction.createFunction(functions.at(i));
+                if (function != null) {
+                    resultList.add(function);
+                }
+            }
+            return Collections.unmodifiableList(resultList);
+        }
+        return Collections.emptyList();
     }
 }

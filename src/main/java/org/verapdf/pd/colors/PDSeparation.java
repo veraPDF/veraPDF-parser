@@ -23,6 +23,7 @@ package org.verapdf.pd.colors;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResources;
+import org.verapdf.pd.function.PDFunction;
 
 /**
  * @author Maksim Bezrukov
@@ -45,13 +46,17 @@ public class PDSeparation extends PDSpecialColorSpace {
         return super.getBaseColorSpace();
     }
 
+    public COSObject getCosTintTransform() {
+        return getObject().at(3);
+    }
+
+    public PDFunction getTintTransform() {
+        return PDFunction.createFunction(getCosTintTransform());
+    }
+
     @Override
     COSObject getBaseColorSpaceObject() {
         return getObject().at(2);
-    }
-
-    public COSObject getTintTransform() {
-        return getObject().at(3);
     }
 
     @Override
