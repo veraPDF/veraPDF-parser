@@ -69,7 +69,7 @@ class XrefStreamParser {
         try {
             xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
             fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).getDirectBase();
-            if (fieldSizes.size() != 3) {
+            if (fieldSizes == null || fieldSizes.size() != 3) {
                 throw new IOException("W array in xref should have 3 elements.");
             }
             initializeIndex();
