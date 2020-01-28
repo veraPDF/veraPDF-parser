@@ -3,6 +3,7 @@ package org.verapdf.pd.structure;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.tools.TaggedPDFConstants;
 import org.verapdf.tools.TaggedPDFHelper;
 
 /**
@@ -53,7 +54,7 @@ public class StructureType {
 	}
 
 	public String getNameSpaceURI() {
-		return this.nameSpace == null ? TaggedPDFHelper.PDF_NAMESPACE : this.nameSpace.getNS();
+		return this.nameSpace == null ? TaggedPDFConstants.PDF_NAMESPACE : this.nameSpace.getNS();
 	}
 
 	public PDStructureNameSpace getNameSpace() {

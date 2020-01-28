@@ -40,80 +40,76 @@ public class TaggedPDFHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(TaggedPDFHelper.class.getCanonicalName());
 
-	public static final String PDF_NAMESPACE = "http://iso.org/pdf/ssn";
-	public static final String PDF2_NAMESPACE = "http://iso.org/pdf2/ssn";
-	public static final String MATH_ML_NAMESPACE = "http://www.w3.org/1998/Math/MathML";
-
 	private static Set<String> PDF_1_7_STANDART_ROLE_TYPES;
 	private static Set<String> PDF_2_0_STANDART_ROLE_TYPES;
 
 	static {
 		Set<String> tempSet = new HashSet<>();
 		// Common standard structure types for PDF 1.7 and 2.0
-		tempSet.add("Document");
-		tempSet.add("Part");
-		tempSet.add("Div");
-		tempSet.add("Caption");
-		tempSet.add("THead");
-		tempSet.add("TBody");
-		tempSet.add("TFoot");
-		tempSet.add("H");
-		tempSet.add("P");
-		tempSet.add("L");
-		tempSet.add("LI");
-		tempSet.add("Lbl");
-		tempSet.add("LBody");
-		tempSet.add("Table");
-		tempSet.add("TR");
-		tempSet.add("TH");
-		tempSet.add("TD");
-		tempSet.add("Span");
-		tempSet.add("Link");
-		tempSet.add("Annot");
-		tempSet.add("Ruby");
-		tempSet.add("Warichu");
-		tempSet.add("Figure");
-		tempSet.add("Formula");
-		tempSet.add("Form");
-		tempSet.add("RB");
-		tempSet.add("RT");
-		tempSet.add("RP");
-		tempSet.add("WT");
-		tempSet.add("WP");
+		tempSet.add(TaggedPDFConstants.DOCUMENT);
+		tempSet.add(TaggedPDFConstants.PART);
+		tempSet.add(TaggedPDFConstants.DIV);
+		tempSet.add(TaggedPDFConstants.CAPTION);
+		tempSet.add(TaggedPDFConstants.THEAD);
+		tempSet.add(TaggedPDFConstants.TBODY);
+		tempSet.add(TaggedPDFConstants.TFOOT);
+		tempSet.add(TaggedPDFConstants.H);
+		tempSet.add(TaggedPDFConstants.P);
+		tempSet.add(TaggedPDFConstants.L);
+		tempSet.add(TaggedPDFConstants.LI);
+		tempSet.add(TaggedPDFConstants.LBL);
+		tempSet.add(TaggedPDFConstants.LBODY);
+		tempSet.add(TaggedPDFConstants.TABLE);
+		tempSet.add(TaggedPDFConstants.TR);
+		tempSet.add(TaggedPDFConstants.TH);
+		tempSet.add(TaggedPDFConstants.TD);
+		tempSet.add(TaggedPDFConstants.SPAN);
+		tempSet.add(TaggedPDFConstants.LINK);
+		tempSet.add(TaggedPDFConstants.ANNOT);
+		tempSet.add(TaggedPDFConstants.RUBY);
+		tempSet.add(TaggedPDFConstants.WARICHU);
+		tempSet.add(TaggedPDFConstants.FIGURE);
+		tempSet.add(TaggedPDFConstants.FORMULA);
+		tempSet.add(TaggedPDFConstants.FORM);
+		tempSet.add(TaggedPDFConstants.RB);
+		tempSet.add(TaggedPDFConstants.RT);
+		tempSet.add(TaggedPDFConstants.RP);
+		tempSet.add(TaggedPDFConstants.WT);
+		tempSet.add(TaggedPDFConstants.WP);
 
 		Set<String> pdf_1_7 = new HashSet<>(tempSet);
 
 		// Standart structure types present in 1.7
-		pdf_1_7.add("Art");
-		pdf_1_7.add("Sect");
-		pdf_1_7.add("BlockQuote");
-		pdf_1_7.add("TOC");
-		pdf_1_7.add("TOCI");
-		pdf_1_7.add("Index");
-		pdf_1_7.add("NonStruct");
-		pdf_1_7.add("Private");
-		pdf_1_7.add("Quote");
-		pdf_1_7.add("Note");
-		pdf_1_7.add("Reference");
-		pdf_1_7.add("BibEntry");
-		pdf_1_7.add("Code");
-		pdf_1_7.add("H1");
-		pdf_1_7.add("H2");
-		pdf_1_7.add("H3");
-		pdf_1_7.add("H4");
-		pdf_1_7.add("H5");
-		pdf_1_7.add("H6");
+		pdf_1_7.add(TaggedPDFConstants.ART);
+		pdf_1_7.add(TaggedPDFConstants.SECT);
+		pdf_1_7.add(TaggedPDFConstants.BLOCK_QUOTE);
+		pdf_1_7.add(TaggedPDFConstants.TOC);
+		pdf_1_7.add(TaggedPDFConstants.TOCI);
+		pdf_1_7.add(TaggedPDFConstants.INDEX);
+		pdf_1_7.add(TaggedPDFConstants.NON_STRUCT);
+		pdf_1_7.add(TaggedPDFConstants.PRIVATE);
+		pdf_1_7.add(TaggedPDFConstants.QUOTE);
+		pdf_1_7.add(TaggedPDFConstants.NOTE);
+		pdf_1_7.add(TaggedPDFConstants.REFERENCE);
+		pdf_1_7.add(TaggedPDFConstants.BIB_ENTRY);
+		pdf_1_7.add(TaggedPDFConstants.CODE);
+		pdf_1_7.add(TaggedPDFConstants.H1);
+		pdf_1_7.add(TaggedPDFConstants.H2);
+		pdf_1_7.add(TaggedPDFConstants.H3);
+		pdf_1_7.add(TaggedPDFConstants.H4);
+		pdf_1_7.add(TaggedPDFConstants.H5);
+		pdf_1_7.add(TaggedPDFConstants.H6);
 
 		Set<String> pdf_2_0 = new HashSet<>(tempSet);
 
-		pdf_2_0.add("DocumentFragment");
-		pdf_2_0.add("Aside");
-		pdf_2_0.add("Title");
-		pdf_2_0.add("FENote");
-		pdf_2_0.add("Sub");
-		pdf_2_0.add("Em");
-		pdf_2_0.add("Strong");
-		pdf_2_0.add("Artifact");
+		pdf_2_0.add(TaggedPDFConstants.DOCUMENT_FRAGMENT);
+		pdf_2_0.add(TaggedPDFConstants.ASIDE);
+		pdf_2_0.add(TaggedPDFConstants.TITLE);
+		pdf_2_0.add(TaggedPDFConstants.FENOTE);
+		pdf_2_0.add(TaggedPDFConstants.SUB);
+		pdf_2_0.add(TaggedPDFConstants.EM);
+		pdf_2_0.add(TaggedPDFConstants.STRONG);
+		pdf_2_0.add(TaggedPDFConstants.ARTIFACT);
 
 		PDF_1_7_STANDART_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_7);
 		PDF_2_0_STANDART_ROLE_TYPES = Collections.unmodifiableSet(pdf_2_0);
@@ -151,7 +147,7 @@ public class TaggedPDFHelper {
 			PDNameSpaceRoleMapping nameSpaceMapping = nameSpace.getNameSpaceMapping();
 			if (nameSpaceMapping != null) {
 				return nameSpaceMapping.getEquivalentType(type.getType());
-			} else if (!PDF_NAMESPACE.equals(nameSpace.getNS())) {
+			} else if (!TaggedPDFConstants.PDF_NAMESPACE.equals(nameSpace.getNS())) {
 				return null;
 			}
 		}
@@ -164,11 +160,12 @@ public class TaggedPDFHelper {
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {
 			switch (nameSpace.getNS()) {
-				case PDF_NAMESPACE:
+				case TaggedPDFConstants.PDF_NAMESPACE:
 					return PDF_1_7_STANDART_ROLE_TYPES.contains(structureType);
-				case PDF2_NAMESPACE:
-					return PDF_2_0_STANDART_ROLE_TYPES.contains(structureType) || structureType.matches("^H[1-9][0-9]*$");
-				case MATH_ML_NAMESPACE:
+				case TaggedPDFConstants.PDF2_NAMESPACE:
+					return PDF_2_0_STANDART_ROLE_TYPES.contains(structureType)
+							|| structureType.matches(TaggedPDFConstants.HN_REGEXP);
+				case TaggedPDFConstants.MATH_ML_NAMESPACE:
 					return true;
 				default:
 					return false;
@@ -284,6 +281,6 @@ public class TaggedPDFHelper {
 			return false;
 		}
 		ASAtom type = obj.getNameKey(ASAtom.TYPE);
-		return type == ASAtom.getASAtom("MCR") || type == ASAtom.getASAtom("OBJR");
+		return type == ASAtom.MCR || type == ASAtom.OBJR;
 	}
 }
