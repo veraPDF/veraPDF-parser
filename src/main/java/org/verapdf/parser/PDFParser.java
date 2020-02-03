@@ -480,12 +480,11 @@ public class PDFParser extends COSParser {
 
         if(isCR(ch)){
             ch = this.source.readByte();
+            this.source.unread();
             if(!isLF(ch)){
                 LOGGER.log(Level.FINE,
                         "Incorrect end of the line in cross-reference table.");
-                return;
             }
-            this.source.unread();
             return;
         } else if(ch == CharTable.ASCII_SPACE) {
             ch = this.source.readByte();
