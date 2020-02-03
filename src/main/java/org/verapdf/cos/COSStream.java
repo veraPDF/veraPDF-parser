@@ -21,7 +21,6 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASConcatenatedInputStream;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.as.io.ASOutputStream;
@@ -352,16 +351,4 @@ public class COSStream extends COSDictionary {
 		return true;
 	}
 
-	public static COSObject concatenateStreams(COSArray streams) throws IOException {
-		List<ASInputStream> resList = new ArrayList<>();
-		for (COSObject stream : streams) {
-			if (stream.getType() == COSObjType.COS_STREAM) {
-				ASInputStream streamData = stream.getData(FilterFlags.DECODE);
-				resList.add(streamData);
-			}
-		}
-		ASInputStream[] asInputStreams = resList.toArray(new ASInputStream[resList.size()]);
-		ASInputStream inputContentStream = new ASConcatenatedInputStream(asInputStreams);
-		return COSStream.construct(inputContentStream);
-	}
 }
