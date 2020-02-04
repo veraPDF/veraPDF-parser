@@ -40,10 +40,6 @@ import java.util.List;
  */
 class XrefStreamParser {
 
-    private COSArray index;
-    private ASInputStream xrefInputStream;
-    private COSArray fieldSizes;
-    private List<Long> objIDs;
     private COSXRefInfo section;
     private COSStream xrefCOSStream;
 
@@ -65,19 +61,14 @@ class XrefStreamParser {
      * @throws IOException
      */
     void parseStreamAndTrailer() throws IOException {
-
-        try {
-            xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
-            fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).getDirectBase();
-            if (fieldSizes == null || fieldSizes.size() != 3) {
+        try (ASInputStream xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE)) {
+            COSObject sizesObject = xrefCOSStream.getKey(ASAtom.W);
+            if (sizesObject.getType() != COSObjType.COS_ARRAY || sizesObject.size() != 3) {
                 throw new IOException("W array in xref should have 3 elements.");
             }
-            initializeIndex();
-            initializeObjIDs();
-            parseStream();
+            List<Long> objIDs = initializeObjIDs(initializeIndex());
+            parseStream(sizesObject, xrefInputStream, objIDs);
             setTrailer();
-        } finally {
-            xrefInputStream.close();
         }
     }
 
@@ -86,33 +77,34 @@ class XrefStreamParser {
      *
      * @throws IOException
      */
-    private void initializeIndex()
-            throws IOException {
-        index = (COSArray) xrefCOSStream.getKey(ASAtom.INDEX).getDirectBase();
+    private COSObject initializeIndex() throws IOException {
+        COSObject indexObject = xrefCOSStream.getKey(ASAtom.INDEX);
 
-        if (index == null) {
+        if (indexObject.empty()) {
             COSObject[] defaultIndex = new COSObject[2];
             defaultIndex[0] = COSInteger.construct(0);
             defaultIndex[1] = xrefCOSStream.getKey(ASAtom.SIZE);
-            index = (COSArray) COSArray.construct(2, defaultIndex).getDirectBase();
-        } else if (index.size() % 2 != 0) {
+            indexObject = COSArray.construct(2, defaultIndex);
+        } else if (indexObject.size() % 2 != 0) {
             throw new IOException("Index array in xref stream has odd amount of elements.");
         }
+        return indexObject;
     }
 
     /**
      * This method calculates object ID for all objects, described in this xref
      * stream using Index array.
      */
-    private void initializeObjIDs() {
-        objIDs = new ArrayList<>();
-        for (int i = 0; i < index.size() / 2; ++i) {
-            COSInteger firstID = (COSInteger) index.at(2 * i).getDirectBase();
-            COSInteger lengthOfSubsection = (COSInteger) index.at(2 * i + 1).getDirectBase();
+    private List<Long> initializeObjIDs(COSObject indexObject) {
+        List<Long> objIDs = new ArrayList<>();
+        for (int i = 0; i < indexObject.size() / 2; ++i) {
+            COSInteger firstID = (COSInteger) indexObject.at(2 * i).getDirectBase();
+            COSInteger lengthOfSubsection = (COSInteger) indexObject.at(2 * i + 1).getDirectBase();
             for (int j = 0; j < lengthOfSubsection.get(); ++j) {
                 objIDs.add(firstID.get() + j);
             }
         }
+        return objIDs;
     }
 
     /**
@@ -120,10 +112,13 @@ class XrefStreamParser {
      *
      * @throws IOException
      */
-    private void parseStream() throws IOException {
-        byte[] field0 = new byte[fieldSizes.at(0).getInteger().intValue()];
-        byte[] field1 = new byte[fieldSizes.at(1).getInteger().intValue()];
-        byte[] field2 = new byte[fieldSizes.at(2).getInteger().intValue()];
+    private void parseStream(COSObject sizesObject, ASInputStream xrefInputStream, List<Long> objIDs) throws IOException {
+        if (sizesObject.getType() != COSObjType.COS_ARRAY || sizesObject.size() != 3) {
+            throw new IOException("W array in xref should have 3 elements.");
+        }
+        byte[] field0 = new byte[sizesObject.at(0).getInteger().intValue()];
+        byte[] field1 = new byte[sizesObject.at(1).getInteger().intValue()];
+        byte[] field2 = new byte[sizesObject.at(2).getInteger().intValue()];
         byte[] buffer;
         byte[] remainedBytes = new byte[0];
         int objIdIndex = 0;
