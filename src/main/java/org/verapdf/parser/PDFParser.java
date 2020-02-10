@@ -460,7 +460,11 @@ public class PDFParser extends COSParser {
                 nextToken();
                 xref.generation = (int) getToken().integer;
                 nextToken();
-                xref.free = getToken().getValue().charAt(0);
+                String value = getToken().getValue();
+                if (value.isEmpty()) {
+                    throw new IOException("Failed to parse xref table");
+                }
+                xref.free = value.charAt(0);
                 xrefs.addEntry(number + i, xref);
             }
             nextToken();
@@ -535,6 +539,9 @@ public class PDFParser extends COSParser {
 	private void getTrailer(final COSTrailer trailer) throws IOException {
 		if (findKeyword(Token.Keyword.KW_TRAILER)) {
 			COSObject obj = nextObject();
+			if (obj.empty()) {
+				throw new IOException("Trailer shall not be empty");
+			}
 			trailer.setObject(obj);
 		}
 
