@@ -482,8 +482,7 @@ public class PDFParser extends COSParser {
             ch = this.source.readByte();
             this.source.unread();
             if(!isLF(ch)){
-                LOGGER.log(Level.FINE,
-                        "Incorrect end of the line in cross-reference table.");
+                LOGGER.log(Level.WARNING, "Incorrect end of the line in cross-reference table.");
             }
             return;
         } else if(ch == CharTable.ASCII_SPACE) {
@@ -493,8 +492,7 @@ public class PDFParser extends COSParser {
             }
         }
 
-        LOGGER.log(Level.FINE,
-                "Incorrect end of the line in cross-reference table.");
+        LOGGER.log(Level.WARNING, "Incorrect end of the line in cross-reference table.");
     }
 
     private void parseXrefStream(final COSXRefInfo section) throws IOException {
