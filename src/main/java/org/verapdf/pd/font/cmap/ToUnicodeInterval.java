@@ -20,9 +20,8 @@
  */
 package org.verapdf.pd.font.cmap;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -82,12 +81,7 @@ public class ToUnicodeInterval {
         if (fffe != null) {
             return fffe;
         }
-        try {
-            return  (unicode[0] == 0) ? String.valueOf(unicode[1]) : new String(unicode, "UTF-16BE");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.log(Level.FINE, "Can't find String encoding UTF-16BE", e);
-            return null;    // I'm sure this won't be reached
-        }
+        return  (unicode[0] == 0) ? String.valueOf(unicode[1]) : new String(unicode, StandardCharsets.UTF_16BE);
     }
 
     private static String getFFFEFromUnicode(byte[] unicode) {

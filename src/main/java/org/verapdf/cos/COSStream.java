@@ -33,6 +33,7 @@ import org.verapdf.io.SeekableInputStream;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +69,7 @@ public class COSStream extends COSDictionary {
 
 	protected COSStream(final String string) {
 		super();
-		this.stream = new ASMemoryInStream(string.getBytes());
+		this.stream = new ASMemoryInStream(string.getBytes(StandardCharsets.ISO_8859_1));
 		this.flags = FilterFlags.RAW_DATA;
 	}
 
@@ -84,7 +85,7 @@ public class COSStream extends COSDictionary {
 
 	protected COSStream(final COSDictionary dictionary, final String string, final FilterFlags flags) {
 		super(dictionary);
-		this.stream = new ASMemoryInStream(string.getBytes());
+		this.stream = new ASMemoryInStream(string.getBytes(StandardCharsets.ISO_8859_1));
 		this.flags = flags;
 	}
 

@@ -23,6 +23,7 @@ package org.verapdf.pd.font.truetype;
 import org.verapdf.io.SeekableInputStream;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -113,6 +114,6 @@ class TrueTypePostTable extends TrueTypeTable {
         int length = this.readByte();
         byte[] str = new byte[length];
         this.source.read(str, length);
-        return new String(str);
+        return new String(str, StandardCharsets.ISO_8859_1);
     }
 }
