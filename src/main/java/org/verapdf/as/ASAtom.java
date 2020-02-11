@@ -355,6 +355,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom MAX_LEN = new ASAtom("MaxLen");
     public static final ASAtom MAX_WIDTH = new ASAtom("MaxWidth");
     public static final ASAtom MCID = new ASAtom("MCID");
+    public static final ASAtom MCR = new ASAtom("MCR");
     public static final ASAtom MDP = new ASAtom("MDP");
     public static final ASAtom MEDIA_BOX = new ASAtom("MediaBox");
     public static final ASAtom METADATA = new ASAtom("Metadata");
@@ -382,6 +383,7 @@ public class ASAtom implements Comparable<ASAtom> {
     // O
     public static final ASAtom O = new ASAtom("O");
     public static final ASAtom OBJ = new ASAtom("Obj");
+    public static final ASAtom OBJR = new ASAtom("OBJR");
     public static final ASAtom OBJ_STM = new ASAtom("ObjStm");
     public static final ASAtom OC = new ASAtom("OC");
     public static final ASAtom OCG = new ASAtom("OCG");
