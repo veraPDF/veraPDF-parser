@@ -466,10 +466,38 @@ public class PDFParser extends COSParser {
                 }
                 xref.free = value.charAt(0);
                 xrefs.addEntry(number + i, xref);
+
+                checkXrefTableEntryLastBytes();
             }
             nextToken();
         }
         this.source.seekFromCurrentPosition(-7);
+    }
+
+    /**
+     * Checks that last bytes in the entry of Xref table should be:
+     * EOL(CRLF), or Space and LF, or Space and CR
+     *
+     * @throws IOException - incorrect reading from file
+     */
+    private void checkXrefTableEntryLastBytes() throws IOException {
+        boolean isLastBytesCorrect;
+
+        byte ch = this.source.readByte();
+        if (isCR(ch)) {
+            ch = this.source.readByte();
+            isLastBytesCorrect = isLF(ch);
+        } else if (ch == CharTable.ASCII_SPACE) {
+            ch = this.source.readByte();
+            isLastBytesCorrect = (isLF(ch) || isCR(ch));
+        } else {
+            isLastBytesCorrect = false;
+        }
+
+        if (!isLastBytesCorrect){
+            this.source.unread();
+            LOGGER.log(Level.WARNING, "Incorrect end of line in cross-reference table.");
+        }
     }
 
     private void parseXrefStream(final COSXRefInfo section) throws IOException {
