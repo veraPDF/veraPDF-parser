@@ -18,43 +18,40 @@
  * If a copy of the MPL was not distributed with this file, you can obtain one at
  * http://mozilla.org/MPL/2.0/.
  */
-package org.verapdf.pd;
+package org.verapdf.pd.function;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.pd.function.PDFunction;
 
-/**
- * @author Maksim Bezrukov
- */
-public class PDHalftone extends PDObject {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-    /**
-     * Constructing Halftone object from base object
-     * @param obj base object for halftone. Can be name, dictionary or stream
-     */
-    public PDHalftone(COSObject obj) {
-        super(obj);
-    }
+public class PDType3Function extends PDFunction {
 
-    public Long getHalftoneType() {
-        COSObject base = getObject();
-        if (base.getType() == COSObjType.COS_NAME) {
-            return null;
-        }
-        return base.getIntegerKey(ASAtom.HALFTONE_TYPE);
-    }
+	private static final Logger LOGGER = Logger.getLogger(PDType3Function.class.getCanonicalName());
 
-    public String getHalftoneName() {
-        COSObject base = getObject();
-        if (base.getType() == COSObjType.COS_NAME) {
-            return base.getName().getValue();
-        }
-        return base.getStringKey(ASAtom.HALFTONE_NAME);
-    }
+	protected PDType3Function(COSObject obj) {
+		super(obj);
+	}
 
-    public PDFunction getCustomTransferFunction() {
-        return PDFunction.createFunction(getObject().getKey(ASAtom.TRANSFER_FUNCTION));
-    }
+	public List<PDFunction> getFunctions() {
+		COSObject obj = getKey(ASAtom.FUNCTIONS);
+		if (obj.getType() != COSObjType.COS_ARRAY) {
+			LOGGER.log(Level.WARNING, "Invalid Functions key value in Type 3 Function dictionary");
+			return Collections.emptyList();
+		}
+
+		List<PDFunction> pdFunctions = new ArrayList<>();
+		for (int i = 0; i < obj.size(); i++) {
+			PDFunction function = PDFunction.createFunction(obj.at(i));
+			if (function != null) {
+				pdFunctions.add(function);
+			}
+		}
+		return Collections.unmodifiableList(pdFunctions);
+	}
 }

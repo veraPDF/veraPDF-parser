@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResources;
+import org.verapdf.pd.function.PDFunction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,8 +59,12 @@ public class PDDeviceN extends PDSpecialColorSpace {
         return getObject().at(2);
     }
 
-    public COSObject getTintTransform() {
+    public COSObject getCosTintTransform() {
         return getObject().at(3);
+    }
+
+    public PDFunction getTintTransform() {
+        return PDFunction.createFunction(getCosTintTransform());
     }
 
     public COSObject getAttributes() {

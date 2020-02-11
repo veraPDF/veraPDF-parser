@@ -542,6 +542,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom TR2 = new ASAtom("TR2");
     public static final ASAtom TRAPPED = new ASAtom("Trapped");
     public static final ASAtom TRANS = new ASAtom("Trans");
+    public static final ASAtom TRANSFER_FUNCTION = new ASAtom("TransferFunction");
     public static final ASAtom TRANSPARENCY = new ASAtom("Transparency");
     public static final ASAtom TREF = new ASAtom("TRef");
     public static final ASAtom TRIM_BOX = new ASAtom("TrimBox");
