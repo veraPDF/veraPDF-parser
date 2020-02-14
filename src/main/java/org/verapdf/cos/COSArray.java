@@ -20,15 +20,22 @@
  */
 package org.verapdf.cos;
 
+import org.verapdf.as.io.ASConcatenatedInputStream;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class COSArray extends COSDirect implements Iterable<COSObject> {
+
+    private static final Logger LOGGER = Logger.getLogger(COSArray.class.getCanonicalName());
 
     private List<COSObject> entries;
 
@@ -211,4 +218,32 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         }
         return true;
     }
+
+    @Override
+    public ASInputStream getData(final COSStream.FilterFlags flags) {
+        List<ASInputStream> streams = new ArrayList<>();
+        try {
+            for (COSObject object : entries) {
+                if (object.getType() == COSObjType.COS_STREAM) {
+                    streams.add(object.getData(flags));
+                }
+            }
+        } catch (Exception any) {
+            for(ASInputStream stream : streams) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Error in closing stream", e);
+                }
+            }
+            throw any;
+        }
+        return new ASConcatenatedInputStream(streams);
+    }
+
+    @Override
+    public ASInputStream getData() {
+        return getData(COSStream.FilterFlags.RAW_DATA);
+    }
+
 }
