@@ -567,8 +567,8 @@ public class PDFParser extends COSParser {
 	private void getTrailer(final COSTrailer trailer) throws IOException {
 		if (findKeyword(Token.Keyword.KW_TRAILER)) {
 			COSObject obj = nextObject();
-			if (obj.empty()) {
-				throw new IOException("Trailer shall not be empty");
+			if (obj.empty() || obj.getType() != COSObjType.COS_DICT) {
+				throw new IOException("Trailer is empty or has invalid type");
 			}
 			trailer.setObject(obj);
 		}
