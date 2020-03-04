@@ -518,6 +518,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom SUBTYPE = new ASAtom("Subtype");
     public static final ASAtom SUBTYPE_2 = new ASAtom("Subtype2");
     public static final ASAtom SUPPLEMENT = new ASAtom("Supplement");
+    public static final ASAtom SUSPECTS = new ASAtom("Suspects");
     public static final ASAtom SV = new ASAtom("SV");
     public static final ASAtom SW = new ASAtom("SW");
     public static final ASAtom SY = new ASAtom("Sy");
