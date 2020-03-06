@@ -525,6 +525,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom SYMBOL = new ASAtom("Symbol");
     // T
     public static final ASAtom T = new ASAtom("T");
+    public static final ASAtom TABS = new ASAtom("Tabs");
     public static final ASAtom TARGET = new ASAtom("Target");
     public static final ASAtom TEMPLATES = new ASAtom("Templates");
     public static final ASAtom THREADS = new ASAtom("Threads");
