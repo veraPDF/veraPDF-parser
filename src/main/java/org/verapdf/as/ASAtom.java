@@ -156,6 +156,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom CROP_BOX = new ASAtom("CropBox");
     public static final ASAtom CRYPT = new ASAtom("Crypt");
     public static final ASAtom CS = new ASAtom("CS");
+    public static final ASAtom CT = new ASAtom("CT");
     // D
     public static final ASAtom D = new ASAtom("D");
     public static final ASAtom DA = new ASAtom("DA");
@@ -277,6 +278,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom HALFTONE_NAME = new ASAtom("HalftoneName");
     public static final ASAtom HALFTONE_TYPE = new ASAtom("HalftoneType");
     public static final ASAtom HARD_LIGHT = new ASAtom("HardLight");
+    public static final ASAtom HEADERS = new ASAtom("Headers");
     public static final ASAtom HEIGHT = new ASAtom("Height");
     public static final ASAtom HELVETICA = new ASAtom("Helvetica");
     public static final ASAtom HELVETICA_BOLD = new ASAtom("Helvetica-Bold");
@@ -481,6 +483,7 @@ public class ASAtom implements Comparable<ASAtom> {
     // S
     public static final ASAtom S = new ASAtom("S");
     public static final ASAtom SA = new ASAtom("SA");
+    public static final ASAtom SCOPE = new ASAtom("Scope");
     public static final ASAtom SCREEN = new ASAtom("Screen");
     public static final ASAtom SE = new ASAtom("SE");
     public static final ASAtom SEPARATION = new ASAtom("Separation");
