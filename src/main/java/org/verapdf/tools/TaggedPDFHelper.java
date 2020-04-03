@@ -40,8 +40,8 @@ public class TaggedPDFHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(TaggedPDFHelper.class.getCanonicalName());
 
-	private static Set<String> PDF_1_7_STANDART_ROLE_TYPES;
-	private static Set<String> PDF_2_0_STANDART_ROLE_TYPES;
+	private static Set<String> PDF_1_7_STANDARD_ROLE_TYPES;
+	private static Set<String> PDF_2_0_STANDARD_ROLE_TYPES;
 
 	static {
 		Set<String> tempSet = new HashSet<>();
@@ -111,8 +111,8 @@ public class TaggedPDFHelper {
 		pdf_2_0.add(TaggedPDFConstants.STRONG);
 		pdf_2_0.add(TaggedPDFConstants.ARTIFACT);
 
-		PDF_1_7_STANDART_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_7);
-		PDF_2_0_STANDART_ROLE_TYPES = Collections.unmodifiableSet(pdf_2_0);
+		PDF_1_7_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_7);
+		PDF_2_0_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_2_0);
 	}
 
 	private static final int MAX_NUMBER_OF_ELEMENTS = 1;
@@ -155,15 +155,15 @@ public class TaggedPDFHelper {
 		return equiv == null ? null : StructureType.createStructureType(equiv);
 	}
 
-	private static boolean isStandardType(StructureType type) {
+	public static boolean isStandardType(StructureType type) {
 		String structureType = type.getType().getValue();
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {
 			switch (nameSpace.getNS()) {
 				case TaggedPDFConstants.PDF_NAMESPACE:
-					return PDF_1_7_STANDART_ROLE_TYPES.contains(structureType);
+					return PDF_1_7_STANDARD_ROLE_TYPES.contains(structureType);
 				case TaggedPDFConstants.PDF2_NAMESPACE:
-					return PDF_2_0_STANDART_ROLE_TYPES.contains(structureType)
+					return PDF_2_0_STANDARD_ROLE_TYPES.contains(structureType)
 							|| structureType.matches(TaggedPDFConstants.HN_REGEXP);
 				case TaggedPDFConstants.MATH_ML_NAMESPACE:
 					return true;
@@ -171,7 +171,7 @@ public class TaggedPDFHelper {
 					return false;
 			}
 		} else {
-			return PDF_1_7_STANDART_ROLE_TYPES.contains(structureType);
+			return PDF_1_7_STANDARD_ROLE_TYPES.contains(structureType);
 		}
 	}
 
