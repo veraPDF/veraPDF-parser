@@ -49,6 +49,10 @@ public class PDAnnotation extends PDObject {
 		return getObject().getIntegerKey(ASAtom.F);
 	}
 
+	public Long getStructParent() {
+		return getObject().getIntegerKey(ASAtom.STRUCT_PARENT);
+	}
+
 	public String getContents() {
 		return getStringKey(ASAtom.CONTENTS);
 	}
