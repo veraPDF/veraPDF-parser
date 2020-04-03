@@ -74,6 +74,26 @@ public class PDStructElem extends PDStructTreeNode {
 		return StructureType.createStructureType(getKey(ASAtom.S), getKey(ASAtom.NS));
 	}
 
+	public String getActualText() {
+		return getStringKey(ASAtom.ACTUAL_TEXT);
+	}
+
+	public String getAlternateDescription() {
+		return getStringKey(ASAtom.ALT);
+	}
+
+	public String getExpandedAbbreviation() {
+		return getStringKey(ASAtom.E);
+	}
+
+	public PDStructElem getParent() {
+		COSObject parentObject = getKey(ASAtom.P);
+		if (parentObject != null) {
+			return new PDStructElem(parentObject, this.rootRoleMap);
+		}
+		return null;
+	}
+
 	public StructureType getDefaultStructureType() {
 		return TaggedPDFHelper.getDefaultStructureType(this.getStructureType(), this.rootRoleMap);
 	}
