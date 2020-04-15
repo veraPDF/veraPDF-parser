@@ -330,4 +330,8 @@ public class PDPage extends PDPageTreeNode {
         }
         return null;
     }
+
+    public String getTabs() {
+        return getObject().getStringKey(ASAtom.TABS);
+    }
 }
