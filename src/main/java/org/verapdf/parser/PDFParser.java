@@ -337,11 +337,13 @@ public class PDFParser extends COSParser {
         source.seekFromEnd(STARTXREF.length);
         byte[] buf = new byte[STARTXREF.length];
         while (source.getStreamLength() - source.getOffset() < 1024) {
-            long res = source.getOffset();
             source.read(buf);
             if (Arrays.equals(buf, STARTXREF)) {
                 nextToken();
                 return this.getToken().integer;
+            }
+            if (source.getOffset() <= STARTXREF.length) {
+                throw new IOException("Document doesn't contain startxref keyword");
             }
             source.seekFromCurrentPosition(-STARTXREF.length - 1);
         }
