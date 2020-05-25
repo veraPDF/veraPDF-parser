@@ -138,10 +138,12 @@ public class PDNumberTreeNode extends PDObject {
                 COSObject res;
                 for (PDNumberTreeNode kid : kids) {
                     COSKey kidObjectKey = kid.getObject().getObjectKey();
-                    if (visitedKeys.contains(kidObjectKey)) {
-                        throw new LoopedException("Loop inside number tree");
-                    } else {
-                        visitedKeys.add(kidObjectKey);
+                    if (kidObjectKey != null) {
+                        if (visitedKeys.contains(kidObjectKey)) {
+                            throw new LoopedException("Loop inside number tree");
+                        } else {
+                            visitedKeys.add(kidObjectKey);
+                        }
                     }
                     res = kid.getObject(key, visitedKeys);
                     if (res != null) {
