@@ -53,7 +53,8 @@ public class PDNumberTreeNode extends PDObject {
     public long[] getLimitsArray() {
         COSObject limits = this.getKey(ASAtom.LIMITS);
         if (limits != null && !limits.empty() && limits.getType() == COSObjType.COS_ARRAY
-                && limits.size() >= 2) {
+                && limits.size() >= 2 && limits.at(0).getType() == COSObjType.COS_INTEGER
+                && limits.at(1).getType() == COSObjType.COS_INTEGER) {
             long[] res = new long[2];
             res[0] = limits.at(0).getInteger();
             res[1] = limits.at(1).getInteger();
@@ -137,10 +138,12 @@ public class PDNumberTreeNode extends PDObject {
                 COSObject res;
                 for (PDNumberTreeNode kid : kids) {
                     COSKey kidObjectKey = kid.getObject().getObjectKey();
-                    if (visitedKeys.contains(kidObjectKey)) {
-                        throw new LoopedException("Loop inside number tree");
-                    } else {
-                        visitedKeys.add(kidObjectKey);
+                    if (kidObjectKey != null) {
+                        if (visitedKeys.contains(kidObjectKey)) {
+                            throw new LoopedException("Loop inside number tree");
+                        } else {
+                            visitedKeys.add(kidObjectKey);
+                        }
                     }
                     res = kid.getObject(key, visitedKeys);
                     if (res != null) {
