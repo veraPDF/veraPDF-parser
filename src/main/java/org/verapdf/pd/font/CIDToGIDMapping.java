@@ -50,7 +50,7 @@ public class CIDToGIDMapping {
      */
     public CIDToGIDMapping(COSObject obj) throws IOException {
         if (obj != null && (obj.getType() == COSObjType.COS_STREAM ||
-                obj.getType() == COSObjType.COS_NAME)) {
+                (obj.getType() == COSObjType.COS_NAME && obj.getName() == ASAtom.IDENTITY))) {
             if (obj.getType() == COSObjType.COS_NAME && obj.getName() == ASAtom.IDENTITY) {
                 this.isIdentity = true;
                 this.mapping = new int[0];
