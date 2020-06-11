@@ -131,7 +131,7 @@ class Type2CharStringParser extends BaseCharStringParser {
         byte[] buf = new byte[4];
         if (firstByte == 28) {
             readStreams(buf, 2);
-            return new CFFNumber((char) (((buf[0] & 0xFF) << 8) | (buf[1] & 0xFF)));
+            return new CFFNumber((short) (((buf[0] & 0xFF) << 8) | (buf[1] & 0xFF)));
         } else {
             readStreams(buf, 4);
             int integer = 0;
