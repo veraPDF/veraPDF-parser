@@ -311,6 +311,9 @@ public class CMapParser extends PSParser {
             if (token.length == 1) {
                 return new String(token, StandardCharsets.ISO_8859_1);
             }
+            if (token.length == 2 && token[0] == (byte) 0xFF && token[1] == (byte) 0xFE) {
+                return "\uFFFE";
+            }
             return new String(token, StandardCharsets.UTF_16BE);
         }
         throw new IOException("CMap contains invalid entry in bfchar. Expected "
