@@ -243,7 +243,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     public float getWidth(int code) {
         int cid = this.externalCMap.toCID(code);
         Integer gid = getGid(cid);
-        return (gid == null || gid == 0) ? -1 : widths.getWidth(gid);
+        return gid == null ? -1 : widths.getWidth(gid);
     }
 
     /**
