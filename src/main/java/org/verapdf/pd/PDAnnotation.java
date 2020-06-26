@@ -65,6 +65,18 @@ public class PDAnnotation extends PDObject {
 		return getStringKey(ASAtom.M);
 	}
 
+	public String getTU() {
+		return getStringKey(ASAtom.TU);
+	}
+
+	public COSObject getParent(){
+		COSObject res = getKey(ASAtom.PARENT);
+		if (res != null && res.getType() == COSObjType.COS_DICT) {
+			return res;
+		}
+		return null;
+	}
+
 	public Double getCA() {
 		return getObject().getRealKey(ASAtom.CA);
 	}
