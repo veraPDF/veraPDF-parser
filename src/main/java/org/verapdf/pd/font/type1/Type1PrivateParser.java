@@ -52,6 +52,7 @@ class Type1PrivateParser extends BaseParser {
     private Map<String, Integer> glyphWidths;
     private double[] fontMatrix;
     private boolean isDefaultFontMatrix;
+    private boolean charStringsFound;
 
     /**
      * {@inheritDoc}
@@ -62,6 +63,7 @@ class Type1PrivateParser extends BaseParser {
         isDefaultFontMatrix = Arrays.equals(this.fontMatrix,
                 Type1FontProgram.DEFAULT_FONT_MATRIX);
         this.lenIV = 4;
+        this.charStringsFound = false;
     }
 
     /**
@@ -73,7 +75,7 @@ class Type1PrivateParser extends BaseParser {
         skipSpaces(true);
 
         while (getToken().type != Token.Type.TT_EOF &&
-                (getToken().getValue() == null || !getToken().getValue().startsWith(Type1StringConstants.CLOSEFILE))) {
+                (getToken().getValue() == null || !charStringsFound || !getToken().getValue().startsWith(Type1StringConstants.CLOSEFILE))) {
             nextToken();
             processToken();
         }
@@ -99,7 +101,11 @@ class Type1PrivateParser extends BaseParser {
             case TT_NAME:
                 switch (this.getToken().getValue()) {
                     case Type1StringConstants.CHAR_STRINGS_STRING:
+                        charStringsFound = true;
                         nextToken();
+                        if (this.getToken().type != Token.Type.TT_INTEGER) {
+                            break;
+                        }
                         int amountOfGlyphs = (int) this.getToken().integer;
                         nextToken();    // reading "dict"
                         nextToken();    // reading "dup"
