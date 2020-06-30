@@ -308,7 +308,7 @@ public class NotSeekableBaseParser implements Closeable {
 
             if (isEndOfComment(ch)) {
                 ch = this.source.readByte();
-                if (isLF(ch)) { // EOL == CR
+                if (!isLF(ch)) { // EOL == CR
                     this.source.unread();
                 } // else EOL == CRLF
                 return;
@@ -568,7 +568,9 @@ public class NotSeekableBaseParser implements Closeable {
                     this.token.type = Token.Type.TT_REAL;
                     appendToToken(ch);
                 } else if (ch == '#' && isPSParser) {
-                    radix = (int) this.token.integer;
+                    if (this.token.type == Token.Type.TT_INTEGER) {
+                        radix = Integer.valueOf(this.token.getValue());
+                    }
                     token.clearValue();
                 } else {
                     this.source.unread();
