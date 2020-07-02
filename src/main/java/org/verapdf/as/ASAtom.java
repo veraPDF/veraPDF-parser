@@ -133,6 +133,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom CMAPNAME = new ASAtom("CMapName");
     public static final ASAtom CMYK = new ASAtom("CMYK");
     public static final ASAtom CO = new ASAtom("CO");
+    public static final ASAtom COL_SPAN = new ASAtom("ColSpan");
     public static final ASAtom COLOR_BURN = new ASAtom("ColorBurn");
     public static final ASAtom COLOR_DODGE = new ASAtom("ColorDodge");
     public static final ASAtom COLORANTS = new ASAtom("Colorants");
@@ -476,6 +477,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom ROLE_MAP_NS = new ASAtom("RoleMapNS");
     public static final ASAtom ROOT = new ASAtom("Root");
     public static final ASAtom ROTATE = new ASAtom("Rotate");
+    public static final ASAtom ROW_SPAN = new ASAtom("RowSpan");
     public static final ASAtom ROWS = new ASAtom("Rows");
     public static final ASAtom RUN_LENGTH_DECODE = new ASAtom("RunLengthDecode");
     public static final ASAtom RUN_LENGTH_DECODE_ABBREVIATION = new ASAtom("RL");
