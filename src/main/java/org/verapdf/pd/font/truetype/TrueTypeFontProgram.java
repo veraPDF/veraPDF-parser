@@ -30,6 +30,8 @@ import org.verapdf.pd.font.PDFont;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents TrueTypeFontProgram.
@@ -37,6 +39,8 @@ import java.util.Map;
  * @author Sergey Shemyakov
  */
 public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProgram {
+
+    private static final Logger LOGGER = Logger.getLogger(TrueTypeFontProgram.class.getCanonicalName());
 
     private COSObject encoding;
     private boolean isSymbolic;
@@ -61,7 +65,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
     @Override
     public void parseFont() throws IOException {
         super.parseFont();
-        if (!isSymbolic) {
+        if (!isSymbolic && encoding.getDirectBase() != null) {
             this.createCIDToNameTable();
         }
     }
@@ -71,7 +75,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      */
     @Override
     public boolean containsCode(int code) {
-        if (!isSymbolic) {
+        if (!isSymbolic && encoding.getDirectBase() != null) {
             String glyph;
             if (this.encodingMappingArray != null && code < this.encodingMappingArray.length) {
                 glyph = this.encodingMappingArray[code];
@@ -100,7 +104,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      */
     @Override
     public float getWidth(int code) {
-        if (isSymbolic) {
+        if (isSymbolic || encoding.getDirectBase() == null) {
             return getWidthSymbolic(code);
         } else {
             if (encodingMappingArray == null) {  // no external encoding
@@ -118,10 +122,10 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
 
     @Override
     public String getGlyphName(int code) {
-        if (!isSymbolic && encodingMappingArray != null &&
+        if (!isSymbolic && encoding.getDirectBase() != null && encodingMappingArray != null &&
                 code < encodingMappingArray.length) {
             return encodingMappingArray[code];
-        } else if (isSymbolic) {
+        } else if (isSymbolic || encoding.getDirectBase() == null) {
             return " "; // indicates that toUnicode should not be checked.
         }
         return null;
@@ -132,7 +136,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      */
     @Override
     public float getWidth(String glyphName) {
-        if (isSymbolic) {
+        if (isSymbolic || encoding.getDirectBase() == null) {
             return -1;
         }
         int gid = getGidFromCMaps(glyphName);
@@ -154,7 +158,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
 
     @Override
     public boolean containsGlyph(String glyphName) {
-        if (!isSymbolic) {
+        if (!isSymbolic && encoding.getDirectBase() != null) {
             int gid = getGidFromCMaps(glyphName);
             return gid >= 0 && gid < getNGlyphs();
         } else {
@@ -269,7 +273,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
                 System.arraycopy(TrueTypePredefined.MAC_EXPERT_ENCODING, 0,
                         encodingMappingArray, 0, 256);
             } else {
-                throw new IOException("Error in reading /Encoding entry in font dictionary");
+                LOGGER.log(Level.SEVERE, "Error in reading /Encoding entry in font dictionary");
+                System.arraycopy(TrueTypePredefined.STANDARD_ENCODING, 0,
+                        encodingMappingArray, 0, 256);
             }
         } else {
             System.arraycopy(TrueTypePredefined.STANDARD_ENCODING, 0,
