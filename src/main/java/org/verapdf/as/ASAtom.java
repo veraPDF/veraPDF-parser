@@ -22,11 +22,13 @@ package org.verapdf.as;
 
 import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Class represents predefined PDF name. Also it caches known PDF names.
+ * Internally each ASAtom is represented as a byte array packed into Java String using ISO_8859_1 encoding
  *
  * @author Timur Kamalov
  */
@@ -614,7 +616,7 @@ public class ASAtom implements Comparable<ASAtom> {
     }
 
     private ASAtom(String value, boolean predefinedValue) {
-        this.value = value;
+        this.value = new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
         if (predefinedValue) {
             PREDEFINED_PDF_NAMES.put(value, this);
         } else {
@@ -641,7 +643,6 @@ public class ASAtom implements Comparable<ASAtom> {
             return CACHED_PDF_NAMES.get(value);
         } else {
             ASAtom result = new ASAtom(value, false);
-            result.value = value;
             CACHED_PDF_NAMES.put(value, result);
             return result;
         }
@@ -655,7 +656,7 @@ public class ASAtom implements Comparable<ASAtom> {
     }
 
     private void setValue(String value) {
-        this.value = value;
+        this.value = new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
     /**
