@@ -110,6 +110,10 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
         return this.parser.getCmapTable(platformID, encodingID) != null;
     }
 
+    public boolean isCmapPresent() {
+        return this.parser.isCmapPresent();
+    }
+
     protected float getWidthWithCheck(int gid) {
         if (gid < widths.length) {
             return widths[gid];

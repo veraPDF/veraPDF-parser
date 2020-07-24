@@ -156,4 +156,16 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         }
         return null;
     }
+
+    Boolean isCmapPresent() {
+        if (cmapParser != null) {
+            for (TrueTypeCmapSubtable ttci : cmapParser.getCmapInfos()) {
+                if (ttci.getPlatformID() != 3 ||
+                        ttci.getEncodingID() != 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
