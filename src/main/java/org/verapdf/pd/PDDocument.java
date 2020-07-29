@@ -53,16 +53,25 @@ public class PDDocument {
 	public PDDocument() throws IOException {
 		this.catalog = new PDCatalog();
 		this.constructDocument();
+		if (getNumberOfPages() == 0) {
+			throw new IOException("Pages not found");
+		}
 	}
 
 	public PDDocument(final String filename) throws IOException {
 		this.catalog = new PDCatalog();
 		this.document = new COSDocument(filename, this);
+		if (getNumberOfPages() == 0) {
+			throw new IOException("Pages not found");
+		}
 	}
 
 	public PDDocument(final InputStream fileStream) throws IOException {
 		this.catalog = new PDCatalog();
 		this.document = new COSDocument(fileStream, this);
+		if (getNumberOfPages() == 0) {
+			throw new IOException("Pages not found");
+		}
 	}
 
 	private void constructDocument() {
