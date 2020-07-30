@@ -26,6 +26,8 @@ import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
+import org.verapdf.cos.COSKey;
+import org.verapdf.exceptions.LoopedException;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.PDObject;
@@ -34,6 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,7 +102,12 @@ public class PDCMap extends PDObject {
      * @return CMap file object read from stream or loaded from predefined CMap
      * file or null if load failed.
      */
+
     public CMap getCMapFile() {
+        return getCMapFile(new HashSet<>());
+    }
+
+    private CMap getCMapFile(Set<COSKey> keys) {
         if (!parsedCMap) {
             parsedCMap = true;
             if (this.getObject().getType() == COSObjType.COS_STREAM) {
@@ -120,7 +129,14 @@ public class PDCMap extends PDObject {
             }
             parseUseCMap();
             if (useCMap != null) {
-                this.cMapFile.useCMap(useCMap.getCMapFile());
+                COSKey key = this.getObject().getKey();
+                if (keys.contains(key)) {
+                    throw new LoopedException("Loop inside CMap");
+                }
+                if (key != null) {
+                    keys.add(key);
+                }
+                this.cMapFile.useCMap(useCMap.getCMapFile(keys));
             }
         }
         return this.cMapFile;
