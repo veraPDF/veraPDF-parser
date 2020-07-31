@@ -616,7 +616,7 @@ public class ASAtom implements Comparable<ASAtom> {
     }
 
     private ASAtom(String value, boolean predefinedValue) {
-        this.value = new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        this.value = value;
         if (predefinedValue) {
             PREDEFINED_PDF_NAMES.put(value, this);
         } else {
@@ -656,7 +656,7 @@ public class ASAtom implements Comparable<ASAtom> {
     }
 
     private void setValue(String value) {
-        this.value = new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        this.value = value;
     }
 
     /**
