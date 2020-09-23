@@ -21,6 +21,7 @@
 package org.verapdf.parser;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +45,13 @@ public class Token {
 
 	public void toKeyword() {
 		this.type = Type.TT_KEYWORD;
-		this.keyword = getKeyword(token.toString());
+
+		try {
+			this.keyword = getKeyword(token.toString("ISO-8859-1"));
+		} catch (UnsupportedEncodingException e) {
+			// cannot happen as ISO-8859-1 is required to be implemented in Java
+			this.keyword = getKeyword(token.toString());
+		}
 	}
 
 	public void append(int c) {
