@@ -44,7 +44,7 @@ public class Token {
 
 	public void toKeyword() {
 		this.type = Type.TT_KEYWORD;
-		this.keyword = getKeyword(token.toString());
+		this.keyword = getKeyword(getValue());
 	}
 
 	public void append(int c) {
