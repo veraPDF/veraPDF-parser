@@ -24,14 +24,21 @@ import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.text.DecimalFormatSymbols;
 
 /**
  * @author Timur Kamalov
  */
 public class COSReal extends COSNumber {
 
-    private static final NumberFormat FORMATTER = new DecimalFormat("#0.000000");
+    private static final DecimalFormat FORMATTER;
+
+    static {
+        FORMATTER = new DecimalFormat("#0.000000");
+        DecimalFormatSymbols decFormSymbols = FORMATTER.getDecimalFormatSymbols();
+        decFormSymbols.setDecimalSeparator('.');
+        FORMATTER.setDecimalFormatSymbols(decFormSymbols);
+    }
 
     private double value;
 
@@ -90,7 +97,7 @@ public class COSReal extends COSNumber {
         {
             while (stringValue.endsWith("0") && !stringValue.endsWith(".0"))
             {
-                stringValue = stringValue.substring(0,stringValue.length()-1);
+                stringValue = stringValue.substring(0, stringValue.length() - 1);
             }
         }
         return stringValue;
