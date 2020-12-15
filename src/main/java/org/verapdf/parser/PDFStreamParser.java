@@ -302,7 +302,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			l = lastInlineImageDict.getIntegerKey(ASAtom.LENGTH);
 		}
 		while (!(this.source.isEOF())) {
-			if (previousByte == 'E' && currentByte == 'I' && isSourceAfterImage(l) && source.peek() == ' ') {
+			if (previousByte == 'E' && currentByte == 'I' && isSourceAfterImage(l) && CharTable.isSpace(source.peek())) {
 			    break;
             }
 			previousByte = currentByte;
