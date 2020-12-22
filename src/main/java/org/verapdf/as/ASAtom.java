@@ -22,7 +22,6 @@ package org.verapdf.as;
 
 import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +35,11 @@ public class ASAtom implements Comparable<ASAtom> {
 
     private static final Map<String, ASAtom> PREDEFINED_PDF_NAMES = new HashMap<>();
     private static final Map<String, ASAtom> CACHED_PDF_NAMES = new HashMap<>();
+
+    // 3
+    public static final ASAtom key3D = new ASAtom("3D");
+    public static final ASAtom key3DD = new ASAtom("3DD");
+    public static final ASAtom key3DRef = new ASAtom("3DRef");
 
     // A
     public static final ASAtom A = new ASAtom("A");
@@ -291,6 +295,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom HIDE_TOOLBAR = new ASAtom("HideToolbar");
     public static final ASAtom HIDE_WINDOWUI = new ASAtom("HideWindowUI");
     public static final ASAtom HT = new ASAtom("HT");
+    public static final ASAtom HTO = new ASAtom("HTO");
     public static final ASAtom HTP = new ASAtom("HTP");
     // I
     public static final ASAtom I = new ASAtom("I");
@@ -435,6 +440,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom PERMS = new ASAtom("Perms");
     public static final ASAtom PG = new ASAtom("Pg");
     public static final ASAtom PI = new ASAtom("PI");
+    public static final ASAtom PIECE_INFO = new ASAtom("PieceInfo");
     public static final ASAtom PO = new ASAtom("PO");
     public static final ASAtom POPUP = new ASAtom("Popup");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");

@@ -79,7 +79,7 @@ public class TaggedPDFHelper {
 
 		Set<String> pdf_1_7 = new HashSet<>(tempSet);
 
-		// Standart structure types present in 1.7
+		// Standard structure types present in 1.7
 		pdf_1_7.add(TaggedPDFConstants.ART);
 		pdf_1_7.add(TaggedPDFConstants.SECT);
 		pdf_1_7.add(TaggedPDFConstants.BLOCK_QUOTE);
