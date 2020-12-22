@@ -228,4 +228,21 @@ public class PDAnnotation extends PDObject {
 		}
 		return null;
 	}
+
+	public PD3DStream get3DD() {
+		COSObject object = getKey(ASAtom.key3DD);
+		if (object != null && (object.getType() == COSObjType.COS_DICT)) {
+			ASAtom type = object.getNameKey(ASAtom.TYPE);
+			if (ASAtom.key3DRef.equals(type)) {
+				object = object.getKey(ASAtom.key3DD);
+			}
+		}
+		if (object != null && object.getType() == COSObjType.COS_STREAM) {
+			ASAtom type = object.getNameKey(ASAtom.TYPE);
+			if (ASAtom.key3D.equals(type)) {
+				return new PD3DStream(object);
+			}
+		}
+		return null;
+	}
 }
