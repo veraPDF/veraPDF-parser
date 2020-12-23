@@ -23,9 +23,9 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.actions.PDPageAdditionalActions;
+import org.verapdf.pd.annotations.PDWidgetAnnotation;
 import org.verapdf.pd.colors.PDColorSpace;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -88,6 +88,21 @@ public class PDPage extends PDPageTreeNode {
             return getDoubleArrayForBox(array);
         }
         return null;
+    }
+
+    public List<PDOutputIntent> getOutputIntents() {
+        COSObject base = getKey(ASAtom.OUTPUT_INTENTS);
+        if (base != null && base.getType() == COSObjType.COS_ARRAY) {
+            COSArray array = (COSArray) base.getDirectBase();
+            List<PDOutputIntent> result = new ArrayList<>(array.size());
+            for (COSObject obj : array) {
+                if (obj != null && obj.getType().isDictionaryBased()) {
+                    result.add(new PDOutputIntent(obj));
+                }
+            }
+            return Collections.unmodifiableList(result);
+        }
+        return Collections.emptyList();
     }
 
     public double[] getCropBox() {
@@ -271,7 +286,11 @@ public class PDPage extends PDPageTreeNode {
             }
             for (COSObject annot : (COSArray) annots.getDirectBase()) {
                 if (annot != null && annot.getType() == COSObjType.COS_DICT) {
-                    res.add(new PDAnnotation(annot));
+                    if (ASAtom.WIDGET.equals(annot.getNameKey(ASAtom.SUBTYPE))) {
+                        res.add(new PDWidgetAnnotation(annot));
+                    } else {
+                        res.add(new PDAnnotation(annot));
+                    }
                 }
             }
             return Collections.unmodifiableList(res);

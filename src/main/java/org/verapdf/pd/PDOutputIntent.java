@@ -21,6 +21,7 @@
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.external.ICCProfile;
@@ -58,6 +59,14 @@ public class PDOutputIntent extends PDObject {
 		return null;
 	}
 
+	public String getColorSpace() {
+		ICCProfile iccProfile = getDestOutputProfile();
+		if (iccProfile != null && "GTS_PDFA1".equals(getSubtype())) {
+			return iccProfile.getColorSpace();
+		}
+		return null;
+	}
+
 	public ICCProfile getDestOutputProfile() {
 		COSObject profile = getKey(ASAtom.DEST_OUTPUT_PROFILE);
 		if (profile != null && profile.getType() == COSObjType.COS_STREAM) {
@@ -74,6 +83,15 @@ public class PDOutputIntent extends PDObject {
 		COSObject base = getKey(key);
 		if (base != null && base.getType() == COSObjType.COS_STRING) {
 			return base.getString();
+		}
+		return null;
+	}
+
+	public String getDestOutputProfileIndirect() {
+		COSObject obj = getKey(ASAtom.DEST_OUTPUT_PROFILE);
+		if (!obj.empty() && obj.isIndirect()) {
+			COSKey key = obj.getKey();
+			return String.valueOf(key.getNumber() + " " + key.getGeneration());
 		}
 		return null;
 	}
