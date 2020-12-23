@@ -594,6 +594,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom W2 = new ASAtom("W2");
     public static final ASAtom WC = new ASAtom("WC");
     public static final ASAtom WHITE_POINT = new ASAtom("WhitePoint");
+    public static final ASAtom WIDGET = new ASAtom("Widget");
     public static final ASAtom WIDTH = new ASAtom("Width");
     public static final ASAtom WIDTHS = new ASAtom("Widths");
     public static final ASAtom WIN_ANSI_ENCODING = new ASAtom("WinAnsiEncoding");

@@ -18,33 +18,30 @@
  * If a copy of the MPL was not distributed with this file, you can obtain one at
  * http://mozilla.org/MPL/2.0/.
  */
-package org.verapdf.pd.actions;
+package org.verapdf.pd.annotations;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.verapdf.pd.PDAnnotation;
+import org.verapdf.pd.actions.PDAnnotationAdditionalActions;
+import org.verapdf.pd.actions.PDWidgetAdditionalActions;
 
 /**
- * @author Maksim Bezrukov
+ * @author Maxim Plushchov
  */
-public class PDFormFieldActions extends PDAbstractAdditionalActions {
+public class PDWidgetAnnotation extends PDAnnotation {
 
-	private static final ASAtom[] actionNames = {ASAtom.K, ASAtom.F, ASAtom.V, ASAtom.C};
-
-	public PDFormFieldActions(COSObject obj) {
+	public PDWidgetAnnotation(COSObject obj) {
 		super(obj);
 	}
 
-	@Override
-	public boolean containsOtherKeys() {
-		return false;
-	}
-
-	@Override
-	public ASAtom[] getActionNames() {
-		return actionNames;
+	public PDAnnotationAdditionalActions getAdditionalActions() {
+		COSObject aa = getKey(ASAtom.AA);
+		if (aa != null && aa.getType() == COSObjType.COS_DICT) {
+			return new PDWidgetAdditionalActions(aa);
+		}
+		return null;
 	}
 
 }

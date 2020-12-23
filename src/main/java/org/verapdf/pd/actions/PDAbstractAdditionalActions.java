@@ -25,10 +25,28 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDObject;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.ArrayList;
+
 /**
  * @author Maksim Bezrukov
  */
 public abstract class PDAbstractAdditionalActions extends PDObject {
+
+    private static final Set<ASAtom> permittedActionNames;
+
+    static {
+        permittedActionNames = new HashSet<>();
+        permittedActionNames.add(ASAtom.E);
+        permittedActionNames.add(ASAtom.X);
+        permittedActionNames.add(ASAtom.D);
+        permittedActionNames.add(ASAtom.U);
+        permittedActionNames.add(ASAtom.FOCUS_ABBREVIATION);
+        permittedActionNames.add(ASAtom.BL_FOCUS);
+    }
 
     protected PDAbstractAdditionalActions(COSObject obj) {
         super(obj);
@@ -41,4 +59,38 @@ public abstract class PDAbstractAdditionalActions extends PDObject {
         }
         return null;
     }
+
+    public ASAtom[] getActionNames() {
+        return null;
+    }
+
+    public List<PDAction> getActions() {
+        ASAtom[] actionNames = getActionNames();
+        if (actionNames == null) {
+            return Collections.emptyList();
+        }
+        List<PDAction> actions = new ArrayList<>(actionNames.length);
+        PDAction action;
+        for (ASAtom name : actionNames) {
+            action = getAction(name);
+            if (name != null) {
+                actions.add(action);
+            }
+        }
+        return actions;
+    }
+
+    // return true, if dictionary contains keys not from the following list: E, X, D, U, Fo, and Bl.
+    public boolean containsOtherKeys() {
+        if (!this.getObject().empty()) {
+            Set<ASAtom> names = this.getObject().getDirectBase().getKeySet();
+            for (ASAtom name : names) {
+                if (!permittedActionNames.contains(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

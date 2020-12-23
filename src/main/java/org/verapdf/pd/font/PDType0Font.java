@@ -45,6 +45,7 @@ public class PDType0Font extends PDCIDFont {
     private static final String IDENTITY_V = "Identity-V";
     private static final String JAPAN_1 = "Japan1";
     private static final String KOREA_1 = "Korea1";
+    private static final String KR_9 = "KR";
     private static final String GB_1 = "GB1";
     private static final String CNS_1 = "CNS1";
     private static final String ADOBE = "Adobe";
@@ -72,7 +73,7 @@ public class PDType0Font extends PDCIDFont {
         if (this.pdcMap == null) {
             COSObject cMap = this.type0FontDict.getKey(ASAtom.ENCODING);
             if (!cMap.empty()) {
-                org.verapdf.pd.font.cmap.PDCMap pdcMap = new org.verapdf.pd.font.cmap.PDCMap(cMap);
+                PDCMap pdcMap = new PDCMap(cMap);
                 this.pdcMap = pdcMap;
                 return pdcMap;
             }
@@ -169,8 +170,8 @@ public class PDType0Font extends PDCIDFont {
             String registry = cidSystemInfo.getRegistry();
             if (ADOBE.equals(registry)) {
                 String ordering = cidSystemInfo.getOrdering();
-                if (JAPAN_1.equals(ordering) || CNS_1.equals(ordering) ||
-                        KOREA_1.equals(ordering) || GB_1.equals(ordering)) {
+                if (JAPAN_1.equals(ordering) || CNS_1.equals(ordering) || GB_1.equals(ordering) ||
+                        KOREA_1.equals(ordering) || KR_9.equals(ordering)) {
                     String ucsName = "Adobe-" + ordering + "-" + UCS2;
                     this.ucsCMap = new PDCMap(COSName.construct(ucsName));
                 }

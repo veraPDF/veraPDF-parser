@@ -20,31 +20,19 @@
  */
 package org.verapdf.pd.actions;
 
-import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * @author Maksim Bezrukov
+ * @author Maxim Plushchov
  */
-public class PDFormFieldActions extends PDAbstractAdditionalActions {
+public class PDWidgetAdditionalActions extends PDAnnotationAdditionalActions {
 
-	private static final ASAtom[] actionNames = {ASAtom.K, ASAtom.F, ASAtom.V, ASAtom.C};
+    public PDWidgetAdditionalActions(COSObject obj) {
+        super(obj);
+    }
 
-	public PDFormFieldActions(COSObject obj) {
-		super(obj);
-	}
-
-	@Override
-	public boolean containsOtherKeys() {
-		return false;
-	}
-
-	@Override
-	public ASAtom[] getActionNames() {
-		return actionNames;
-	}
-
+    @Override
+    public boolean containsOtherKeys() {
+        return false;
+    }
 }
