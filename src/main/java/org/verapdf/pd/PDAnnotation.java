@@ -77,6 +77,10 @@ public class PDAnnotation extends PDObject {
 		return null;
 	}
 
+	public COSObject getBM() {
+		return this.getKey(ASAtom.BM);
+	}
+
 	public Double getCA() {
 		return getObject().getRealKey(ASAtom.CA);
 	}
