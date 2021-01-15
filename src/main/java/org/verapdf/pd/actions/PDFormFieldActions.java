@@ -23,9 +23,6 @@ package org.verapdf.pd.actions;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Maksim Bezrukov
  */

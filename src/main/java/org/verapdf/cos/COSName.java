@@ -24,17 +24,12 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class COSName extends COSDirect {
-
-    private static final Logger LOGGER = Logger.getLogger(COSName.class.getCanonicalName());
 
     private ASAtom value;
 
