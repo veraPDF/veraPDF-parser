@@ -209,12 +209,43 @@ public class TaggedPDFHelper {
 		}
 	}
 
-	public static List<PDStructElem> getStructTreeRootChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
+	public static List<PDStructElem> getStructTreeRootStructChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
+		return getStructChildren(parent, roleMap, false);
+	}
+
+	public static List<Object> getStructTreeRootChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
 		return getChildren(parent, roleMap, false);
 	}
 
-	public static List<PDStructElem> getStructElemChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
+	public static List<PDStructElem> getStructElemStructChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
+		return getStructChildren(parent, roleMap, true);
+	}
+
+	public static List<Object> getStructElemChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
 		return getChildren(parent, roleMap, true);
+	}
+
+	private static List<Object> getChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+		if (parent == null || parent.getType() != COSObjType.COS_DICT) {
+			LOGGER.log(Level.FINE, "Parent element for struct elements is null or not a COSDictionary");
+			return Collections.emptyList();
+		}
+
+		COSObject children = parent.getKey(ASAtom.K);
+		if (children != null) {
+			if (isStructElem(children, checkType)) {
+				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
+				list.add(new PDStructElem(children, roleMap));
+				return Collections.unmodifiableList(list);
+			} else if (children.getType() == COSObjType.COS_INTEGER) {
+				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
+				list.add(children);
+				return Collections.unmodifiableList(list);
+			} else if (children.getType() == COSObjType.COS_ARRAY) {
+				return getChildrenFromArray(children, roleMap, checkType);
+			}
+		}
+		return Collections.emptyList();
 	}
 
 	/**
@@ -223,7 +254,7 @@ public class TaggedPDFHelper {
 	 * @param parent parent dictionary
 	 * @return list of structure elements
 	 */
-	private static List<PDStructElem> getChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+	private static List<PDStructElem> getStructChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
 		if (parent == null || parent.getType() != COSObjType.COS_DICT) {
 			LOGGER.log(Level.FINE, "Parent element for struct elements is null or not a COSDictionary");
 			return Collections.emptyList();
@@ -236,7 +267,7 @@ public class TaggedPDFHelper {
 				list.add(new PDStructElem(children, roleMap));
 				return Collections.unmodifiableList(list);
 			} else if (children.getType() == COSObjType.COS_ARRAY) {
-				return getChildrenFromArray(children, roleMap, checkType);
+				return getStructChildrenFromArray(children, roleMap, checkType);
 			}
 		}
 		return Collections.emptyList();
@@ -248,13 +279,29 @@ public class TaggedPDFHelper {
 	 * @param children array of children structure elements
 	 * @return list of structure elements
 	 */
-	private static List<PDStructElem> getChildrenFromArray(COSObject children, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
-		if (children.size().intValue() > 0) {
+	private static List<PDStructElem> getStructChildrenFromArray(COSObject children, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+		if (children.size() > 0) {
 			List<PDStructElem> list = new ArrayList<>();
-			for (int i = 0; i < children.size().intValue(); ++i) {
+			for (int i = 0; i < children.size(); ++i) {
 				COSObject elem = children.at(i);
 				if (isStructElem(elem, checkType)) {
 					list.add(new PDStructElem(elem, roleMap));
+				}
+			}
+			return Collections.unmodifiableList(list);
+		}
+		return Collections.emptyList();
+	}
+
+	private static List<Object> getChildrenFromArray(COSObject children, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+		if (children.size() > 0) {
+			List<Object> list = new ArrayList<>();
+			for (int i = 0; i < children.size(); ++i) {
+				COSObject elem = children.at(i);
+				if (isStructElem(elem, checkType)) {
+					list.add(new PDStructElem(elem, roleMap));
+				} else if (elem.getType() == COSObjType.COS_INTEGER) {
+					list.add(elem);
 				}
 			}
 			return Collections.unmodifiableList(list);
