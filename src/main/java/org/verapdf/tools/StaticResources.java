@@ -42,9 +42,9 @@ public class StaticResources {
 
 	private static final Logger LOGGER = Logger.getLogger(StaticResources.class.getCanonicalName());
 
-	private static ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
-	private static ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
-	private static ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
+	private static final ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
+	private static final ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
+	private static final ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
 
 	private StaticResources() {
 	}
