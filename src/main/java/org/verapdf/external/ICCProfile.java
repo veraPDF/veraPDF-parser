@@ -32,6 +32,8 @@ import org.verapdf.pd.colors.PDColorSpace;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,7 +87,8 @@ public class ICCProfile extends PDObject {
 	private static final int CREATION_MIN_OFFSET = 32;
 	/** Offset of creation sec byte */
 	private static final int CREATION_SEC_OFFSET = 34;
-
+	/** Offset of profile flags */
+	private static final int PROFILE_FLAGS_OFFSET = 44;
 
 	private byte[] profileHeader = new byte[0];
 	private Calendar creationDate;
@@ -115,6 +118,42 @@ public class ICCProfile extends PDObject {
 		} catch (IOException e) {
 			this.isLooksValid = false;
 			LOGGER.log(Level.FINE, "Exception during obtaining ICCProfile header", e);
+		}
+	}
+
+	public String getMD5() {
+		String profileID = getProfileID();
+		if (profileID != null) {
+			return profileID;
+		}
+		byte[] buffer = new byte[getSize(profileHeader)];
+		try (ASInputStream data = this.getObject().getData(COSStream.FilterFlags.DECODE)) {
+			if (buffer.length != data.read(buffer, buffer.length)) {
+				return null;
+			}
+			setZero(buffer, PROFILE_FLAGS_OFFSET, PROFILE_FLAGS_OFFSET + REQUIRED_LENGTH);
+			setZero(buffer, RENDERING_INTENT_OFFSET, RENDERING_INTENT_OFFSET + REQUIRED_LENGTH);
+			setZero(buffer, PROFILE_ID_OFFSET, PROFILE_ID_OFFSET + PROFILE_ID_LENGTH);
+			MessageDigest md5  = MessageDigest.getInstance("MD5");
+			md5.update(buffer);
+			byte[] md5Result = md5.digest();
+			if (isNotAllZero(md5Result)) {
+				return new String(md5Result, StandardCharsets.ISO_8859_1);
+			} else {
+				return null;
+			}
+		} catch (NoSuchAlgorithmException | IOException  e) {
+			LOGGER.log(Level.FINE, "Exception during calculating ICCProfile md5 value", e);
+			return null;
+		}
+	}
+
+	private void setZero(byte[] buffer, int offset, int end) {
+		if (end > buffer.length) {
+			return;
+		}
+		for (int i = offset;  i < end; i++) {
+			buffer[i] = 0;
 		}
 	}
 
@@ -292,6 +331,18 @@ public class ICCProfile extends PDObject {
 		int part = header[off] & 0xFF;
 		part <<= 8;
 		part += header[off + 1] & 0xFF;
+		return part;
+	}
+
+	private static int getSize(byte[] header) {
+		if (header.length < 4) {
+			return header.length;
+		}
+		int part = header[0] & 0xFF;
+		for (int i = 1; i < 4; i++) {
+			part <<= 8;
+			part += header[i] & 0xFF;
+		}
 		return part;
 	}
 
