@@ -101,6 +101,10 @@ public class PDICCBased extends PDColorSpace {
 		return null;
 	}
 
+	public String getICCProfileMD5() {
+		return iccProfile != null ? this.iccProfile.getMD5() : null;
+	}
+
 	public double[] getRange() {
 		return this.iccProfile == null ? null : this.iccProfile.getRange();
 	}
