@@ -356,6 +356,17 @@ public class BaseParser {
 		}
 	}
 
+	protected void nextLine() throws IOException {
+		byte ch;
+		while (!this.source.isEOF()) {
+			ch = this.source.readByte();
+			if (isEOL(ch)) {
+				skipEOL();
+				return;
+			}
+		}
+	}
+
 	protected boolean isEOL(byte ch) throws IOException {
 		if (isLF(ch)) {
 			return true; // EOL == LF
