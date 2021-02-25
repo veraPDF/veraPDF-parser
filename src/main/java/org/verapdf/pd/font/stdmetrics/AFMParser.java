@@ -150,9 +150,7 @@ public class AFMParser extends BaseParser {
         this.nextToken();   // N
         this.nextToken();
         sfm.putWidth(this.getToken().getValue(), width);
-        for (int i = 0; i < 7; ++i) {   // finish reading line
-            this.nextToken();
-        }
+        nextLine();// finish reading line
     }
 
     private double getNextDoubleWithCheck(String errorDescription) throws IOException {
