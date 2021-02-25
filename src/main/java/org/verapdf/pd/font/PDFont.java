@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +42,8 @@ import java.util.logging.Logger;
  */
 public abstract class PDFont extends PDResource {
 
+    private static Map<String, Double> weightNames = new LinkedHashMap<>();
+
     private static final Logger LOGGER = Logger.getLogger(PDFont.class.getCanonicalName());
 
     protected COSDictionary dictionary;
@@ -51,7 +54,10 @@ public abstract class PDFont extends PDResource {
     protected Encoding encoding = null;
     private boolean successfullyParsed = false;
     private final String fontName;
+    private final String fontNameWithoutSubset;
     private final ASAtom subtype;
+    protected double[] boundingBox;
+    private Double fontWeight;
 
     /**
      * Constructor from COSDictionary.
@@ -71,6 +77,15 @@ public abstract class PDFont extends PDResource {
             fontDescriptor = new PDFontDescriptor(COSDictionary.construct());
         }
         this.fontName = this.dictionary.getStringKey(ASAtom.BASE_FONT);
+        this.fontNameWithoutSubset = fontName != null ? (fontName.matches("^[A-Z]{6}+.+") ? fontName.substring(7) : fontName) : null;
+        this.boundingBox = fontDescriptor.getFontBoundingBox();
+        if (this.boundingBox == null) {
+            this.boundingBox = new double[]{0.0, 0.0, 1000.0, 1000.0};
+        }
+        this.fontWeight = fontDescriptor.getFontWeight();
+        if (fontWeight == null) {
+            detectFontWeight();
+        }
         this.subtype = this.dictionary.getNameKey(ASAtom.SUBTYPE);
     }
 
@@ -123,6 +138,10 @@ public abstract class PDFont extends PDResource {
         return this.encoding;
     }
 
+    public Double getFontWeight() {
+        return fontWeight;
+    }
+
     /**
      * Gets encoding object from COSObject.
      *
@@ -150,6 +169,17 @@ public abstract class PDFont extends PDResource {
      */
     public String getName() {
         return this.fontName;
+    }
+
+    /**
+     * @return name of the font without subset as specified in BaseFont key of font dictionary.
+     */
+    public String getNameWithoutSubset() {
+        return this.fontNameWithoutSubset;
+    }
+
+    public double[] getBoundingBox() {
+        return boundingBox;
     }
 
     /**
@@ -353,4 +383,37 @@ public abstract class PDFont extends PDResource {
         String[] nameSplitting = this.getName().split("\\+");
         return nameSplitting[0].length() == 6;
     }
+
+    private void detectFontWeight() {
+        if (fontNameWithoutSubset != null) {
+            for (String weightName : weightNames.keySet()) {
+                if (fontNameWithoutSubset.contains(weightName)) {
+                    fontWeight = weightNames.get(weightName);
+                    return;
+                }
+            }
+        }
+        if (fontWeight == null) {
+            fontWeight = 400.0;
+        }
+    }
+
+    static {
+        weightNames.put("Thin", 100.0);
+        weightNames.put("Extra Light", 200.0);
+        weightNames.put("Ultra Light", 200.0);
+        weightNames.put("Light", 300.0);
+        weightNames.put("Normal", 400.0);
+        weightNames.put("Book", 400.0);
+        weightNames.put("Regular", 400.0);
+        weightNames.put("Medium", 500.0);
+        weightNames.put("Semi Bold", 600.0);
+        weightNames.put("Demi Bold", 600.0);
+        weightNames.put("Extra Bold", 800.0);
+        weightNames.put("Ultra Bold", 800.0);
+        weightNames.put("Bold", 700.0);
+        weightNames.put("Black", 900.0);
+        weightNames.put("Heavy", 900.0);
+    }
+
 }
