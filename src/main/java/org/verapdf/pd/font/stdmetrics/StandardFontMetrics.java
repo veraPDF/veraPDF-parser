@@ -23,6 +23,8 @@ package org.verapdf.pd.font.stdmetrics;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class provides access to metrics of a standard font.
@@ -30,6 +32,8 @@ import java.util.Map;
  * @author Sergey Shemyakov
  */
 public class StandardFontMetrics {
+
+    private static final Logger LOGGER = Logger.getLogger(StandardFontMetrics.class.getCanonicalName());
 
     private static final String NOTDEF_STRING = ".notdef";
 
@@ -64,7 +68,14 @@ public class StandardFontMetrics {
      */
     public int getWidth(String glyphName) {
         Integer res = this.widths.get(glyphName);
-        return res == null ? this.widths.get(NOTDEF_STRING) : res;
+        if (res != null) {
+            return res;
+        }
+        if (this.widths.containsKey(NOTDEF_STRING)) {
+            return this.widths.get(NOTDEF_STRING);
+        }
+        LOGGER.log(Level.SEVERE, "Missing width of glyph with name" + glyphName);
+        return 0;
     }
 
     public String getFontName() {

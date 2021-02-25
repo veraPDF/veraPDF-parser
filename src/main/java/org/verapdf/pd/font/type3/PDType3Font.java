@@ -44,6 +44,10 @@ public class PDType3Font extends PDSimpleFont {
     public PDType3Font(COSDictionary dictionary) {
         super(dictionary);
         this.setSuccessfullyParsed(true);
+        this.boundingBox = getFontBoundingBox();
+        if (this.boundingBox == null) {
+            this.boundingBox = new double[]{0.0, 0.0, 1000.0, 1000.0};
+        }
     }
 
     /**
@@ -103,7 +107,7 @@ public class PDType3Font extends PDSimpleFont {
                     res[i] = obj.getReal();
                 } else {
                     String fontName = getName() == null ? "" : getName();
-                    LOGGER.log(Level.FINE, "Font bounding box array for font " + fontName +
+                    LOGGER.log(Level.SEVERE, "Font bounding box array for font " + fontName +
                             " contains " + obj.getType());
                     return null;
                 }
@@ -111,7 +115,7 @@ public class PDType3Font extends PDSimpleFont {
             return res;
         } else {
             String fontName = getName() == null ? "" : getName();
-            LOGGER.log(Level.FINE, "Font bounding box array for font " + fontName +
+            LOGGER.log(Level.SEVERE, "Font bounding box array for font " + fontName +
                     " is not an array of 4 elements");
             return null;
         }

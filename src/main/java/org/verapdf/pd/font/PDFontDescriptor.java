@@ -282,7 +282,7 @@ public class PDFontDescriptor extends PDObject {
         if (italicAngle == null) {
             italicAngle = getRealKey(ASAtom.ITALIC_ANGLE);
         }
-        return italicAngle;
+        return italicAngle != null ? italicAngle : 0.0;
     }
 
     /**
