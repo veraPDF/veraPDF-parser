@@ -147,6 +147,8 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     }
 
     protected void readPrivateDictUnit() throws IOException {
+        this.defaultWidthX = 0; // default value
+        this.nominalWidthX = 0; // default value
         int next = this.source.peek() & 0xFF;
         if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
             this.stack.add(readNumber());
