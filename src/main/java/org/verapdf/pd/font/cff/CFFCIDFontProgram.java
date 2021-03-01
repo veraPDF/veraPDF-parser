@@ -195,6 +195,8 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
 
     private void readPrivateDict(long from, long size, int fontDictNum) throws IOException {
         this.stack.clear();
+        this.nominalWidthX = 0;
+        this.defaultWidthX = 0;
         long startingOffset = this.source.getOffset();
         this.source.seek(from);
         while (this.source.getOffset() < from + size) {
