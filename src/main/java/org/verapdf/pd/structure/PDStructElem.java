@@ -74,8 +74,8 @@ public class PDStructElem extends PDStructTreeNode {
 		return StructureType.createStructureType(getKey(ASAtom.S), getKey(ASAtom.NS));
 	}
 
-	public String getActualText() {
-		return getStringKey(ASAtom.ACTUAL_TEXT);
+	public COSObject getActualText() {
+		return getKey(ASAtom.ACTUAL_TEXT);
 	}
 
 	public String getAlternateDescription() {
