@@ -63,6 +63,7 @@ public class COSDocument {
 	private List<COSObject> changedObjects;
 	private List<COSObject> addedObjects;
 	private FileResourceHandler resourceHandler;
+	private String fileName;
 
 	private byte postEOFDataSize;
 
@@ -86,6 +87,7 @@ public class COSDocument {
 
 	public COSDocument(final String fileName, final PDDocument document) throws IOException {
 		this.resourceHandler = new FileResourceHandler();
+		this.fileName = fileName;
 		initReader(fileName);
 
 		initCOSDocument(document);
@@ -432,5 +434,9 @@ public class COSDocument {
 
 	public SortedSet<Long> getStartXRefs() {
 		return this.reader.getStartXRefs();
+	}
+
+	public String getFileName() {
+		return fileName;
 	}
 }
