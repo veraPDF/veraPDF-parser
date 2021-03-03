@@ -142,6 +142,9 @@ public class PDExtGState extends PDResource {
 
     private List<PDFunction> getFunctions(ASAtom atom) {
         COSObject functions = getKey(atom);
+        if (functions == null) {
+            return Collections.emptyList();
+        }
         if (functions.getType() == COSObjType.COS_STREAM) {
             PDFunction function = PDFunction.createFunction(functions);
             if (function != null) {
