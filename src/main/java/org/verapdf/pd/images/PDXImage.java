@@ -73,7 +73,12 @@ public class PDXImage extends PDXObject {
 				this.colorSpaceName = rawColorSpace.getName();
 			}
 			if (rawColorSpace.getType() == COSObjType.COS_ARRAY) {
-				this.imageCS = ColorSpaceFactory.getColorSpace(rawColorSpace, resources);
+				COSArray array = ((COSArray)rawColorSpace.getDirectBase());
+				if (array.size() == 1 && array.at(0).getType() == COSObjType.COS_NAME) {
+					this.colorSpaceName = array.at(0).getName();
+				} else {
+					this.imageCS = ColorSpaceFactory.getColorSpace(rawColorSpace, resources);
+				}
 			}
 		}
 	}
