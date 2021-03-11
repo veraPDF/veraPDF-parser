@@ -99,7 +99,7 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
             int gid = this.cidToGID.getGID(cid);
             TrueTypeMaxpTable maxpParser = parser.getMaxpParser();
             return maxpParser != null &&
-                    gid < maxpParser.getNumGlyphs() && gid != 0;
+                    gid < maxpParser.getNumGlyphs();
         }
         return false;
     }
