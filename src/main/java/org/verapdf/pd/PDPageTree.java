@@ -58,15 +58,19 @@ public class PDPageTree {
 	}
 
 	public PDPage getPage(final int index) {
-		if (index < this.getPageCount()) {
-			final PDPage page = this.root.findTerminalPDPage(index);
-			if (page != null) {
-				page.pageNumber = index;
-				page.pagesTotal = index;
+		try {
+			if (index < this.getPageCount()) {
+				final PDPage page = this.root.findTerminalPDPage(index);
+				if (page != null) {
+					page.pageNumber = index;
+					page.pagesTotal = index;
+				}
+				return page;
+			} else {
+				return null;
 			}
-			return page;
-		} else {
-			return null;
+		} catch (IndexOutOfBoundsException e) {
+			throw new IndexOutOfBoundsException("Invalid page tree");
 		}
 	}
 
