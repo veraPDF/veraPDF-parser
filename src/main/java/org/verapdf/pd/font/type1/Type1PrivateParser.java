@@ -25,6 +25,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
+import org.verapdf.pd.font.CFFNumber;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +54,7 @@ class Type1PrivateParser extends BaseParser {
     private double[] fontMatrix;
     private boolean isDefaultFontMatrix;
     private boolean charStringsFound;
+    private Map<Integer, CFFNumber> subrWidths;
 
     /**
      * {@inheritDoc}
@@ -120,8 +122,11 @@ class Type1PrivateParser extends BaseParser {
                             this.lenIV = (int) this.getToken().integer;
                         }
                         break;
-                    case Type1StringConstants.SUBRS:    // skipping binary data that can be bad for parser
+                    case Type1StringConstants.SUBRS:
                         nextToken();
+                        if (subrWidths == null) {
+                            subrWidths = new HashMap<>();
+                        }
                         int amountOfSubrs = (int) this.getToken().integer;
                         nextToken();    // reading "array"
                         for (int i = 0; i < amountOfSubrs; ++i) {
@@ -130,11 +135,21 @@ class Type1PrivateParser extends BaseParser {
                                 break;
                             }
                             nextToken();    // reading number
+                            long number = this.getToken().integer;
                             nextToken();
                             long toSkip = this.getToken().integer;
                             skipRD();
                             this.skipSpaces();
+                            long beginOffset = this.source.getOffset();
                             this.source.skip(toSkip);
+                            try (ASInputStream chunk = this.source.getStream(beginOffset, toSkip);
+                                 ASInputStream eexecDecode = new EexecFilterDecode(
+                                         chunk, true, this.lenIV); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
+                                Type1CharStringParser parser = new Type1CharStringParser(decodedCharString, subrWidths);
+                                if (parser.getWidth() != null) {
+                                    subrWidths.put((int) number, parser.getWidth());
+                                }
+                            }
                             this.nextToken();   // reading "NP"
                             // some fonts have 'noaccess put' instead of 'NP'. Supporting this case as well
                             if (this.getToken().getValue().equals(Type1StringConstants.NOACCESS)) {
@@ -176,7 +191,7 @@ class Type1PrivateParser extends BaseParser {
         try (ASInputStream chunk = this.source.getStream(beginOffset, charstringLength);
              ASInputStream eexecDecode = new EexecFilterDecode(
                      chunk, true, this.lenIV); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
-            Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
+            Type1CharStringParser parser = new Type1CharStringParser(decodedCharString, subrWidths);
             if (parser.getWidth() != null) {
                 if (!isDefaultFontMatrix) {
                     glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getReal()));
