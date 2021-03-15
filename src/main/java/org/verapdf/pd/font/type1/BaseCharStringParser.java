@@ -25,6 +25,7 @@ import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.cff.CFFIndex;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -42,6 +43,7 @@ public abstract class BaseCharStringParser {
     protected CFFIndex localSubrs;
     protected int bias;
     protected int gBias;
+    protected Map<Integer, CFFNumber> subrWidths;
 
     /**
      * Constructor that calls method parse(), so width is extracted right after
@@ -52,6 +54,10 @@ public abstract class BaseCharStringParser {
      */
     protected BaseCharStringParser(ASInputStream stream) throws IOException {
         this(stream, null, 0, null, 0);
+    }
+
+    protected BaseCharStringParser(ASInputStream stream, Map<Integer, CFFNumber> subrWidths) throws IOException {
+        this(stream, null, 0, null, 0, subrWidths);
     }
 
     /**
@@ -68,6 +74,11 @@ public abstract class BaseCharStringParser {
      */
     protected BaseCharStringParser(ASInputStream stream, CFFIndex localSubrs,
                                    int bias, CFFIndex globalSubrs, int gBias) throws IOException {
+        this(stream, localSubrs, bias, globalSubrs, gBias, null);
+    }
+
+    protected BaseCharStringParser(ASInputStream stream, CFFIndex localSubrs,
+                                   int bias, CFFIndex globalSubrs, int gBias, Map<Integer, CFFNumber> subrWidths) throws IOException {
         this.streams = new Stack<>();
         this.streams.push(stream);
         this.stack = new Stack<>();
@@ -76,6 +87,7 @@ public abstract class BaseCharStringParser {
         this.localSubrs = localSubrs == null ? CFFIndex.getEmptyIndex() : localSubrs;
         this.bias = bias;
         this.gBias = gBias;
+        this.subrWidths = subrWidths;
         parse();
     }
 
