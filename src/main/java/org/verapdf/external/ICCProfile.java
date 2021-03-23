@@ -91,6 +91,7 @@ public class ICCProfile extends PDObject {
 	private static final int PROFILE_FLAGS_OFFSET = 44;
 
 	private byte[] profileHeader = new byte[0];
+	private byte[] md5ByteValue;
 	private Calendar creationDate;
 	private boolean isLooksValid = true;
 	private String description = null;
@@ -126,26 +127,48 @@ public class ICCProfile extends PDObject {
 		if (profileID != null) {
 			return profileID;
 		}
-		byte[] buffer = new byte[getSize(profileHeader)];
-		try (ASInputStream data = this.getObject().getData(COSStream.FilterFlags.DECODE)) {
-			if (buffer.length != data.read(buffer, buffer.length)) {
+		if (md5ByteValue == null) {
+			int iccProfileSize = getSize(profileHeader);
+			try (ASInputStream data = this.getObject().getData(COSStream.FilterFlags.DECODE)) {
+				byte[] buffer = getICCProfileBytes(data, iccProfileSize);
+				if (buffer.length != iccProfileSize) {
+					md5ByteValue = new byte[0];
+					return null;
+				}
+				setZero(buffer, PROFILE_FLAGS_OFFSET, PROFILE_FLAGS_OFFSET + REQUIRED_LENGTH);
+				setZero(buffer, RENDERING_INTENT_OFFSET, RENDERING_INTENT_OFFSET + REQUIRED_LENGTH);
+				setZero(buffer, PROFILE_ID_OFFSET, PROFILE_ID_OFFSET + PROFILE_ID_LENGTH);
+				MessageDigest md5  = MessageDigest.getInstance("MD5");
+				md5.update(buffer);
+				md5ByteValue = md5.digest();
+			} catch (NoSuchAlgorithmException | IOException  e) {
+				LOGGER.log(Level.FINE, "Exception during calculating ICCProfile md5 value", e);
+				md5ByteValue = new byte[0];
 				return null;
 			}
-			setZero(buffer, PROFILE_FLAGS_OFFSET, PROFILE_FLAGS_OFFSET + REQUIRED_LENGTH);
-			setZero(buffer, RENDERING_INTENT_OFFSET, RENDERING_INTENT_OFFSET + REQUIRED_LENGTH);
-			setZero(buffer, PROFILE_ID_OFFSET, PROFILE_ID_OFFSET + PROFILE_ID_LENGTH);
-			MessageDigest md5  = MessageDigest.getInstance("MD5");
-			md5.update(buffer);
-			byte[] md5Result = md5.digest();
-			if (isNotAllZero(md5Result)) {
-				return new String(md5Result, StandardCharsets.ISO_8859_1);
-			} else {
-				return null;
-			}
-		} catch (NoSuchAlgorithmException | IOException  e) {
-			LOGGER.log(Level.FINE, "Exception during calculating ICCProfile md5 value", e);
-			return null;
 		}
+		if (md5ByteValue != null && isNotAllZero(md5ByteValue)) {
+			return new String(md5ByteValue, StandardCharsets.ISO_8859_1);
+		}
+		return null;
+	}
+
+	private static byte[] getICCProfileBytes(ASInputStream data, int iccProfileSize) throws IOException {
+		byte[] buffer = new byte[iccProfileSize];
+		int bufferSize = 2048;
+		byte[] temp = new byte[bufferSize];
+		int size = 0;
+		int read = data.read(temp, bufferSize);
+		while (read != -1) {
+			if (size + read >= iccProfileSize) {
+				System.arraycopy(temp, 0, buffer, size, iccProfileSize - size);
+				return buffer;
+			}
+			System.arraycopy(temp, 0, buffer, size, read);
+			size += read;
+			read = data.read(temp, bufferSize);
+		}
+		return Arrays.copyOf(buffer, size);
 	}
 
 	private void setZero(byte[] buffer, int offset, int end) {
