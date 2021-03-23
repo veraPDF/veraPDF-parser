@@ -342,7 +342,7 @@ public class COSParser extends BaseParser {
 				}
 			}
 			if (realStreamSize == -1) {
-				//TODO : exception?
+				throw new IOException("End of stream is not found");
 			}
 		}
 
