@@ -25,6 +25,7 @@ import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSString;
+import org.verapdf.cos.COSKey;
 import org.verapdf.tools.TaggedPDFHelper;
 
 import java.util.List;
@@ -90,6 +91,14 @@ public class PDStructElem extends PDStructTreeNode {
 		COSObject parentObject = getKey(ASAtom.P);
 		if (parentObject != null) {
 			return new PDStructElem(parentObject, this.rootRoleMap);
+		}
+		return null;
+	}
+
+	public COSKey getPageObjectNumber() {
+		COSObject object = getObject().getKey(ASAtom.PG);
+		if (object != null) {
+			return object.getKey();
 		}
 		return null;
 	}

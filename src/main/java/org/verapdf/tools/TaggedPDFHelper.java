@@ -24,10 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.pd.structure.PDNameSpaceRoleMapping;
-import org.verapdf.pd.structure.PDStructElem;
-import org.verapdf.pd.structure.PDStructureNameSpace;
-import org.verapdf.pd.structure.StructureType;
+import org.verapdf.pd.structure.*;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -237,6 +234,10 @@ public class TaggedPDFHelper {
 				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
 				list.add(new PDStructElem(children, roleMap));
 				return Collections.unmodifiableList(list);
+			} else if (isMCR(children)) {
+				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
+				list.add(new PDMCRDictionary(children));
+				return Collections.unmodifiableList(list);
 			} else if (children.getType() == COSObjType.COS_INTEGER) {
 				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
 				list.add(children);
@@ -300,6 +301,8 @@ public class TaggedPDFHelper {
 				COSObject elem = children.at(i);
 				if (isStructElem(elem, checkType)) {
 					list.add(new PDStructElem(elem, roleMap));
+				} else if (isMCR(elem)) {
+					list.add(new PDMCRDictionary(elem));
 				} else if (elem.getType() == COSObjType.COS_INTEGER) {
 					list.add(elem);
 				}
@@ -315,6 +318,17 @@ public class TaggedPDFHelper {
 		}
 		ASAtom type = dictionary.getNameKey(ASAtom.TYPE);
 		return !checkType || type == null || type.equals(ASAtom.STRUCT_ELEM);
+	}
+
+	public static boolean isMCR(COSObject obj) {
+		if (obj == null || obj.empty()) {
+			return false;
+		}
+		if (!obj.getType().isDictionaryBased()) {
+			return false;
+		}
+		ASAtom type = obj.getNameKey(ASAtom.TYPE);
+		return ASAtom.MCR.equals(type);
 	}
 
 	public static boolean isContentItem(COSObject obj) {
