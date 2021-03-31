@@ -21,6 +21,7 @@
 package org.verapdf.pd.images;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObjType;
@@ -31,6 +32,7 @@ import org.verapdf.pd.PDMetadata;
 import org.verapdf.pd.PDResources;
 import org.verapdf.pd.colors.PDColorSpace;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,8 +66,12 @@ public class PDXImage extends PDXObject {
 	private void parseJPXAndColorSpace() {
 		List<ASAtom> filters = getFilters();
 		if (filters.contains(ASAtom.JPX_DECODE)) {
-			this.jpxStream = JPEG2000.fromStream(getObject().getData());
-			this.imageCS = this.imageCS == null ? this.jpxStream.getImageColorSpace() : this.imageCS;
+			try (ASInputStream stream = getObject().getData()) {
+				this.jpxStream = JPEG2000.fromStream(stream);
+				this.imageCS = this.imageCS == null ? this.jpxStream.getImageColorSpace() : this.imageCS;
+			} catch (IOException e) {
+				LOGGER.log(Level.FINE, "IO Exception reading JP2K stream", e);
+			}
 		}
 		COSObject rawColorSpace = getKey(ASAtom.COLORSPACE);
 		if (rawColorSpace != null && !rawColorSpace.empty() && rawColorSpace.getType() != COSObjType.COS_NULL) {
