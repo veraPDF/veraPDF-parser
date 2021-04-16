@@ -63,6 +63,10 @@ public class Token {
 		this.token.reset();
 	}
 
+	public int getSize() {
+		return token.size();
+	}
+
 	public enum Type {
 		TT_NONE,
 		TT_KEYWORD,

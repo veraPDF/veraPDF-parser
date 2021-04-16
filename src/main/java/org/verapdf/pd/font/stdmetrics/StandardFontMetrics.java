@@ -74,7 +74,7 @@ public class StandardFontMetrics {
         if (this.widths.containsKey(NOTDEF_STRING)) {
             return this.widths.get(NOTDEF_STRING);
         }
-        LOGGER.log(Level.SEVERE, "Missing width of glyph with name" + glyphName);
+        LOGGER.log(Level.SEVERE, "Missing width of glyph with name " + glyphName);
         return 0;
     }
 

@@ -49,6 +49,9 @@ public class NotSeekableBaseParser implements Closeable {
     private static final byte ASCII_ZERO = 48;
     private static final byte ASCII_NINE = 57;
 
+    // max string length in bytes
+    private static final int MAX_STRING_LENGTH = 65535;
+
     // indicates if this parser is a postscript parser
     protected boolean isPSParser = false;
 
@@ -413,6 +416,60 @@ public class NotSeekableBaseParser implements Closeable {
                             break;
                         default:
                             appendToToken(ch);
+                            break;
+                    }
+                    break;
+                }
+            }
+            ch = source.readByte();
+            if (token.getSize() > MAX_STRING_LENGTH) {
+                LOGGER.log(Level.WARNING, "Content stream string token exceeds " + MAX_STRING_LENGTH + " bytes");
+                break;
+            }
+        }
+        while (!this.source.isEOF()) {
+            switch (ch) {
+                default:
+                    break;
+                case '(':
+                    parenthesesDepth++;
+                    break;
+                case ')':
+                    if (parenthesesDepth == 0) {
+                        return;
+                    }
+                    parenthesesDepth--;
+                    break;
+                case '\\': {
+                    ch = this.source.readByte();
+                    switch (ch) {
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7': {
+                            if (!isPSParser) {
+                                // look for 1, 2, or 3 octal characters
+                                for (int i = 1; i < 3; i++) {
+                                    ch = this.source.readByte();
+                                    if (ch < '0' || ch > '7') {
+                                        this.source.unread();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case ASCII_CR:
+                            ch = this.source.readByte();
+                            if (ch != ASCII_LF) {
+                                this.source.unread();
+                            }
+                            break;
+                        default:
                             break;
                     }
                     break;
