@@ -93,7 +93,7 @@ class Type2CharStringParser extends BaseCharStringParser {
             case 28:    // actually not an operator but 2-byte number
                 this.stack.push(readNextNumber(nextByte));
                 return false;
-            case 10:    // subrcall
+            case 10:    // callsubr
                 return execSubr(localSubrs, bias);
             case 29:    // callgsubr
                 return execSubr(globalSubrs, gBias);
@@ -118,7 +118,7 @@ class Type2CharStringParser extends BaseCharStringParser {
 
     private boolean execSubr(CFFIndex subrs, int bias) throws IOException {
         int subrNum = (int) this.stack.pop().getInteger();
-        if(subrs.size() > subrNum + bias) {
+        if(subrs.size() > Math.max(subrNum + bias, 0)) {
             byte[] subr = subrs.get(subrNum + bias);
             ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
             addStream(subrStream);

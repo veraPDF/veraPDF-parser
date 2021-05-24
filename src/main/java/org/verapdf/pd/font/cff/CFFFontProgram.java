@@ -104,16 +104,27 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             } else if (supplementFirstByte == 29) {
                 rosOffset = 9;
             } else {
-                return false;
+                return isContainsROS(topDict);
             }
             if (topDict[rosOffset] == 12 && topDict[rosOffset + 1] == 30) {
                 isCIDFont = true;
                 return true;
             }
-            return false;
+            return isContainsROS(topDict);
         } catch (ArrayIndexOutOfBoundsException ex) {
-            return false;
+            return isContainsROS(topDict);
         }
+    }
+
+    private boolean isContainsROS(byte[] topDict) {
+        for (int rosOffset = 0; rosOffset < topDict.length - 2; rosOffset++) {
+            if (topDict[rosOffset] == 12 && topDict[rosOffset + 1] == 30) {
+                LOGGER.log(Level.WARNING, "The Top DICT does not begin with ROS operator");
+                isCIDFont = true;
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
