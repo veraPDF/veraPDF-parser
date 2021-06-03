@@ -26,13 +26,19 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.external.ICCProfile;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  * @author Maksim Bezrukov
  */
 public class PDOutputIntent extends PDObject {
+	private static final Logger LOGGER = Logger.getLogger(PDOutputIntent.class.getCanonicalName());
 
 	public PDOutputIntent(COSObject obj) {
 		super(obj);
+		if (getOutputConditionIdentifier() == null) {
+			LOGGER.log(Level.WARNING, "Missing OutputConditionIdentifier in an output intent dictionary");
+		}
 	}
 
 	public String getOutputCondition() {
