@@ -35,7 +35,7 @@ public class COSXRefSection {
 
 	public COSXRefSection() {
 		this.entries = new TreeMap<>();
-		this.entries.put(0, new COSXRefEntry(0, 65535, 'f'));
+		this.entries.put(0, COSXRefEntry.FIRST_XREF_ENTRY);
 	}
 
 	public void add(final COSKey key, final long offset) {

@@ -427,7 +427,7 @@ public class PDFParser extends COSParser {
         }
     }
 
-    private void parseXrefTable(final COSXRefSection xrefs) throws IOException {
+    protected void parseXrefTable(final COSXRefSection xrefs) throws IOException {
         //check spacings after "xref" keyword
         //pdf/a-1b specification, clause 6.1.4
         byte space = this.source.readByte();
@@ -467,6 +467,10 @@ public class PDFParser extends COSParser {
                     throw new IOException("Failed to parse xref table");
                 }
                 xref.free = value.charAt(0);
+                if (i == 0 && COSXRefEntry.FIRST_XREF_ENTRY.equals(xref) && number != 0) {
+                    number = 0;
+                    LOGGER.log(Level.WARNING, "Incorrect xref section");
+                }
                 xrefs.addEntry(number + i, xref);
 
                 checkXrefTableEntryLastBytes();
