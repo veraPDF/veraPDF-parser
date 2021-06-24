@@ -81,7 +81,7 @@ public class ToUnicodeInterval {
         if (fffe != null) {
             return fffe;
         }
-        return  (unicode[0] == 0) ? String.valueOf(unicode[1]) : new String(unicode, StandardCharsets.UTF_16BE);
+        return  (unicode[0] == 0) ? String.valueOf((char)unicode[1]) : new String(unicode, StandardCharsets.UTF_16BE);
     }
 
     private static String getFFFEFromUnicode(byte[] unicode) {
