@@ -201,7 +201,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     private double[] getFontMatrix() {
         COSObject fontMatrixObject = this.getObjectFromUserDict(ASAtom.getASAtom(
                 Type1StringConstants.FONT_MATRIX_STRING));
-        if (fontMatrixObject != null && fontMatrixObject.getType() != COSObjType.COS_ARRAY) {
+        if (fontMatrixObject != null && fontMatrixObject.getType() == COSObjType.COS_ARRAY) {
             double[] res = new double[6];
             int pointer = 0;
             for (COSObject obj : ((COSArray) fontMatrixObject.get())) {
