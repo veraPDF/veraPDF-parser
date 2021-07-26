@@ -21,6 +21,7 @@
 package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSObjType;
@@ -112,7 +113,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     private void processObject(COSObject nextObject) throws IOException, PostScriptException {
         if (nextObject.getType() == COSObjType.COS_NAME &&
                 nextObject.getString().equals(Type1StringConstants.EEXEC_STRING)) {
-            this.skipSpaces();
+            this.skipSpacesExceptNullByte();
             Type1PrivateParser parser = null;
             try (ASInputStream eexecEncoded = this.source.getStreamUntilToken(
                     CLEAR_TO_MARK_BYTES)) {
@@ -152,6 +153,19 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     public float getWidth(String glyphName) {
         Integer res = this.glyphWidths.get(glyphName);
         return res == null ? -1 : res;
+    }
+
+    protected void skipSpacesExceptNullByte() throws IOException {
+        byte ch;
+        while (!this.source.isEOF()) {
+            ch = this.source.readByte();
+            if (CharTable.isSpace(ch) && ch != 0) {
+                continue;
+            }
+
+            this.source.unread();
+            break;
+        }
     }
 
     @Override
