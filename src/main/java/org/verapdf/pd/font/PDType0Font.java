@@ -77,7 +77,7 @@ public class PDType0Font extends PDCIDFont {
                 this.pdcMap = pdcMap;
                 return pdcMap;
             }
-            return null;
+            throw new NullPointerException("There is no Encoding entry in Type0 font dictionary");
         }
         return this.pdcMap;
     }
