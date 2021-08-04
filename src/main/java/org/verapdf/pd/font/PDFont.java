@@ -78,9 +78,11 @@ public abstract class PDFont extends PDResource {
         }
         this.fontName = this.dictionary.getStringKey(ASAtom.BASE_FONT);
         this.fontNameWithoutSubset = fontName != null ? (fontName.matches("^[A-Z]{6}+.+") ? fontName.substring(7) : fontName) : null;
-        this.boundingBox = fontDescriptor.getFontBoundingBox();
-        if (this.boundingBox == null) {
-            this.boundingBox = new double[]{0.0, 0.0, 1000.0, 1000.0};
+        if (!(this instanceof PDType3Font)) {
+            this.boundingBox = fontDescriptor.getFontBoundingBox();
+            if (this.boundingBox == null) {
+                this.boundingBox = new double[]{0.0, 0.0, 1000.0, 1000.0};
+            }
         }
         this.fontWeight = fontDescriptor.getFontWeight();
         if (fontWeight == null) {
