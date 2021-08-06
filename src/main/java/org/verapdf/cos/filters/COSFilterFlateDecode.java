@@ -80,14 +80,6 @@ public class COSFilterFlateDecode extends ASBufferedInFilter {
                 return res;
             }
         } catch (DataFormatException e) {
-            if ("incorrect data check".equals(e.getMessage())) {
-                for(int i = size; i > 0; i--) {
-                    if (buffer[i - 1] != 0) {
-                        return i;
-                    }
-                }
-                return -1;
-            }
             throw new IOException("Can't decode Flate encoded data", e);
         }
     }
