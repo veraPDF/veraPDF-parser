@@ -57,10 +57,10 @@ public class PDFormField extends PDObject {
 
     private static PDFormField createTypedFormField(COSObject obj, Set<COSKey> parents) {
 		if (obj == null) {
-			throw new IllegalStateException("Argument object can not be null");
+			throw new IllegalArgumentException("Argument object can not be null");
 		}
 		if (parents == null) {
-			throw new IllegalStateException("Argument parents can not be null");
+			throw new IllegalArgumentException("Argument parents can not be null");
 		}
         ASAtom fieldType = getFieldTypeCOSObject(obj);
         if (fieldType == ASAtom.SIG) {

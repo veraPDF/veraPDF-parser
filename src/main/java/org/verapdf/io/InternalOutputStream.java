@@ -23,6 +23,7 @@ package org.verapdf.io;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
+import org.verapdf.exceptions.VeraPDFParserException;
 
 import java.io.*;
 
@@ -147,7 +148,7 @@ public class InternalOutputStream implements ASOutputStream, Closeable {
 		//check if file already exists and delete it
 		if (file.exists()) {
 			if (!file.delete()) {
-				throw new RuntimeException("Cannot create file : " + fileName);
+				throw new VeraPDFParserException("Cannot create file : " + fileName);
 			}
 		}
 		return file;

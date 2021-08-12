@@ -25,6 +25,7 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.cmap.PDCMap;
 
@@ -77,7 +78,7 @@ public class PDType0Font extends PDCIDFont {
                 this.pdcMap = pdcMap;
                 return pdcMap;
             }
-            throw new NullPointerException("There is no Encoding entry in Type0 font dictionary");
+            throw new VeraPDFParserException("There is no Encoding entry in Type0 font dictionary");
         }
         return this.pdcMap;
     }

@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.cos.*;
 import org.verapdf.exceptions.LoopedException;
+import org.verapdf.exceptions.VeraPDFParserException;
 
 import java.util.*;
 
@@ -146,7 +147,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 					isTerminal = false;
 				} else {
 					//TODO : ASException
-					throw new RuntimeException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
+					throw new VeraPDFParserException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
 				}
 
 				kid_i.setParent(this);

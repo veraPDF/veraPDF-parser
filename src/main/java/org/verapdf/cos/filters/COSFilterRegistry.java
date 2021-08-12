@@ -29,6 +29,7 @@ import org.verapdf.as.filters.IASFilterFactory;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 import org.verapdf.cos.COSDictionary;
+import org.verapdf.exceptions.VeraPDFParserException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public class COSFilterRegistry {
 			registerFactory(ASAtom.ASCII_HEX_DECODE, new ASFilterFactory(ASAtom.ASCII_HEX_DECODE));
 			registerFactory(ASAtom.ASCII85_DECODE, new ASFilterFactory(ASAtom.ASCII85_DECODE));
 			registerFactory(ASAtom.LZW_DECODE, new ASFilterFactory(ASAtom.LZW_DECODE));
-		} catch (Exception e) {
+		} catch (VeraPDFParserException e) {
 			LOGGER.log(Level.FINE, "Trying to register factory twice", e);
 		}
 	}
@@ -66,9 +67,9 @@ public class COSFilterRegistry {
 		return registeredFactories.get(name);
 	}
 
-	private static void registerFactory(final ASAtom filterName, final IASFilterFactory factory) throws Exception {
+	private static void registerFactory(final ASAtom filterName, final IASFilterFactory factory) throws VeraPDFParserException {
 		if (registeredFactories.containsKey(filterName)) {
-			throw new Exception("COSFilterRegistry::RegisterFactory(...)" + StringExceptions.DUPLICATE_FACTORY_NAMES);
+			throw new VeraPDFParserException("COSFilterRegistry::RegisterFactory(...)" + StringExceptions.DUPLICATE_FACTORY_NAMES);
 		}
 		registeredFactories.put(filterName, factory);
 	}
