@@ -29,6 +29,7 @@ import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefRange;
 import org.verapdf.cos.xref.COSXRefSection;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
 
@@ -233,7 +234,7 @@ public class Writer implements IVisitor {
 			this.write(EOL);
 			this.write("endstream");
 		} catch (IOException e) {
-			throw new RuntimeException(StringExceptions.WRITE_ERROR);
+			throw new VeraPDFParserException(StringExceptions.WRITE_ERROR);
 		}
 	}
 
@@ -278,7 +279,7 @@ public class Writer implements IVisitor {
 			this.write(key);
 			this.write(" R");
 		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
+			throw new VeraPDFParserException(e.getMessage());
 		}
 	}
 
@@ -314,7 +315,7 @@ public class Writer implements IVisitor {
 				write(key, this.document.getObject(key));
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(StringExceptions.WRITE_ERROR);
+			throw new VeraPDFParserException(StringExceptions.WRITE_ERROR);
 		}
 	}
 

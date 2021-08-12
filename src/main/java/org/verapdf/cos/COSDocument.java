@@ -25,6 +25,7 @@ import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.exceptions.LoopedException;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.io.IReader;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.Reader;
@@ -224,8 +225,8 @@ public class COSDocument {
 			return this.body.get(key);
 		} catch (IOException e) {
 			//TODO : maybe not runtime, maybe no exception at all
-			throw new RuntimeException("Error while parsing object : " + key.getNumber() +
-									   " " + key.getGeneration(), e);
+			throw new VeraPDFParserException("Error while parsing object : " + key.getNumber() +
+			                                 " " + key.getGeneration(), e);
 		}
 	}
 

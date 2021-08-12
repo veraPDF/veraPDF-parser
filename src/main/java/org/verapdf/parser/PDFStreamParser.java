@@ -25,6 +25,7 @@ import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.*;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.operator.InlineImageOperator;
 import org.verapdf.operator.Operator;
 
@@ -82,7 +83,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 						token = parseNextToken();
 					}
 				} catch (IOException e) {
-					throw new RuntimeException(e);
+					throw new VeraPDFParserException(e);
 				}
 			}
 
