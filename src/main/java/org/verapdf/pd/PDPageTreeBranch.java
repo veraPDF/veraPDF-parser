@@ -55,6 +55,14 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		super.setObject(obj);
 	}
 
+	public PDPageTreeBranch(final COSObject obj, final PDPageTreeBranch parentTreeBranch) {
+		this.isTerminal = true;
+		this.leafCount = 0;
+		this.children = new ArrayList<>();
+		setParent(parentTreeBranch);
+		super.setObject(obj);
+	}
+
 	private PDPageTreeBranch(final PDPageTreeBranch leftChild, final PDPageTreeBranch rightChild) {
 		this.isTerminal = false;
 		this.children = new ArrayList<>();
@@ -143,7 +151,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 				if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGE) {
 					kid_i = new PDPage(obj);
 				} else if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGES) {
-					kid_i = new PDPageTreeBranch(obj);
+					kid_i = new PDPageTreeBranch(obj, this);
 					isTerminal = false;
 				} else {
 					//TODO : ASException
@@ -172,7 +180,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 				throw new LoopedException("Page tree loop found");
 			}
 			res.add(objectKey);
-			curr = this.getParent();
+			curr = curr.getParent();
 		}
 		return Collections.unmodifiableSet(res);
 	}
