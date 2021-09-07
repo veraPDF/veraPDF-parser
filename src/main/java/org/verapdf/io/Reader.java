@@ -102,8 +102,8 @@ public class Reader extends XRefReader {
 			return parser.getObject(key);
 		}
 		COSKey newKey = new COSKey(- (int)offset, 0);
-		COSObject object = getObject(newKey);
-		if(object == null || !object.getType().equals(COSObjType.COS_STREAM)) {
+		COSObject object = !newKey.equals(key) ? getObject(newKey) : null;
+		if (object == null || !object.getType().equals(COSObjType.COS_STREAM)) {
 			throw new IOException("Object number " + (-offset) + " should" +
 					" be object stream, but in fact it is " +
 					(object == null ? "null" : object.getType()));
