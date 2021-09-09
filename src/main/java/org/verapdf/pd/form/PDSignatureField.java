@@ -21,9 +21,7 @@
 package org.verapdf.pd.form;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
 import org.verapdf.pd.PDSignature;
 
 import java.util.Set;
@@ -44,9 +42,11 @@ public class PDSignatureField extends PDFormField {
      * digital signature can't be obtained.
      */
     public PDSignature getSignature() {
-        COSDictionary sigDict = (COSDictionary)
-                this.getObject().getKey(ASAtom.V).getDirectBase();
-        return sigDict == null ? null : new PDSignature(sigDict);
+        COSBase directBase = this.getObject().getKey(ASAtom.V).getDirectBase();
+        if (directBase != null && directBase.getType() == COSObjType.COS_DICT) {
+        	return new PDSignature((COSDictionary) directBase);
+        }
+        return null;
     }
 
     /**
