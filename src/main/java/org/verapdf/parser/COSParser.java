@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
@@ -283,7 +284,12 @@ public class COSParser extends BaseParser {
 		checkStreamSpacings(dict);
 		long streamStartOffset = source.getOffset();
 
-		Long size = dict.getKey(ASAtom.LENGTH).getInteger();
+		COSObject length = dict.getKey(ASAtom.LENGTH);
+		if (this.keyOfCurrentObject != null && this.keyOfCurrentObject.equals(length.getKey())) {
+			throw new VeraPDFParserException("Object with key " + this.keyOfCurrentObject + " has stream length value" +
+			                                 " which references to its own object key");
+		}
+		Long size = length.getInteger();
 		source.seek(streamStartOffset);
 
 		boolean streamLengthValid = checkStreamLength(size);
