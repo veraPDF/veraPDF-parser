@@ -113,7 +113,9 @@ class Type1PrivateParser extends BaseParser {
                         nextToken();    // reading "dup"
                         nextToken();    // reading "begin"
                         for (int i = 0; i < amountOfGlyphs; ++i) {
-                            decodeCharString();
+                            if (!decodeCharString()) {
+                                break;
+                            }
                         }
                         break;
                     case Type1StringConstants.LEN_IV_STRING:
@@ -163,7 +165,7 @@ class Type1PrivateParser extends BaseParser {
         }
     }
 
-    private void decodeCharString() throws IOException {
+    private boolean decodeCharString() throws IOException {
         if (glyphWidths == null) {
             this.glyphWidths = new HashMap<>();
         }
@@ -174,8 +176,8 @@ class Type1PrivateParser extends BaseParser {
             // There are files with wrong charstring amount specified. Actual
             // amount can be determined from "end" keyword.
             if (getToken().type == Token.Type.TT_KEYWORD && getToken().getValue().equals("end")) {
-                LOGGER.log(Level.FINE, "Error in parsing private data in Type 1 font: incorrect amount of charstings specified.");
-                return;
+                LOGGER.log(Level.WARNING, "Error in parsing private data in Type 1 font: incorrect amount of charstings specified.");
+                return false;
             } else {
                 throw e;
             }
@@ -201,6 +203,7 @@ class Type1PrivateParser extends BaseParser {
             }
             this.nextToken();
         }
+        return true;
     }
 
     private void checkTokenType(Token.Type expectedType) throws IOException {
