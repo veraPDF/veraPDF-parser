@@ -27,6 +27,8 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is base class for CFF CID font and CFF Type 1 font parsers.
@@ -34,6 +36,8 @@ import java.util.ArrayList;
  * @author Sergey Shemyakov
  */
 abstract class CFFFontBaseParser extends CFFFileBaseParser {
+
+    private static final Logger LOGGER = Logger.getLogger(CFFFontBaseParser.class.getCanonicalName());
 
     protected boolean attemptedParsing = false;
     protected boolean successfullyParsed = false;
@@ -155,19 +159,30 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
             if (next < 22) {
                 switch (next) {
                     case 20:    // defaultWidthX
-                        this.defaultWidthX = (int)
-                                this.stack.get(stack.size() - 1).getInteger();
-                        this.stack.clear();
+                        if (!this.stack.isEmpty()) {
+                            this.defaultWidthX = (int)
+                                    this.stack.get(stack.size() - 1).getInteger();
+                            this.stack.clear();
+                            LOGGER.log(Level.FINE, "Empty arguments stack for defaultWidthX operator");
+                        }
                         break;
                     case 21:    // nominalWidthX
-                        this.nominalWidthX = (int)
-                                this.stack.get(stack.size() - 1).getInteger();
-                        this.stack.clear();
+                        if (!this.stack.isEmpty()) {
+                            this.nominalWidthX = (int)
+                                    this.stack.get(stack.size() - 1).getInteger();
+                            this.stack.clear();
+                            LOGGER.log(Level.FINE, "Empty arguments stack for nominalWidthX operator");
+
+                        }
                         break;
                     case 19:    // Subrs
-                        this.subrsOffset = this.stack.get(stack.size() - 1).getInteger()
-                                + privateDictOffset;
-                        this.stack.clear();
+                        if (!this.stack.isEmpty()) {
+                            this.subrsOffset = this.stack.get(stack.size() - 1).getInteger()
+                                               + privateDictOffset;
+                            this.stack.clear();
+                            LOGGER.log(Level.FINE, "Empty arguments stack for Subrs operator");
+                        }
+                        break;
                     default:
                         this.stack.clear();
                 }
