@@ -37,7 +37,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
 
     private static final Logger LOGGER = Logger.getLogger(COSArray.class.getCanonicalName());
 
-    private List<COSObject> entries;
+    private final List<COSObject> entries;
 
     protected COSArray() {
         super();

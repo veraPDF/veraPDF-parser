@@ -344,8 +344,12 @@ public class PSOperator extends PSObject {
                 COSObject index = getTopNumber();
                 COSObject array = operandStack.pop();
                 if (array.getType() == COSObjType.COS_ARRAY) {
-                    array.remove(index.getInteger().intValue());
-                    array.insert(index.getInteger().intValue(), toPut);
+                    int intIndex = index.getInteger().intValue();
+                    if (array.size() <= intIndex || intIndex < 0) {
+                        throw new PostScriptException("Index greater than array size or less than 0");
+                    }
+                    array.remove(intIndex);
+                    array.insert(intIndex, toPut);
                     return;
                 }
             }
