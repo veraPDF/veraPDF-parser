@@ -99,7 +99,7 @@ public class PDType3Font extends PDSimpleFont {
      */
     public double[] getFontBoundingBox() {
         COSObject bbox = getKey(ASAtom.FONT_BBOX);
-        if (bbox.getType() == COSObjType.COS_ARRAY || bbox.size() == 4) {
+        if (bbox.getType() == COSObjType.COS_ARRAY && bbox.size() == 4) {
             double[] res = new double[4];
             for (int i = 0; i < 4; ++i) {
                 COSObject obj = bbox.at(i);
