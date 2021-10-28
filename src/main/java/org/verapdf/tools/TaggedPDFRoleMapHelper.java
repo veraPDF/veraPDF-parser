@@ -123,7 +123,7 @@ public class TaggedPDFRoleMapHelper {
 	 * @return standard type for the given one or null in cases when there is
 	 * no standard for the given or there is a cycle of the custom types
 	 */
-	public String getStandardType(ASAtom type, boolean isPDFA1) {
+	public String getStandardType(ASAtom type, boolean isPDFA1, boolean isWCAG) {
 		if (type == null) {
 			return null;
 		}
@@ -134,6 +134,9 @@ public class TaggedPDFRoleMapHelper {
 			isFastStop = true;
 		} else {
 			currentStandardTypes = PDF_1_7_STANDARD_ROLE_TYPES;
+			if (isWCAG) {
+				currentStandardTypes.add("Artifact");
+			}
 			isFastStop = false;
 		}
 		return getStandardType(type, currentStandardTypes, isFastStop);
