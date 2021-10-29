@@ -223,7 +223,10 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     @Override
     public String getGlyphName(int code) {
-        if(isStandardEncoding) {
+        if (code < 0) {
+            return NOTDEF_STRING;
+        }
+        if (isStandardEncoding) {
             if (code < CFFPredefined.STANDARD_ENCODING.length) {
                 return CFFPredefined.STANDARD_STRINGS[CFFPredefined.STANDARD_ENCODING[code]];
             }
