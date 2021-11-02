@@ -330,8 +330,12 @@ public class PSOperator extends PSObject {
 
     private void array() throws PostScriptException {
         try {
-            COSObject arraySize = getTopNumber();
-            this.operandStack.push(COSArray.construct(arraySize.getInteger().intValue()));
+            int arraySize = getTopNumber().getInteger().intValue();
+            COSObject array = COSArray.construct(arraySize);
+            for (int i = 0; i < arraySize; i++) {
+                array.add(COSObject.getEmpty());
+            }
+            this.operandStack.push(array);
         } catch (PostScriptException e) {
             throw new PostScriptException("Can't execute array operator", e);
         }
