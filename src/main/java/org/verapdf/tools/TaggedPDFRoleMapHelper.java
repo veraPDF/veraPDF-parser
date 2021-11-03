@@ -29,84 +29,6 @@ import java.util.*;
  */
 public class TaggedPDFRoleMapHelper {
 
-	private static Set<String> PDF_1_4_STANDARD_ROLE_TYPES;
-	private static Set<String> PDF_1_7_STANDARD_ROLE_TYPES;
-
-	static {
-		Set<String> tempSet = new HashSet<>();
-		// Standard structure types for grouping elements PDF 1.4 and PDF 1.7
-		tempSet.add("Document");
-		tempSet.add("Part");
-		tempSet.add("Art");
-		tempSet.add("Sect");
-		tempSet.add("Div");
-		tempSet.add("BlockQuote");
-		tempSet.add("Caption");
-		tempSet.add("TOC");
-		tempSet.add("TOCI");
-		tempSet.add("Index");
-		tempSet.add("NonStruct");
-		tempSet.add("Private");
-
-		// Standard structure types for paragraphlike elements PDF 1.4 and PDF 1.7
-		tempSet.add("H");
-		tempSet.add("H1");
-		tempSet.add("H2");
-		tempSet.add("H3");
-		tempSet.add("H4");
-		tempSet.add("H5");
-		tempSet.add("H6");
-		tempSet.add("P");
-
-		//Standard structure types for list elements PDF 1.4 and PDF 1.7
-		tempSet.add("L");
-		tempSet.add("LI");
-		tempSet.add("Lbl");
-		tempSet.add("LBody");
-
-		//Standard structure types for table elements PDF 1.4 and PDF 1.7
-		tempSet.add("Table");
-		tempSet.add("TR");
-		tempSet.add("TH");
-		tempSet.add("TD");
-
-		// Standard structure types for inline-level structure elements PDF 1.4 and PDF 1.7
-		tempSet.add("Span");
-		tempSet.add("Quote");
-		tempSet.add("Note");
-		tempSet.add("Reference");
-		tempSet.add("BibEntry");
-		tempSet.add("Code");
-		tempSet.add("Link");
-
-		// Standard structure types for illustration elements PDF 1.4 and PDF 1.7
-		tempSet.add("Figure");
-		tempSet.add("Formula");
-		tempSet.add("Form");
-
-		PDF_1_4_STANDARD_ROLE_TYPES = new HashSet<>(tempSet);
-
-		//Standard structure types for table elements PDF 1.7
-		tempSet.add("THead");
-		tempSet.add("TBody");
-		tempSet.add("TFoot");
-
-		// Standard structure types for inline-level structure elements PDF 1.7
-		tempSet.add("Annot");
-		tempSet.add("Ruby");
-		tempSet.add("Warichu");
-
-		// Standard structure types for Ruby and Warichu elements PDF 1.7
-		// Elements "Ruby" and "Warichu" are removed here, because they are already in set
-		tempSet.add("RB");
-		tempSet.add("RT");
-		tempSet.add("RP");
-		tempSet.add("WT");
-		tempSet.add("WP");
-
-		PDF_1_7_STANDARD_ROLE_TYPES = new HashSet<>(tempSet);
-	}
-
 	private Map<ASAtom, ASAtom> roleMap;
 
 	/**
@@ -130,12 +52,13 @@ public class TaggedPDFRoleMapHelper {
 		Set<String> currentStandardTypes;
 		boolean isFastStop;
 		if (isPDFA1) {
-			currentStandardTypes = PDF_1_4_STANDARD_ROLE_TYPES;
+			currentStandardTypes = TaggedPDFHelper.getPdf14StandardRoleTypes();
 			isFastStop = true;
 		} else {
-			currentStandardTypes = PDF_1_7_STANDARD_ROLE_TYPES;
 			if (isWCAG) {
-				currentStandardTypes.add("Artifact");
+				currentStandardTypes = TaggedPDFHelper.getWcagStandardRoleTypes();
+			} else {
+				currentStandardTypes = TaggedPDFHelper.getPdf17StandardRoleTypes();
 			}
 			isFastStop = false;
 		}
