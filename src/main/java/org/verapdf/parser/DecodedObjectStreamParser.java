@@ -111,6 +111,7 @@ public class DecodedObjectStreamParser extends COSParser {
         this.flag = true;
         this.objects.clear();   // In case if some COSInteger was read before.
         this.integers.clear();
+        this.keyOfCurrentObject = key;
         COSObject res = nextObject();
         res.setObjectKey(key);
         return res;
