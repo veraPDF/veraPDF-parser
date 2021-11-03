@@ -37,46 +37,52 @@ public class TaggedPDFHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(TaggedPDFHelper.class.getCanonicalName());
 
+	private static Set<String> PDF_1_4_STANDARD_ROLE_TYPES;
 	private static Set<String> PDF_1_7_STANDARD_ROLE_TYPES;
 	private static Set<String> PDF_2_0_STANDARD_ROLE_TYPES;
+	private static Set<String> WCAG_STANDARD_ROLE_TYPES;
 
 	static {
 		Set<String> tempSet = new HashSet<>();
-		// Common standard structure types for PDF 1.7 and 2.0
+
+		// Common standard structure types for PDF 1.4, 1.7 and 2.0
+
+		// Standard structure types for grouping elements PDF 1.4, 1.7 and 2.0
 		tempSet.add(TaggedPDFConstants.DOCUMENT);
 		tempSet.add(TaggedPDFConstants.PART);
 		tempSet.add(TaggedPDFConstants.DIV);
 		tempSet.add(TaggedPDFConstants.CAPTION);
-		tempSet.add(TaggedPDFConstants.THEAD);
-		tempSet.add(TaggedPDFConstants.TBODY);
-		tempSet.add(TaggedPDFConstants.TFOOT);
+
+		// Standard structure types for paragraphlike elements PDF 1.4, 1.7 and 2.0
 		tempSet.add(TaggedPDFConstants.H);
 		tempSet.add(TaggedPDFConstants.P);
+
+		//Standard structure types for list elements PDF 1.4, 1.7 and 2.0
 		tempSet.add(TaggedPDFConstants.L);
 		tempSet.add(TaggedPDFConstants.LI);
 		tempSet.add(TaggedPDFConstants.LBL);
 		tempSet.add(TaggedPDFConstants.LBODY);
+
+		//Standard structure types for table elements PDF 1.4, 1.7 and 2.0
 		tempSet.add(TaggedPDFConstants.TABLE);
 		tempSet.add(TaggedPDFConstants.TR);
 		tempSet.add(TaggedPDFConstants.TH);
 		tempSet.add(TaggedPDFConstants.TD);
+
+		// Standard structure types for inline-level structure elements PDF 1.4, 1.7 and 2.0
 		tempSet.add(TaggedPDFConstants.SPAN);
 		tempSet.add(TaggedPDFConstants.LINK);
-		tempSet.add(TaggedPDFConstants.ANNOT);
-		tempSet.add(TaggedPDFConstants.RUBY);
-		tempSet.add(TaggedPDFConstants.WARICHU);
+
+		// Standard structure types for illustration elements PDF 1.4, 1.7 and 2.0
 		tempSet.add(TaggedPDFConstants.FIGURE);
 		tempSet.add(TaggedPDFConstants.FORMULA);
 		tempSet.add(TaggedPDFConstants.FORM);
-		tempSet.add(TaggedPDFConstants.RB);
-		tempSet.add(TaggedPDFConstants.RT);
-		tempSet.add(TaggedPDFConstants.RP);
-		tempSet.add(TaggedPDFConstants.WT);
-		tempSet.add(TaggedPDFConstants.WP);
 
 		Set<String> pdf_1_7 = new HashSet<>(tempSet);
 
-		// Standard structure types present in 1.7
+		// Standard structure types present in PDF 1.7 and 1.4
+
+		// Standard structure types for grouping elements PDF 1.7 and 1.4
 		pdf_1_7.add(TaggedPDFConstants.ART);
 		pdf_1_7.add(TaggedPDFConstants.SECT);
 		pdf_1_7.add(TaggedPDFConstants.BLOCK_QUOTE);
@@ -85,11 +91,15 @@ public class TaggedPDFHelper {
 		pdf_1_7.add(TaggedPDFConstants.INDEX);
 		pdf_1_7.add(TaggedPDFConstants.NON_STRUCT);
 		pdf_1_7.add(TaggedPDFConstants.PRIVATE);
+
+		// Standard structure types for inline-level structure elements PDF 1.7 and 1.4
 		pdf_1_7.add(TaggedPDFConstants.QUOTE);
 		pdf_1_7.add(TaggedPDFConstants.NOTE);
 		pdf_1_7.add(TaggedPDFConstants.REFERENCE);
 		pdf_1_7.add(TaggedPDFConstants.BIB_ENTRY);
 		pdf_1_7.add(TaggedPDFConstants.CODE);
+
+		// Standard structure types for paragraphlike elements PDF 1.7 and 1.4
 		pdf_1_7.add(TaggedPDFConstants.H1);
 		pdf_1_7.add(TaggedPDFConstants.H2);
 		pdf_1_7.add(TaggedPDFConstants.H3);
@@ -97,7 +107,28 @@ public class TaggedPDFHelper {
 		pdf_1_7.add(TaggedPDFConstants.H5);
 		pdf_1_7.add(TaggedPDFConstants.H6);
 
+		Set<String> pdf_1_4 = new HashSet<>(pdf_1_7);
 		Set<String> pdf_2_0 = new HashSet<>(tempSet);
+		tempSet = new HashSet<>();
+
+		// Common standard structure types for PDF 1.7 and 2.0
+		tempSet.add(TaggedPDFConstants.THEAD);
+		tempSet.add(TaggedPDFConstants.TBODY);
+		tempSet.add(TaggedPDFConstants.TFOOT);
+		tempSet.add(TaggedPDFConstants.ANNOT);
+		tempSet.add(TaggedPDFConstants.RUBY);
+		tempSet.add(TaggedPDFConstants.WARICHU);
+		tempSet.add(TaggedPDFConstants.RB);
+		tempSet.add(TaggedPDFConstants.RT);
+		tempSet.add(TaggedPDFConstants.RP);
+		tempSet.add(TaggedPDFConstants.WT);
+		tempSet.add(TaggedPDFConstants.WP);
+
+		pdf_1_7.addAll(tempSet);
+		pdf_2_0.addAll(tempSet);
+
+		Set<String> wcag = new HashSet<>(pdf_1_7);
+		wcag.add(TaggedPDFConstants.ARTIFACT);
 
 		pdf_2_0.add(TaggedPDFConstants.DOCUMENT_FRAGMENT);
 		pdf_2_0.add(TaggedPDFConstants.ASIDE);
@@ -108,8 +139,10 @@ public class TaggedPDFHelper {
 		pdf_2_0.add(TaggedPDFConstants.STRONG);
 		pdf_2_0.add(TaggedPDFConstants.ARTIFACT);
 
+		PDF_1_4_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_4);
 		PDF_1_7_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_7);
 		PDF_2_0_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_2_0);
+		WCAG_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(wcag);
 	}
 
 	private static final int MAX_NUMBER_OF_ELEMENTS = 1;
@@ -170,6 +203,11 @@ public class TaggedPDFHelper {
 		} else {
 			return PDF_1_7_STANDARD_ROLE_TYPES.contains(structureType);
 		}
+	}
+
+	public static boolean isWCAGStandardType(StructureType type) {
+		String structureType = type.getType().getValue();
+		return WCAG_STANDARD_ROLE_TYPES.contains(structureType);
 	}
 
 	private static void addVisited(StructureType type) {
@@ -343,5 +381,17 @@ public class TaggedPDFHelper {
 		}
 		ASAtom type = obj.getNameKey(ASAtom.TYPE);
 		return type == ASAtom.MCR || type == ASAtom.OBJR;
+	}
+
+	public static Set<String> getPdf14StandardRoleTypes() {
+		return PDF_1_4_STANDARD_ROLE_TYPES;
+	}
+
+	public static Set<String> getPdf17StandardRoleTypes() {
+		return PDF_1_7_STANDARD_ROLE_TYPES;
+	}
+
+	public static Set<String> getWcagStandardRoleTypes() {
+		return WCAG_STANDARD_ROLE_TYPES;
 	}
 }
