@@ -232,20 +232,10 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
             }
         } else if (isExpertEncoding) {
             if (code < CFFPredefined.EXPERT_ENCODING.length) {
-                int sid = CFFPredefined.EXPERT_ENCODING[code];
-                if (sid == CFFPredefined.SPACE_SID_EXPERT) {
-                    return CFFPredefined.EXPERT_CHARSET[CFFPredefined.SPACE_SID_EXPERT];
-                } else if (sid < CFFPredefined.ISO_ADOBE_CHARSET.length) {
-                    return CFFPredefined.STANDARD_STRINGS[sid];
-                } else if (sid <= CFFPredefined.EXPERT_ENCODING_LAST_SID) {
-                    return CFFPredefined.EXPERT_CHARSET[sid -
-                            CFFPredefined.ISO_ADOBE_CHARSET.length - 2];
-                }
+                return CFFPredefined.STANDARD_STRINGS[CFFPredefined.EXPERT_ENCODING[code]];
             }
-        } else {
-            if (code < encoding.length) {
-                return inverseCharSet.get(encoding[code] + 1);
-            }
+        } else if (code < encoding.length) {
+            return inverseCharSet.get(encoding[code] + 1);
         }
         return NOTDEF_STRING;
     }
