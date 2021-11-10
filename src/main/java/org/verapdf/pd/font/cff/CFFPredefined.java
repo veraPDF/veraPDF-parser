@@ -1431,6 +1431,4 @@ public class CFFPredefined {
     };
 
     public static final int N_STD_STRINGS = STANDARD_STRINGS.length;
-    public static final int SPACE_SID_EXPERT = 1;
-    public static final int EXPERT_ENCODING_LAST_SID = 378;
 }

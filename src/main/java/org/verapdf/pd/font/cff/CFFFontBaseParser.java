@@ -163,6 +163,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                             this.defaultWidthX = (int)
                                     this.stack.get(stack.size() - 1).getInteger();
                             this.stack.clear();
+                        } else {
                             LOGGER.log(Level.FINE, "Empty arguments stack for defaultWidthX operator");
                         }
                         break;
@@ -171,8 +172,8 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                             this.nominalWidthX = (int)
                                     this.stack.get(stack.size() - 1).getInteger();
                             this.stack.clear();
+                        } else {
                             LOGGER.log(Level.FINE, "Empty arguments stack for nominalWidthX operator");
-
                         }
                         break;
                     case 19:    // Subrs
@@ -180,6 +181,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                             this.subrsOffset = this.stack.get(stack.size() - 1).getInteger()
                                                + privateDictOffset;
                             this.stack.clear();
+                        } else {
                             LOGGER.log(Level.FINE, "Empty arguments stack for Subrs operator");
                         }
                         break;
