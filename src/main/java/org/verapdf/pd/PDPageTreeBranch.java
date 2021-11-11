@@ -174,8 +174,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		Set<COSKey> res = new HashSet<>();
 		PDPageTreeNode curr = this;
 		while (curr != null) {
-			COSObject object = curr.getObject();
-			COSKey objectKey = object.getObjectKey();
+			COSKey objectKey = curr.getObject().getObjectKey();
 			if (res.contains(objectKey)) {
 				throw new LoopedException("Page tree loop found");
 			}
@@ -184,6 +183,15 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		}
 		return Collections.unmodifiableSet(res);
 	}
+
+//	PDPageTreeNode parent = getParent();
+//	Set<COSKey> res = parent != null ? new HashSet<>(parent.parentKeys) : new HashSet<>();
+//	COSKey objectKey = this.getObject().getObjectKey();
+//		if (res.contains(objectKey)) {
+//		throw new LoopedException("Page tree loop found");
+//	}
+//		res.add(objectKey);
+//		return Collections.unmodifiableSet(res);
 
 	protected void updateToObject() {
 		COSObject branch = getObject();
