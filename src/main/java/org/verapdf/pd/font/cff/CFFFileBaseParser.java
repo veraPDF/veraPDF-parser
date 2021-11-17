@@ -74,6 +74,9 @@ class CFFFileBaseParser {
         for (int i = 0; i < count + 1; ++i) {
             offset[i] = (int) readOffset(offSize);
         }
+        if (offset[count] < 1) {
+            throw new IOException("Wrong index data offset");
+        }
         byte[] data = new byte[offset[count] - 1];
         if (source.read(data, data.length) != data.length) {
             throw new IOException("End of stream is reached");
