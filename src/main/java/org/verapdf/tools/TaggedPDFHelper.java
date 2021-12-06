@@ -129,6 +129,7 @@ public class TaggedPDFHelper {
 
 		Set<String> wcag = new HashSet<>(pdf_1_7);
 		wcag.add(TaggedPDFConstants.ARTIFACT);
+		wcag.add(TaggedPDFConstants.TITLE);
 
 		pdf_2_0.add(TaggedPDFConstants.DOCUMENT_FRAGMENT);
 		pdf_2_0.add(TaggedPDFConstants.ASIDE);
