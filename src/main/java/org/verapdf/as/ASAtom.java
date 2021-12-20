@@ -518,6 +518,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom STD_CF = new ASAtom("StdCF");
     public static final ASAtom STEM_H = new ASAtom("StemH");
     public static final ASAtom STEM_V = new ASAtom("StemV");
+    public static final ASAtom STM = new ASAtom("Stm");
     public static final ASAtom STM_F = new ASAtom("StmF");
     public static final ASAtom STR_F = new ASAtom("StrF");
     public static final ASAtom STRUCT_ELEM = new ASAtom("StructElem");
