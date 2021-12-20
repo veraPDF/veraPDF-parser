@@ -34,12 +34,14 @@ public class PDMCRDictionary extends PDObject {
 		super(obj);
 	}
 
-	public COSKey getPageObjectNumber() {
+	public COSKey getPageObjectKey() {
 		COSObject object = getObject().getKey(ASAtom.PG);
-		if (object != null) {
-			return object.getKey();
-		}
-		return null;
+		return object != null ? object.getKey() : null;
+	}
+
+	public COSKey getStreamObjectKey() {
+		COSObject object = getObject().getKey(ASAtom.STM);
+		return object != null ? object.getKey() : null;
 	}
 
 	public Long getMCID() {
