@@ -21,8 +21,11 @@
 package org.verapdf.parser;
 
 import org.verapdf.cos.COSInteger;
+import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSReal;
+import org.verapdf.parser.postscript.PSOperator;
+import org.verapdf.pd.function.PSOperatorsConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,53 +37,53 @@ public class FunctionParser extends BaseParser {
 
     private static final Logger LOGGER = Logger.getLogger(FunctionParser.class.getCanonicalName());
 
-    private static final Set<String> FUNCTION_KEYWORDS;
+    public static final Set<String> FUNCTION_KEYWORDS;
     static {
         Set<String> tempSet = new HashSet<>();
-        tempSet.add("abs");
-        tempSet.add("cvi");
-        tempSet.add("floor");
-        tempSet.add("mod");
-        tempSet.add("sin");
-        tempSet.add("add");
-        tempSet.add("cvr");
-        tempSet.add("idiv");
-        tempSet.add("mul");
-        tempSet.add("sqrt");
-        tempSet.add("atan");
-        tempSet.add("div");
-        tempSet.add("ln");
-        tempSet.add("neg");
-        tempSet.add("sub");
-        tempSet.add("ceiling");
-        tempSet.add("exp");
-        tempSet.add("log");
-        tempSet.add("round");
-        tempSet.add("truncate");
-        tempSet.add("cos");
-        tempSet.add("and");
-        tempSet.add("false");
-        tempSet.add("le");
-        tempSet.add("not");
-        tempSet.add("true");
-        tempSet.add("bitshift");
-        tempSet.add("ge");
-        tempSet.add("lt");
-        tempSet.add("or");
-        tempSet.add("xor");
-        tempSet.add("eq");
-        tempSet.add("gt");
-        tempSet.add("ne");
-        tempSet.add("if");
-        tempSet.add("ifelse");
-        tempSet.add("copy");
-        tempSet.add("exch");
-        tempSet.add("pop");
-        tempSet.add("dup");
-        tempSet.add("index");
-        tempSet.add("roll");
-        tempSet.add("{");
-        tempSet.add("}");
+        tempSet.add(PSOperatorsConstants.ABS);
+        tempSet.add(PSOperatorsConstants.CVI);
+        tempSet.add(PSOperatorsConstants.FLOOR);
+        tempSet.add(PSOperatorsConstants.MOD);
+        tempSet.add(PSOperatorsConstants.SIN);
+        tempSet.add(PSOperatorsConstants.ADD);
+        tempSet.add(PSOperatorsConstants.CVR);
+        tempSet.add(PSOperatorsConstants.IDIV);
+        tempSet.add(PSOperatorsConstants.MUL);
+        tempSet.add(PSOperatorsConstants.SQRT);
+        tempSet.add(PSOperatorsConstants.ATAN);
+        tempSet.add(PSOperatorsConstants.DIV);
+        tempSet.add(PSOperatorsConstants.LN);
+        tempSet.add(PSOperatorsConstants.NEG);
+        tempSet.add(PSOperatorsConstants.SUB);
+        tempSet.add(PSOperatorsConstants.CEILING);
+        tempSet.add(PSOperatorsConstants.EXP);
+        tempSet.add(PSOperatorsConstants.LOG);
+        tempSet.add(PSOperatorsConstants.ROUND);
+        tempSet.add(PSOperatorsConstants.TRUNCATE);
+        tempSet.add(PSOperatorsConstants.COS);
+        tempSet.add(PSOperatorsConstants.AND);
+        tempSet.add(PSOperatorsConstants.FALSE);
+        tempSet.add(PSOperatorsConstants.LE);
+        tempSet.add(PSOperatorsConstants.NOT);
+        tempSet.add(PSOperatorsConstants.TRUE);
+        tempSet.add(PSOperatorsConstants.BITSHIFT);
+        tempSet.add(PSOperatorsConstants.GE);
+        tempSet.add(PSOperatorsConstants.LT);
+        tempSet.add(PSOperatorsConstants.OR);
+        tempSet.add(PSOperatorsConstants.XOR);
+        tempSet.add(PSOperatorsConstants.EQ);
+        tempSet.add(PSOperatorsConstants.GT);
+        tempSet.add(PSOperatorsConstants.NE);
+        tempSet.add(PSOperatorsConstants.IF);
+        tempSet.add(PSOperatorsConstants.IFELSE);
+        tempSet.add(PSOperatorsConstants.COPY);
+        tempSet.add(PSOperatorsConstants.EXCH);
+        tempSet.add(PSOperatorsConstants.POP);
+        tempSet.add(PSOperatorsConstants.DUP);
+        tempSet.add(PSOperatorsConstants.INDEX);
+        tempSet.add(PSOperatorsConstants.ROLL);
+        tempSet.add(PSOperatorsConstants.LEFT_CURLY_BRACE);
+        tempSet.add(PSOperatorsConstants.RIGHT_CURLY_BRACE);
 
         FUNCTION_KEYWORDS = Collections.unmodifiableSet(tempSet);
     }
@@ -111,6 +114,8 @@ public class FunctionParser extends BaseParser {
             case TT_KEYWORD:
                 if (!FUNCTION_KEYWORDS.contains(this.getToken().getValue())) {
                     LOGGER.log(Level.WARNING, "Invalid keyword in Function");
+                } else {
+                    operators.add(new PSOperator(COSName.construct(this.getToken().getValue())));
                 }
                 break;
             case TT_INTEGER:
@@ -120,7 +125,7 @@ public class FunctionParser extends BaseParser {
                 operators.add(COSReal.construct(this.getToken().real));
                 break;
             default:
-                LOGGER.log(Level.WARNING,"Invalid object type in Function");
+                LOGGER.log(Level.WARNING, "Invalid object type in Function");
                 break;
         }
     }

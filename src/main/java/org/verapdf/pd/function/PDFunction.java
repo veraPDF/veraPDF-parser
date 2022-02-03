@@ -21,15 +21,11 @@
 package org.verapdf.pd.function;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.COSObjType;
+import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
-import org.verapdf.parser.FunctionParser;
 import org.verapdf.pd.PDObject;
 
-import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,8 +33,6 @@ import java.util.logging.Logger;
 public class PDFunction extends PDObject {
 
     private static final Logger LOGGER = Logger.getLogger(PDFunction.class.getCanonicalName());
-
-    private FunctionParser parser;
 
     protected PDFunction(COSObject obj) {
        super(obj);
@@ -59,40 +53,48 @@ public class PDFunction extends PDObject {
         switch (functionType.intValue()) {
             case 3:
                 return new PDType3Function(obj);
+            case 4:
+                return new PDType4Function(obj);
             default:
                 return new PDFunction(obj);
         }
    }
 
-    public List<COSObject> getOperators() {
-        COSObject obj = this.getObject();
-        if (obj.getType() != COSObjType.COS_STREAM) {
-            return Collections.emptyList();
-        }
-        if (this.parser == null) {
-            try {
-                parseStream();
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING,"Can not parse function", e);
-                return Collections.emptyList();
-            }
-        }
-        return Collections.unmodifiableList(parser.getOperators());
-    }
-
-    private void parseStream() throws IOException{
-        try (ASInputStream functionStream = getObject().getData(COSStream.FilterFlags.DECODE)) {
-            this.parser = new FunctionParser(functionStream);
-            this.parser.parse();
-        } finally {
-            if (this.parser != null) {
-                this.parser.closeInputStream();
-            }
-        }
-    }
-
     public Long getFunctionType() {
         return getObject().getIntegerKey(ASAtom.FUNCTION_TYPE);
     }
 
+    public COSArray getCOSArray(final ASAtom key){
+        COSObject obj = this.getKey(key);
+        return obj == null ? null : (COSArray) obj.getDirectBase();
+    }
+
+    public COSArray getDomain(){
+        return getCOSArray(ASAtom.DOMAIN);
+    }
+
+    public COSArray getRange(){
+        return getCOSArray(ASAtom.RANGE);
+    }
+
+    public List<COSObject> getValuesInIntervals(List<COSObject> values, COSArray intervals) {
+        if (intervals != null && intervals.size() >= values.size() * 2) {
+            List<COSObject> result = new ArrayList<>();
+            for (int i = 0; i < values.size(); ++i) {
+                result.add(min(max(values.get(i), intervals.at(2 * i)), intervals.at(2 * i + 1)));
+            }
+            return result;
+        } else {
+            LOGGER.log(Level.WARNING, "Intervals size is invalid");
+            return values;
+        }
+    }
+
+    private COSObject max(COSObject first, COSObject second) {
+        return first.getReal() >= second.getReal() ? first : second;
+    }
+
+    private COSObject min(COSObject first, COSObject second) {
+        return first.getReal() <= second.getReal() ? first : second;
+    }
 }
