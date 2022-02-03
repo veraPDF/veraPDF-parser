@@ -28,14 +28,18 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.Token;
 import org.verapdf.parser.postscript.PSObject;
+import org.verapdf.parser.postscript.PSOperator;
 import org.verapdf.parser.postscript.PSParser;
 import org.verapdf.parser.postscript.PostScriptException;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
+import org.verapdf.pd.function.PSOperatorsConstants;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -58,6 +62,45 @@ public class Type1FontProgram extends PSParser implements FontProgram {
             Type1StringConstants.CLEARTOMARK_STRING.getBytes(StandardCharsets.ISO_8859_1);
     private boolean attemptedParsing = false;
     private boolean successfullyParsed = false;
+
+    public static final Set<String> OPERATORS_KEYWORDS;
+
+    static {
+        Set<String> tempSet = new HashSet<>();
+        tempSet.add(PSOperatorsConstants.ABS);
+        tempSet.add(PSOperatorsConstants.FLOOR);
+        tempSet.add(PSOperatorsConstants.MOD);
+        tempSet.add(PSOperatorsConstants.ADD);
+        tempSet.add(PSOperatorsConstants.IDIV);
+        tempSet.add(PSOperatorsConstants.MUL);
+        tempSet.add(PSOperatorsConstants.DIV);
+        tempSet.add(PSOperatorsConstants.NEG);
+        tempSet.add(PSOperatorsConstants.SUB);
+        tempSet.add(PSOperatorsConstants.CEILING);
+        tempSet.add(PSOperatorsConstants.ROUND);
+        tempSet.add(PSOperatorsConstants.COPY);
+        tempSet.add(PSOperatorsConstants.EXCH);
+        tempSet.add(PSOperatorsConstants.POP);
+        tempSet.add(PSOperatorsConstants.DUP);
+        tempSet.add(PSOperatorsConstants.INDEX);
+        tempSet.add(PSOperatorsConstants.ROLL);
+        tempSet.add(PSOperatorsConstants.CLEAR);
+        tempSet.add(PSOperatorsConstants.COUNT);
+        tempSet.add(PSOperatorsConstants.MARK);
+        tempSet.add(PSOperatorsConstants.CLEARTOMARK);
+        tempSet.add(PSOperatorsConstants.COUNTTOMARK);
+        tempSet.add(PSOperatorsConstants.DICT);
+        tempSet.add(PSOperatorsConstants.BEGIN);
+        tempSet.add(PSOperatorsConstants.LENGTH);
+        tempSet.add(PSOperatorsConstants.DEF);
+        tempSet.add(PSOperatorsConstants.LOAD);
+        tempSet.add(PSOperatorsConstants.ARRAY);
+        tempSet.add(PSOperatorsConstants.PUT);
+        tempSet.add(PSOperatorsConstants.FOR);
+        tempSet.add(PSOperatorsConstants.STANDARD_ENCODING);
+
+        OPERATORS_KEYWORDS = Collections.unmodifiableSet(tempSet);
+    }
 
     /**
      * {@inheritDoc}
@@ -130,7 +173,23 @@ public class Type1FontProgram extends PSParser implements FontProgram {
                 }
             }
         } else {
-            PSObject.getPSObject(nextObject).execute(operandStack, userDict);
+            toExecute(nextObject);
+        }
+    }
+
+    private void toExecute(COSObject next) throws PostScriptException {
+        PSObject operator = PSObject.getPSObject(next);
+        if (operator instanceof PSOperator) {
+            if (!OPERATORS_KEYWORDS.contains(((PSOperator) operator).getOperator())) {
+                COSObject dictEntry = userDict.get(ASAtom.getASAtom(((PSOperator) operator).getOperator()));
+                if (dictEntry != null) {
+                    toExecute(dictEntry);
+                }
+            } else {
+                operator.execute(operandStack, userDict);
+            }
+        } else {
+            operator.execute(operandStack, userDict);
         }
     }
 

@@ -43,7 +43,7 @@ public class PSProcedure extends PSObject {
     }
 
     public void executeProcedure(Stack<COSObject> operandStack,
-                 Map<ASAtom, COSObject> userDict) throws PostScriptException {
+                                 Map<ASAtom, COSObject> userDict) throws PostScriptException {
         for (COSObject obj : procedure) {
             PSObject.getPSObject(obj).execute(operandStack, userDict);
         }
@@ -51,7 +51,21 @@ public class PSProcedure extends PSObject {
 
     @Override
     public void execute(Stack<COSObject> operandStack,
-                        Map<ASAtom, COSObject> userDict) throws PostScriptException {
+                        Map<ASAtom, COSObject> userDict) {
         operandStack.push(this);
+    }
+
+    public Stack<COSObject> modifiedExecuteProcedure(Stack<COSObject> operandStack,
+                                                     Map<ASAtom, COSObject> userDict) throws PostScriptException {
+        for (COSObject obj : procedure) {
+            if (obj != null) {
+                if (obj instanceof PSOperator) {
+                    ((PSOperator) obj).execute(operandStack, userDict);
+                } else {
+                    operandStack.push(obj);
+                }
+            }
+        }
+        return operandStack;
     }
 }

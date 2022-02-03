@@ -68,6 +68,12 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         this.entries = new ArrayList<>(size);
     }
 
+    public COSArray(List<COSObject> values){
+        super();
+        this.entries = new ArrayList<>();
+        this.entries.addAll(values);
+    }
+
     //! Object type
     public COSObjType getType() {
         return COSObjType.COS_ARRAY;
