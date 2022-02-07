@@ -30,7 +30,9 @@ import org.verapdf.parser.postscript.PSOperator;
 import java.util.ArrayList;
 import java.util.List;
 
-class PDFunctionTest {
+class PDFunctionTestHelper {
+    public static final double EPSILON = 1.0E-7;
+
     public static class ListOfCOSObjectsConverter implements ArgumentConverter {
         @Override
         public List<COSObject> convert(Object source, ParameterContext parameterContext) throws ArgumentConversionException {

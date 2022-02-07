@@ -51,6 +51,8 @@ public class PDFunction extends PDObject {
         }
 
         switch (functionType.intValue()) {
+            case 2:
+                return new PDType2Function(obj);
             case 3:
                 return new PDType3Function(obj);
             case 4:
@@ -96,5 +98,9 @@ public class PDFunction extends PDObject {
 
     private COSObject min(COSObject first, COSObject second) {
         return first.getReal() <= second.getReal() ? first : second;
+    }
+
+    public List<COSObject> getResult(List<COSObject> operands) {
+        return null;
     }
 }

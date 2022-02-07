@@ -21,8 +21,10 @@
 package org.verapdf.pd.function;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSReal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,27 +33,122 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PDType3Function extends PDFunction {
+    private COSArray domain;
+    private List<COSObject> subdomains;
+    private List<PDFunction> functions;
+    private static final Logger LOGGER = Logger.getLogger(PDType3Function.class.getCanonicalName());
 
-	private static final Logger LOGGER = Logger.getLogger(PDType3Function.class.getCanonicalName());
+    protected PDType3Function(COSObject obj) {
+        super(obj);
+        domain = getDomain();
+        subdomains = getSubdomains();
+        functions = getFunctions();
+    }
 
-	protected PDType3Function(COSObject obj) {
-		super(obj);
-	}
+    public void setSubdomains(List<COSObject> subdomains) {
+        this.subdomains = subdomains;
+        List<COSObject> dom = new ArrayList<>();
+        dom.add(subdomains.get(0));
+        dom.add(subdomains.get(subdomains.size() - 1));
+        this.domain = new COSArray(dom);
+    }
 
-	public List<PDFunction> getFunctions() {
-		COSObject obj = getKey(ASAtom.FUNCTIONS);
-		if (obj.getType() != COSObjType.COS_ARRAY) {
-			LOGGER.log(Level.WARNING, "Invalid Functions key value in Type 3 Function dictionary");
-			return Collections.emptyList();
-		}
+    public void setFunctions(List<PDFunction> functions) {
+        this.functions = functions;
+    }
 
-		List<PDFunction> pdFunctions = new ArrayList<>();
-		for (int i = 0; i < obj.size(); i++) {
-			PDFunction function = PDFunction.createFunction(obj.at(i));
-			if (function != null) {
-				pdFunctions.add(function);
-			}
-		}
-		return Collections.unmodifiableList(pdFunctions);
-	}
+    public List<COSObject> getSubdomains() {
+        if (subdomains == null) {
+            if (domain == null) {
+                LOGGER.log(Level.WARNING, "Invalid Domain key value in Type 3 Function dictionary");
+                return null;
+            }
+            COSArray bounds = getCOSArray(ASAtom.BOUNDS);
+            subdomains = new ArrayList<>();
+            subdomains.add(domain.at(0));
+            if (bounds != null) {
+                for (COSObject bound : bounds) {
+                    subdomains.add(bound);
+                }
+            }
+            subdomains.add(domain.at(1));
+        }
+        return subdomains;
+    }
+
+    public COSArray getEncode() {
+        COSArray encode = getCOSArray(ASAtom.ENCODE);
+        List<COSObject> subdomains = getSubdomains();
+        if (encode == null) {
+            List<COSObject> encodeFromSubdomains = new ArrayList<>();
+            for (int i = 0; i < subdomains.size() - 1; ++i) {
+                encodeFromSubdomains.add(subdomains.get(i));
+                encodeFromSubdomains.add(subdomains.get(i + 1));
+            }
+            encode = new COSArray(encodeFromSubdomains);
+        }
+        return encode;
+    }
+
+    public List<PDFunction> getFunctions() {
+        if (functions == null) {
+            COSObject obj = getKey(ASAtom.FUNCTIONS);
+            if (obj == null || obj.getType() != COSObjType.COS_ARRAY) {
+                LOGGER.log(Level.WARNING, "Invalid Functions key value in Type 3 Function dictionary");
+                return Collections.emptyList();
+            }
+
+            List<PDFunction> pdFunctions = new ArrayList<>();
+            for (int i = 0; i < obj.size(); i++) {
+                PDFunction function = PDFunction.createFunction(obj.at(i));
+                if (function != null) {
+                    pdFunctions.add(function);
+                }
+            }
+            functions = Collections.unmodifiableList(pdFunctions);
+        }
+        return functions;
+    }
+
+    public int getIntervalNumber(COSObject x) {
+        int functionsCount = getSubdomains().size() - 1;
+        if (x.getReal().equals(getSubdomains().get(0).getReal())) {
+            return 0;
+        }
+        for (int i = 0; i < functionsCount - 1; ++i) {
+            if (x.getReal() >= getSubdomains().get(i).getReal() && x.getReal() < getSubdomains().get(i + 1).getReal()) {
+                return i;
+            }
+        }
+        return functionsCount - 1;
+    }
+
+    @Override
+    public List<COSObject> getResult(List<COSObject> operands) {
+        if (subdomains == null) {
+            LOGGER.log(Level.WARNING, "Invalid subdomains in Type 3 Function dictionary");
+            return null;
+        }
+        COSArray encode = getEncode();
+        if (encode.size() < 2 * (subdomains.size() - 1)) {
+            LOGGER.log(Level.WARNING, "Invalid Encode key value in Type 3 Function dictionary");
+            return null;
+        }
+        if (operands.size() > 1) {
+            LOGGER.log(Level.WARNING, "Too many operands. The first one will be chosen");
+        }
+        List<COSObject> operand = new ArrayList<>();
+        operand.add(operands.get(0));
+        operand = getValuesInIntervals(operand, domain);
+        int i = getIntervalNumber(operand.get(0));
+        operand.set(0, interpolate(operand.get(0), subdomains.get(i), subdomains.get(i + 1), encode.at(2 * i), encode.at(2 * i + 1)));
+        return Collections.unmodifiableList(getValuesInIntervals(getFunctions().get(i).getResult(operand), getRange()));
+    }
+
+    private COSObject interpolate(COSObject x, COSObject xMin, COSObject xMax, COSObject encodeLeft, COSObject encodeRight) {
+        if (!xMax.getReal().equals(xMin.getReal())) {
+            return COSReal.construct(encodeLeft.getReal() + (x.getReal() - xMin.getReal()) * (encodeRight.getReal() - encodeLeft.getReal()) / (xMax.getReal() - xMin.getReal()));
+        }
+        return encodeLeft;
+    }
 }
