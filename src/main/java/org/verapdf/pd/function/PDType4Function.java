@@ -119,6 +119,7 @@ public class PDType4Function extends PDFunction {
         modifiedOperators.add(new PSProcedure(new COSArray(proc)));
     }
 
+    @Override
     public List<COSObject> getResult(List<COSObject> operands) {
         try {
             Stack<COSObject> operandStack = new Stack<>();
@@ -133,8 +134,7 @@ public class PDType4Function extends PDFunction {
                 }
             }
             List<COSObject> operandsInRange = new ArrayList<>(operandStack);
-            operandsInRange = getValuesInIntervals(operandsInRange, getRange());
-            return Collections.unmodifiableList(operandsInRange);
+            return Collections.unmodifiableList(getValuesInIntervals(operandsInRange, getRange()));
         } catch (PostScriptException e) {
             LOGGER.log(Level.WARNING, "Invalid operators stream", e);
             return null;
