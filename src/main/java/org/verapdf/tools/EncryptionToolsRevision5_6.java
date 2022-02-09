@@ -27,6 +27,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -139,16 +140,28 @@ public class EncryptionToolsRevision5_6 {
 
     public static void enableAES256() throws GeneralSecurityException {
         try {   // Allow using of AES with 256-bit key.
-            Field field = Class.forName("javax.crypto.JceSecurity").
+            Field restrictedField = Class.forName("javax.crypto.JceSecurity").
                     getDeclaredField("isRestricted");
 
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+            getDeclaredFields0.setAccessible(true);
+            Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
+            Field modifiersField = null;
+            for (Field field : fields) {
+                if ("modifiers".equals(field.getName())) {
+                    modifiersField = field;
+                    break;
+                }
+            }
+            if (modifiersField == null){
+                throw new IllegalStateException("Field \"modifiers\" is not declared in java.lang.reflect.Field");
+            }
             modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            modifiersField.setInt(restrictedField, restrictedField.getModifiers() & ~Modifier.FINAL);
             modifiersField.setAccessible(false);
 
-            field.setAccessible(true);
-            field.set(null, Boolean.FALSE);
+            restrictedField.setAccessible(true);
+            restrictedField.set(null, Boolean.FALSE);
         } catch (Exception ex) {
             throw new GeneralSecurityException("Can't enable using of 256-bit key for AES encryption", ex);
         }
