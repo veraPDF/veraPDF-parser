@@ -46,8 +46,26 @@ public class PDLab extends PDCIEDictionaryBased {
         return ASAtom.LAB;
     }
 
+    // See ISO 32000-2:2020, chapter 8.6.5.4
+    @Override
+    public double[] toRGB(double[] value) {
+        double lstar = (value[0] + 16d) * (1d / 116d);
+        double x = wpX * inverse(lstar + value[1] * (1d / 500d));
+        double y = wpY * inverse(lstar);
+        double z = wpZ * inverse(lstar - value[2] * (1d / 200d));
+        return convXYZtoRGB(x, y, z);
+    }
+
     public double[] getRange() {
         double[] res = TypeConverter.getRealArray(this.dictionary.getKey(ASAtom.RANGE), 4, "Range");
         return res != null ? res : new double[]{-100, 100, -100, 100};
+    }
+
+    private double inverse(double x) {
+        if (x > 6.0 / 29.0) {
+            return x * x * x;
+        } else {
+            return (108d / 841d) * (x - (4d / 29d));
+        }
     }
 }

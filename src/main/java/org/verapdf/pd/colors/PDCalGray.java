@@ -45,6 +45,15 @@ public class PDCalGray extends PDCIEDictionaryBased {
         return ASAtom.CALGRAY;
     }
 
+    // See ISO 32000-2:2020, chapter 8.6.5.2
+    @Override
+    public double[] toRGB(double[] value) {
+        double a = value[0];
+        double gamma = getGamma();
+        double powAG = Math.pow(a, gamma);
+        return convXYZtoRGB(wpX * powAG, wpY * powAG, wpZ * powAG);
+    }
+
     public Double getGamma() {
         return getNumber(this.dictionary.getKey(ASAtom.GAMMA), 1);
     }

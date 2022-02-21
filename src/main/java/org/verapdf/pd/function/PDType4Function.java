@@ -39,7 +39,7 @@ public class PDType4Function extends PDFunction {
     private List<COSObject> operators;
     private List<COSObject> modifiedOperators;
     private static final Logger LOGGER = Logger.getLogger(PDType4Function.class.getCanonicalName());
-    protected FunctionParser parser;
+    private FunctionParser parser;
 
     protected PDType4Function(COSObject obj) {
         super(obj);
@@ -88,7 +88,9 @@ public class PDType4Function extends PDFunction {
         if (modifiedOperators == null) {
             modifiedOperators = new ArrayList<>();
             Iterator<COSObject> ops = getOperators().iterator();
-            ops.next();
+            if (PSOperatorsConstants.LEFT_CURLY_BRACE.equals(getOperators().get(0).getString())) {
+                ops.next();
+            }
             while (ops.hasNext()) {
                 COSObject obj = ops.next();
                 if (obj != null) {

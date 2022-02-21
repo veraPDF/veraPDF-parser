@@ -91,4 +91,10 @@ public class PDDeviceN extends PDSpecialColorSpace {
         }
         return Collections.emptyList();
     }
+
+    @Override
+    public double[] toRGB(double[] value) {
+        double[] altValue = getDoubleArrayResult(value, getTintTransform());
+        return getAlternateSpace().toRGB(altValue);
+    }
 }

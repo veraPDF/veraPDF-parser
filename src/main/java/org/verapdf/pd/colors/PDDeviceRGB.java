@@ -23,6 +23,8 @@ package org.verapdf.pd.colors;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSName;
 
+import java.awt.color.ColorSpace;
+
 /**
  * @author Maksim Bezrukov
  */
@@ -30,6 +32,8 @@ public class PDDeviceRGB extends PDColorSpace {
 
     public static final PDDeviceRGB INSTANCE = new PDDeviceRGB(false);
     public static final PDDeviceRGB INHERITED_INSTANCE = new PDDeviceRGB(true);
+
+    private final ColorSpace colorSpaceRGB = ColorSpace.getInstance(ColorSpace.CS_sRGB);
 
     private PDDeviceRGB(boolean isInherited) {
         super(COSName.construct(ASAtom.DEVICERGB));
@@ -44,5 +48,15 @@ public class PDDeviceRGB extends PDColorSpace {
     @Override
     public ASAtom getType() {
         return ASAtom.DEVICERGB;
+    }
+
+    @Override
+    public double[] toRGB(double[] value) {
+        float[] rgb = new float[value.length];
+        for (int i = 0; i < value.length; ++i){
+            rgb[i] = (float) value[i];
+        }
+        rgb = colorSpaceRGB.toRGB(rgb);
+        return new double[]{(double) rgb[0], (double) rgb[1], (double) rgb[2]};
     }
 }

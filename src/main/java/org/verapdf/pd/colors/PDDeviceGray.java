@@ -45,4 +45,9 @@ public class PDDeviceGray extends PDColorSpace {
     public ASAtom getType() {
         return ASAtom.DEVICEGRAY;
     }
+
+    @Override
+    public double[] toRGB(double[] value) {
+        return new double[]{value[0], value[0], value[0]};
+    }
 }

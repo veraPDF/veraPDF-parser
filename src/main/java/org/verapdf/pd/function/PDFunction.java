@@ -23,6 +23,7 @@ package org.verapdf.pd.function;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSReal;
 import org.verapdf.pd.PDObject;
 
 import java.util.ArrayList;
@@ -51,6 +52,8 @@ public class PDFunction extends PDObject {
         }
 
         switch (functionType.intValue()) {
+            case 0:
+                return new PDType0Function(obj);
             case 2:
                 return new PDType2Function(obj);
             case 3:
@@ -90,6 +93,13 @@ public class PDFunction extends PDObject {
             LOGGER.log(Level.WARNING, "Intervals size is invalid");
             return values;
         }
+    }
+
+    public COSObject interpolate(COSObject x, COSObject xMin, COSObject xMax, COSObject encodeLeft, COSObject encodeRight) {
+        if (!xMax.getReal().equals(xMin.getReal())) {
+            return COSReal.construct(encodeLeft.getReal() + (x.getReal() - xMin.getReal()) * (encodeRight.getReal() - encodeLeft.getReal()) / (xMax.getReal() - xMin.getReal()));
+        }
+        return encodeLeft;
     }
 
     private COSObject max(COSObject first, COSObject second) {

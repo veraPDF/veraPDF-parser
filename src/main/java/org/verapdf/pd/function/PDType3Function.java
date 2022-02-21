@@ -144,11 +144,4 @@ public class PDType3Function extends PDFunction {
         operand.set(0, interpolate(operand.get(0), subdomains.get(i), subdomains.get(i + 1), encode.at(2 * i), encode.at(2 * i + 1)));
         return Collections.unmodifiableList(getValuesInIntervals(getFunctions().get(i).getResult(operand), getRange()));
     }
-
-    private COSObject interpolate(COSObject x, COSObject xMin, COSObject xMax, COSObject encodeLeft, COSObject encodeRight) {
-        if (!xMax.getReal().equals(xMin.getReal())) {
-            return COSReal.construct(encodeLeft.getReal() + (x.getReal() - xMin.getReal()) * (encodeRight.getReal() - encodeLeft.getReal()) / (xMax.getReal() - xMin.getReal()));
-        }
-        return encodeLeft;
-    }
 }

@@ -66,6 +66,11 @@ public class PDPattern extends PDColorSpace {
         return ASAtom.PATTERN;
     }
 
+    @Override
+    public double[] toRGB(double[] value) {
+        return null;
+    }
+
     public int getPatternType() {
         return TYPE_PATTERN;
     }

@@ -53,7 +53,10 @@ public class PDType4FunctionTest {
                 Arguments.of("{ 2 mul neg 2 div exch 2 mul sqrt 2 div add }", "2 3", "-2"),
                 Arguments.of("{ dup add 9 le { dup mul dup add } { 1 sub dup mul } ifelse }", "2 3", "8"),
                 Arguments.of("{ dup add 9 le { dup mul dup add } { 1 sub dup mul } ifelse }", "5 6", "16"),
-                Arguments.of("{ dup sub 0 eq { 125 5 div sqrt } if }", "5", "5")
+                Arguments.of("{ dup sub 0 eq { 125 5 div sqrt } if }", "5", "5"),
+                Arguments.of("{ 3 3 1 roll }", "1 2", "3 1 2"),
+                Arguments.of("{ 3 2 roll }", "1 2 3 4", "1 3 4 2"),
+                Arguments.of("{ 3 -2 roll }", "1 2 3 4", "1 4 2 3")
         );
     }
 

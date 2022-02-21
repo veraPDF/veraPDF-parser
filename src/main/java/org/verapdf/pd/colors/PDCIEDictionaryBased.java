@@ -26,14 +26,20 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.tools.TypeConverter;
 
+import java.awt.color.ColorSpace;
+
 /**
  * @author Maksim Bezrukov
  */
 public abstract class PDCIEDictionaryBased extends PDColorSpace {
 
-    private static final double[] DEFAULT_BLACK_POINT = new double[] {0,0,0};
+    private static final double[] DEFAULT_BLACK_POINT = new double[]{0, 0, 0};
 
     protected COSObject dictionary;
+
+    protected double wpX = 1;
+    protected double wpY = 1;
+    protected double wpZ = 1;
 
     protected PDCIEDictionaryBased() {
         this(COSDictionary.construct());
@@ -45,6 +51,19 @@ public abstract class PDCIEDictionaryBased extends PDColorSpace {
         this.dictionary = (dict == null || !(dict.getType() == COSObjType.COS_DICT)) ?
                 COSDictionary.construct()
                 : dict;
+        fillWhitepointCache(getWhitePoint());
+    }
+
+    private void fillWhitepointCache(double[] whitepoint) {
+        wpX = whitepoint[0];
+        wpY = whitepoint[1];
+        wpZ = whitepoint[2];
+    }
+
+    protected double[] convXYZtoRGB(double x, double y, double z) {
+        float[] rgb = ColorSpace.getInstance(ColorSpace.CS_CIEXYZ)
+                .toRGB(new float[]{(float) Math.max(0, x), (float) Math.max(0, y), (float) Math.max(0, z)});
+        return new double[]{(double) rgb[0], (double) rgb[1], (double) rgb[2]};
     }
 
     public double[] getWhitePoint() {
