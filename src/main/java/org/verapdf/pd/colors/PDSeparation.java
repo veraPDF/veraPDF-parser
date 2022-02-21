@@ -68,4 +68,10 @@ public class PDSeparation extends PDSpecialColorSpace {
     public ASAtom getType() {
         return ASAtom.SEPARATION;
     }
+
+    @Override
+    public double[] toRGB(double[] value) {
+        double[] altColor = getDoubleArrayResult(value, getTintTransform());
+        return getAlternate().toRGB(altColor);
+    }
 }

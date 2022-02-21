@@ -45,4 +45,13 @@ public class PDDeviceCMYK extends PDColorSpace {
     public ASAtom getType() {
         return ASAtom.DEVICECMYK;
     }
+
+    @Override
+    public double[] toRGB(double[] cmyk) {
+        double[] rgb = new double[3];
+        rgb[0] = 1.0d - Math.min(1.0, cmyk[0] + cmyk[3]);
+        rgb[1] = 1.0d - Math.min(1.0, cmyk[1] + cmyk[3]);
+        rgb[2] = 1.0d - Math.min(1.0, cmyk[2] + cmyk[3]);
+        return rgb;
+    }
 }

@@ -293,17 +293,27 @@ public class PSOperator extends PSObject {
         }
     }
 
-    private void roll() throws PostScriptException {    // TODO: check this
+    private void roll() throws PostScriptException {
         try {
             COSObject[] topTwoNumbers = getTopTwoNumbers();
             int j = topTwoNumbers[0].getInteger().intValue();
             int n = topTwoNumbers[1].getInteger().intValue();
+            if (j < 0) {
+                j = n - Math.abs(j) % n;
+            }
             int size = operandStack.size();
             if (size >= n) {
-                List<COSObject> lastElements = operandStack.subList(size - n, size);
-                int splitPoint = n - 1 - ((j - 1) % n);
-                operandStack.addAll(lastElements.subList(splitPoint - 1, size));
-                operandStack.addAll(lastElements.subList(0, splitPoint - 1));
+                List<COSObject> lastElements = new ArrayList<>();
+                for (int i = 0; i < n; ++i) {
+                    lastElements.add(operandStack.pop());
+                }
+                int splitPoint = (j - 1) % n;
+                for (int i = splitPoint; i >= 0; --i) {
+                    operandStack.push(lastElements.get(i));
+                }
+                for (int i = n - 1; i > splitPoint; --i) {
+                    operandStack.push(lastElements.get(i));
+                }
             } else {
                 throw new PostScriptException("Stack has less than n elements");
             }

@@ -21,8 +21,13 @@
 package org.verapdf.pd.colors;
 
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSReal;
 import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDResources;
+import org.verapdf.pd.function.PDFunction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base class for special color spaces, see 8.6.6 of PDF-1.7 specification.
@@ -46,6 +51,19 @@ public abstract class PDSpecialColorSpace extends PDColorSpace {
     protected PDColorSpace getBaseColorSpace() {
         return ColorSpaceFactory.getColorSpace(
                 getBaseColorSpaceObject(), this.resources, wasDefault);
+    }
+
+    protected double[] getDoubleArrayResult(double[] src, PDFunction function) {
+        List<COSObject> values = new ArrayList<>();
+        for (double item : src) {
+            values.add(COSReal.construct(item));
+        }
+        List<COSObject> result = function.getResult(values);
+        double[] resultValue = new double[result.size()];
+        for (int i = 0; i < result.size(); ++i) {
+            resultValue[i] = result.get(i).getReal();
+        }
+        return resultValue;
     }
 
     public void setWasDefault(boolean wasDefault) {

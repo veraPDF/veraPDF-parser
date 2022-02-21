@@ -83,6 +83,11 @@ public class PDICCBased extends PDColorSpace {
 		return ASAtom.ICCBASED;
 	}
 
+	@Override
+	public double[] toRGB(double[] value) {
+		return getAlternate().toRGB(value);
+	}
+
 	public String getColorSpaceType() {
 		String colorSpaceType = null;
 		if (iccProfile != null) {
