@@ -49,6 +49,6 @@ jobs:
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: core/target/site/jacoco/jacoco.xml
+          coverage-reports: target/site/jacoco/jacoco.xml
       - name: Codacy analysis reporting
         uses: codacy/codacy-analysis-cli-action@4.0.0
