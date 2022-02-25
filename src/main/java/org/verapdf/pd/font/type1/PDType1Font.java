@@ -226,8 +226,9 @@ public class PDType1Font extends PDSimpleFont {
      */
     @Override
     public Double getWidth(int code) {
-        if (getFontProgram() != null) {
-            return super.getWidth(code);
+        Double width = super.getWidth(code);
+        if (width != null) {
+            return width;
         }
         if (fontMetrics != null) {
             StandardFontMetrics metrics =
