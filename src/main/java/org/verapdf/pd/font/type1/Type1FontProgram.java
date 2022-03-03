@@ -331,4 +331,9 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     public ASFileStreamCloser getFontProgramResource() {
         return new ASFileStreamCloser(this.source);
     }
+
+    @Override
+    public String getWeight() {
+        return null;
+    }
 }
