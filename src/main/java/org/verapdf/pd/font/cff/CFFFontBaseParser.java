@@ -58,6 +58,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected long charStringsOffset;
     protected long charSetOffset;
     protected int charStringType;
+    protected String weight;
 
     //CharStrings
     protected int nGlyphs;
@@ -89,6 +90,11 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                 this.source.readByte();
                 if (next < 22) {
                     switch (next) {
+                        case 4:
+                            this.weight =
+                                    getStringBySID((int) this.stack.get(this.stack.size() - 1).getInteger());
+                            this.stack.clear();
+                            break;
                         case 15:    // charset
                             this.charSetOffset =
                                     this.stack.get(this.stack.size() - 1).getInteger();
@@ -205,5 +211,9 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
         } else {
             return new ASFileStreamCloser(this.source);
         }
+    }
+
+    public String getWeight() {
+        return weight;
     }
 }

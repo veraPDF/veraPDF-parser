@@ -207,4 +207,14 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             return new ASFileStreamCloser(this.source);
         }
     }
+
+    @Override
+    public String getWeight() {
+        try {
+            this.parseFont();
+        } catch (IOException exception) {
+            return null;
+        }
+        return font.getWeight();
+    }
 }

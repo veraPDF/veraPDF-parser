@@ -140,4 +140,9 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
             return new ASFileStreamCloser(this.parser.source);
         }
     }
+
+    @Override
+    public String getWeight() {
+        return null;
+    }
 }

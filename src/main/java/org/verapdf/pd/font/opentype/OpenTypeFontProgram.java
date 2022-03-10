@@ -198,4 +198,9 @@ public class OpenTypeFontProgram implements FontProgram {
             return new ASFileStreamCloser(this.source);
         }
     }
+
+    @Override
+    public String getWeight() {
+        return null;
+    }
 }
