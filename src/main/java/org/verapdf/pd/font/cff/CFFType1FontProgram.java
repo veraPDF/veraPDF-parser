@@ -234,7 +234,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
             if (code < CFFPredefined.EXPERT_ENCODING.length) {
                 return CFFPredefined.STANDARD_STRINGS[CFFPredefined.EXPERT_ENCODING[code]];
             }
-        } else if (code < encoding.length) {
+        } else if (code < encoding.length && encoding[code] + 1 < inverseCharSet.size()) {
             return inverseCharSet.get(encoding[code] + 1);
         }
         return NOTDEF_STRING;
