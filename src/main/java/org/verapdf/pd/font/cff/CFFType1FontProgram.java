@@ -63,6 +63,9 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         this.topDictEndOffset = topDictEndOffset;
         this.externalCMap = externalCMap;
         this.isSubset = isSubset;
+        fontMatrix = new float[6];
+        System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,
+                DEFAULT_FONT_MATRIX.length);
     }
 
     /**

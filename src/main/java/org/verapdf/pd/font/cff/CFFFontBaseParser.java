@@ -53,8 +53,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected long privateDictSize;
     protected long topDictBeginOffset;
     protected long topDictEndOffset;
-    protected float[] fontMatrix = new float[6];
-    boolean fontMatrixRead = false;
+    protected float[] fontMatrix;
     protected long charStringsOffset;
     protected long charSetOffset;
     protected int charStringType;
@@ -75,8 +74,6 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     public CFFFontBaseParser(SeekableInputStream source) {
         super(source);
         stack = new ArrayList<>(48);
-        System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,
-                DEFAULT_FONT_MATRIX.length);
         this.charStringType = 2;
         this.charSetOffset = 0; // default
     }
@@ -116,11 +113,9 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                             next = this.source.readByte() & 0xFF;
                             switch (next) {
                                 case 7:     // FontMatrix
-                                    if (!fontMatrixRead) {
-                                        fontMatrixRead = true;
-                                        for (int i = 0; i < 6; ++i) {
-                                            fontMatrix[i] = this.stack.get(i).getReal();
-                                        }
+                                    fontMatrix = new float[6];
+                                    for (int i = 0; i < 6; ++i) {
+                                        fontMatrix[i] = this.stack.get(i).getReal();
                                     }
                                     this.stack.clear();
                                     break;
