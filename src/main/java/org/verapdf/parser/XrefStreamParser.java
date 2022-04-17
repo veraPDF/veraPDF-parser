@@ -174,6 +174,8 @@ class XrefStreamParser {
                         break;
                     case 2:
                         xref = new COSXRefEntry();
+                        //a negative number to identify a case of object stream from normal offset
+                        //see method Reader.getObject(final COSKey key) and ISO 32000-2 7.5.7 and 7.5.8.3
                         xref.offset = -numberFromBytes(field1);
                         if (field2.length > 0) {
                             xref.generation = 0;
