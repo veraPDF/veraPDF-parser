@@ -179,7 +179,7 @@ public class CMapParser extends PSParser {
                 cMap.shortestCodeSpaceLength = begin.length;
             }
         } else {
-            LOGGER.log(Level.FINE, "CMap " + cMap.getName() + " has overlapping codespace ranges.");
+            LOGGER.log(Level.WARNING, "CMap " + cMap.getName() + " has overlapping codespace ranges.");
         }
     }
 
