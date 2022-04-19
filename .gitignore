@@ -14,6 +14,9 @@ hs_err_pid*
 /.idea/**
 *.iml
 
+# Ignore Mac DS_Store files
+.DS_Store
+
 # Eclipse artefacts
 **/.project
 **/.settings
