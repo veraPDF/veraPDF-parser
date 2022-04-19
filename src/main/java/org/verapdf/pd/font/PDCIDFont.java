@@ -94,7 +94,7 @@ public class PDCIDFont extends PDFont {
     public COSStream getCIDSet() {
         if (fontDescriptor != null) {
             COSObject cidSet = this.fontDescriptor.getKey(ASAtom.CID_SET);
-            if (cidSet != null && cidSet.getType() == COSObjType.COS_STREAM) {
+            if (cidSet != null && cidSet.getType() == COSObjType.COS_STREAM && ((COSStream) cidSet.getDirectBase()).getLength() != 0) {
                 return (COSStream)cidSet.getDirectBase();
             }
         }
