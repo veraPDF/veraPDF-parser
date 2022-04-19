@@ -1,11 +1,11 @@
 %!PS-Adobe-3.0 Resource-CMap
 %%DocumentNeededResources: ProcSet (CIDInit)
-%%DocumentNeededResources: CMap (UniCNS-UTF16-H)
+%%DocumentNeededResources: CMap (H)
 %%IncludeResource: ProcSet (CIDInit)
-%%IncludeResource: CMap (UniCNS-UTF16-H)
-%%BeginResource: CMap (UniCNS-UTF16-V)
-%%Title: (UniCNS-UTF16-V Adobe CNS1 7)
-%%Version: 1.009
+%%IncludeResource: CMap (H)
+%%BeginResource: CMap (V)
+%%Title: (V Adobe Japan1 1)
+%%Version: 12.005
 %%Copyright: -----------------------------------------------------------
 %%Copyright: Copyright 1990-2019 Adobe. All rights reserved.
 %%Copyright:
@@ -48,41 +48,52 @@
 
 begincmap
 
-/UniCNS-UTF16-H usecmap
+/H usecmap
 
 /CIDSystemInfo 3 dict dup begin
   /Registry (Adobe) def
-  /Ordering (CNS1) def
-  /Supplement 7 def
+  /Ordering (Japan1) def
+  /Supplement 1 def
 end def
 
-/CMapName /UniCNS-UTF16-V def
-/CMapVersion 1.009 def
+/CMapName /V def
+/CMapVersion 12.005 def
 /CMapType 1 def
 
-/XUID [1 10 25592] def
+/UIDOffset 850 def
+/XUID [1 10 25340] def
 
 /WMode 1 def
 
-6 begincidchar
-<2013> 120
-<2014> 122
-<2025> 109
-<fe4f> 13745
-<ff5b> 134
-<ff5d> 135
-endcidchar
-
-7 begincidrange
-<3008> <3009> 150
-<300a> <300b> 146
-<300c> <300d> 154
-<300e> <300f> 158
-<3010> <3011> 142
-<3014> <3015> 138
-<ff08> <ff09> 130
+27 begincidrange
+<2122> <2123> 7887
+<2131> <2132> 7889
+<213c> <213e> 7891
+<2141> <2145> 7894
+<214a> <215b> 7899
+<2161> <2161> 7917
+<2421> <2421> 7918
+<2423> <2423> 7919
+<2425> <2425> 7920
+<2427> <2427> 7921
+<2429> <2429> 7922
+<2443> <2443> 7923
+<2463> <2463> 7924
+<2465> <2465> 7925
+<2467> <2467> 7926
+<246e> <246e> 7927
+<2521> <2521> 7928
+<2523> <2523> 7929
+<2525> <2525> 7930
+<2527> <2527> 7931
+<2529> <2529> 7932
+<2543> <2543> 7933
+<2563> <2563> 7934
+<2565> <2565> 7935
+<2567> <2567> 7936
+<256e> <256e> 7937
+<2575> <2576> 7938
 endcidrange
-
 endcmap
 CMapName currentdict /CMap defineresource pop
 end
