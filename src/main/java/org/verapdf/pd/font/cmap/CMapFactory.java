@@ -56,8 +56,7 @@ class CMapFactory {
             }
         }
         try {
-            CMapParser parser =
-                    new CMapParser(cMapStream);
+            CMapParser parser = new CMapParser(cMapStream);
             parser.parse();
             res = parser.getCMap();
         } catch (IOException e) {

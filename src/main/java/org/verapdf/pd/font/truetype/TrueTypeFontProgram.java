@@ -65,7 +65,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
     @Override
     public void parseFont() throws IOException {
         super.parseFont();
-        if (!isSymbolic && encoding.getDirectBase() != null) {
+        if (!isSymbolic && encoding.getDirectBase() != null && encodingMappingArray == null) {
             this.createCIDToNameTable();
         }
     }
