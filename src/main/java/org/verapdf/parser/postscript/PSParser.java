@@ -22,8 +22,10 @@ package org.verapdf.parser.postscript;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.NotSeekableCOSParser;
+import org.verapdf.pd.function.PSOperatorsConstants;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -50,4 +52,14 @@ public class PSParser extends NotSeekableCOSParser {
         return userDict.get(key);
     }
 
+    @Override
+    protected COSObject getDictionary() {
+        this.flag = true;
+        return COSName.construct(PSOperatorsConstants.LEFT_ANGLE_BRACES);
+    }
+
+    @Override
+    protected COSObject getCloseDictionary() {
+        return COSName.construct(PSOperatorsConstants.RIGHT_ANGLE_BRACES);
+    }
 }

@@ -79,4 +79,6 @@ public class PSOperatorsConstants {
     public static final String STANDARD_ENCODING = "StandardEncoding";
     public static final String LEFT_CURLY_BRACE = "{";
     public static final String RIGHT_CURLY_BRACE = "}";
+    public static final String LEFT_ANGLE_BRACES = "<<";
+    public static final String RIGHT_ANGLE_BRACES = ">>";
 }

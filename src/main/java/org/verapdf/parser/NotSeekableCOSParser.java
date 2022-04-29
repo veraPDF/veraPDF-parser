@@ -173,12 +173,12 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
                 this.flag = false;
                 return getDictionary();
             case TT_CLOSEDICT:
-                return new COSObject();
+                return getCloseDictionary();
             case TT_EOF:
                 return new COSObject();
             case TT_STARTPROC:
                 this.flag = false;
-                COSObject proc =  getArray();
+                COSObject proc = getArray();
                 return PSObject.getPSObject(proc, true);
         }
         return new COSObject();
@@ -222,6 +222,10 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
             return new COSObject();
         }
         return COSName.construct(token.getValue());
+    }
+
+    protected COSObject getCloseDictionary() {
+        return new COSObject();
     }
 
     protected COSObject getDictionary() throws IOException {
