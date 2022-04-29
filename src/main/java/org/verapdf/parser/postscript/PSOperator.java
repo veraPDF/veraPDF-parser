@@ -187,6 +187,12 @@ public class PSOperator extends PSObject {
                 case PSOperatorsConstants.LOAD:
                     load();
                     break;
+                case PSOperatorsConstants.LEFT_ANGLE_BRACES:
+                    mark();
+                    break;
+                case PSOperatorsConstants.RIGHT_ANGLE_BRACES:
+                    closeDictionary();
+                    break;
 
                 // Array Operators
                 case PSOperatorsConstants.ARRAY:
@@ -221,6 +227,31 @@ public class PSOperator extends PSObject {
                     }
             }
         }
+    }
+
+    private void closeDictionary() throws PostScriptException {
+        COSObject dictionary = COSDictionary.construct();
+        while (operandStack.size() > 1) {
+            COSObject value = operandStack.pop();
+            if (value == PSStackMark.getInstance()) {
+                operandStack.add(dictionary);
+                return;
+            }
+            COSObject key = operandStack.pop();
+            if (key == PSStackMark.getInstance()) {
+                throw new PostScriptException("Odd number of arguments between << and >> operators");
+            }
+            COSObjType keyType = key.getType();
+            if (keyType == COSObjType.COS_NAME || keyType == COSObjType.COS_STRING) {
+                // any object can be key, but we support only COSName and COSString
+                dictionary.setKey(ASAtom.getASAtom(key.getString()), value);
+            }
+        }
+        if (!operandStack.empty() && operandStack.pop() == PSStackMark.getInstance()) {
+            operandStack.add(dictionary);
+            return;
+        }
+        throw new PostScriptException("Missing << operator before >> operator");
     }
 
     private void opIfElse() throws PostScriptException {
