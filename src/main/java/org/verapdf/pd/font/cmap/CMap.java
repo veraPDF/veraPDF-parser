@@ -36,7 +36,8 @@ public class CMap {
     private static final Logger LOGGER = Logger.getLogger(CMap.class.getCanonicalName());
 
     private int wMode;
-    private String registry, ordering;
+    private String registry;
+    private String ordering;
     private int supplement;
     private String name;
     private boolean usesNonPredefinedCMap;

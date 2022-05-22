@@ -28,7 +28,7 @@ import org.verapdf.io.InternalInputStream;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Sergey Shemyakov
@@ -46,8 +46,8 @@ public class TrueTypeParserTest {
         TrueTypeFontProgram font = new TrueTypeFontProgram(new InternalInputStream(MONO_FONT_PATH, 2),
                 IS_SYMBOLIC, ENCODING);
         font.parseFont();
-        assertTrue(font.getWidth("z") == 600f);
-        assertTrue(font.getWidth("yakute") == 1000f);
+        assertEquals(600f, font.getWidth("z"), 0.0);
+        assertEquals(1000f, font.getWidth("yakute"), 0.0);
     }
 
     @Test
@@ -55,8 +55,8 @@ public class TrueTypeParserTest {
         TrueTypeFontProgram font = new TrueTypeFontProgram(new InternalInputStream(REGULAR_FONT_PATH, 2),
                 IS_SYMBOLIC, ENCODING);
         font.parseFont();
-        assertTrue((int) font.getWidth("z") == 500);
-        assertTrue((int) font.getWidth("zero") == 556);
-        assertTrue((int) font.getWidth("yakute") == 365);
+        assertEquals(500, (int) font.getWidth("z"));
+        assertEquals(556, (int) font.getWidth("zero"));
+        assertEquals(365, (int) font.getWidth("yakute"));
     }
 }

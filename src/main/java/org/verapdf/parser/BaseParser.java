@@ -547,7 +547,8 @@ public class BaseParser {
 
 			// if ch == # (0x23)
 			if (ch == 0x23) {
-				byte ch1, ch2;
+				byte ch1;
+				byte ch2;
 				byte dc;
 				ch1 = this.source.readByte();
 				if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.ER) {

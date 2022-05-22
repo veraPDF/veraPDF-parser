@@ -65,7 +65,8 @@ public class ASBufferedInFilter extends ASInFilter {
 
     private final int bufferCapacity;
     protected byte[] buffer;
-    private int bufferBegin, bufferEnd;
+    private int bufferBegin;
+    private int bufferEnd;
 
     public ASBufferedInFilter(ASInputStream stream) throws IOException {
         this(stream, BF_BUFFER_SIZE);

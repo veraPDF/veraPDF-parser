@@ -27,7 +27,8 @@ package org.verapdf.pd.font.cmap;
  */
 class CIDInterval implements CIDMappable {
 
-    private int intervalStart, intervalEnd;
+    private int intervalStart;
+    private int intervalEnd;
     protected int startingCID;
 
     CIDInterval(int intervalStart, int intervalEnd, int startingCID) {

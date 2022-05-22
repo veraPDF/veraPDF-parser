@@ -101,17 +101,16 @@ public class StandardSecurityHandler {
                     this.encryptionKey = EncryptionToolsRevision5_6.getFileEncryptionKey("".getBytes(), o, u,
                             getOE(), getUE(), revision);
                 }
-                this.isEmptyStringPassword =
-                        Boolean.valueOf(this.encryptionKey != null);
+                this.isEmptyStringPassword = this.encryptionKey != null;
                 return this.isEmptyStringPassword;
             } catch (GeneralSecurityException e) {
                 LOGGER.log(Level.FINE, "Caught Security Exception while document decryption", e);
-                this.isEmptyStringPassword = Boolean.valueOf(false);
+                this.isEmptyStringPassword = false;
                 return this.isEmptyStringPassword;
             }
         }
         LOGGER.log(Level.FINE, "Can't authenticate password in encrypted PDF, something is null.");
-        this.isEmptyStringPassword = Boolean.valueOf(false);
+        this.isEmptyStringPassword = Boolean.FALSE;
         return this.isEmptyStringPassword;
     }
 

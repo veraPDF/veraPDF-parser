@@ -193,10 +193,10 @@ public class PDType1Font extends PDSimpleFont {
     public Boolean isStandard() {
         if (this.isStandard == null) {
             if (!isEmbedded() && isNameStandard()) {
-                isStandard = Boolean.valueOf(true);
+                isStandard = true;
                 return isStandard;
             }
-            isStandard = Boolean.valueOf(false);
+            isStandard = false;
             return isStandard;
         }
         return this.isStandard;

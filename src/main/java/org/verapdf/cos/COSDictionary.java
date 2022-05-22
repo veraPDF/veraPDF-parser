@@ -305,4 +305,10 @@ public class COSDictionary extends COSDirect {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "dictionary(size = " + size() + ")";
+    }
+
 }

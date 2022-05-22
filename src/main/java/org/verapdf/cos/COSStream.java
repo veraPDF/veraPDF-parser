@@ -351,4 +351,9 @@ public class COSStream extends COSDictionary {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "stream(size = " + realStreamSize + ")";
+	}
+
 }

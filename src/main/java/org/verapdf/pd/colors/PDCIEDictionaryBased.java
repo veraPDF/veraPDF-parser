@@ -48,7 +48,7 @@ public abstract class PDCIEDictionaryBased extends PDColorSpace {
     protected PDCIEDictionaryBased(COSObject obj) {
         super(obj);
         COSObject dict = obj.at(1);
-        this.dictionary = (dict == null || !(dict.getType() == COSObjType.COS_DICT)) ?
+        this.dictionary = (dict == null || dict.getType() != COSObjType.COS_DICT) ?
                 COSDictionary.construct()
                 : dict;
         fillWhitepointCache(getWhitePoint());
