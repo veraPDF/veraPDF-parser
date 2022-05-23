@@ -192,12 +192,7 @@ public class PDType1Font extends PDSimpleFont {
      */
     public Boolean isStandard() {
         if (this.isStandard == null) {
-            if (!isEmbedded() && isNameStandard()) {
-                isStandard = true;
-                return isStandard;
-            }
-            isStandard = false;
-            return isStandard;
+            isStandard = !isEmbedded() && isNameStandard();
         }
         return this.isStandard;
     }
@@ -231,12 +226,11 @@ public class PDType1Font extends PDSimpleFont {
             return width;
         }
         if (fontMetrics != null) {
-            StandardFontMetrics metrics =
-                    StandardFontMetricsFactory.getFontMetrics(this.getName());
             Encoding enc = this.getEncodingMapping();
-            if (metrics != null) {
-                return Double.valueOf(metrics.getWidth(enc.getName(code)));
+            if (Encoding.empty().equals(enc)) {
+                enc = new Encoding(fontMetrics.getEncodingScheme());
             }
+            return (double) fontMetrics.getWidth(enc.getName(code));
         }
         // should not get here
         LOGGER.log(Level.FINE, "Can't get standard metrics");

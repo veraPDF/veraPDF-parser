@@ -37,11 +37,13 @@ public class Encoding {
 
     private static final Logger LOGGER = Logger.getLogger(Encoding.class.getCanonicalName());
 
-    private static final Encoding EMPTY = new Encoding(null);
+    private static final Encoding EMPTY = new Encoding((ASAtom) null);
 
     private static final String NOTDEF = ".notdef";
 
-    private String[] predefinedEncoding;
+    private static final String ADOBE_STANDARD_ENCODING = "AdobeStandardEncoding";
+
+    private final String[] predefinedEncoding;
     private Map<Integer, String> differences;
 
     /**
@@ -56,6 +58,14 @@ public class Encoding {
             this.predefinedEncoding = TrueTypePredefined.MAC_EXPERT_ENCODING;
         } else if (predefinedEncoding == ASAtom.WIN_ANSI_ENCODING) {
             this.predefinedEncoding = TrueTypePredefined.WIN_ANSI_ENCODING;
+        } else {
+            this.predefinedEncoding = new String[0];
+        }
+    }
+
+    public Encoding(String predefinedEncoding) {
+        if (ADOBE_STANDARD_ENCODING.equals(predefinedEncoding)) {
+            this.predefinedEncoding = TrueTypePredefined.STANDARD_ENCODING;
         } else {
             this.predefinedEncoding = new String[0];
         }

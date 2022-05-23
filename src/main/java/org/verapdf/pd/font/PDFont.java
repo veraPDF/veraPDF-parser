@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDResource;
 import org.verapdf.pd.font.cmap.PDCMap;
+import org.verapdf.pd.font.type1.PDType1Font;
 import org.verapdf.pd.font.type3.PDType3Font;
 
 import java.io.IOException;
@@ -341,12 +342,11 @@ public abstract class PDFont extends PDResource {
      * @return width for glyph with given code as specified in Widths array.
      */
     public Double getWidth(int code) {
-        if (dictionary.knownKey(ASAtom.WIDTHS).booleanValue()
-                && dictionary.knownKey(ASAtom.FIRST_CHAR).booleanValue()
-                && dictionary.knownKey(ASAtom.LAST_CHAR).booleanValue()) {
+        if (dictionary.knownKey(ASAtom.WIDTHS) && dictionary.knownKey(ASAtom.FIRST_CHAR)
+                && dictionary.knownKey(ASAtom.LAST_CHAR)) {
             int firstChar = dictionary.getIntegerKey(ASAtom.FIRST_CHAR).intValue();
             int lastChar = dictionary.getIntegerKey(ASAtom.LAST_CHAR).intValue();
-            if (getWidths().size().intValue() > 0 && code >= firstChar && code <= lastChar) {
+            if (getWidths().size() > 0 && code >= firstChar && code <= lastChar) {
                 return getWidths().at(code - firstChar).getReal();
             }
         }
@@ -355,7 +355,7 @@ public abstract class PDFont extends PDResource {
             return fontDescriptor.getMissingWidth();
         }
 
-        if (this instanceof PDType3Font) {
+        if (this instanceof PDType3Font || this instanceof PDType1Font) {
             return null;
         }
 
