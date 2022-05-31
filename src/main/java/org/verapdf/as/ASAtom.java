@@ -481,6 +481,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom REQUIREMENTS = new ASAtom("Requirements");
     public static final ASAtom RGB = new ASAtom("RGB");
     public static final ASAtom RI = new ASAtom("RI");
+    public static final ASAtom ROLE = new ASAtom("Role");
     public static final ASAtom ROLE_MAP = new ASAtom("RoleMap");
     public static final ASAtom ROLE_MAP_NS = new ASAtom("RoleMapNS");
     public static final ASAtom ROOT = new ASAtom("Root");

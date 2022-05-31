@@ -283,6 +283,10 @@ public class TaggedPDFHelper {
 				return Collections.unmodifiableList(list);
 			} else if (children.getType() == COSObjType.COS_ARRAY) {
 				return getChildrenFromArray(children, roleMap, checkType);
+			} else if (isOBJR(children)) {
+				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
+				list.add(new PDOBJRDictionary(children));
+				return Collections.unmodifiableList(list);
 			}
 		}
 		return Collections.emptyList();
@@ -344,6 +348,8 @@ public class TaggedPDFHelper {
 					list.add(new PDMCRDictionary(elem));
 				} else if (elem.getType() == COSObjType.COS_INTEGER) {
 					list.add(elem);
+				} else if (isOBJR(elem)) {
+					list.add(new PDOBJRDictionary(elem));
 				}
 			}
 			return Collections.unmodifiableList(list);
@@ -368,6 +374,17 @@ public class TaggedPDFHelper {
 		}
 		ASAtom type = obj.getNameKey(ASAtom.TYPE);
 		return ASAtom.MCR.equals(type);
+	}
+
+	public static boolean isOBJR(COSObject obj) {
+		if (obj == null || obj.empty()) {
+			return false;
+		}
+		if (!obj.getType().isDictionaryBased()) {
+			return false;
+		}
+		ASAtom type = obj.getNameKey(ASAtom.TYPE);
+		return ASAtom.OBJR.equals(type);
 	}
 
 	public static boolean isContentItem(COSObject obj) {
