@@ -26,6 +26,8 @@ import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Instance of this class represent a parser of CIDFont from FontSet of CFF file.
@@ -33,6 +35,8 @@ import java.util.*;
  * @author Sergey Shemyakov
  */
 public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram {
+
+    private static final Logger LOGGER = Logger.getLogger(CFFCIDFontProgram.class.getCanonicalName());
 
     private long fdArrayOffset;
     private long fdSelectOffset;
@@ -136,6 +140,10 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
                         nLeft = this.readCard8() & 0xFF;
                     } else {
                         nLeft = this.readCard16();
+                    }
+                    if (charSetPointer + nLeft >= nGlyphs) {
+                        LOGGER.log(Level.WARNING, "Invalid embedded cff font. Charset range exceeds number of glyphs");
+                        nLeft = nGlyphs - charSetPointer - 1;
                     }
                     for (int i = 0; i <= nLeft; ++i) {
                         this.charSet.put(first + i, charSetPointer++);
