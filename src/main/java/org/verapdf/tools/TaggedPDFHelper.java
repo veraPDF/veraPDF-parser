@@ -37,10 +37,10 @@ public class TaggedPDFHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(TaggedPDFHelper.class.getCanonicalName());
 
-	private static Set<String> PDF_1_4_STANDARD_ROLE_TYPES;
-	private static Set<String> PDF_1_7_STANDARD_ROLE_TYPES;
-	private static Set<String> PDF_2_0_STANDARD_ROLE_TYPES;
-	private static Set<String> WCAG_STANDARD_ROLE_TYPES;
+	private static final Set<String> PDF_1_4_STANDARD_ROLE_TYPES;
+	private static final Set<String> PDF_1_7_STANDARD_ROLE_TYPES;
+	private static final Set<String> PDF_2_0_STANDARD_ROLE_TYPES;
+	private static final Set<String> WCAG_STANDARD_ROLE_TYPES;
 
 	static {
 		Set<String> tempSet = new HashSet<>();
@@ -407,6 +407,10 @@ public class TaggedPDFHelper {
 
 	public static Set<String> getPdf17StandardRoleTypes() {
 		return PDF_1_7_STANDARD_ROLE_TYPES;
+	}
+
+	public static Set<String> getPdf20StandardRoleTypes() {
+		return PDF_2_0_STANDARD_ROLE_TYPES;
 	}
 
 	public static Set<String> getWcagStandardRoleTypes() {
