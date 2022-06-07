@@ -27,6 +27,8 @@ import org.verapdf.cos.COSObject;
  */
 public class PDWidgetAdditionalActions extends PDAnnotationAdditionalActions {
 
+    private static final String WIDGET_ANNOT_PARENT_TYPE = "WidgetAnnot";
+
     public PDWidgetAdditionalActions(COSObject obj) {
         super(obj);
     }
@@ -34,5 +36,10 @@ public class PDWidgetAdditionalActions extends PDAnnotationAdditionalActions {
     @Override
     public boolean containsOtherKeys() {
         return false;
+    }
+
+    @Override
+    public String getParentType() {
+        return WIDGET_ANNOT_PARENT_TYPE;
     }
 }

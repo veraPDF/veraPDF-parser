@@ -93,4 +93,5 @@ public abstract class PDAbstractAdditionalActions extends PDObject {
         return false;
     }
 
+    public abstract String getParentType();
 }
