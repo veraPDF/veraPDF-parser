@@ -156,4 +156,8 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         }
         return null;
     }
+
+    TrueTypeHheaTable getHheaParser() {
+        return hheaParser;
+    }
 }

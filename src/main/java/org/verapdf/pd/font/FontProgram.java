@@ -101,4 +101,8 @@ public interface FontProgram {
     ASFileStreamCloser getFontProgramResource();
 
     String getWeight();
+
+    Double getAscent();
+
+    Double getDescent();
 }

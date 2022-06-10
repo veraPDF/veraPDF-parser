@@ -33,6 +33,8 @@ import java.io.IOException;
 class TrueTypeHheaTable extends TrueTypeTable {
 
     private int numberOfHMetrics;
+    private int ascender;
+    private int descender;
 
     TrueTypeHheaTable(SeekableInputStream source, long offset) {
         super(source, offset);
@@ -42,10 +44,10 @@ class TrueTypeHheaTable extends TrueTypeTable {
     void readTable() throws IOException {
         long startingOffset = this.source.getOffset();
         this.source.seek(this.offset);
-        this.source.skip(4 +   // version
-                2 +             // ascender
-                2 +             // descender
-                2 +             // line gap
+        this.source.skip(4); // version
+        this.ascender = this.readFWord();
+        this.descender = this.readFWord();
+        this.source.skip(2 + // line gap
                 2 +             // advanceWidthMax
                 2 +             // minLeftSideBearing
                 2 +             // minRightSideBearing
@@ -61,5 +63,13 @@ class TrueTypeHheaTable extends TrueTypeTable {
 
     int getNumberOfHMetrics() {
         return numberOfHMetrics;
+    }
+
+    public int getAscender() {
+        return ascender;
+    }
+
+    public int getDescender() {
+        return descender;
     }
 }

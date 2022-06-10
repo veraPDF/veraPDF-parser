@@ -217,4 +217,14 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         }
         return font.getWeight();
     }
+
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
+    }
 }

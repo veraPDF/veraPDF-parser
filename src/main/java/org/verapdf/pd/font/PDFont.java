@@ -388,6 +388,16 @@ public abstract class PDFont extends PDResource {
         return nameSplitting[0].length() == 6;
     }
 
+    public Double getAscent() {
+        FontProgram program = this.getFontProgram();
+        return program != null ? program.getAscent() : null;
+    }
+
+    public Double getDescent() {
+        FontProgram program = this.getFontProgram();
+        return program != null ? program.getDescent() : null;
+    }
+
     private void detectFontWeight() {
         FontProgram program = this.getFontProgram();
         if (program != null) {

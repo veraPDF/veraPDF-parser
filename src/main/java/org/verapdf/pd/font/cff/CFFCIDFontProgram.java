@@ -294,6 +294,16 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         return null;  // No need in this method
     }
 
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
