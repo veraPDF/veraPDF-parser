@@ -243,6 +243,16 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         return NOTDEF_STRING;
     }
 
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */

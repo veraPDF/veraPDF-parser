@@ -203,4 +203,14 @@ public class OpenTypeFontProgram implements FontProgram {
     public String getWeight() {
         return null;
     }
+
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
+    }
 }

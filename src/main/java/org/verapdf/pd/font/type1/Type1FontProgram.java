@@ -338,4 +338,14 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     public String getWeight() {
         return null;
     }
+
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
+    }
 }
