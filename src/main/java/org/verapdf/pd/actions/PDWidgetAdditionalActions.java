@@ -34,11 +34,6 @@ public class PDWidgetAdditionalActions extends PDAnnotationAdditionalActions {
     }
 
     @Override
-    public boolean containsOtherKeys() {
-        return false;
-    }
-
-    @Override
     public String getParentType() {
         return WIDGET_ANNOT_PARENT_TYPE;
     }
