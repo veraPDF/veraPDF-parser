@@ -37,11 +37,6 @@ public class PDFormFieldActions extends PDAbstractAdditionalActions {
 	}
 
 	@Override
-	public boolean containsOtherKeys() {
-		return false;
-	}
-
-	@Override
 	public ASAtom[] getActionNames() {
 		return actionNames;
 	}

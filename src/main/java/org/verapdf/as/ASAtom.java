@@ -24,6 +24,7 @@ import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Class represents predefined PDF name. Also it caches known PDF names.
@@ -205,6 +206,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom DM = new ASAtom("Dm");
     public static final ASAtom DOC = new ASAtom("Doc");
     public static final ASAtom DOC_CHECKSUM = new ASAtom("DocChecksum");
+    public static final ASAtom DOC_MDP = new ASAtom("DocMDP");
     public static final ASAtom DOC_TIME_STAMP = new ASAtom("DocTimeStamp");
     public static final ASAtom DOMAIN = new ASAtom("Domain");
     public static final ASAtom DOS = new ASAtom("DOS");
@@ -544,6 +546,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom TARGET = new ASAtom("Target");
     public static final ASAtom TEMPLATES = new ASAtom("Templates");
     public static final ASAtom THREADS = new ASAtom("Threads");
+    public static final ASAtom THUMB = new ASAtom("Thumb");
     public static final ASAtom TI = new ASAtom("TI");
     public static final ASAtom TILING_TYPE = new ASAtom("TilingType");
     public static final ASAtom TIMES_BOLD = new ASAtom("Times-Bold");
@@ -608,6 +611,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom XFA = new ASAtom("XFA");
     public static final ASAtom X_STEP = new ASAtom("XStep");
     public static final ASAtom XHEIGHT = new ASAtom("XHeight");
+    public static final ASAtom XML = new ASAtom("XML");
     public static final ASAtom XOBJECT = new ASAtom("XObject");
     public static final ASAtom XREF = new ASAtom("XRef");
     public static final ASAtom XREF_STM = new ASAtom("XRefStm");
@@ -673,20 +677,18 @@ public class ASAtom implements Comparable<ASAtom> {
      */
     @Override
     public String toString() {
-        String result = "";
-
-        result += "/";
+        StringBuilder result = new StringBuilder("/");
         for (int i = 0; i < value.length(); i++) {
             final int c = value.charAt(i);
-            if ( CharTable.isRegular(c) && c != '#' && c > 32 && c < 127) {
-                result += (char) c;
+            if (CharTable.isRegular(c) && c != '#' && c > 32 && c < 127) {
+                result.append((char) c);
             } else {
-                result += '#';
-                result += (char) COSFilterASCIIHexEncode.ASCII_HEX_BIG[c];
-                result += (char) COSFilterASCIIHexEncode.ASCII_HEX_LITTLE[c];
+                result.append('#');
+                result.append(COSFilterASCIIHexEncode.ASCII_HEX_BIG[c]);
+                result.append(COSFilterASCIIHexEncode.ASCII_HEX_LITTLE[c]);
             }
         }
-        return result;
+        return result.toString();
     }
 
     @Override
@@ -696,7 +698,7 @@ public class ASAtom implements Comparable<ASAtom> {
 
         ASAtom asAtom = (ASAtom) o;
 
-        return !(value != null ? !value.equals(asAtom.value) : asAtom.value != null);
+        return Objects.equals(value, asAtom.value);
 
     }
 
