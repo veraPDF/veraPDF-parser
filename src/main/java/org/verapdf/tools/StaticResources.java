@@ -21,6 +21,7 @@
 package org.verapdf.tools;
 
 import org.verapdf.cos.COSKey;
+import org.verapdf.parser.PDFFlavour;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.structure.PDStructureNameSpace;
@@ -42,6 +43,7 @@ public class StaticResources {
 
 	private static final Logger LOGGER = Logger.getLogger(StaticResources.class.getCanonicalName());
 
+	private static final ThreadLocal<PDFFlavour> flavour = new ThreadLocal<>();
 	private static final ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
 	private static final ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
 	private static final ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
@@ -131,6 +133,7 @@ public class StaticResources {
 		StaticResources.cMapCache.set(new HashMap<>());
 		StaticResources.structureNameSpaceCache.set(new HashMap<>());
 		StaticResources.cachedFonts.set(new HashMap<>());
+		StaticResources.flavour.set(null);
 	}
 
 	private static void checkForNull(ThreadLocal variable) {
@@ -161,5 +164,13 @@ public class StaticResources {
 
 	public static void setCachedFonts(Map<String, FontProgram> cachedFonts) {
 		StaticResources.cachedFonts.set(cachedFonts);
+	}
+
+	public static PDFFlavour getFlavour() {
+		return flavour.get();
+	}
+
+	public static void setFlavour(PDFFlavour flavour) {
+		StaticResources.flavour.set(flavour);
 	}
 }

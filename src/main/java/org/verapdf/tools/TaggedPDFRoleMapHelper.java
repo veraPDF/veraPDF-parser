@@ -21,6 +21,7 @@
 package org.verapdf.tools;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.parser.PDFFlavour;
 
 import java.util.*;
 
@@ -45,17 +46,17 @@ public class TaggedPDFRoleMapHelper {
 	 * @return standard type for the given one or null in cases when there is
 	 * no standard for the given or there is a cycle of the custom types
 	 */
-	public String getStandardType(ASAtom type, boolean isPDFA1, boolean isWCAG) {
+	public String getStandardType(ASAtom type) {
 		if (type == null) {
 			return null;
 		}
 		Set<String> currentStandardTypes;
 		boolean isFastStop;
-		if (isPDFA1) {
+		if (StaticResources.getFlavour() == PDFFlavour.PDFA_1_A || StaticResources.getFlavour() == PDFFlavour.PDFA_1_B) {
 			currentStandardTypes = TaggedPDFHelper.getPdf14StandardRoleTypes();
 			isFastStop = true;
 		} else {
-			if (isWCAG) {
+			if (StaticResources.getFlavour() == PDFFlavour.WCAG2_1) {
 				currentStandardTypes = TaggedPDFHelper.getWcagStandardRoleTypes();
 			} else {
 				currentStandardTypes = TaggedPDFHelper.getPdf17StandardRoleTypes();
