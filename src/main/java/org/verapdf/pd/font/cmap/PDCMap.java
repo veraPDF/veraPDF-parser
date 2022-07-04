@@ -189,9 +189,14 @@ public class PDCMap extends PDObject {
         }
         if (this.getObject().getType() == COSObjType.COS_NAME) {
             // actually creating COSDictionary with values from predefined CMap.
-            String registry = this.getCMapFile().getRegistry();
-            String ordering = this.getCMapFile().getOrdering();
-            int supplement = this.getCMapFile().getSupplement();
+            CharacterCollections.CIDSystemInfo info = CharacterCollections.getCIDSystemInfo(this.getObject().getString());
+            if (info == null) {
+                this.cidSystemInfo = (COSDictionary) COSDictionary.construct().getDirectBase();
+                return this.cidSystemInfo;
+            }
+            String registry = info.getRegistry().getRegistry();
+            String ordering = info.getOrdering().getOrdering();
+            int supplement = info.getSupplement();
             COSDictionary res = (COSDictionary)
                     COSDictionary.construct(ASAtom.REGISTRY, registry).get();
             res.setStringKey(ASAtom.ORDERING, ordering);
