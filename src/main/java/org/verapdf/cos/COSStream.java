@@ -42,6 +42,8 @@ import java.util.logging.Logger;
  */
 public class COSStream extends COSDictionary {
 
+	public static final String STREAM = "stream";
+
 	private static final Logger LOGGER = Logger.getLogger(COSStream.class.getCanonicalName());
 
 	private ASInputStream stream;
@@ -353,7 +355,7 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public String toString() {
-		return "stream(size = " + realStreamSize + ")";
+		return STREAM + "(" + SIZE + " = " + realStreamSize + ")";
 	}
 
 }

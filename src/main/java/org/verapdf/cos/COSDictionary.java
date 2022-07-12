@@ -31,6 +31,9 @@ import java.util.*;
  */
 public class COSDictionary extends COSDirect {
 
+    public static final String SIZE = "size";
+    public static final String DICTIONARY = "dictionary";
+
     private Map<ASAtom, COSObject> entries;
 
     protected COSDictionary() {
@@ -308,7 +311,7 @@ public class COSDictionary extends COSDirect {
 
     @Override
     public String toString() {
-        return "dictionary(size = " + size() + ")";
+        return DICTIONARY + "(" + SIZE + " = " + size() + ")";
     }
 
 }
