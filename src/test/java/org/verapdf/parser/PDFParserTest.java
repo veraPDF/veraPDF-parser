@@ -40,7 +40,7 @@ public class PDFParserTest {
             COSXRefSection section = new COSXRefSection();
             pdfParser.initializeToken();
             pdfParser.parseXrefTable(section);
-            Assert.assertTrue(COSXRefEntry.FIRST_XREF_ENTRY.equals(section.getEntry(0)));
+            Assert.assertEquals(COSXRefEntry.FIRST_XREF_ENTRY, section.getEntry(0));
         } catch (IOException ex) {
             System.out.println("Parsing error: ");
             ex.printStackTrace();

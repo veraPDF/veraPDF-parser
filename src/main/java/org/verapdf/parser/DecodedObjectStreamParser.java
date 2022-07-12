@@ -66,7 +66,8 @@ public class DecodedObjectStreamParser extends COSParser {
         int n = (int) ((COSInteger) this.objectStream.getKey(ASAtom.N).getDirectBase()).get();
         long first = ((COSInteger) this.objectStream.getKey(ASAtom.FIRST).getDirectBase()).get();
         for (int i = 0; i < n; ++i) {
-            Long objNum, objOffset;
+            Long objNum;
+            Long objOffset;
             skipSpaces(false);
             readNumber();
             objNum = getToken().integer;

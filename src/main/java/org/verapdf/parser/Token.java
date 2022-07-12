@@ -30,6 +30,8 @@ import java.util.Map;
  */
 public class Token {
 
+	private static final Map<String, Keyword> KEYWORDS = new HashMap<>();
+
 	public Type type;
 	public Keyword keyword;
 
@@ -100,8 +102,6 @@ public class Token {
 		KW_STARTXREF,
 		KW_TRAILER
 	}
-
-	private static final Map<String, Keyword> KEYWORDS = new HashMap<>();
 
 	static {
 		KEYWORDS.put("null", Keyword.KW_NULL);

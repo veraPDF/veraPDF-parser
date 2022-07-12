@@ -150,7 +150,7 @@ public class COSDictionary extends COSDirect {
     }
 
     public boolean setKey(final ASAtom key, final COSObject value) {
-        if (value.empty()) {
+        if (value.empty() || value.get() instanceof COSNull) {
             this.entries.remove(key);
         } else {
             this.entries.put(key, value);
@@ -170,7 +170,6 @@ public class COSDictionary extends COSDirect {
     }
 
     public Long getIntegerKey(final ASAtom key) {
-
         return getKey(key).getInteger();
     }
 
@@ -306,4 +305,10 @@ public class COSDictionary extends COSDirect {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "dictionary(size = " + size() + ")";
+    }
+
 }

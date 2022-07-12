@@ -84,9 +84,8 @@ public class CMapFile {
     }
 
     private void parseCMapFile() {
-        String cMapName = parentStream.getStringKey(ASAtom.CMAPNAME);
         try (ASInputStream data = this.parentStream.getData(COSStream.FilterFlags.DECODE)) {
-            cMap = CMapFactory.getCMap(cMapName == null ? "" : cMapName, data);
+            cMap = CMapFactory.getCMap(PDCMap.getCMapID(parentStream), data);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Exception while parsing cmap file", e);
         }

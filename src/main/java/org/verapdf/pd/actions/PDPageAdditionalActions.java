@@ -28,6 +28,8 @@ import org.verapdf.cos.COSObject;
  */
 public class PDPageAdditionalActions extends PDAbstractAdditionalActions {
 
+	private static final String PAGE_PARENT_TYPE = "Page";
+
 	private static final ASAtom[] actionNames = {ASAtom.O, ASAtom.C};
 
 	public PDPageAdditionalActions(COSObject obj) {
@@ -37,5 +39,10 @@ public class PDPageAdditionalActions extends PDAbstractAdditionalActions {
 	@Override
 	public ASAtom[] getActionNames() {
 		return actionNames;
+	}
+
+	@Override
+	public String getParentType() {
+		return PAGE_PARENT_TYPE;
 	}
 }

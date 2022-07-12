@@ -37,10 +37,10 @@ public class TaggedPDFHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(TaggedPDFHelper.class.getCanonicalName());
 
-	private static Set<String> PDF_1_4_STANDARD_ROLE_TYPES;
-	private static Set<String> PDF_1_7_STANDARD_ROLE_TYPES;
-	private static Set<String> PDF_2_0_STANDARD_ROLE_TYPES;
-	private static Set<String> WCAG_STANDARD_ROLE_TYPES;
+	private static final Set<String> PDF_1_4_STANDARD_ROLE_TYPES;
+	private static final Set<String> PDF_1_7_STANDARD_ROLE_TYPES;
+	private static final Set<String> PDF_2_0_STANDARD_ROLE_TYPES;
+	private static final Set<String> WCAG_STANDARD_ROLE_TYPES;
 
 	static {
 		Set<String> tempSet = new HashSet<>();
@@ -283,6 +283,10 @@ public class TaggedPDFHelper {
 				return Collections.unmodifiableList(list);
 			} else if (children.getType() == COSObjType.COS_ARRAY) {
 				return getChildrenFromArray(children, roleMap, checkType);
+			} else if (isOBJR(children)) {
+				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
+				list.add(new PDOBJRDictionary(children));
+				return Collections.unmodifiableList(list);
 			}
 		}
 		return Collections.emptyList();
@@ -344,6 +348,8 @@ public class TaggedPDFHelper {
 					list.add(new PDMCRDictionary(elem));
 				} else if (elem.getType() == COSObjType.COS_INTEGER) {
 					list.add(elem);
+				} else if (isOBJR(elem)) {
+					list.add(new PDOBJRDictionary(elem));
 				}
 			}
 			return Collections.unmodifiableList(list);
@@ -370,6 +376,17 @@ public class TaggedPDFHelper {
 		return ASAtom.MCR.equals(type);
 	}
 
+	public static boolean isOBJR(COSObject obj) {
+		if (obj == null || obj.empty()) {
+			return false;
+		}
+		if (!obj.getType().isDictionaryBased()) {
+			return false;
+		}
+		ASAtom type = obj.getNameKey(ASAtom.TYPE);
+		return ASAtom.OBJR.equals(type);
+	}
+
 	public static boolean isContentItem(COSObject obj) {
 		if (obj == null || obj.empty()) {
 			return false;
@@ -390,6 +407,10 @@ public class TaggedPDFHelper {
 
 	public static Set<String> getPdf17StandardRoleTypes() {
 		return PDF_1_7_STANDARD_ROLE_TYPES;
+	}
+
+	public static Set<String> getPdf20StandardRoleTypes() {
+		return PDF_2_0_STANDARD_ROLE_TYPES;
 	}
 
 	public static Set<String> getWcagStandardRoleTypes() {

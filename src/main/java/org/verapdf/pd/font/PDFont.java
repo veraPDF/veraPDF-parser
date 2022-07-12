@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDResource;
 import org.verapdf.pd.font.cmap.PDCMap;
+import org.verapdf.pd.font.type1.PDType1Font;
 import org.verapdf.pd.font.type3.PDType3Font;
 
 import java.io.IOException;
@@ -84,10 +85,6 @@ public abstract class PDFont extends PDResource {
                 this.boundingBox = new double[]{0.0, 0.0, 1000.0, 1000.0};
             }
         }
-        this.fontWeight = fontDescriptor.getFontWeight();
-        if (fontWeight == null) {
-            detectFontWeight();
-        }
         this.subtype = this.dictionary.getNameKey(ASAtom.SUBTYPE);
     }
 
@@ -141,6 +138,12 @@ public abstract class PDFont extends PDResource {
     }
 
     public Double getFontWeight() {
+        if (fontWeight == null) {
+            this.fontWeight = fontDescriptor.getFontWeight();
+            if (fontWeight == null) {
+                detectFontWeight();
+            }
+        }
         return fontWeight;
     }
 
@@ -339,12 +342,11 @@ public abstract class PDFont extends PDResource {
      * @return width for glyph with given code as specified in Widths array.
      */
     public Double getWidth(int code) {
-        if (dictionary.knownKey(ASAtom.WIDTHS).booleanValue()
-                && dictionary.knownKey(ASAtom.FIRST_CHAR).booleanValue()
-                && dictionary.knownKey(ASAtom.LAST_CHAR).booleanValue()) {
+        if (dictionary.knownKey(ASAtom.WIDTHS) && dictionary.knownKey(ASAtom.FIRST_CHAR)
+                && dictionary.knownKey(ASAtom.LAST_CHAR)) {
             int firstChar = dictionary.getIntegerKey(ASAtom.FIRST_CHAR).intValue();
             int lastChar = dictionary.getIntegerKey(ASAtom.LAST_CHAR).intValue();
-            if (getWidths().size().intValue() > 0 && code >= firstChar && code <= lastChar) {
+            if (getWidths().size() > 0 && code >= firstChar && code <= lastChar) {
                 return getWidths().at(code - firstChar).getReal();
             }
         }
@@ -353,7 +355,7 @@ public abstract class PDFont extends PDResource {
             return fontDescriptor.getMissingWidth();
         }
 
-        if (this instanceof PDType3Font) {
+        if (this instanceof PDType3Font || this instanceof PDType1Font) {
             return null;
         }
 
@@ -386,33 +388,60 @@ public abstract class PDFont extends PDResource {
         return nameSplitting[0].length() == 6;
     }
 
+    public Double getAscent() {
+        FontProgram program = this.getFontProgram();
+        return program != null ? program.getAscent() : null;
+    }
+
+    public Double getDescent() {
+        FontProgram program = this.getFontProgram();
+        return program != null ? program.getDescent() : null;
+    }
+
     private void detectFontWeight() {
-        if (fontNameWithoutSubset != null) {
-            for (String weightName : weightNames.keySet()) {
-                if (fontNameWithoutSubset.contains(weightName)) {
-                    fontWeight = weightNames.get(weightName);
-                    return;
+        FontProgram program = this.getFontProgram();
+        if (program != null) {
+            this.fontWeight = weightNames.get(program.getWeight());
+        }
+        if (this.fontWeight == null) {
+            if (fontNameWithoutSubset != null) {
+                for (String weightName : weightNames.keySet()) {
+                    if (fontNameWithoutSubset.contains(weightName)) {
+                        fontWeight = weightNames.get(weightName);
+                        return;
+                    }
                 }
             }
-        }
-        if (fontWeight == null) {
             fontWeight = 400.0;
         }
     }
 
     static {
         weightNames.put("Thin", 100.0);
+        weightNames.put("ExtraLight", 200.0);
         weightNames.put("Extra Light", 200.0);
+        weightNames.put("Extra-Light", 200.0);
+        weightNames.put("UltraLight", 200.0);
         weightNames.put("Ultra Light", 200.0);
+        weightNames.put("Ultra-Light", 200.0);
         weightNames.put("Light", 300.0);
         weightNames.put("Normal", 400.0);
         weightNames.put("Book", 400.0);
         weightNames.put("Regular", 400.0);
         weightNames.put("Medium", 500.0);
+        weightNames.put("Semibold", 600.0);
+        weightNames.put("SemiBold", 600.0);
         weightNames.put("Semi Bold", 600.0);
+        weightNames.put("Semi-Bold", 600.0);
+        weightNames.put("DemiBold", 600.0);
         weightNames.put("Demi Bold", 600.0);
+        weightNames.put("Demi-Bold", 600.0);
+        weightNames.put("ExtraBold", 800.0);
         weightNames.put("Extra Bold", 800.0);
+        weightNames.put("Extra-Bold", 800.0);
+        weightNames.put("UltraBold", 800.0);
         weightNames.put("Ultra Bold", 800.0);
+        weightNames.put("Ultra-Bold", 800.0);
         weightNames.put("Bold", 700.0);
         weightNames.put("Black", 900.0);
         weightNames.put("Heavy", 900.0);

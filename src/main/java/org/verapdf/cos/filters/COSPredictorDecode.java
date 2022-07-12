@@ -39,8 +39,9 @@ public class COSPredictorDecode extends ASBufferedInFilter {
     private static final int BITS_PER_COMPONENT_DEFAULT = 8;
     private static final int COLUMNS_DEFAULT = 1;
 
-    private int bitsPerComponent, bytesPerChar,
-            lineLength;
+    private int bitsPerComponent;
+    private int bytesPerChar;
+    private int lineLength;
     private byte predictor;
     private byte[] previousLine = null;
     private boolean streamEnded = false;

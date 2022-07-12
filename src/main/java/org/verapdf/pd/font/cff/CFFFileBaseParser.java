@@ -154,10 +154,14 @@ class CFFFileBaseParser {
 
     protected CFFNumber readNumber() throws IOException {
         byte first = this.source.readByte();
-        if (first == 0x1E) {
-            return new CFFNumber(this.readReal());
-        } else {
-            return new CFFNumber(this.readInteger(first));
+        try {
+            if (first == 0x1E) {
+                return new CFFNumber(this.readReal());
+            } else {
+                return new CFFNumber(this.readInteger(first));
+            }
+        } catch (NumberFormatException e) {
+            throw new IOException("Invalid number format: " + e.getMessage());
         }
     }
 

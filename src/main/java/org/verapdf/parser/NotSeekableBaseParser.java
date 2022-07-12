@@ -568,7 +568,8 @@ public class NotSeekableBaseParser implements Closeable {
             }
 
             if (ch == '#' && !isPSParser) {
-                byte ch1, ch2;
+                byte ch1;
+                byte ch2;
                 byte dc;
                 ch1 = this.source.readByte();
                 if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.ER) {

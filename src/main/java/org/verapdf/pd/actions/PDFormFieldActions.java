@@ -28,6 +28,8 @@ import org.verapdf.cos.COSObject;
  */
 public class PDFormFieldActions extends PDAbstractAdditionalActions {
 
+	private static final String FORM_FIELD_PARENT_TYPE = "FormField";
+
 	private static final ASAtom[] actionNames = {ASAtom.K, ASAtom.F, ASAtom.V, ASAtom.C};
 
 	public PDFormFieldActions(COSObject obj) {
@@ -35,13 +37,12 @@ public class PDFormFieldActions extends PDAbstractAdditionalActions {
 	}
 
 	@Override
-	public boolean containsOtherKeys() {
-		return false;
-	}
-
-	@Override
 	public ASAtom[] getActionNames() {
 		return actionNames;
 	}
 
+	@Override
+	public String getParentType() {
+		return FORM_FIELD_PARENT_TYPE;
+	}
 }

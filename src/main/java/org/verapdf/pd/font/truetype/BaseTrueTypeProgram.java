@@ -114,7 +114,7 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
         if (gid < widths.length) {
             return widths[gid];
         } else {
-            if(gid < this.parser.getMaxpParser().getNumGlyphs()) {
+            if (gid < this.parser.getMaxpParser().getNumGlyphs()) {
                 return widths[widths.length - 1];   // case of monospaced fonts
             } else {
                 return widths[0];
@@ -139,5 +139,26 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
         } else {
             return new ASFileStreamCloser(this.parser.source);
         }
+    }
+
+    @Override
+    public String getWeight() {
+        return null;
+    }
+
+    @Override
+    public Double getAscent() {
+        if (this.parser.getHeadParser() != null && this.parser.getHheaParser() != null) {
+            return 1000d / this.parser.getHeadParser().getUnitsPerEm() * parser.getHheaParser().getAscender();
+        }
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        if (this.parser.getHeadParser() != null && this.parser.getHheaParser() != null) {
+            return 1000d / this.parser.getHeadParser().getUnitsPerEm() * parser.getHheaParser().getDescender();
+        }
+        return null;
     }
 }

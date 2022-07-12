@@ -65,7 +65,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
     @Override
     public void parseFont() throws IOException {
         super.parseFont();
-        if (!isSymbolic && encoding.getDirectBase() != null) {
+        if (!isSymbolic && encoding.getDirectBase() != null && encodingMappingArray == null) {
             this.createCIDToNameTable();
         }
     }
@@ -86,7 +86,11 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
                 return false;
             }
             int gid = getGidFromCMaps(glyph);
-            return gid >= 0 && gid < getNGlyphs();
+            if (gid == 0) {
+                // if cmap lookup fails we go to post table
+                gid = getGidFromPostTable(glyph);
+            }
+            return gid > 0 && gid < getNGlyphs();
         } else {
             if (isCmapPresent(3, 0)) {
                 //No need to look at cmap(1, 0) if cmap(3, 0) exist
@@ -107,16 +111,18 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         if (isSymbolic || encoding.getDirectBase() == null) {
             return getWidthSymbolic(code);
         } else {
-            if (encodingMappingArray == null) {  // no external encoding
+            float width;
+            if (encodingMappingArray != null && code < encodingMappingArray.length) {
+                String glyphName = encodingMappingArray[code];
+                width = getWidth(glyphName);
+            } else {
+                width = getWidth(TrueTypePredefined.NOTDEF_STRING);
+            }
+            if (width == -1) {
                 int gid = this.parser.getCmapParser().getGID(code);
                 return getWidthWithCheck(gid);
             }
-            if (code < 256) {
-                String glyphName = encodingMappingArray[code];
-                return getWidth(glyphName);
-            } else {
-                return getWidth(TrueTypePredefined.NOTDEF_STRING);
-            }
+            return width;
         }
     }
 
@@ -208,7 +214,8 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             gid = cmap10.getGlyph(code);
             return getWidthWithCheck(gid);
         }
-        return -1;
+        gid = this.parser.getCmapParser().getGID(code);
+        return getWidthWithCheck(gid);
     }
 
     private int getGIDFrom30(int code) {

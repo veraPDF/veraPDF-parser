@@ -88,7 +88,7 @@ public class Reader extends XRefReader {
 		long offset = getOffset(key).longValue();
 		if (offset == 0) {
 			return new COSObject();
-		} else if(offset > 0) {
+		} else if (offset > 0) {
 			if (header.getHeaderOffset() > 0) {
 				offset += header.getHeaderOffset();
 			}
@@ -97,8 +97,10 @@ public class Reader extends XRefReader {
 			return result;
 		}
 		//TODO : set object key
+		//a negative number to identify a case of object stream from normal offset
+		//see method XrefStreamParser.parseStream and ISO 32000-2 7.5.7 and 7.5.8.3
 		DecodedObjectStreamParser parser = objectStreams.get(Long.valueOf(-offset));
-		if(parser != null) {
+		if (parser != null) {
 			return parser.getObject(key);
 		}
 		COSKey newKey = new COSKey(- (int)offset, 0);

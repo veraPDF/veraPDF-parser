@@ -72,13 +72,13 @@ public class COSFilters extends PDObject {
 				}
 			}
 		}
-		if(decodeParameters == null) {
+		if (decodeParameters == null) {
 			decodeParameters = new ArrayList<>(entries.size());
 			for(int i = 0; i < entries.size(); ++i) {
 				decodeParameters.add((COSDictionary) COSDictionary.construct().get());
 			}
 		}
-		if(decodeParameters.size() != entries.size()) {
+		if (decodeParameters.size() != entries.size()) {
 			LOGGER.log(Level.FINE, "Amount of DecodeParams dictionaries and " +
 					"amount of decode filters in COSStream shall be equal.");
 		}

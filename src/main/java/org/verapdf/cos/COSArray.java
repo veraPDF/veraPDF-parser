@@ -252,4 +252,8 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         return getData(COSStream.FilterFlags.RAW_DATA);
     }
 
+    @Override
+    public String toString() {
+        return entries.toString();
+    }
 }

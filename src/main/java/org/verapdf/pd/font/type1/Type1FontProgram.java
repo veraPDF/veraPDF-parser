@@ -98,6 +98,8 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         tempSet.add(PSOperatorsConstants.PUT);
         tempSet.add(PSOperatorsConstants.FOR);
         tempSet.add(PSOperatorsConstants.STANDARD_ENCODING);
+        tempSet.add(PSOperatorsConstants.LEFT_ANGLE_BRACES);
+        tempSet.add(PSOperatorsConstants.RIGHT_ANGLE_BRACES);
 
         OPERATORS_KEYWORDS = Collections.unmodifiableSet(tempSet);
     }
@@ -330,5 +332,20 @@ public class Type1FontProgram extends PSParser implements FontProgram {
      */
     public ASFileStreamCloser getFontProgramResource() {
         return new ASFileStreamCloser(this.source);
+    }
+
+    @Override
+    public String getWeight() {
+        return null;
+    }
+
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
     }
 }

@@ -399,4 +399,10 @@ public class COSIndirect extends COSBase {
 
         return this.getDirect().equals(that.getDirect());
     }
+
+    @Override
+    public String toString() {
+        COSObject direct = getDirect();
+        return direct != null ? direct.toString() : null;
+    }
 }

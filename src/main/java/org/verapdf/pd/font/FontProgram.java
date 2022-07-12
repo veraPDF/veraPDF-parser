@@ -99,4 +99,10 @@ public interface FontProgram {
      * stream or null if stream is memory stream.
      */
     ASFileStreamCloser getFontProgramResource();
+
+    String getWeight();
+
+    Double getAscent();
+
+    Double getDescent();
 }

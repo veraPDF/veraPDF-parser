@@ -26,6 +26,8 @@ import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Instance of this class represent a parser of CIDFont from FontSet of CFF file.
@@ -33,6 +35,8 @@ import java.util.*;
  * @author Sergey Shemyakov
  */
 public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram {
+
+    private static final Logger LOGGER = Logger.getLogger(CFFCIDFontProgram.class.getCanonicalName());
 
     private long fdArrayOffset;
     private long fdSelectOffset;
@@ -137,6 +141,10 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
                     } else {
                         nLeft = this.readCard16();
                     }
+                    if (charSetPointer + nLeft >= nGlyphs) {
+                        LOGGER.log(Level.WARNING, "Invalid embedded cff font. Charset range exceeds number of glyphs");
+                        nLeft = nGlyphs - charSetPointer - 1;
+                    }
                     for (int i = 0; i <= nLeft; ++i) {
                         this.charSet.put(first + i, charSetPointer++);
                     }
@@ -181,7 +189,9 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         this.fontMatrices = new float[fontDictIndex.size()][6];
         this.bias = new int[fontDictIndex.size()];
         this.localSubrIndexes = new CFFIndex[fontDictIndex.size()];
+        float[] topDictFontMatrix = this.fontMatrix;
         for (int i = 0; i < fontDictIndex.size(); ++i) {
+            this.fontMatrix = null;
             this.readTopDict(fontDictIndex.getOffset(i) + fdArrayOffset +
                     fontDictIndex.getOffsetShift() - 1,
                     fontDictIndex.getOffset(i + 1) + fdArrayOffset +
@@ -189,8 +199,30 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
             this.readPrivateDict(this.privateDictOffset, this.privateDictSize, i);
             this.nominalWidths[i] = this.nominalWidthX;
             this.defaultWidths[i] = this.defaultWidthX;
-            this.fontMatrices[i] = this.fontMatrix;
+            this.fontMatrices[i] = calculateMatrix(topDictFontMatrix, this.fontMatrix);
         }
+    }
+
+    private float[] calculateMatrix(float[] topDictFontMatrix, float[] fontMatrix) {
+        if (topDictFontMatrix != null && fontMatrix != null) {
+            return multiplyArrays(topDictFontMatrix, fontMatrix);
+        } else if (topDictFontMatrix != null) {
+            return topDictFontMatrix;
+        } else if (fontMatrix != null) {
+            return fontMatrix;
+        }
+        return DEFAULT_FONT_MATRIX;
+    }
+
+    private float[] multiplyArrays(float[] a, float[] b) {
+        float[] c = new float[6];
+        c[0] = a[0] * b[0] + a[1] * b[2];
+        c[1] = a[0] * b[1] + a[1] * b[3];
+        c[2] = a[2] * b[0] + a[3] * b[2];
+        c[3] = a[2] * b[1] + a[3] * b[3];
+        c[4] = a[4] * b[0] + a[5] * b[2] + b[4];
+        c[5] = a[4] * b[1] + a[5] * b[3] + b[5];
+        return c;
     }
 
     private void readPrivateDict(long from, long size, int fontDictNum) throws IOException {
@@ -260,6 +292,16 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     @Override
     public String getGlyphName(int code) {
         return null;  // No need in this method
+    }
+
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
     }
 
     /**

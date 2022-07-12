@@ -18,8 +18,10 @@ public class PDType0Function extends PDFunction {
     private final COSArray decode;
     private final int outputDimension = getRange().size() / 2;
     private List<Integer> sizesProducts;
+    private long numberOfSampleBytes = 0;
 
     private static final Logger LOGGER = Logger.getLogger(PDType2Function.class.getCanonicalName());
+    private static final long ALLOWABLE_MEMORY_CAPACITY = 100000000;
 
     protected PDType0Function(COSObject obj) {
         super(obj);
@@ -103,12 +105,15 @@ public class PDType0Function extends PDFunction {
         return sampleTable;
     }
 
-    private int getNumberOfSampleBytes() {
-        double num = 1.0;
-        for (COSObject item : size) {
-            num *= item.getInteger();
+    private long getNumberOfSampleBytes() {
+        if (numberOfSampleBytes == 0) {
+            double num = 1.0;
+            for (COSObject item : size) {
+                num *= item.getInteger();
+            }
+            numberOfSampleBytes = (long) Math.ceil(num * getBitsPerSample() / 8.0 * outputDimension);
         }
-        return (int) Math.ceil(num * getBitsPerSample() / 8.0 * outputDimension);
+        return numberOfSampleBytes;
     }
 
     private BitSet getSamples() {
@@ -118,7 +123,7 @@ public class PDType0Function extends PDFunction {
             return new BitSet();
         }
         try (ASInputStream functionStream = getObject().getData(COSStream.FilterFlags.DECODE)) {
-            byte[] bytes = new byte[getNumberOfSampleBytes()];
+            byte[] bytes = new byte[(int) getNumberOfSampleBytes()];
             functionStream.read(bytes);
             return BitSet.valueOf(bytes);
         } catch (IOException e) {
@@ -156,6 +161,12 @@ public class PDType0Function extends PDFunction {
     @Override
     public List<COSObject> getResult(List<COSObject> ops) {
         try {
+            if (getNumberOfSampleBytes() > ALLOWABLE_MEMORY_CAPACITY) {
+                LOGGER.log(Level.WARNING, "Type 0 function sample stream requires more than " +
+                        (int) (ALLOWABLE_MEMORY_CAPACITY / 1E6) + "Mb of data. " +
+                        "The result of the function will not be evaluated. ");
+                return null;
+            }
             List<COSObject> operands = getValuesInIntervals(ops, getDomain());
             List<COSObject> result = new ArrayList<>();
             for (int i = 0; i < operands.size(); ++i) {
@@ -184,6 +195,32 @@ public class PDType0Function extends PDFunction {
             BitSet bitSet = new BitSet(n);
             bitSet.or(BitSet.valueOf(new long[]{bits}));
             result.add(bitSet);
+        }
+        return result;
+    }
+
+    private List<List<Integer>> getCubicNCombinations(int n) {
+        List<List<Integer>> result = new ArrayList<>();
+        int N = 1 << (2 * n);
+        for (int bits = N - 1; bits >= 0; --bits) {
+            List<Integer> combination = new ArrayList<>();
+            int currentValue = bits;
+            for (int i = n - 1; i >= 0; --i) {
+                int val = (int) Math.pow(4, i);
+                if (val > currentValue) {
+                    combination.add(-1);
+                } else if (val * 3 <= currentValue) {
+                    combination.add(2);
+                    currentValue -= val * 3;
+                } else if (val * 2 <= currentValue) {
+                    combination.add(1);
+                    currentValue -= val * 2;
+                } else {
+                    combination.add(0);
+                    currentValue -= val;
+                }
+            }
+            result.add(combination);
         }
         return result;
     }
@@ -236,6 +273,50 @@ public class PDType0Function extends PDFunction {
     }
 
     private List<COSObject> multiCubicInterpolation(List<Double> x) {
-        return multiLinearInterpolation(x);
+        try {
+            List<List<Double>> samples = new ArrayList<>();
+            for (List<Integer> combination : getCubicNCombinations(x.size())) {
+                List<Integer> sampleX = new ArrayList<>();
+                for (int i = 0; i < x.size(); ++i) {
+                    sampleX.add((int) Math.max(0, Math.min(size.at(i).getInteger() - 1, Math.floor(x.get(i)) + combination.get(i))));
+                }
+                samples.add(getSampleValue(sampleX).stream().map(v -> (double) v).collect(Collectors.toList()));
+            }
+            List<Double> interpolateResult = nCubicInterpolate(x.size(), samples, x);
+            List<COSObject> result = new ArrayList<>();
+            for (Double value : interpolateResult) {
+                result.add(COSReal.construct(value));
+            }
+            return result;
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to get interpolant coefficients", e);
+            return null;
+        }
+    }
+    
+    private List<Double> nCubicInterpolate(int n, List<List<Double>> p, List<Double> coordinates) {
+        if (n == 1) {
+            return cubicInterpolate(p, coordinates.get(0) - Math.floor(coordinates.get(0)));
+        } else {
+            List<List<Double>> arr = new ArrayList<>();
+            int skip = 1 << (n - 1) * 2;
+            arr.add(nCubicInterpolate(n - 1, p, coordinates.subList(1, coordinates.size())));
+            arr.add(nCubicInterpolate(n - 1, p.subList(skip, p.size()), coordinates.subList(1, coordinates.size())));
+            arr.add(nCubicInterpolate(n - 1, p.subList(2 * skip, p.size()), coordinates.subList(1, coordinates.size())));
+            arr.add(nCubicInterpolate(n - 1, p.subList(3 * skip, p.size()), coordinates.subList(1, coordinates.size())));
+            return cubicInterpolate(arr, coordinates.get(0) - Math.floor(coordinates.get(0)));
+        }
+    }
+
+    private List<Double> cubicInterpolate(List<List<Double>> adjacentSampleValues, double x) {
+        List<Double> result = new ArrayList<>();
+        for (int i = 0; i < outputDimension; ++i) {
+            result.add(adjacentSampleValues.get(2).get(i) + 0.5 * x * (adjacentSampleValues.get(1).get(i) -
+                    adjacentSampleValues.get(3).get(i) + x * (2.0 * adjacentSampleValues.get(3).get(i) -
+                    5.0 * adjacentSampleValues.get(2).get(i) + 4.0 * adjacentSampleValues.get(1).get(i) -
+                    adjacentSampleValues.get(0).get(i) + x * (3.0 * (adjacentSampleValues.get(2).get(i) -
+                    adjacentSampleValues.get(1).get(i)) + adjacentSampleValues.get(0).get(i) - adjacentSampleValues.get(3).get(i)))));
+        }
+        return result;
     }
 }

@@ -28,6 +28,8 @@ import org.verapdf.cos.COSObject;
  */
 public class PDAnnotationAdditionalActions extends PDAbstractAdditionalActions {
 
+    private static final String ANNOT_PARENT_TYPE = "Annot";
+
     private static final ASAtom[] actionNames = {ASAtom.E, ASAtom.X, ASAtom.D, ASAtom.U, ASAtom.FOCUS_ABBREVIATION,
             ASAtom.BL_FOCUS, ASAtom.PO, ASAtom.PC, ASAtom.PV, ASAtom.PI};
 
@@ -40,4 +42,8 @@ public class PDAnnotationAdditionalActions extends PDAbstractAdditionalActions {
         return actionNames;
     }
 
+    @Override
+    public String getParentType() {
+        return ANNOT_PARENT_TYPE;
+    }
 }

@@ -24,7 +24,6 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.tools.TaggedPDFConstants;
-import org.verapdf.tools.TaggedPDFHelper;
 
 /**
  * @author Maksim Bezrukov

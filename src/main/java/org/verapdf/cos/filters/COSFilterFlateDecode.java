@@ -66,10 +66,11 @@ public class COSFilterFlateDecode extends ASBufferedInFilter {
             }
             inflater.setInput(this.buffer, 0, bytesFed);
         }
+        long added = 0;
         try {
             int res = inflater.inflate(buffer, 0, size);
             if (res == 0) {
-                long added = this.addToBuffer(BF_BUFFER_SIZE);
+                added = this.addToBuffer(BF_BUFFER_SIZE);
                 if (added == -1) {
                     return -1;
                 } else {
@@ -80,8 +81,26 @@ public class COSFilterFlateDecode extends ASBufferedInFilter {
                 return res;
             }
         } catch (DataFormatException e) {
-            throw new IOException("Can't decode Flate encoded data", e);
+            try {
+                return readByByte(buffer, size, (added != 0 || bytesFed != 0) ? (int) (bytesFed + added) : size);
+            } catch (IOException exp) {
+                throw new IOException("Can't decode Flate encoded data", e);
+            }
         }
+    }
+
+    public int readByByte(byte[] buffer, int size, int bufferSize) throws IOException {
+        this.inflater.reset();
+        inflater.setInput(this.buffer, 0, bufferSize);
+        int readBytesAmount = 0;
+        try {
+            while (readBytesAmount < size && inflater.inflate(buffer, readBytesAmount, 1) == 1) {
+                readBytesAmount++;
+            }
+        } catch (DataFormatException exp) {
+            return readBytesAmount == 0 ? -1 : readBytesAmount;
+        }
+        throw new IOException();
     }
 
     /**

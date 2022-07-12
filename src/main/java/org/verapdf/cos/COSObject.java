@@ -495,4 +495,9 @@ public class COSObject {
 		return base != null ? base.equals(cosObject.base) : cosObject.base == null;
 
 	}
+
+	@Override
+	public String toString() {
+		return base!= null ? base.toString() : null;
+	}
 }

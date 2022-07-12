@@ -31,13 +31,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Sergey Shemyakov
  */
 public class CMapTest {
-    private String cMapPath = "src/test/resources/org/verapdf/pd/font/cmap/83pv-RKSJ-H";
+    private final String cMapPath = "src/test/resources/org/verapdf/pd/font/cmap/83pv-RKSJ-H";
+
+    private final byte[] begin1 = {0x40, 0x40, 0x40};
+    private final byte[] end1 = {(byte) 0x80, (byte) 0x80, (byte) 0x80};
+    private final byte[] begin2 = {(byte) 0x81, 0x40};
+    private final byte[] end2 = {(byte) 0x90, (byte) 0x80};
+    private final byte[] begin3 = {0x40, 0x40, (byte) 0x81, 0x20};
+    private final byte[] end3 = {(byte) 0x80, (byte) 0x80, (byte) 0xA0, 0x40};
 
     @Test
     public void testParser() {
@@ -46,12 +53,12 @@ public class CMapTest {
             CMapParser parser = new CMapParser(stream);
             parser.parse();
             CMap cMap = parser.getCMap();
-            assertTrue(cMap.getRegistry().equals("Adobe"));
-            assertTrue(cMap.getOrdering().equals("Japan1"));
-            assertTrue(cMap.toCID(0x1F) == 1);
-            assertTrue(cMap.toCID(0x84bc) == 7516);
-            assertTrue(cMap.toCID(0xECEE) == 921);
-            assertTrue(cMap.toCID(0xECEF) == 922);
+            assertEquals("Adobe", cMap.getRegistry());
+            assertEquals("Japan1", cMap.getOrdering());
+            assertEquals(1, cMap.toCID(0x1F));
+            assertEquals(7516, cMap.toCID(0x84bc));
+            assertEquals(921, cMap.toCID(0xECEE));
+            assertEquals(922, cMap.toCID(0xECEF));
         } catch (FileNotFoundException ex) {
             System.out.println("File " + cMapPath + " not found.");
         } catch (IOException ex) {
@@ -63,13 +70,6 @@ public class CMapTest {
         }
     }
 
-    private byte[] begin1 = {0x40, 0x40, 0x40};
-    private byte[] end1 = {(byte) 0x80, (byte) 0x80, (byte) 0x80};
-    private byte[] begin2 = {(byte) 0x81, 0x40};
-    private byte[] end2 = {(byte) 0x90, (byte) 0x80};
-    private byte[] begin3 = {0x40, 0x40, (byte) 0x81, 0x20};
-    private byte[] end3 = {(byte) 0x80, (byte) 0x80, (byte) 0xA0, 0x40};
-
     @Test
     public void testCMap() {
         try {
@@ -79,10 +79,10 @@ public class CMapTest {
             CMap cMap = parser.getCMap();   //Testing defined characters
             byte[] bytes = {0x01, (byte) 0x81, 0x40, (byte) 0xFE, (byte) 0xE6, (byte) 0x4A};
             ASInputStream stream = new ASMemoryInStream(bytes);
-            assertTrue(cMap.toCID(cMap.getCodeFromStream(stream)) == 1);
-            assertTrue(cMap.toCID(cMap.getCodeFromStream(stream)) == 633);
-            assertTrue(cMap.toCID(cMap.getCodeFromStream(stream)) == 228);
-            assertTrue(cMap.toCID(cMap.getCodeFromStream(stream)) == 6638);
+            assertEquals(1, cMap.toCID(cMap.getCodeFromStream(stream)));
+            assertEquals(633, cMap.toCID(cMap.getCodeFromStream(stream)));
+            assertEquals(228, cMap.toCID(cMap.getCodeFromStream(stream)));
+            assertEquals(6638, cMap.toCID(cMap.getCodeFromStream(stream)));
 
             CMap cMap1 = new CMap();    //Testing undefined characters
             List<CodeSpace> list = new ArrayList<>(3);
@@ -96,17 +96,17 @@ public class CMapTest {
                     0x41, 0x41, (byte) 0x90, (byte) 0xFF, /*that should be read thirdly*/
                     (byte) 0x82, (byte) 0xFF /*that should be read fourthly*/};
             ASMemoryInStream stream1 = new ASMemoryInStream(bytes1);
-            assertTrue(cMap1.getCodeFromStream(stream1) == 0);
-            assertTrue(stream1.available() == 9);
+            assertEquals(0, cMap1.getCodeFromStream(stream1));
+            assertEquals(9, stream1.available());
 
-            assertTrue(cMap1.getCodeFromStream(stream1) == 0);
-            assertTrue(stream1.available() == 6);
+            assertEquals(0, cMap1.getCodeFromStream(stream1));
+            assertEquals(6, stream1.available());
 
-            assertTrue(cMap1.getCodeFromStream(stream1) == 0);
-            assertTrue(stream1.available() == 2);
+            assertEquals(0, cMap1.getCodeFromStream(stream1));
+            assertEquals(2, stream1.available());
 
-            assertTrue(cMap1.getCodeFromStream(stream1) == 0);
-            assertTrue(stream1.available() == 0);
+            assertEquals(0, cMap1.getCodeFromStream(stream1));
+            assertEquals(0, stream1.available());
         } catch (FileNotFoundException ex) {
             System.out.println("File " + cMapPath + " not found.");
         } catch (IOException ex) {
