@@ -2,7 +2,6 @@ veraPDF-parser
 ==============
 *Greenfield PDF parser developed for veraPDF*
 
-[![Build Status](https://travis-ci.org/veraPDF/veraPDF-parser.svg?branch=integration)](https://travis-ci.org/veraPDF/parser "Travis-CI")
 [![Build Status](http://jenkins.openpreservation.org/buildStatus/icon?job=veraPDF-parser)](http://jenkins.openpreservation.org/job/veraPDF-parser/ "OPF Jenkins Release")
 [![Build Status](http://jenkins.openpreservation.org/buildStatus/icon?job=veraPDF-parser-dev)](http://jenkins.openpreservation.org/job/veraPDF-parser-dev/ "OPF Jenkins Development")
 [![Maven Central](https://img.shields.io/maven-central/v/org.verapdf/parser.svg)](http://repo1.maven.org/maven2/org/verapdf/parser/ "Maven central")
