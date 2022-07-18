@@ -139,31 +139,33 @@ public class EncryptionToolsRevision5_6 {
     }
 
     public static void enableAES256() throws GeneralSecurityException {
-        try {   // Allow using of AES with 256-bit key.
-            Field restrictedField = Class.forName("javax.crypto.JceSecurity").
-                    getDeclaredField("isRestricted");
+        if (Cipher.getMaxAllowedKeyLength("AES") < 256) {
+            try {   // Allow using of AES with 256-bit key.
+                Field restrictedField = Class.forName("javax.crypto.JceSecurity").
+                        getDeclaredField("isRestricted");
 
-            Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-            getDeclaredFields0.setAccessible(true);
-            Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
-            Field modifiersField = null;
-            for (Field field : fields) {
-                if ("modifiers".equals(field.getName())) {
-                    modifiersField = field;
-                    break;
+                Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+                getDeclaredFields0.setAccessible(true);
+                Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
+                Field modifiersField = null;
+                for (Field field : fields) {
+                    if ("modifiers".equals(field.getName())) {
+                        modifiersField = field;
+                        break;
+                    }
                 }
-            }
-            if (modifiersField == null){
-                throw new IllegalStateException("Field \"modifiers\" is not declared in java.lang.reflect.Field");
-            }
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(restrictedField, restrictedField.getModifiers() & ~Modifier.FINAL);
-            modifiersField.setAccessible(false);
+                if (modifiersField == null) {
+                    throw new IllegalStateException("Field \"modifiers\" is not declared in java.lang.reflect.Field");
+                }
+                modifiersField.setAccessible(true);
+                modifiersField.setInt(restrictedField, restrictedField.getModifiers() & ~Modifier.FINAL);
+                modifiersField.setAccessible(false);
 
-            restrictedField.setAccessible(true);
-            restrictedField.set(null, Boolean.FALSE);
-        } catch (Exception ex) {
-            throw new GeneralSecurityException("Can't enable using of 256-bit key for AES encryption", ex);
+                restrictedField.setAccessible(true);
+                restrictedField.set(null, Boolean.FALSE);
+            } catch (Exception ex) {
+                throw new GeneralSecurityException("Can't enable using of 256-bit key for AES encryption", ex);
+            }
         }
     }
 
