@@ -84,7 +84,7 @@ public class EexecFilterDecode extends ASBufferedInFilter {
      */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
-        int bytesRead = (int) this.feedBuffer(bytesToDiscard + size);
+        int bytesRead = this.feedBuffer(bytesToDiscard + size);
         int res = bytesRead - bytesToDiscard;
         if (bytesRead <= 0) {
             return -1;
