@@ -257,6 +257,11 @@ public class PDType1Font extends PDSimpleFont {
         return this.getFontProgram().containsCode(code);
     }
 
+    @Override
+    public double[] getBoundingBox() {
+        return fontMetrics != null && fontMetrics.getFontBBox() != null ? fontMetrics.getFontBBox() : super.getBoundingBox();
+    }
+
     private boolean isEmbedded() {
         return this.getFontProgram() != null;
     }
