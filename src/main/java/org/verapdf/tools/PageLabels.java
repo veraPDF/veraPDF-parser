@@ -61,10 +61,10 @@ public class PageLabels {
 	}
 
 	private void addLabelsFromArray(COSArray nums) {
-		for (int i = 0; i < nums.size(); i+=2) {
+		for (int i = 0; i < nums.size(); i += 2) {
 			COSObject cosKey = nums.at(i);
 			Long key = cosKey == null ? null : cosKey.getInteger();
-			COSObject cosValue = nums.at(i+1);
+			COSObject cosValue = nums.at(i + 1);
 			if (key != null && cosValue != null && !cosValue.empty() && cosValue.getType() == COSObjType.COS_DICT) {
 				PageLabelDictionary pageLabelDictionary = new PageLabelDictionary((COSDictionary) cosValue.getDirectBase(), key.intValue());
 				this.labelsMap.put(key.intValue(), pageLabelDictionary);

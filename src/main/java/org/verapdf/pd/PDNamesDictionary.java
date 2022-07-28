@@ -41,6 +41,10 @@ public class PDNamesDictionary extends PDObject {
 		return getNameTreeByName(ASAtom.JAVA_SCRIPT);
 	}
 
+	public PDNameTreeNode getDests() {
+		return getNameTreeByName(ASAtom.DESTS);
+	}
+
 	private PDNameTreeNode getNameTreeByName(ASAtom name) {
 		COSObject base = getKey(name);
 		if (base != null && base.getType() == COSObjType.COS_DICT) {
