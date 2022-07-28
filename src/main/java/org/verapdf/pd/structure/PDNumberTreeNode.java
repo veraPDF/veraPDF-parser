@@ -116,7 +116,7 @@ public class PDNumberTreeNode extends PDObject {
         return getObject(key, visitedKeys);
     }
 
-    public COSObject getObject(Long key, Set<COSKey> visitedKeys) {
+    private COSObject getObject(Long key, Set<COSKey> visitedKeys) {
         long[] limits = this.getLimitsArray();
         if (limits != null) {
             if (key < limits[0] || key > limits[1]) {

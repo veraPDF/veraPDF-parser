@@ -140,6 +140,10 @@ public class PDAnnotation extends PDObject {
 		return null;
 	}
 
+	public COSObject getDestination() {
+		return getKey(ASAtom.DEST);
+	}
+
 	public double[] getColor() {
 		return TypeConverter.getRealArray(getKey(ASAtom.C), "Color");
 	}

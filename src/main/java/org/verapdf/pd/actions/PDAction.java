@@ -83,4 +83,12 @@ public class PDAction extends PDObject {
 	public COSObject getRendition() {
 		return getObject().getKey(ASAtom.R);
 	}
+
+	public COSObject getDestination() {
+		return getObject().getKey(ASAtom.D);
+	}
+
+	public COSObject getStructureDestination() {
+		return getObject().getKey(ASAtom.SD);
+	}
 }

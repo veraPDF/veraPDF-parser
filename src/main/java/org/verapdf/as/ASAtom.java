@@ -280,6 +280,7 @@ public class ASAtom implements Comparable<ASAtom> {
     // G
     public static final ASAtom G = new ASAtom("G");
     public static final ASAtom GAMMA = new ASAtom("Gamma");
+    public static final ASAtom GO_TO = new ASAtom("GoTo");
     public static final ASAtom GROUP = new ASAtom("Group");
     public static final ASAtom GTS_PDFA1 = new ASAtom("GTS_PDFA1");
     // H
@@ -498,6 +499,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom SA = new ASAtom("SA");
     public static final ASAtom SCOPE = new ASAtom("Scope");
     public static final ASAtom SCREEN = new ASAtom("Screen");
+    public static final ASAtom SD = new ASAtom("SD");
     public static final ASAtom SE = new ASAtom("SE");
     public static final ASAtom SEPARATION = new ASAtom("Separation");
     public static final ASAtom SET_F = new ASAtom("SetF");
