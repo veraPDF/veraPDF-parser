@@ -28,6 +28,8 @@ import org.verapdf.cos.visitor.IVisitor;
  */
 public class COSNull extends COSDirect {
 
+    private static final String NULL_STRING = "null";
+
     public static final COSNull NULL = new COSNull();
 
     public COSObjType getType() {
@@ -50,5 +52,10 @@ public class COSNull extends COSDirect {
     public boolean equals(Object o) {
         if (this == o) return true;
         return o instanceof COSNull;
+    }
+
+    @Override
+    public String toString() {
+        return NULL_STRING;
     }
 }
