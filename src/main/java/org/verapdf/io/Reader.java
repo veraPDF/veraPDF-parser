@@ -151,18 +151,16 @@ public class Reader extends XRefReader {
 		this.parser.getXRefInfo(infos);
 		setXRefInfo(infos);
 
-		if(this.parser.isEncrypted()) {
-			if(!docCanBeDecrypted()) {
-				this.getPDFSource().close();
-				if (this.parser.getDocument() != null) {
-					FileResourceHandler handler =
-							this.parser.getDocument().getResourceHandler();
-					if (handler != null) {
-						handler.close();
-					}
+		if (this.parser.isEncrypted() && !docCanBeDecrypted()) {
+			this.getPDFSource().close();
+			if (this.parser.getDocument() != null) {
+				FileResourceHandler handler =
+						this.parser.getDocument().getResourceHandler();
+				if (handler != null) {
+					handler.close();
 				}
-				throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 			}
+			throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 		}
 	}
 
@@ -178,7 +176,7 @@ public class Reader extends XRefReader {
 			}
 			StandardSecurityHandler ssh = new StandardSecurityHandler(encryption,
 					this.getTrailer().getID(), this.parser.getDocument());
-			boolean res = ssh.isEmptyStringPassword();
+			boolean res = ssh.checkPassword();
 			if (res) {
 				this.parser.getDocument().setStandardSecurityHandler(ssh);
 			}
