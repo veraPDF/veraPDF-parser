@@ -51,6 +51,8 @@ public class StaticResources {
 	private static final ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
 	private static final ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
 
+	private static final ThreadLocal<String> password = new ThreadLocal<>();
+
 	private StaticResources() {
 	}
 
@@ -146,6 +148,7 @@ public class StaticResources {
 		StaticResources.cachedFonts.set(new HashMap<>());
 		StaticResources.flavour.set(null);
 		StaticResources.document.set(null);
+		StaticResources.setPassword(null);
 	}
 
 	private static void checkForNull(ThreadLocal variable) {
@@ -184,5 +187,13 @@ public class StaticResources {
 
 	public static void setFlavour(PDFFlavour flavour) {
 		StaticResources.flavour.set(flavour);
+	}
+
+	public static String getPassword() {
+		return password.get();
+	}
+
+	public static void setPassword(String password) {
+		StaticResources.password.set(password);
 	}
 }
