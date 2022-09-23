@@ -44,4 +44,8 @@ public class PDWidgetAnnotation extends PDAnnotation {
 		return null;
 	}
 
+	public String getT() {
+		return getStringKey(ASAtom.T);
+	}
+
 }
