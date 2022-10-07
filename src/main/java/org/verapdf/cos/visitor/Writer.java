@@ -306,6 +306,7 @@ public class Writer implements IVisitor {
 
 	public void writeBody() {
 		try {
+			this.write("\r\n");
 			while (!this.toWrite.isEmpty()) {
 				final COSKey key = this.toWrite.get(0);
 
