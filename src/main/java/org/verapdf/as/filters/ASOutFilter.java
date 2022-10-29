@@ -70,15 +70,17 @@ public abstract class ASOutFilter implements ASOutputStream {
 	 */
 	@Override
  	public long write(ASInputStream stream) throws IOException {
-		byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
-		int read = stream.read(buf, buf.length);
-		int res = 0;
-		while (read != -1) {
-			this.write(buf, 0, read);
-			res += read;
-			read = stream.read(buf, buf.length);
-		}
-		return res;
+		return this.storedOutputStream != null ?
+				this.storedOutputStream.write(stream) : 0;
+//		byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
+//		int read = stream.read(buf, buf.length);
+//		int res = 0;
+//		while (read != -1) {
+//			this.write(buf, 0, read);
+//			res += read;
+//			read = stream.read(buf, buf.length);
+//		}
+//		return res;
 	}
 
 	/**

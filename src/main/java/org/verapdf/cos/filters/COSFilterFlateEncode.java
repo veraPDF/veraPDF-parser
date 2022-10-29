@@ -20,11 +20,14 @@
  */
 package org.verapdf.cos.filters;
 
+import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.filters.io.ASBufferingOutFilter;
+import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 
 import java.io.IOException;
 import java.util.zip.Deflater;
+import java.util.zip.DeflaterInputStream;
 
 /**
  * Filter that implements flate encoding.
@@ -84,6 +87,20 @@ public class COSFilterFlateEncode extends ASBufferingOutFilter {
             res += deflated;
         }
         deflater.finish();
+        return res;
+    }
+
+    @Override
+    public long write(ASInputStream stream) throws IOException {
+        DeflaterInputStream deflaterInputStream = new DeflaterInputStream(stream);
+        int res = 0;
+        byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
+        int deflated = deflaterInputStream.read(buf);
+        while (deflated > 0) {
+            this.getStoredOutputStream().write(buf, 0, deflated);
+            res += deflated;
+            deflated = deflaterInputStream.read(buf);
+        }
         return res;
     }
 }
