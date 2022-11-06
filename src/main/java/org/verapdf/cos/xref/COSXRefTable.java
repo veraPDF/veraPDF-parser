@@ -31,29 +31,39 @@ import java.util.List;
 public class COSXRefTable {
 
 	private List<COSKey> all;
-	private int size;
+	private int maxKeyNumber;
 
 	public COSXRefTable() {
 		this.all = new ArrayList<>();
-		this.size = 1;
+		maxKeyNumber = 0;
 	}
 
 	public void set(final List<COSKey> keys) {
 		this.all = keys;
-		int lastIndex = keys.size() - 1;
-		this.size = keys.isEmpty() ? 1 : keys.get(lastIndex).getNumber() + 1;
+		maxKeyNumber = keys.stream().map(COSKey::getNumber).max(Integer::compare).orElse(0);
+	}
+
+	private int getGreatestKeyNumberFromXref() {
+		return maxKeyNumber;
 	}
 
 	public COSKey next() {
-		return new COSKey(this.size++);
+		return new COSKey(getGreatestKeyNumberFromXref() + 1);
 	}
 
 	public void newKey(final COSKey key) {
 		this.all.add(key);
+		if (key.getNumber() > maxKeyNumber) {
+			maxKeyNumber = key.getNumber();
+		}
 	}
 
 	public void newKey(final List<COSKey> key) {
 		this.all.addAll(key);
+		int newKeysMaxKeyNumber = key.stream().map(COSKey::getNumber).max(Integer::compare).orElse(0);
+		if (newKeysMaxKeyNumber > maxKeyNumber) {
+			maxKeyNumber = newKeysMaxKeyNumber;
+		}
 	}
 
 	public List<COSKey> getAllKeys() {

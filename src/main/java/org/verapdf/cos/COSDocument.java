@@ -246,7 +246,6 @@ public class COSDocument {
 		if (key == null) {
 			key = this.xref.next();
 			this.body.set(key, obj.isIndirect() ? obj.getDirect() : obj);
-			obj = COSIndirect.construct(key, this);
 		}
 
 		this.xref.newKey(key);
@@ -380,7 +379,7 @@ public class COSDocument {
 	}
 
 	public void addObject(COSObject obj) {
-		if (obj != null && !obj.empty()) {
+		if (obj != null && !obj.empty() && !isObjectAdded(obj)) {
 			this.addedObjects.add(obj);
 		}
 	}
@@ -397,6 +396,10 @@ public class COSDocument {
 
 	public void removeChangedObject(COSObject obj) {
 		this.changedObjects.remove(obj);
+	}
+
+	public boolean isObjectAdded(COSObject obj) {
+		return listContainsObject(addedObjects, obj);
 	}
 
 	public boolean isObjectChanged(COSObject obj) {

@@ -109,7 +109,6 @@ public class Writer implements IVisitor {
 	}
 
 	private List<COSKey> prepareAddedObjects(List<COSObject> addedObjects) {
-		int cosKeyNumber = this.document.getLastKeyNumber() + 1;
 		List<COSKey> res = new ArrayList<>();
 		for (COSObject obj : addedObjects) {
 			if (!obj.isIndirect()) {
