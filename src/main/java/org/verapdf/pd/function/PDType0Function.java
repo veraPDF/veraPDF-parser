@@ -20,7 +20,7 @@ public class PDType0Function extends PDFunction {
     private List<Integer> sizesProducts;
     private long numberOfSampleBytes = 0;
 
-    private static final Logger LOGGER = Logger.getLogger(PDType2Function.class.getCanonicalName());
+    private static final Logger LOGGER = Logger.getLogger(PDType0Function.class.getCanonicalName());
     private static final long ALLOWABLE_MEMORY_CAPACITY = 100000000;
 
     protected PDType0Function(COSObject obj) {

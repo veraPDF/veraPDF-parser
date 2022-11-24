@@ -218,7 +218,7 @@ public class PDFParser extends COSParser {
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         calculatePostEOFDataSize();
-        this.getXRefInfo(infos, new HashSet<Long>(), Long.valueOf(0L));
+        this.getXRefInfo(infos, new HashSet<Long>(), null);
     }
 
     public COSObject getObject(final long offset) throws IOException {
@@ -347,7 +347,7 @@ public class PDFParser extends COSParser {
             }
             source.seekFromCurrentPosition(-STARTXREF.length - 1);
         }
-        return Long.valueOf(0L);
+        return null;
     }
 
     private void calculatePostEOFDataSize() throws IOException {
@@ -516,8 +516,15 @@ public class PDFParser extends COSParser {
                 this.getToken().keyword != Token.Keyword.KW_OBJ) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
-        COSObject xrefCOSStream = getDictionary();
-        if (xrefCOSStream.getType() != COSObjType.COS_STREAM) {
+        COSObject xrefCOSStream;
+        try {
+            xrefCOSStream = getDictionary();
+        } catch (Exception e) {
+            throw new IOException("PDFParser::GetXRefSection(...)" + "Exception during parsing xref stream at offset " +
+                    section.getStartXRef(), e);
+        }
+        if (xrefCOSStream.getType() != COSObjType.COS_STREAM ||
+                !COSName.construct(ASAtom.XREF).equals(xrefCOSStream.getKey(ASAtom.TYPE))) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.getDirectBase());
@@ -529,9 +536,9 @@ public class PDFParser extends COSParser {
     }
 
 	private void getXRefInfo(final List<COSXRefInfo> info, Set<Long> processedOffsets, Long offset) throws IOException {
-        if (offset.longValue() == 0) {
+        if (offset == null) {
 			offset = findLastXRef();
-			if (offset.longValue() == 0) {
+			if (offset == null) {
 				throw new IOException("PDFParser::GetXRefInfo(...)" + StringExceptions.START_XREF_VALIDATION);
 			}
 		}
@@ -560,12 +567,12 @@ public class PDFParser extends COSParser {
         COSTrailer trailer = section.getTrailer();
 
         offset = trailer.getXRefStm();
-        if (offset != null && offset.longValue() != 0) {
+        if (offset != null) {
             getXRefInfo(info, processedOffsets, offset);
         }
 
         offset = trailer.getPrev();
-		if (offset != null && offset.longValue() != 0) {
+		if (offset != null) {
             getXRefInfo(info, processedOffsets, offset);
 		}
 	}
