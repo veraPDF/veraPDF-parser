@@ -84,4 +84,11 @@ public class PDMetadata extends PDObject {
         }
         return null;
     }
+
+    public static boolean isMetadataObject(COSObject obj) {
+        return obj != null
+                && obj.getType() == COSObjType.COS_STREAM
+                && obj.getNameKey(ASAtom.TYPE) == ASAtom.METADATA
+                && obj.getNameKey(ASAtom.SUBTYPE) == ASAtom.XML;
+    }
 }
