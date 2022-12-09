@@ -29,11 +29,15 @@ import org.verapdf.pd.colors.PDColorSpace;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class PDPage extends PDPageTreeNode {
+
+    private static final Logger LOGGER = Logger.getLogger(PDPage.class.getCanonicalName());
 
     //! Predefined page sizes
     public static double PAGE_SIZE_A3[] = {0, 0, 842, 1190};
@@ -183,6 +187,8 @@ public class PDPage extends PDPageTreeNode {
             COSObject resources = getInheritableResources();
             if (resources != null) {
                 this.resources = new PDResources(resources);
+            } else {
+                LOGGER.log(Level.WARNING, "Missing /Resources entry or inherited resources in the page dictionary");
             }
         }
 
