@@ -54,15 +54,15 @@ public class PDInlineImage extends PDResource {
 	}
 
 	public boolean isInterpolate() {
-		Boolean value = getObject().getBooleanKey(ASAtom.INTERPOLATE);
-		value = value == null ? getObject().getBooleanKey(ASAtom.I) : value;
+		Boolean value = getObject().getBooleanKey(ASAtom.I);
+		value = value == null ? getObject().getBooleanKey(ASAtom.INTERPOLATE) : value;
 		return value != null ? value.booleanValue() : false;
 	}
 
 	public List<COSName> getCOSFilters() {
-		COSObject filters = getKey(ASAtom.FILTER);
+		COSObject filters = getKey(ASAtom.F);
 		if (filters == null || filters.empty()) {
-			filters = getKey(ASAtom.F);
+			filters = getKey(ASAtom.FILTER);
 		}
 
 		if (filters != null) {
