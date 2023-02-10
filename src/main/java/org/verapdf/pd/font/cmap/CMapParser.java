@@ -266,7 +266,8 @@ public class CMapParser extends PSParser {
             byte[] token = getToken().getByteValue();
             int lastByte = token[token.length - 1] & 0xFF;
             if (lastByte > 255 - bfRangeEnd + bfRangeBegin) {
-                bfRangeEnd = 255 + bfRangeBegin - lastByte;
+                LOGGER.log(Level.WARNING, "Incorrect bfrange in toUnicode CMap: " +
+                        "the last byte of the string incremented past 255.");
             }
             this.cMap.addUnicodeInterval(new ToUnicodeInterval(bfRangeBegin, bfRangeEnd,
                     getToken().getByteValue()));
