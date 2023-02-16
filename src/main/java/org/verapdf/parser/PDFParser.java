@@ -218,6 +218,7 @@ public class PDFParser extends COSParser {
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         calculatePostEOFDataSize();
+        document.setFileSize(source.getStreamLength());
         this.getXRefInfo(infos, new HashSet<Long>(), null);
     }
 
