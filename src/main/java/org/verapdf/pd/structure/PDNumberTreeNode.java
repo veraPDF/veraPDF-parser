@@ -35,7 +35,7 @@ import java.util.*;
  *
  * @author Sergey Shemyakov
  */
-public class PDNumberTreeNode extends PDObject {
+public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
 
     /**
      * Constructor from number tree node dictionary.
@@ -76,7 +76,7 @@ public class PDNumberTreeNode extends PDObject {
             }
             return Collections.unmodifiableList(res);
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**
@@ -97,7 +97,7 @@ public class PDNumberTreeNode extends PDObject {
             }
             return Collections.unmodifiableMap(res);
         }
-        return null;
+        return Collections.emptyMap();
     }
 
     /**
@@ -154,5 +154,18 @@ public class PDNumberTreeNode extends PDObject {
         }
 
         return null;
+    }
+
+    public NumberTreeIterator iterator() {
+        return new NumberTreeIterator(this);
+    }
+
+    public Long size() {
+        long i = 0;
+        NumberTreeIterator iterator = iterator();
+        for (; iterator.hasNext(); i++) {
+            iterator.next();
+        }
+        return i;
     }
 }

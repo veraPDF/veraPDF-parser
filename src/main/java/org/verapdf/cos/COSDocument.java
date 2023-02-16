@@ -66,6 +66,7 @@ public class COSDocument {
 	private FileResourceHandler resourceHandler;
 	private String fileName;
 
+	private long fileSize;
 	private byte postEOFDataSize;
 
 	private boolean xrefEOLMarkersComplyPDFA = true;
@@ -278,6 +279,14 @@ public class COSDocument {
 
 	public void setHeader(COSHeader header) {
 		this.header = header;
+	}
+
+	public long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(long fileSize) {
+		this.fileSize = fileSize;
 	}
 
 	public byte getPostEOFDataSize() {
