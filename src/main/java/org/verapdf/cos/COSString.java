@@ -192,6 +192,39 @@ public class COSString extends COSDirect {
         return result.toString();
     }
 
+    public boolean isASCIIString() {
+        for (byte b : value) {
+            if ((b & 0xFF) >= 128) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public String getASCIIString() {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : value) {
+            if ((b & 0xFF) < 128) {
+                sb.append((char)(b & 0xFF));
+            }
+        }
+        return sb.toString();
+    }
+
+    public boolean isTextString() {
+        if (value.length > 2) {
+            if ((value[0] & 0xFF) == 0xFE && (value[1] & 0xFF) == 0xFF) {
+                return true;
+            }
+        }
+        if (value.length > 3) {
+            if ((value[0] & 0xFF) == 0xEF && (value[1] & 0xFF) == 0xBB && (value[2] & 0xFF) == 0xBF) {
+                return true;
+            }
+        }
+        return PDFDocEncoding.isPDFDocEncodingString(value);
+    }
+
     protected String toLitString() {
         StringBuilder result = new StringBuilder();
         result.append('(');
