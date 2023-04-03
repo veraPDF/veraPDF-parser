@@ -100,4 +100,13 @@ public class PDFDocEncoding {
         }
         return sb.toString();
     }
+
+    public static boolean isPDFDocEncodingString(byte[] bytes) {
+        for (byte b : bytes) {
+            if ((b & 0xFF) >= encoding.length) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
