@@ -55,6 +55,9 @@ public abstract class PDCIEDictionaryBased extends PDColorSpace {
     }
 
     private void fillWhitepointCache(double[] whitepoint) {
+        if (whitepoint == null || whitepoint.length < 3) {
+            return;
+        }
         wpX = whitepoint[0];
         wpY = whitepoint[1];
         wpZ = whitepoint[2];

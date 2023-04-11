@@ -133,7 +133,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                     }
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             throw new IOException("Error with stack in processing Top DICT in CFF file", e);
         }
     }

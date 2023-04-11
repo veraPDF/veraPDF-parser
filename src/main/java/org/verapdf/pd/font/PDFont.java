@@ -346,8 +346,9 @@ public abstract class PDFont extends PDResource {
                 && dictionary.knownKey(ASAtom.LAST_CHAR)) {
             int firstChar = dictionary.getIntegerKey(ASAtom.FIRST_CHAR).intValue();
             int lastChar = dictionary.getIntegerKey(ASAtom.LAST_CHAR).intValue();
-            if (getWidths().size() > 0 && code >= firstChar && code <= lastChar) {
-                return getWidths().at(code - firstChar).getReal();
+            COSObject widths = getWidths();
+            if (widths.getType() == COSObjType.COS_ARRAY && widths.size() > 0 && code >= firstChar && code <= lastChar) {
+                return widths.at(code - firstChar).getReal();
             }
         }
 
