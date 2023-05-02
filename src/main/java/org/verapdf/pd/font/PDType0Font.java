@@ -21,10 +21,7 @@
 package org.verapdf.pd.font;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
 import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.cmap.PDCMap;
@@ -149,7 +146,6 @@ public class PDType0Font extends PDCIDFont {
         }
         PDCMap pdcMap = this.getCMap();
         if (pdcMap != null && pdcMap.getCMapFile() != null) {
-            int cid = pdcMap.getCMapFile().toCID(code);
             String registry = pdcMap.getRegistry();
             String ordering = pdcMap.getOrdering();
             String ucsName = registry + "-" + ordering + "-" + UCS2;
@@ -157,6 +153,7 @@ public class PDType0Font extends PDCIDFont {
             CMap ucsCMap = pdUCSCMap.getCMapFile();
             if (ucsCMap != null) {
                 this.ucsCMap = pdUCSCMap;
+                int cid = pdcMap.getCMapFile().toCID(code);
                 return ucsCMap.getUnicode(cid);
             }
             LOGGER.log(Level.FINE, "Can't load CMap " + ucsName);

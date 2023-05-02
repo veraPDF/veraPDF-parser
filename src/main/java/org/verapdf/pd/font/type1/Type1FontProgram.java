@@ -38,10 +38,7 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -347,5 +344,10 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     @Override
     public Double getDescent() {
         return null;
+    }
+
+    @Override
+    public List<Integer> getCIDList() {
+        return Collections.emptyList();
     }
 }
