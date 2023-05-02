@@ -184,6 +184,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         return font != null && font.isSuccessfulParsing();
     }
 
+    @Override
     public List<Integer> getCIDList() {
         if (this.font instanceof CFFCIDFontProgram) {
             return ((CFFCIDFontProgram) this.font).getCIDList();

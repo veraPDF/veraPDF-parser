@@ -29,6 +29,8 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDFont;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -315,5 +317,10 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
     @Override
     public boolean containsCID(int cid) {
         return false;
+    }
+
+    @Override
+    public List<Integer> getCIDList() {
+        return Collections.emptyList();
     }
 }

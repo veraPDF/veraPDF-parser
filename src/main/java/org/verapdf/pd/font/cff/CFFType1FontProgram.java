@@ -25,9 +25,7 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Instance of this class represent a Type1 font from FontSet of
@@ -386,5 +384,10 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
             }
         }
         return null;
+    }
+
+    @Override
+    public List<Integer> getCIDList() {
+        return Collections.emptyList();
     }
 }
