@@ -102,6 +102,7 @@ public abstract class COSBase {
 	public abstract String getStringKey(final ASAtom key);
 	public abstract boolean setStringKey(final ASAtom key, final String value);
 	public abstract ASAtom getNameKey(final ASAtom key);
+	public abstract String getNameKeyStringValue(final ASAtom key);
 	public abstract boolean setNameKey(final ASAtom key, final ASAtom value);
 	public abstract boolean setArrayKey(final ASAtom key);
 	public abstract boolean setArrayKey(final ASAtom key, final COSObject array);

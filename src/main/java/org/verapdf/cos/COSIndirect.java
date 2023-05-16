@@ -262,6 +262,10 @@ public class COSIndirect extends COSBase {
         return getDirect().getNameKey(key);
     }
 
+    public String getNameKeyStringValue(final ASAtom key) {
+        return getDirect().getNameKeyStringValue(key);
+    }
+
     public boolean setNameKey(final ASAtom key, final ASAtom value) {
         getDirect().setNameKey(key, value);
         return true;

@@ -76,7 +76,7 @@ public class AttributeHelper {
 	}
 
 	private static COSObject getAttributeValue(COSObject object, ASAtom attributeName, String O) {
-		if (object.getType() == COSObjType.COS_DICT && O.equals(object.getStringKey(ASAtom.O))) {
+		if (object.getType() == COSObjType.COS_DICT && O.equals(object.getNameKeyStringValue(ASAtom.O))) {
 			return object.getKey(attributeName);
 		}
 		return COSObject.getEmpty();

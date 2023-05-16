@@ -195,7 +195,11 @@ public class COSDictionary extends COSDirect {
     }
 
     public String getStringKey(final ASAtom key) {
-        return getKey(key).getString();
+        COSObject object = getKey(key);
+        if (object.getType() == COSObjType.COS_NAME) {
+            return null;
+        }
+        return object.getString();
     }
 
     public boolean setStringKey(final ASAtom key, final String value) {
@@ -207,6 +211,11 @@ public class COSDictionary extends COSDirect {
 
     public final ASAtom getNameKey(final ASAtom key) {
         return getKey(key).getName();
+    }
+
+    public final String getNameKeyStringValue(final ASAtom key) {
+        ASAtom value = getNameKey(key);
+        return value != null ? value.getValue() : null;
     }
 
     public boolean setNameKey(final ASAtom key, final ASAtom value) {

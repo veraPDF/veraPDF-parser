@@ -86,6 +86,10 @@ public class PDObject {
 		return object.getNameKey(key);
 	}
 
+	public String getNameKeyStringValue(final ASAtom key) {
+		return object.getNameKeyStringValue(key);
+	}
+
 	public void setNameKey(final ASAtom key, final ASAtom value) {
 		object.setNameKey(key, value);
 	}

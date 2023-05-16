@@ -283,6 +283,10 @@ public class COSObject {
 		return this.base != null ? this.base.getNameKey(key) : null;
 	}
 
+	public String getNameKeyStringValue(final ASAtom key) {
+		return this.base != null ? this.base.getNameKeyStringValue(key) : null;
+	}
+
 	public void setNameKey(final ASAtom key, final ASAtom value) {
 		if (value != null && (this.base == null || !this.base.setNameKey(key, value))) {
 			this.base = new COSDictionary(key, value);

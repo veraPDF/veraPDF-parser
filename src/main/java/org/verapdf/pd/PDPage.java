@@ -357,6 +357,13 @@ public class PDPage extends PDPageTreeNode {
     }
 
     public String getTabs() {
-        return getObject().getStringKey(ASAtom.TABS);
+        COSObject tabs = getObject().getKey(ASAtom.TABS);
+        if (tabs == null || tabs.empty()) {
+            return null;
+        }
+        if (tabs.getType() != COSObjType.COS_NAME) {
+            LOGGER.log(Level.WARNING, "Entry Tabs in page dictionary " + getObject().getKey() + " does not have type name");
+        }
+        return tabs.getString();
     }
 }

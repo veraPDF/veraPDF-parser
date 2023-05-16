@@ -79,7 +79,7 @@ public class PDType3Font extends PDSimpleFont {
 
     @Override
     public String getName() {
-        return this.dictionary.getStringKey(ASAtom.NAME);
+        return this.dictionary.getNameKeyStringValue(ASAtom.NAME);
     }
 
     /**
