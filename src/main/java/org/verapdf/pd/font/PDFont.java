@@ -77,7 +77,7 @@ public abstract class PDFont extends PDResource {
         } else {
             fontDescriptor = new PDFontDescriptor(COSDictionary.construct());
         }
-        this.fontName = this.dictionary.getStringKey(ASAtom.BASE_FONT);
+        this.fontName = this.dictionary.getNameKeyStringValue(ASAtom.BASE_FONT);
         this.fontNameWithoutSubset = fontName != null ? (fontName.matches("^[A-Z]{6}+.+") ? fontName.substring(7) : fontName) : null;
         if (!(this instanceof PDType3Font)) {
             this.boundingBox = fontDescriptor.getFontBoundingBox();
@@ -106,7 +106,7 @@ public abstract class PDFont extends PDResource {
      * @return font type (Type entry).
      */
     public String getType() {
-        String type = this.dictionary.getStringKey(ASAtom.TYPE);
+        String type = this.dictionary.getNameKeyStringValue(ASAtom.TYPE);
         return type == null ? "" : type;
     }
 

@@ -33,7 +33,7 @@ public class PD3DStream extends PDObject {
     }
 
     public String getSubtype() {
-        return getObject().getStringKey(ASAtom.SUBTYPE);
+        return getObject().getNameKeyStringValue(ASAtom.SUBTYPE);
     }
 
 }
