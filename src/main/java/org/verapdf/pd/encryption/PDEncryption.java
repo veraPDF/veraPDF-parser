@@ -29,6 +29,8 @@ import org.verapdf.pd.PDObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents encryption dictionary on PD level.
@@ -36,6 +38,8 @@ import java.util.Set;
  * @author Sergey Shemyakov
  */
 public class PDEncryption extends PDObject {
+
+    private static final Logger LOGGER = Logger.getLogger(PDEncryption.class.getCanonicalName());
 
     private static final boolean DEFAULT_ENCRYPT_METADATA = true;
     private static final int DEFAULT_LENGTH = 40;
@@ -168,7 +172,10 @@ public class PDEncryption extends PDObject {
     private Map<ASAtom, PDCryptFilter> getCryptFilters() {
         HashMap<ASAtom, PDCryptFilter> res = new HashMap<>();
         COSObject cf = getKey(ASAtom.CF);
-        if (cf == null || cf.getType() != COSObjType.COS_DICT) {
+        if (cf == null || cf.empty() || cf.isIndirect() || cf.getType() != COSObjType.COS_DICT) {
+            if (cf != null && !cf.empty()) {
+                LOGGER.log(Level.WARNING, "Cannot parse CF entry in encryption dictionary. It is should be a direct dictionary");
+            }
             return res;
         }
         Set<ASAtom> filters = cf.getKeySet();
