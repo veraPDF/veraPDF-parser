@@ -70,5 +70,9 @@ public abstract class PDSpecialColorSpace extends PDColorSpace {
         this.wasDefault = wasDefault;
     }
 
+    protected PDResources getResources() {
+        return resources;
+    }
+
     abstract COSObject getBaseColorSpaceObject();
 }
