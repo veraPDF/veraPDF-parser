@@ -28,6 +28,7 @@ import org.verapdf.pd.function.PDFunction;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -52,6 +53,20 @@ public class PDDeviceN extends PDSpecialColorSpace {
 
     public PDColorSpace getAlternateSpace() {
         return super.getBaseColorSpace();
+    }
+
+    public List<PDColorSpace> getColorants() {
+        List<PDColorSpace> colorants = new LinkedList<>();
+        COSObject attributes = getAttributes();
+        if (attributes != null && attributes.getType() == COSObjType.COS_DICT) {
+            COSObject colorantsDict = attributes.getKey(ASAtom.COLORANTS);
+            if (colorantsDict.getType() == COSObjType.COS_DICT) {
+                for (COSObject value : colorantsDict.getValues()) {
+                    colorants.add(org.verapdf.factory.colors.ColorSpaceFactory.getColorSpace(value, getResources()));
+                }
+            }
+        }
+        return colorants;
     }
 
     @Override
