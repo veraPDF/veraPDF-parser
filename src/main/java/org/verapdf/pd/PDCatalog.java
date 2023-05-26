@@ -35,11 +35,15 @@ import org.verapdf.tools.PageLabels;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class PDCatalog extends PDObject {
+
+	private static final Logger LOGGER = Logger.getLogger(PDCatalog.class.getCanonicalName());
 
 	private PDPageTree pages;
 
@@ -150,6 +154,18 @@ public class PDCatalog extends PDObject {
 			return new PageLabels((COSDictionary) labelsTree.getDirectBase());
 		}
 		return null;
+	}
+
+	public String getVersion() {
+		COSObject version = getKey(ASAtom.VERSION);
+		if (version == null || version.empty()) {
+			return null;
+		}
+		if (version.getType() != COSObjType.COS_NAME) {
+			LOGGER.log(Level.WARNING, "Entry Version in the catalog does not have type name");
+			return null;
+		}
+		return version.getString();
 	}
 
 }
