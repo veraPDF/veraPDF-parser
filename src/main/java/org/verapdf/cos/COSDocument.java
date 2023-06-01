@@ -211,6 +211,14 @@ public class COSDocument {
 		return result;
 	}
 
+	public COSObject getObject(final long offset) {
+		try {
+			return reader.getObject(offset);
+		} catch (IOException e) {
+			throw new VeraPDFParserException("Error while parsing object at offset " + offset, e);
+		}
+	}
+
 	public COSObject getObject(final COSKey key) {
 		try {
 			COSObject obj = this.body.get(key);
