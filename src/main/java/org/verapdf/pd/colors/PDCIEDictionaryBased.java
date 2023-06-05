@@ -54,7 +54,7 @@ public abstract class PDCIEDictionaryBased extends PDColorSpace {
         fillWhitepointCache(getWhitePoint());
     }
 
-    private void fillWhitepointCache(double[] whitepoint) {
+    protected void fillWhitepointCache(double[] whitepoint) {
         if (whitepoint == null || whitepoint.length < 3) {
             return;
         }

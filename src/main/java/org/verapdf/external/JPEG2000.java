@@ -46,6 +46,7 @@ public class JPEG2000 {
     private static final Long DEFAULT_BIT_DEPTH = Long.valueOf(0);
     private static final Boolean DEFAULT_BPCC_BOX_PRESENT = Boolean.FALSE;
     private static final PDColorSpace DEFAULT_COLOR_SPACE = null;
+    private static final double[] ILLUMINANT_D50 = {0.9642, 1.0000, 0.8251};
     private static final byte[] sign = {0x00, 0x00, 0x00, 0x0C, 0x6A, 0x50, 0x20, 0x20, 0x0D, 0x0A, -0x79, 0x0A};
 
     private static final byte[] header = {0x6A, 0x70, 0x32, 0x68};
@@ -284,7 +285,8 @@ public class JPEG2000 {
             case 12:
                 return PDDeviceCMYK.INSTANCE;
             case 14:
-                return new PDLab();
+                return new PDLab(ILLUMINANT_D50);
+                //todo parsing EP field
             case 17:
                 return new PDICCBased(1);
             case 16:
