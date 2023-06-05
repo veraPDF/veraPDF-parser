@@ -215,7 +215,12 @@ public class InternalInputStream extends SeekableInputStream {
 		return new InternalInputStream(this.stream, fromOffset + startOffset, length, numOfFileUsers, filePath, isTempFile);
 	}
 
-	@Override
+    @Override
+    public SeekableInputStream getSeekableStream(long startOffset, long length) throws IOException {
+        return new InternalInputStream(this.stream, startOffset + fromOffset, length, numOfFileUsers, filePath, isTempFile);
+    }
+
+    @Override
 	public void closeResource() throws IOException {
 		if (!isSourceClosed) {
 			isSourceClosed = true;

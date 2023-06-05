@@ -281,4 +281,9 @@ public class ASMemoryInStream extends SeekableInputStream {
             throw new IOException();
         }
     }
+
+    @Override
+    public SeekableInputStream getSeekableStream(long startOffset, long length) throws IOException {
+        return new ASMemoryInStream(this, (int) startOffset, (int) length);
+    }
 }
