@@ -36,6 +36,10 @@ public class PDLab extends PDCIEDictionaryBased {
         super(obj);
     }
 
+    public PDLab(double[] whitepoint) {
+        fillWhitepointCache(whitepoint);
+    }
+
     @Override
     public int getNumberOfComponents() {
         return 3;
