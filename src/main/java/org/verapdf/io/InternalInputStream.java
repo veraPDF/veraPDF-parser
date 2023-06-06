@@ -49,6 +49,7 @@ public class InternalInputStream extends SeekableInputStream {
 	private String filePath;
 	private long fromOffset;
 	private long size;
+	private long resetPosition;
 
 	public InternalInputStream(final File file) throws IOException {
 		this(file, false);
@@ -166,9 +167,19 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	@Override
+	public boolean markSupported() {
+		return true;
+	}
+
+	@Override
+	public synchronized void mark(int readlimit) {
+		resetPosition = offset;
+	}
+
+	@Override
 	public void reset() throws IOException {
 		checkClosed("Reset");
-		this.seek(0);
+		this.seek(resetPosition);
 	}
 
 	@Override

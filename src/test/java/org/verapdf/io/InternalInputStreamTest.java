@@ -45,4 +45,23 @@ public class InternalInputStreamTest {
             assertEquals(0, stream.getOffset());
         }
     }
+
+
+    @Test
+    public void shouldSupportMarkAndReset() throws IOException {
+        File file = temporaryFolder.newFile();
+        Files.write(file.toPath(), new byte[] { 0, 1,2 });
+
+        try (InternalInputStream stream = new InternalInputStream(file, true)) {
+
+            assertEquals(0, stream.read());
+            stream.mark(Integer.MAX_VALUE);
+
+            assertEquals(1, stream.read());
+            assertEquals(2, stream.read());
+
+            stream.reset();
+            assertEquals(1, stream.read());
+        }
+    }
 }

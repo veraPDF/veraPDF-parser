@@ -64,4 +64,19 @@ public class ASMemoryInStreamTest {
             }
         }
     }
+
+    @Test
+    public void shouldSupportMarkAndReset() throws IOException {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+
+            assertEquals(0, stream.read());
+            stream.mark(Integer.MAX_VALUE);
+
+            assertEquals(1, stream.read());
+            assertEquals(2, stream.read());
+
+            stream.reset();
+            assertEquals(1, stream.read());
+        }
+    }
 }

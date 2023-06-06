@@ -207,6 +207,17 @@ public class ASMemoryInStream extends SeekableInputStream {
         }
     }
 
+    @Override
+    public boolean markSupported() {
+        return true;
+    }
+
+
+    @Override
+    public synchronized void mark(int readlimit) {
+        resetPosition = currentPosition;
+    }
+
     /**
      * Resets stream.
      *
