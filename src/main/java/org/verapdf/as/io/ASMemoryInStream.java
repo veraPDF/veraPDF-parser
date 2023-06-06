@@ -36,6 +36,7 @@ import java.util.Arrays;
 public class ASMemoryInStream extends SeekableInputStream {
 
     private int bufferSize;
+    private int bufferOffset = 0;
     private int currentPosition;
     private byte[] buffer;
     private boolean copiedBuffer;
@@ -82,11 +83,8 @@ public class ASMemoryInStream extends SeekableInputStream {
     public ASMemoryInStream(ASMemoryInStream stream, int offset, int length) {
         this.buffer = stream.buffer;
         this.copiedBuffer = false;
-        if (offset >= 0 && offset < stream.bufferSize) {
-            this.currentPosition = offset;
-        } else {
-            this.currentPosition = 0;
-        }
+        this.bufferOffset = offset;
+        this.currentPosition = 0;
         this.resetPosition = this.currentPosition;
         this.bufferSize = Math.min(stream.bufferSize, offset + length);
         this.numOfBufferUsers = stream.numOfBufferUsers;
@@ -127,6 +125,10 @@ public class ASMemoryInStream extends SeekableInputStream {
         }
     }
 
+    private int currentBufferOffset() {
+        return currentPosition + bufferOffset;
+    }
+
     /**
      * Reads up to size bytes of data into given array.
      *
@@ -137,12 +139,12 @@ public class ASMemoryInStream extends SeekableInputStream {
      */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
-        if (currentPosition == bufferSize) {
+        if (currentBufferOffset() == bufferSize) {
             return -1;
         }
-        int available = Math.min(bufferSize - currentPosition, size);
+        int available = Math.min(bufferSize - currentBufferOffset(), size);
         try {
-            System.arraycopy(this.buffer, currentPosition, buffer, 0, available);
+            System.arraycopy(this.buffer, currentBufferOffset(), buffer, 0, available);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new IOException("Can't write bytes into passed buffer: too small.");
         }
@@ -158,10 +160,10 @@ public class ASMemoryInStream extends SeekableInputStream {
      */
     @Override
     public int read() throws IOException {
-        if (currentPosition == bufferSize) {
+        if (currentBufferOffset() == bufferSize) {
             return -1;
         }
-        return this.buffer[currentPosition++] & 0xFF;
+        return this.buffer[bufferOffset + currentPosition++] & 0xFF;
     }
 
     /**
@@ -169,10 +171,10 @@ public class ASMemoryInStream extends SeekableInputStream {
      */
     @Override
     public int peek() throws IOException {
-        if (currentPosition == bufferSize) {
+        if (currentBufferOffset() == bufferSize) {
             return -1;
         }
-        return this.buffer[currentPosition] & 0xFF;
+        return this.buffer[currentBufferOffset()] & 0xFF;
     }
 
     /**
@@ -184,7 +186,7 @@ public class ASMemoryInStream extends SeekableInputStream {
      */
     @Override
     public int skip(int size) throws IOException {
-        int available = Math.min(bufferSize - currentPosition, size);
+        int available = Math.min(bufferSize - currentBufferOffset(), size);
         currentPosition += available;
         return available;
     }
@@ -220,7 +222,7 @@ public class ASMemoryInStream extends SeekableInputStream {
      */
     @Override
     public long getStreamLength() throws IOException {
-        return this.bufferSize;
+        return this.bufferSize - this.bufferOffset;
     }
 
     /**
@@ -243,7 +245,7 @@ public class ASMemoryInStream extends SeekableInputStream {
      * @return the amount of bytes left in stream.
      */
     public int available() {
-        return bufferSize - currentPosition;
+        return bufferSize - currentBufferOffset();
     }
 
     /**
