@@ -79,4 +79,21 @@ public class ASMemoryInStreamTest {
             assertEquals(1, stream.read());
         }
     }
+
+    @Test(expected = IOException.class)
+    public void shouldNotBeAbleToUnreadAtStart() throws IOException {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+            stream.unread();
+        }
+    }
+
+    @Test
+    public void shouldBeAbleToUnread() throws IOException {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+            assertEquals(0, stream.read());
+            assertEquals(1, stream.read());
+            stream.unread();
+            assertEquals(1, stream.read());
+        }
+    }
 }

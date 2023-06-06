@@ -185,6 +185,9 @@ public class InternalInputStream extends SeekableInputStream {
 	@Override
 	public void seek(long offset) throws IOException {
 		checkClosed("Seeking");
+		if (offset < 0) {
+			throw new IOException("Can't seek for offset " + offset + " in InternalInputStream");
+		}
 		if (offset > this.getStreamLength()) {
 			throw new IllegalArgumentException("Destination offset is greater than stream length");
 		}

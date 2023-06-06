@@ -64,4 +64,25 @@ public class InternalInputStreamTest {
             assertEquals(1, stream.read());
         }
     }
+
+    @Test(expected = IOException.class)
+    public void shouldNotBeAbleToUnreadAtStart() throws IOException {
+        File file = temporaryFolder.newFile();
+        Files.write(file.toPath(), new byte[] { 1, 2, 3 });
+        try (InternalInputStream stream = new InternalInputStream(file, true)) {
+            stream.unread();
+        }
+    }
+
+    @Test
+    public void shouldBeAbleToUnread() throws IOException {
+        File file = temporaryFolder.newFile();
+        Files.write(file.toPath(), new byte[] { 0, 1, 2 });
+        try (InternalInputStream stream = new InternalInputStream(file, true)) {
+            assertEquals(0, stream.read());
+            assertEquals(1, stream.read());
+            stream.unread();
+            assertEquals(1, stream.read());
+        }
+    }
 }
