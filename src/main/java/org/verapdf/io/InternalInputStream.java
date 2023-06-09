@@ -212,7 +212,7 @@ public class InternalInputStream extends SeekableInputStream {
 
 	@Override
 	public ASInputStream getStream(long startOffset, long length) throws IOException {
-		return new InternalInputStream(this.stream, startOffset, length, numOfFileUsers, filePath, isTempFile);
+		return new InternalInputStream(this.stream, fromOffset + startOffset, length, numOfFileUsers, filePath, isTempFile);
 	}
 
 	@Override
