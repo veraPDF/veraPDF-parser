@@ -168,24 +168,28 @@ public class CharStringsWidths {
             } else {
                 throw new IOException("Can't process CharString of type " + this.charStringType);
             }
-        } catch (IOException e) {
-            return new CFFNumber(-1f);
+        } catch (IOException | ArrayIndexOutOfBoundsException e) {
+            return new CFFNumber(DEFAULT_WIDTH);
         }
     }
 
     private float getActualWidth(CFFNumber charStringWidth, int gid) {
-        float res;
-        if (charStringWidth == null) {
-            res = getDefaultWidth(gid);
-        } else {
-            res = charStringWidth.isInteger() ? charStringWidth.getInteger() :
-                    charStringWidth.getReal();
-            res += getNominalWidth(gid);
+        try {
+            float res;
+            if (charStringWidth == null) {
+                res = getDefaultWidth(gid);
+            } else {
+                res = charStringWidth.isInteger() ? charStringWidth.getInteger() :
+                        charStringWidth.getReal();
+                res += getNominalWidth(gid);
+            }
+            if (!isDefaultFontMatrix(gid)) {
+                res *= (getFontMatrix(gid)[0] * 1000);
+            }
+            return res;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return DEFAULT_WIDTH;
         }
-        if (!isDefaultFontMatrix(gid)) {
-            res *= (getFontMatrix(gid)[0] * 1000);
-        }
-        return res;
     }
 
     private int getDefaultWidth(int gid) {

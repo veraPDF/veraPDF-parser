@@ -367,6 +367,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         }
     }
 
+    @Override
     public List<Integer> getCIDList() {
         if (charSet != null) {
             List<Integer> res = new ArrayList<>(this.charSet.size());

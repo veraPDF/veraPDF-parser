@@ -84,7 +84,7 @@ public class PDType0Font extends PDCIDFont {
         if (dict != null) {
             COSArray array =
                     (COSArray) dict.getKey(ASAtom.DESCENDANT_FONTS).getDirectBase();
-            if (array != null) {
+            if (array != null && array.size() > 0 && array.at(0) != null && array.at(0).getType() == COSObjType.COS_DICT) {
                 return (COSDictionary) array.at(0).getDirectBase();
             }
         }
@@ -183,7 +183,7 @@ public class PDType0Font extends PDCIDFont {
      * @param descendant is descendant CID font for this Type 0 font.
      */
     public void setFontProgramFromDescendant(PDCIDFont descendant) {
-        this.fontProgram = descendant.fontProgram;
+        this.fontProgram = descendant != null ? descendant.fontProgram : null;
         this.isFontParsed = true;
     }
 
