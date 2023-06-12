@@ -47,7 +47,7 @@ public class CFFIndex {
     }
 
     byte[] get(int n) {
-        if (n >= count) {
+        if (n < 0 || n >= count || offsets[n] <= 0 || offsets[n + 1] <= 0) {
             throw new ArrayIndexOutOfBoundsException("Can't get object with number "
                     + n + " from INDEX with " + count + " elements.");
         }

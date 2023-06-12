@@ -117,7 +117,7 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
             if (gid < this.parser.getMaxpParser().getNumGlyphs()) {
                 return widths[widths.length - 1];   // case of monospaced fonts
             } else {
-                return widths[0];
+                return widths.length > 0 ? widths[0] : 0;
             }
         }
     }
