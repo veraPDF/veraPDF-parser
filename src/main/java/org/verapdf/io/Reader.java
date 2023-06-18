@@ -55,14 +55,8 @@ public class Reader extends XRefReader {
 	public Reader(final COSDocument document, final String fileName) throws IOException {
 		super();
 		this.parser = new PDFParser(document, fileName);
-		try {
-			this.objectStreams = new HashMap<>();
-			init();
-		} catch (IOException e) {	// If exception is thrown in init() someone
-			// should close document stream
-			this.parser.closeInputStream();
-			throw e;
-		}
+		this.objectStreams = new HashMap<>();
+		init();
 	}
 
 	public Reader(final COSDocument document, final InputStream fileStream) throws IOException {
@@ -145,22 +139,28 @@ public class Reader extends XRefReader {
 
 	// PRIVATE METHODS
 	private void init() throws IOException {
-		this.header = this.parser.getHeader();
+		try {
+			this.header = this.parser.getHeader();
 
-		List<COSXRefInfo> infos = new ArrayList<>();
-		this.parser.getXRefInfo(infos);
-		setXRefInfo(infos);
+			List<COSXRefInfo> infos = new ArrayList<>();
+			this.parser.getXRefInfo(infos);
+			setXRefInfo(infos);
 
-		if (this.parser.isEncrypted() && !docCanBeDecrypted()) {
-			this.getPDFSource().close();
-			if (this.parser.getDocument() != null) {
-				FileResourceHandler handler =
-						this.parser.getDocument().getResourceHandler();
-				if (handler != null) {
-					handler.close();
+			if (this.parser.isEncrypted() && !docCanBeDecrypted()) {
+				this.getPDFSource().close();
+				if (this.parser.getDocument() != null) {
+					FileResourceHandler handler =
+							this.parser.getDocument().getResourceHandler();
+					if (handler != null) {
+						handler.close();
+					}
 				}
+				throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 			}
-			throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+		} catch (IOException e) {	// If exception is thrown in init() someone
+			// should close document stream
+			this.parser.closeInputStream();
+			throw e;
 		}
 	}
 
