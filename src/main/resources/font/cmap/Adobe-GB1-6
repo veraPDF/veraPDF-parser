@@ -2,10 +2,10 @@
 %%DocumentNeededResources: ProcSet (CIDInit)
 %%IncludeResource: ProcSet (CIDInit)
 %%BeginResource: CMap (Identity)
-%%Title: (Identity Adobe GB1 5)
-%%Version: 1.005
+%%Title: (Identity Adobe GB1 6)
+%%Version: 1.000
 %%Copyright: -----------------------------------------------------------
-%%Copyright: Copyright 1990-2019 Adobe. All rights reserved.
+%%Copyright: Copyright 1990-2023 Adobe. All rights reserved.
 %%Copyright:
 %%Copyright: Redistribution and use in source and binary forms, with or
 %%Copyright: without modification, are permitted provided that the
@@ -21,8 +21,8 @@
 %%Copyright: provided with the distribution. 
 %%Copyright:
 %%Copyright: Neither the name of Adobe nor the names of its contributors
-%%Copyright: may be used to endorse or promote products derived from
-%%Copyright: this software without specific prior written permission.
+%%Copyright: may be used to endorse or promote products derived from this
+%%Copyright: software without specific prior written permission. 
 %%Copyright:
 %%Copyright: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
 %%Copyright: CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
@@ -49,21 +49,19 @@ begincmap
 /CIDSystemInfo 3 dict dup begin
   /Registry (Adobe) def
   /Ordering (GB1) def
-  /Supplement 5 def
+  /Supplement 6 def
 end def
 
-/CMapName /Adobe-GB1-5 def
-/CMapVersion 1.005 def
+/CMapName /Adobe-GB1-6 def
+/CMapVersion 1.000 def
 /CMapType 1 def
-
-/XUID [1 10 25605] def
 
 /WMode 0 def
 
-/CIDCount 30284 def
+/CIDCount 30572 def
 
 1 begincodespacerange
-  <0000> <76FF>
+  <0000> <77FF>
 endcodespacerange
 
 100 begincidrange
@@ -169,7 +167,7 @@ endcodespacerange
 <6300> <63ff> 25344
 endcidrange
 
-19 begincidrange
+20 begincidrange
 <6400> <64ff> 25600
 <6500> <65ff> 25856
 <6600> <66ff> 26112
@@ -188,10 +186,11 @@ endcidrange
 <7300> <73ff> 29440
 <7400> <74ff> 29696
 <7500> <75ff> 29952
-<7600> <764b> 30208
+<7600> <76ff> 30208
+<7700> <776b> 30464
 endcidrange
-endcmap
 
+endcmap
 CMapName currentdict /CMap defineresource pop
 end
 end

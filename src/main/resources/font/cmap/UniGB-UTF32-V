@@ -1,13 +1,13 @@
 %!PS-Adobe-3.0 Resource-CMap
 %%DocumentNeededResources: ProcSet (CIDInit)
-%%DocumentNeededResources: CMap (GBK-EUC-H)
+%%DocumentNeededResources: CMap (UniGB-UTF32-H)
 %%IncludeResource: ProcSet (CIDInit)
-%%IncludeResource: CMap (GBK-EUC-H)
-%%BeginResource: CMap (GBK-EUC-V)
-%%Title: (GBK-EUC-V Adobe GB1 2)
-%%Version: 12.005
+%%IncludeResource: CMap (UniGB-UTF32-H)
+%%BeginResource: CMap (UniGB-UTF32-V)
+%%Title: (UniGB-UTF32-V Adobe GB1 6)
+%%Version: 1.000
 %%Copyright: -----------------------------------------------------------
-%%Copyright: Copyright 1990-2019 Adobe. All rights reserved.
+%%Copyright: Copyright 1990-2023 Adobe. All rights reserved.
 %%Copyright:
 %%Copyright: Redistribution and use in source and binary forms, with or
 %%Copyright: without modification, are permitted provided that the
@@ -23,8 +23,8 @@
 %%Copyright: provided with the distribution. 
 %%Copyright:
 %%Copyright: Neither the name of Adobe nor the names of its contributors
-%%Copyright: may be used to endorse or promote products derived from
-%%Copyright: this software without specific prior written permission.
+%%Copyright: may be used to endorse or promote products derived from this
+%%Copyright: software without specific prior written permission. 
 %%Copyright:
 %%Copyright: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
 %%Copyright: CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
@@ -48,44 +48,51 @@
 
 begincmap
 
-/GBK-EUC-H usecmap
+/UniGB-UTF32-H usecmap
 
 /CIDSystemInfo 3 dict dup begin
   /Registry (Adobe) def
   /Ordering (GB1) def
-  /Supplement 2 def
+  /Supplement 6 def
 end def
 
-/CMapName /GBK-EUC-V def
-/CMapVersion 12.005 def
+/CMapName /UniGB-UTF32-V def
+/CMapVersion 1.000 def
 /CMapType 1 def
 
-/XUID [1 10 25378] def
+/XUID [1 10 25604] def
 
 /WMode 1 def
 
-20 begincidrange
-<a1a2> <a1a2>  575
-<a1a3> <a1a3>  574
-<a1aa> <a1aa>  598
-<a1ab> <a1ac> 7704
-<a1ad> <a1ad>  599
-<a1b2> <a1bf>  582
-<a1fe> <a1fe> 7706
-<a3a1> <a3a1>  578
-<a3a8> <a3a9>  580
-<a3ac> <a3ac>  573
-<a3ae> <a3ae> 7707
-<a3ba> <a3bb>  576
-<a3bd> <a3bd> 7708
-<a3bf> <a3bf>  579
-<a3db> <a3db> 7709
-<a3dd> <a3dd> 7710
-<a3df> <a3df>  600
-<a3fb> <a3fb>  596
-<a3fd> <a3fd>  597
-<a3fe> <a3fe> 7711
+17 begincidchar
+<00002014> 598
+<00002026> 599
+<00003001> 575
+<00003002> 574
+<00003013> 7706
+<0000ff01> 578
+<0000ff0c> 573
+<0000ff0e> 7707
+<0000ff1d> 7708
+<0000ff1f> 579
+<0000ff3b> 7709
+<0000ff3d> 7710
+<0000ff3f> 600
+<0000ff5b> 596
+<0000ff5d> 597
+<0000ff5e> 7704
+<0000ffe3> 7711
+endcidchar
+
+6 begincidrange
+<00003008> <0000300f> 584
+<00003010> <00003011> 594
+<00003014> <00003015> 582
+<00003016> <00003017> 592
+<0000ff08> <0000ff09> 580
+<0000ff1a> <0000ff1b> 576
 endcidrange
+
 endcmap
 CMapName currentdict /CMap defineresource pop
 end
