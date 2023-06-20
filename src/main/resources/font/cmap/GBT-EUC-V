@@ -1,11 +1,11 @@
 %!PS-Adobe-3.0 Resource-CMap
 %%DocumentNeededResources: ProcSet (CIDInit)
-%%DocumentNeededResources: CMap (GBK-EUC-H)
+%%DocumentNeededResources: CMap (GBT-EUC-H)
 %%IncludeResource: ProcSet (CIDInit)
-%%IncludeResource: CMap (GBK-EUC-H)
-%%BeginResource: CMap (GBK-EUC-V)
-%%Title: (GBK-EUC-V Adobe GB1 2)
-%%Version: 12.005
+%%IncludeResource: CMap (GBT-EUC-H)
+%%BeginResource: CMap (GBT-EUC-V)
+%%Title: (GBT-EUC-V Adobe GB1 1)
+%%Version: 10.006
 %%Copyright: -----------------------------------------------------------
 %%Copyright: Copyright 1990-2019 Adobe. All rights reserved.
 %%Copyright:
@@ -48,19 +48,20 @@
 
 begincmap
 
-/GBK-EUC-H usecmap
+/GBT-EUC-H usecmap
 
 /CIDSystemInfo 3 dict dup begin
   /Registry (Adobe) def
   /Ordering (GB1) def
-  /Supplement 2 def
+  /Supplement 1 def
 end def
 
-/CMapName /GBK-EUC-V def
-/CMapVersion 12.005 def
+/CMapName /GBT-EUC-V def
+/CMapVersion 10.006 def
 /CMapType 1 def
 
-/XUID [1 10 25378] def
+/UIDOffset 690 def
+/XUID [1 10 25371] def
 
 /WMode 1 def
 

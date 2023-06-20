@@ -1,11 +1,9 @@
 %!PS-Adobe-3.0 Resource-CMap
 %%DocumentNeededResources: ProcSet (CIDInit)
-%%DocumentNeededResources: CMap (GBK-EUC-H)
 %%IncludeResource: ProcSet (CIDInit)
-%%IncludeResource: CMap (GBK-EUC-H)
-%%BeginResource: CMap (GBK-EUC-V)
-%%Title: (GBK-EUC-V Adobe GB1 2)
-%%Version: 12.005
+%%BeginResource: CMap (GB-H)
+%%Title: (GB-H Adobe GB1 0)
+%%Version: 9.006
 %%Copyright: -----------------------------------------------------------
 %%Copyright: Copyright 1990-2019 Adobe. All rights reserved.
 %%Copyright:
@@ -48,43 +46,114 @@
 
 begincmap
 
-/GBK-EUC-H usecmap
-
 /CIDSystemInfo 3 dict dup begin
   /Registry (Adobe) def
   /Ordering (GB1) def
-  /Supplement 2 def
+  /Supplement 0 def
 end def
 
-/CMapName /GBK-EUC-V def
-/CMapVersion 12.005 def
+/CMapName /GB-H def
+/CMapVersion 9.006 def
 /CMapType 1 def
 
-/XUID [1 10 25378] def
+/UIDOffset 200 def
+/XUID [1 10 25362] def
 
-/WMode 1 def
+/WMode 0 def
 
-20 begincidrange
-<a1a2> <a1a2>  575
-<a1a3> <a1a3>  574
-<a1aa> <a1aa>  598
-<a1ab> <a1ac> 7704
-<a1ad> <a1ad>  599
-<a1b2> <a1bf>  582
-<a1fe> <a1fe> 7706
-<a3a1> <a3a1>  578
-<a3a8> <a3a9>  580
-<a3ac> <a3ac>  573
-<a3ae> <a3ae> 7707
-<a3ba> <a3bb>  576
-<a3bd> <a3bd> 7708
-<a3bf> <a3bf>  579
-<a3db> <a3db> 7709
-<a3dd> <a3dd> 7710
-<a3df> <a3df>  600
-<a3fb> <a3fb>  596
-<a3fd> <a3fd>  597
-<a3fe> <a3fe> 7711
+1 begincodespacerange
+  <2121> <7E7E>
+endcodespacerange
+
+88 begincidrange
+<2121> <217e> 96
+<2231> <2262> 190
+<2265> <226e> 240
+<2271> <227c> 250
+<2321> <237e> 262
+<2421> <2473> 356
+<2521> <2576> 439
+<2621> <2638> 525
+<2641> <2675> 549
+<2721> <2741> 602
+<2751> <2771> 635
+<2821> <2840> 668
+<2845> <286a> 700
+<2924> <296f> 738
+<2a21> <2a7e> 814
+<2b21> <2b40> 908
+<3021> <307e> 940
+<3121> <317e> 1034
+<3221> <327e> 1128
+<3321> <337e> 1222
+<3421> <347e> 1316
+<3521> <357e> 1410
+<3621> <367e> 1504
+<3721> <377e> 1598
+<3821> <387e> 1692
+<3921> <397e> 1786
+<3a21> <3a7e> 1880
+<3b21> <3b7e> 1974
+<3c21> <3c7e> 2068
+<3d21> <3d7e> 2162
+<3e21> <3e7e> 2256
+<3f21> <3f7e> 2350
+<4021> <407e> 2444
+<4121> <417e> 2538
+<4221> <427e> 2632
+<4321> <437e> 2726
+<4421> <447e> 2820
+<4521> <457e> 2914
+<4621> <467e> 3008
+<4721> <477e> 3102
+<4821> <487e> 3196
+<4921> <497e> 3290
+<4a21> <4a7e> 3384
+<4b21> <4b7e> 3478
+<4c21> <4c7e> 3572
+<4d21> <4d7e> 3666
+<4e21> <4e7e> 3760
+<4f21> <4f7e> 3854
+<5021> <507e> 3948
+<5121> <517e> 4042
+<5221> <527e> 4136
+<5321> <537e> 4230
+<5421> <547e> 4324
+<5521> <557e> 4418
+<5621> <567e> 4512
+<5721> <5779> 4606
+<5821> <587e> 4695
+<5921> <597e> 4789
+<5a21> <5a7e> 4883
+<5b21> <5b7e> 4977
+<5c21> <5c7e> 5071
+<5d21> <5d7e> 5165
+<5e21> <5e7e> 5259
+<5f21> <5f7e> 5353
+<6021> <607e> 5447
+<6121> <617e> 5541
+<6221> <627e> 5635
+<6321> <637e> 5729
+<6421> <647e> 5823
+<6521> <657e> 5917
+<6621> <667e> 6011
+<6721> <677e> 6105
+<6821> <687e> 6199
+<6921> <697e> 6293
+<6a21> <6a7e> 6387
+<6b21> <6b7e> 6481
+<6c21> <6c7e> 6575
+<6d21> <6d7e> 6669
+<6e21> <6e7e> 6763
+<6f21> <6f7e> 6857
+<7021> <707e> 6951
+<7121> <717e> 7045
+<7221> <727e> 7139
+<7321> <737e> 7233
+<7421> <747e> 7327
+<7521> <757e> 7421
+<7621> <767e> 7515
+<7721> <777e> 7609
 endcidrange
 endcmap
 CMapName currentdict /CMap defineresource pop
