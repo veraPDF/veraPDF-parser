@@ -55,6 +55,9 @@ class CFFFileBaseParser {
     }
 
     private long readOffset(int offSize) throws IOException {
+        if (offSize < 1) {
+            throw new IOException("Tried to read less than one byte");
+        }
         long res = 0;
         for (int i = 0; i < offSize - 1; ++i) {
             res |= (this.source.readByte() & 0xFF);
@@ -70,6 +73,9 @@ class CFFFileBaseParser {
             return new CFFIndex(0, 0, new int[0], new byte[0]);
         }
         int offSize = readCard8();
+        if (offSize == 0) {
+            throw new IOException("Bad offset size");
+        }
         int[] offset = new int[count + 1];
         for (int i = 0; i < count + 1; ++i) {
             offset[i] = (int) readOffset(offSize);

@@ -75,6 +75,8 @@ public abstract class SeekableInputStream extends ASInputStream {
      */
     public abstract ASInputStream getStream(long startOffset, long length) throws IOException;
 
+    public abstract SeekableInputStream getSeekableStream(long startOffset, long length) throws IOException;
+
     /**
      * {@inheritDoc}
      */
@@ -151,6 +153,14 @@ public abstract class SeekableInputStream extends ASInputStream {
      * @return SeekableStream that contains data of passed stream.
      */
     public static SeekableInputStream getSeekableStream(InputStream stream) throws IOException {
+        if (stream instanceof SeekableInputStream) {
+            SeekableInputStream seekableStream = (SeekableInputStream) stream;
+            long offset = seekableStream.getOffset();
+            long remaining = seekableStream.getStreamLength() - offset;
+            SeekableInputStream result = seekableStream.getSeekableStream(offset, remaining);
+            seekableStream.seekFromEnd(0);
+            return result;
+        }
         int totalRead = 0;
         byte[] buffer = new byte[0];
         byte[] temp = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];

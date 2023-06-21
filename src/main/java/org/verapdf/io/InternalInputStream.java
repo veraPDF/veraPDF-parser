@@ -49,6 +49,7 @@ public class InternalInputStream extends SeekableInputStream {
 	private String filePath;
 	private long fromOffset;
 	private long size;
+	private long resetPosition;
 
 	public InternalInputStream(final File file) throws IOException {
 		this(file, false);
@@ -166,14 +167,27 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	@Override
+	public boolean markSupported() {
+		return true;
+	}
+
+	@Override
+	public synchronized void mark(int readlimit) {
+		resetPosition = offset;
+	}
+
+	@Override
 	public void reset() throws IOException {
 		checkClosed("Reset");
-		this.seek(0);
+		this.seek(resetPosition);
 	}
 
 	@Override
 	public void seek(long offset) throws IOException {
 		checkClosed("Seeking");
+		if (offset < 0) {
+			throw new IOException("Can't seek for offset " + offset + " in InternalInputStream");
+		}
 		if (offset > this.getStreamLength()) {
 			throw new IllegalArgumentException("Destination offset is greater than stream length");
 		}
@@ -198,10 +212,15 @@ public class InternalInputStream extends SeekableInputStream {
 
 	@Override
 	public ASInputStream getStream(long startOffset, long length) throws IOException {
-		return new InternalInputStream(this.stream, startOffset, length, numOfFileUsers, filePath, isTempFile);
+		return new InternalInputStream(this.stream, fromOffset + startOffset, length, numOfFileUsers, filePath, isTempFile);
 	}
 
-	@Override
+    @Override
+    public SeekableInputStream getSeekableStream(long startOffset, long length) throws IOException {
+        return new InternalInputStream(this.stream, startOffset + fromOffset, length, numOfFileUsers, filePath, isTempFile);
+    }
+
+    @Override
 	public void closeResource() throws IOException {
 		if (!isSourceClosed) {
 			isSourceClosed = true;
