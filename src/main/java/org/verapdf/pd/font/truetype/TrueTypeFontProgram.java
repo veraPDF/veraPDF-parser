@@ -29,7 +29,11 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDFont;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents TrueTypeFontProgram.
@@ -37,6 +41,8 @@ import java.util.Map;
  * @author Sergey Shemyakov
  */
 public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProgram {
+
+    private static final Logger LOGGER = Logger.getLogger(TrueTypeFontProgram.class.getCanonicalName());
 
     private COSObject encoding;
     private boolean isSymbolic;
@@ -61,7 +67,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
     @Override
     public void parseFont() throws IOException {
         super.parseFont();
-        if (!isSymbolic) {
+        if (!isSymbolic && encoding.getDirectBase() != null && encodingMappingArray == null) {
             this.createCIDToNameTable();
         }
     }
@@ -71,7 +77,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      */
     @Override
     public boolean containsCode(int code) {
-        if (!isSymbolic) {
+        if (!isSymbolic && encoding.getDirectBase() != null) {
             String glyph;
             if (this.encodingMappingArray != null && code < this.encodingMappingArray.length) {
                 glyph = this.encodingMappingArray[code];
@@ -82,17 +88,21 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
                 return false;
             }
             int gid = getGidFromCMaps(glyph);
-            return gid >= 0 && gid < getNGlyphs();
+            if (gid == 0) {
+                // if cmap lookup fails we go to post table
+                gid = getGidFromPostTable(glyph);
+            }
+            return gid > 0 && gid < getNGlyphs();
         } else {
-            if (cMap30containsGlyph(code)) {
-                return true;
+            if (isCmapPresent(3, 0)) {
+                //No need to look at cmap(1, 0) if cmap(3, 0) exist
+                //GID 0 is considered to be .notdef
+                return cMap30containsGlyph(code) && getGIDFrom30(code) != 0;
             }
             TrueTypeCmapSubtable cmap10 = this.parser.getCmapTable(1, 0);
-            if (cmap10 != null) {
-                return cmap10.containsCID(code);
-            }
+            //GID 0 is considered to be .notdef
+            return cmap10 != null && cmap10.containsCID(code) && cmap10.getGlyph(code) != 0;
         }
-        return false;
     }
 
     /**
@@ -100,28 +110,30 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      */
     @Override
     public float getWidth(int code) {
-        if (isSymbolic) {
+        if (isSymbolic || encoding.getDirectBase() == null) {
             return getWidthSymbolic(code);
         } else {
-            if (encodingMappingArray == null) {  // no external encoding
+            float width;
+            if (encodingMappingArray != null && code < encodingMappingArray.length) {
+                String glyphName = encodingMappingArray[code];
+                width = getWidth(glyphName);
+            } else {
+                width = getWidth(TrueTypePredefined.NOTDEF_STRING);
+            }
+            if (width == -1) {
                 int gid = this.parser.getCmapParser().getGID(code);
                 return getWidthWithCheck(gid);
             }
-            if (code < 256) {
-                String glyphName = encodingMappingArray[code];
-                return getWidth(glyphName);
-            } else {
-                return getWidth(TrueTypePredefined.NOTDEF_STRING);
-            }
+            return width;
         }
     }
 
     @Override
     public String getGlyphName(int code) {
-        if (!isSymbolic && encodingMappingArray != null &&
+        if (!isSymbolic && encoding.getDirectBase() != null && encodingMappingArray != null &&
                 code < encodingMappingArray.length) {
             return encodingMappingArray[code];
-        } else if (isSymbolic) {
+        } else if (isSymbolic || encoding.getDirectBase() == null) {
             return " "; // indicates that toUnicode should not be checked.
         }
         return null;
@@ -132,7 +144,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
      */
     @Override
     public float getWidth(String glyphName) {
-        if (isSymbolic) {
+        if (isSymbolic || encoding.getDirectBase() == null) {
             return -1;
         }
         int gid = getGidFromCMaps(glyphName);
@@ -154,7 +166,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
 
     @Override
     public boolean containsGlyph(String glyphName) {
-        if (!isSymbolic) {
+        if (!isSymbolic && encoding.getDirectBase() != null) {
             int gid = getGidFromCMaps(glyphName);
             return gid >= 0 && gid < getNGlyphs();
         } else {
@@ -204,7 +216,8 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             gid = cmap10.getGlyph(code);
             return getWidthWithCheck(gid);
         }
-        return -1;
+        gid = this.parser.getCmapParser().getGID(code);
+        return getWidthWithCheck(gid);
     }
 
     private int getGIDFrom30(int code) {
@@ -269,7 +282,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
                 System.arraycopy(TrueTypePredefined.MAC_EXPERT_ENCODING, 0,
                         encodingMappingArray, 0, 256);
             } else {
-                throw new IOException("Error in reading /Encoding entry in font dictionary");
+                LOGGER.log(Level.SEVERE, "Error in reading /Encoding entry in font dictionary");
+                System.arraycopy(TrueTypePredefined.STANDARD_ENCODING, 0,
+                        encodingMappingArray, 0, 256);
             }
         } else {
             System.arraycopy(TrueTypePredefined.STANDARD_ENCODING, 0,
@@ -302,5 +317,10 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
     @Override
     public boolean containsCID(int cid) {
         return false;
+    }
+
+    @Override
+    public List<Integer> getCIDList() {
+        return Collections.emptyList();
     }
 }

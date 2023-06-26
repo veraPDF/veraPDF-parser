@@ -24,10 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
-import org.verapdf.pd.structure.PDNameSpaceRoleMapping;
-import org.verapdf.pd.structure.PDStructElem;
-import org.verapdf.pd.structure.PDStructureNameSpace;
-import org.verapdf.pd.structure.StructureType;
+import org.verapdf.pd.structure.*;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -40,83 +37,113 @@ public class TaggedPDFHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(TaggedPDFHelper.class.getCanonicalName());
 
-	public static final String PDF_NAMESPACE = "http://iso.org/pdf/ssn";
-	public static final String PDF2_NAMESPACE = "http://iso.org/pdf2/ssn";
-	public static final String MATH_ML_NAMESPACE = "http://www.w3.org/1998/Math/MathML";
-
-	private static Set<String> PDF_1_7_STANDART_ROLE_TYPES;
-	private static Set<String> PDF_2_0_STANDART_ROLE_TYPES;
+	private static final Set<String> PDF_1_4_STANDARD_ROLE_TYPES;
+	private static final Set<String> PDF_1_7_STANDARD_ROLE_TYPES;
+	private static final Set<String> PDF_2_0_STANDARD_ROLE_TYPES;
+	private static final Set<String> WCAG_STANDARD_ROLE_TYPES;
 
 	static {
 		Set<String> tempSet = new HashSet<>();
-		// Common standard structure types for PDF 1.7 and 2.0
-		tempSet.add("Document");
-		tempSet.add("Part");
-		tempSet.add("Div");
-		tempSet.add("Caption");
-		tempSet.add("THead");
-		tempSet.add("TBody");
-		tempSet.add("TFoot");
-		tempSet.add("H");
-		tempSet.add("P");
-		tempSet.add("L");
-		tempSet.add("LI");
-		tempSet.add("Lbl");
-		tempSet.add("LBody");
-		tempSet.add("Table");
-		tempSet.add("TR");
-		tempSet.add("TH");
-		tempSet.add("TD");
-		tempSet.add("Span");
-		tempSet.add("Link");
-		tempSet.add("Annot");
-		tempSet.add("Ruby");
-		tempSet.add("Warichu");
-		tempSet.add("Figure");
-		tempSet.add("Formula");
-		tempSet.add("Form");
-		tempSet.add("RB");
-		tempSet.add("RT");
-		tempSet.add("RP");
-		tempSet.add("WT");
-		tempSet.add("WP");
+
+		// Common standard structure types for PDF 1.4, 1.7 and 2.0
+
+		// Standard structure types for grouping elements PDF 1.4, 1.7 and 2.0
+		tempSet.add(TaggedPDFConstants.DOCUMENT);
+		tempSet.add(TaggedPDFConstants.PART);
+		tempSet.add(TaggedPDFConstants.DIV);
+		tempSet.add(TaggedPDFConstants.CAPTION);
+
+		// Standard structure types for paragraphlike elements PDF 1.4, 1.7 and 2.0
+		tempSet.add(TaggedPDFConstants.H);
+		tempSet.add(TaggedPDFConstants.P);
+
+		//Standard structure types for list elements PDF 1.4, 1.7 and 2.0
+		tempSet.add(TaggedPDFConstants.L);
+		tempSet.add(TaggedPDFConstants.LI);
+		tempSet.add(TaggedPDFConstants.LBL);
+		tempSet.add(TaggedPDFConstants.LBODY);
+
+		//Standard structure types for table elements PDF 1.4, 1.7 and 2.0
+		tempSet.add(TaggedPDFConstants.TABLE);
+		tempSet.add(TaggedPDFConstants.TR);
+		tempSet.add(TaggedPDFConstants.TH);
+		tempSet.add(TaggedPDFConstants.TD);
+
+		// Standard structure types for inline-level structure elements PDF 1.4, 1.7 and 2.0
+		tempSet.add(TaggedPDFConstants.SPAN);
+		tempSet.add(TaggedPDFConstants.LINK);
+
+		// Standard structure types for illustration elements PDF 1.4, 1.7 and 2.0
+		tempSet.add(TaggedPDFConstants.FIGURE);
+		tempSet.add(TaggedPDFConstants.FORMULA);
+		tempSet.add(TaggedPDFConstants.FORM);
 
 		Set<String> pdf_1_7 = new HashSet<>(tempSet);
 
-		// Standart structure types present in 1.7
-		pdf_1_7.add("Art");
-		pdf_1_7.add("Sect");
-		pdf_1_7.add("BlockQuote");
-		pdf_1_7.add("TOC");
-		pdf_1_7.add("TOCI");
-		pdf_1_7.add("Index");
-		pdf_1_7.add("NonStruct");
-		pdf_1_7.add("Private");
-		pdf_1_7.add("Quote");
-		pdf_1_7.add("Note");
-		pdf_1_7.add("Reference");
-		pdf_1_7.add("BibEntry");
-		pdf_1_7.add("Code");
-		pdf_1_7.add("H1");
-		pdf_1_7.add("H2");
-		pdf_1_7.add("H3");
-		pdf_1_7.add("H4");
-		pdf_1_7.add("H5");
-		pdf_1_7.add("H6");
+		// Standard structure types present in PDF 1.7 and 1.4
 
+		// Standard structure types for grouping elements PDF 1.7 and 1.4
+		pdf_1_7.add(TaggedPDFConstants.ART);
+		pdf_1_7.add(TaggedPDFConstants.SECT);
+		pdf_1_7.add(TaggedPDFConstants.BLOCK_QUOTE);
+		pdf_1_7.add(TaggedPDFConstants.TOC);
+		pdf_1_7.add(TaggedPDFConstants.TOCI);
+		pdf_1_7.add(TaggedPDFConstants.INDEX);
+		pdf_1_7.add(TaggedPDFConstants.NON_STRUCT);
+		pdf_1_7.add(TaggedPDFConstants.PRIVATE);
+
+		// Standard structure types for inline-level structure elements PDF 1.7 and 1.4
+		pdf_1_7.add(TaggedPDFConstants.QUOTE);
+		pdf_1_7.add(TaggedPDFConstants.NOTE);
+		pdf_1_7.add(TaggedPDFConstants.REFERENCE);
+		pdf_1_7.add(TaggedPDFConstants.BIB_ENTRY);
+		pdf_1_7.add(TaggedPDFConstants.CODE);
+
+		// Standard structure types for paragraphlike elements PDF 1.7 and 1.4
+		pdf_1_7.add(TaggedPDFConstants.H1);
+		pdf_1_7.add(TaggedPDFConstants.H2);
+		pdf_1_7.add(TaggedPDFConstants.H3);
+		pdf_1_7.add(TaggedPDFConstants.H4);
+		pdf_1_7.add(TaggedPDFConstants.H5);
+		pdf_1_7.add(TaggedPDFConstants.H6);
+
+		Set<String> pdf_1_4 = new HashSet<>(pdf_1_7);
 		Set<String> pdf_2_0 = new HashSet<>(tempSet);
+		tempSet = new HashSet<>();
 
-		pdf_2_0.add("DocumentFragment");
-		pdf_2_0.add("Aside");
-		pdf_2_0.add("Title");
-		pdf_2_0.add("FENote");
-		pdf_2_0.add("Sub");
-		pdf_2_0.add("Em");
-		pdf_2_0.add("Strong");
-		pdf_2_0.add("Artifact");
+		// Common standard structure types for PDF 1.7 and 2.0
+		tempSet.add(TaggedPDFConstants.THEAD);
+		tempSet.add(TaggedPDFConstants.TBODY);
+		tempSet.add(TaggedPDFConstants.TFOOT);
+		tempSet.add(TaggedPDFConstants.ANNOT);
+		tempSet.add(TaggedPDFConstants.RUBY);
+		tempSet.add(TaggedPDFConstants.WARICHU);
+		tempSet.add(TaggedPDFConstants.RB);
+		tempSet.add(TaggedPDFConstants.RT);
+		tempSet.add(TaggedPDFConstants.RP);
+		tempSet.add(TaggedPDFConstants.WT);
+		tempSet.add(TaggedPDFConstants.WP);
 
-		PDF_1_7_STANDART_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_7);
-		PDF_2_0_STANDART_ROLE_TYPES = Collections.unmodifiableSet(pdf_2_0);
+		pdf_1_7.addAll(tempSet);
+		pdf_2_0.addAll(tempSet);
+
+		Set<String> wcag = new HashSet<>(pdf_1_7);
+		wcag.add(TaggedPDFConstants.ARTIFACT);
+		wcag.add(TaggedPDFConstants.TITLE);
+
+		pdf_2_0.add(TaggedPDFConstants.DOCUMENT_FRAGMENT);
+		pdf_2_0.add(TaggedPDFConstants.ASIDE);
+		pdf_2_0.add(TaggedPDFConstants.TITLE);
+		pdf_2_0.add(TaggedPDFConstants.FENOTE);
+		pdf_2_0.add(TaggedPDFConstants.SUB);
+		pdf_2_0.add(TaggedPDFConstants.EM);
+		pdf_2_0.add(TaggedPDFConstants.STRONG);
+		pdf_2_0.add(TaggedPDFConstants.ARTIFACT);
+
+		PDF_1_4_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_4);
+		PDF_1_7_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_7);
+		PDF_2_0_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_2_0);
+		WCAG_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(wcag);
 	}
 
 	private static final int MAX_NUMBER_OF_ELEMENTS = 1;
@@ -151,7 +178,7 @@ public class TaggedPDFHelper {
 			PDNameSpaceRoleMapping nameSpaceMapping = nameSpace.getNameSpaceMapping();
 			if (nameSpaceMapping != null) {
 				return nameSpaceMapping.getEquivalentType(type.getType());
-			} else if (!PDF_NAMESPACE.equals(nameSpace.getNS())) {
+			} else if (!TaggedPDFConstants.PDF_NAMESPACE.equals(nameSpace.getNS())) {
 				return null;
 			}
 		}
@@ -159,23 +186,29 @@ public class TaggedPDFHelper {
 		return equiv == null ? null : StructureType.createStructureType(equiv);
 	}
 
-	private static boolean isStandardType(StructureType type) {
+	public static boolean isStandardType(StructureType type) {
 		String structureType = type.getType().getValue();
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {
 			switch (nameSpace.getNS()) {
-				case PDF_NAMESPACE:
-					return PDF_1_7_STANDART_ROLE_TYPES.contains(structureType);
-				case PDF2_NAMESPACE:
-					return PDF_2_0_STANDART_ROLE_TYPES.contains(structureType) || structureType.matches("^H[1-9][0-9]*$");
-				case MATH_ML_NAMESPACE:
+				case TaggedPDFConstants.PDF_NAMESPACE:
+					return PDF_1_7_STANDARD_ROLE_TYPES.contains(structureType);
+				case TaggedPDFConstants.PDF2_NAMESPACE:
+					return PDF_2_0_STANDARD_ROLE_TYPES.contains(structureType)
+							|| structureType.matches(TaggedPDFConstants.HN_REGEXP);
+				case TaggedPDFConstants.MATH_ML_NAMESPACE:
 					return true;
 				default:
 					return false;
 			}
 		} else {
-			return PDF_1_7_STANDART_ROLE_TYPES.contains(structureType);
+			return PDF_1_7_STANDARD_ROLE_TYPES.contains(structureType);
 		}
+	}
+
+	public static boolean isWCAGStandardType(StructureType type) {
+		String structureType = type.getType().getValue();
+		return WCAG_STANDARD_ROLE_TYPES.contains(structureType);
 	}
 
 	private static void addVisited(StructureType type) {
@@ -212,12 +245,51 @@ public class TaggedPDFHelper {
 		}
 	}
 
-	public static List<PDStructElem> getStructTreeRootChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
+	public static List<PDStructElem> getStructTreeRootStructChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
+		return getStructChildren(parent, roleMap, false);
+	}
+
+	public static List<Object> getStructTreeRootChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
 		return getChildren(parent, roleMap, false);
 	}
 
-	public static List<PDStructElem> getStructElemChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
+	public static List<PDStructElem> getStructElemStructChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
+		return getStructChildren(parent, roleMap, true);
+	}
+
+	public static List<Object> getStructElemChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
 		return getChildren(parent, roleMap, true);
+	}
+
+	private static List<Object> getChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+		if (parent == null || parent.getType() != COSObjType.COS_DICT) {
+			LOGGER.log(Level.FINE, "Parent element for struct elements is null or not a COSDictionary");
+			return Collections.emptyList();
+		}
+
+		COSObject children = parent.getKey(ASAtom.K);
+		if (children != null) {
+			if (isStructElem(children, checkType)) {
+				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
+				list.add(new PDStructElem(children, roleMap));
+				return Collections.unmodifiableList(list);
+			} else if (isMCR(children)) {
+				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
+				list.add(new PDMCRDictionary(children));
+				return Collections.unmodifiableList(list);
+			} else if (children.getType() == COSObjType.COS_INTEGER) {
+				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
+				list.add(children);
+				return Collections.unmodifiableList(list);
+			} else if (children.getType() == COSObjType.COS_ARRAY) {
+				return getChildrenFromArray(children, roleMap, checkType);
+			} else if (isOBJR(children)) {
+				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
+				list.add(new PDOBJRDictionary(children));
+				return Collections.unmodifiableList(list);
+			}
+		}
+		return Collections.emptyList();
 	}
 
 	/**
@@ -226,7 +298,7 @@ public class TaggedPDFHelper {
 	 * @param parent parent dictionary
 	 * @return list of structure elements
 	 */
-	private static List<PDStructElem> getChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+	private static List<PDStructElem> getStructChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
 		if (parent == null || parent.getType() != COSObjType.COS_DICT) {
 			LOGGER.log(Level.FINE, "Parent element for struct elements is null or not a COSDictionary");
 			return Collections.emptyList();
@@ -239,7 +311,7 @@ public class TaggedPDFHelper {
 				list.add(new PDStructElem(children, roleMap));
 				return Collections.unmodifiableList(list);
 			} else if (children.getType() == COSObjType.COS_ARRAY) {
-				return getChildrenFromArray(children, roleMap, checkType);
+				return getStructChildrenFromArray(children, roleMap, checkType);
 			}
 		}
 		return Collections.emptyList();
@@ -251,13 +323,33 @@ public class TaggedPDFHelper {
 	 * @param children array of children structure elements
 	 * @return list of structure elements
 	 */
-	private static List<PDStructElem> getChildrenFromArray(COSObject children, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
-		if (children.size().intValue() > 0) {
+	private static List<PDStructElem> getStructChildrenFromArray(COSObject children, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+		if (children.size() > 0) {
 			List<PDStructElem> list = new ArrayList<>();
-			for (int i = 0; i < children.size().intValue(); ++i) {
+			for (int i = 0; i < children.size(); ++i) {
 				COSObject elem = children.at(i);
 				if (isStructElem(elem, checkType)) {
 					list.add(new PDStructElem(elem, roleMap));
+				}
+			}
+			return Collections.unmodifiableList(list);
+		}
+		return Collections.emptyList();
+	}
+
+	private static List<Object> getChildrenFromArray(COSObject children, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+		if (children.size() > 0) {
+			List<Object> list = new ArrayList<>();
+			for (int i = 0; i < children.size(); ++i) {
+				COSObject elem = children.at(i);
+				if (isStructElem(elem, checkType)) {
+					list.add(new PDStructElem(elem, roleMap));
+				} else if (isMCR(elem)) {
+					list.add(new PDMCRDictionary(elem));
+				} else if (elem.getType() == COSObjType.COS_INTEGER) {
+					list.add(elem);
+				} else if (isOBJR(elem)) {
+					list.add(new PDOBJRDictionary(elem));
 				}
 			}
 			return Collections.unmodifiableList(list);
@@ -273,6 +365,28 @@ public class TaggedPDFHelper {
 		return !checkType || type == null || type.equals(ASAtom.STRUCT_ELEM);
 	}
 
+	public static boolean isMCR(COSObject obj) {
+		if (obj == null || obj.empty()) {
+			return false;
+		}
+		if (!obj.getType().isDictionaryBased()) {
+			return false;
+		}
+		ASAtom type = obj.getNameKey(ASAtom.TYPE);
+		return ASAtom.MCR.equals(type);
+	}
+
+	public static boolean isOBJR(COSObject obj) {
+		if (obj == null || obj.empty()) {
+			return false;
+		}
+		if (!obj.getType().isDictionaryBased()) {
+			return false;
+		}
+		ASAtom type = obj.getNameKey(ASAtom.TYPE);
+		return ASAtom.OBJR.equals(type);
+	}
+
 	public static boolean isContentItem(COSObject obj) {
 		if (obj == null || obj.empty()) {
 			return false;
@@ -284,6 +398,22 @@ public class TaggedPDFHelper {
 			return false;
 		}
 		ASAtom type = obj.getNameKey(ASAtom.TYPE);
-		return type == ASAtom.getASAtom("MCR") || type == ASAtom.getASAtom("OBJR");
+		return type == ASAtom.MCR || type == ASAtom.OBJR;
+	}
+
+	public static Set<String> getPdf14StandardRoleTypes() {
+		return PDF_1_4_STANDARD_ROLE_TYPES;
+	}
+
+	public static Set<String> getPdf17StandardRoleTypes() {
+		return PDF_1_7_STANDARD_ROLE_TYPES;
+	}
+
+	public static Set<String> getPdf20StandardRoleTypes() {
+		return PDF_2_0_STANDARD_ROLE_TYPES;
+	}
+
+	public static Set<String> getWcagStandardRoleTypes() {
+		return WCAG_STANDARD_ROLE_TYPES;
 	}
 }

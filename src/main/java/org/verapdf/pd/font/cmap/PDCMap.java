@@ -22,10 +22,8 @@ package org.verapdf.pd.font.cmap;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
+import org.verapdf.exceptions.LoopedException;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.PDObject;
@@ -34,6 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -79,10 +79,17 @@ public class PDCMap extends PDObject {
     }
 
     private String getCMapID() {
-        if (this.getObject().getType() == COSObjType.COS_STREAM) {
-            return "CMap " + getObject().getObjectKey().toString();
-        } else if (this.getObject().getType() == COSObjType.COS_NAME) {
-            return getObject().getString();
+        return getCMapID(getObject().getDirectBase());
+    }
+
+    protected static String getCMapID(COSBase object) {
+        if (object == null) {
+            return "";
+        }
+        if (object.getType() == COSObjType.COS_STREAM) {
+            return "CMap " + object.getObjectKey().toString();
+        } else if (object.getType() == COSObjType.COS_NAME) {
+            return object.getString();
         }
         return "";
     }
@@ -98,7 +105,12 @@ public class PDCMap extends PDObject {
      * @return CMap file object read from stream or loaded from predefined CMap
      * file or null if load failed.
      */
+
     public CMap getCMapFile() {
+        return getCMapFile(new HashSet<>());
+    }
+
+    private CMap getCMapFile(Set<COSKey> keys) {
         if (!parsedCMap) {
             parsedCMap = true;
             if (this.getObject().getType() == COSObjType.COS_STREAM) {
@@ -120,7 +132,14 @@ public class PDCMap extends PDObject {
             }
             parseUseCMap();
             if (useCMap != null) {
-                this.cMapFile.useCMap(useCMap.getCMapFile());
+                COSKey key = this.getObject().getKey();
+                if (keys.contains(key)) {
+                    throw new LoopedException("Loop inside CMap");
+                }
+                if (key != null) {
+                    keys.add(key);
+                }
+                this.cMapFile.useCMap(useCMap.getCMapFile(keys));
             }
         }
         return this.cMapFile;
@@ -165,19 +184,25 @@ public class PDCMap extends PDObject {
     }
 
     private COSDictionary getCIDSystemInfo() {
+        if (cidSystemInfo != null) {
+            return this.cidSystemInfo;
+        }
         if (this.getObject().getType() == COSObjType.COS_NAME) {
             // actually creating COSDictionary with values from predefined CMap.
-            String registry = this.getCMapFile().getRegistry();
-            String ordering = this.getCMapFile().getOrdering();
-            int supplement = this.getCMapFile().getSupplement();
+            CharacterCollections.CIDSystemInfo info = CharacterCollections.getCIDSystemInfo(this.getObject().getString());
+            if (info == null) {
+                this.cidSystemInfo = (COSDictionary) COSDictionary.construct().getDirectBase();
+                return this.cidSystemInfo;
+            }
+            String registry = info.getRegistry().getRegistry();
+            String ordering = info.getOrdering().getOrdering();
+            int supplement = info.getSupplement();
             COSDictionary res = (COSDictionary)
                     COSDictionary.construct(ASAtom.REGISTRY, registry).get();
             res.setStringKey(ASAtom.ORDERING, ordering);
             res.setIntegerKey(ASAtom.SUPPLEMENT, supplement);
-            return res;
-        }
-
-        if (cidSystemInfo == null) {
+            this.cidSystemInfo = res;
+        } else {
             COSObject cidSystemInfoObject = this.getObject().getKey(ASAtom.CID_SYSTEM_INFO);
             if (cidSystemInfoObject.getType() == COSObjType.COS_DICT) {
                 this.cidSystemInfo = (COSDictionary) cidSystemInfoObject.getDirectBase();

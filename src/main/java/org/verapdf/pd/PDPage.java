@@ -23,17 +23,21 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.actions.PDPageAdditionalActions;
+import org.verapdf.pd.annotations.PDWidgetAnnotation;
 import org.verapdf.pd.colors.PDColorSpace;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class PDPage extends PDPageTreeNode {
+
+    private static final Logger LOGGER = Logger.getLogger(PDPage.class.getCanonicalName());
 
     //! Predefined page sizes
     public static double PAGE_SIZE_A3[] = {0, 0, 842, 1190};
@@ -77,14 +81,8 @@ public class PDPage extends PDPageTreeNode {
 
     private void initializeContents(final COSObject pageDict) {
         COSObject contents = pageDict.getKey(ASAtom.CONTENTS);
-        if (!contents.empty() && contents.getType() == COSObjType.COS_STREAM) {
+        if (contents.getType() == COSObjType.COS_STREAM || contents.getType() == COSObjType.COS_ARRAY) {
             this.content = new PDPageContentStream(contents);
-        } else if (!contents.empty() && contents.getType() == COSObjType.COS_ARRAY) {
-            try {
-                this.content = new PDPageContentStream(COSStream.concatenateStreams((COSArray) contents.getDirectBase()));
-            } catch (IOException e) {
-                this.content = new PDPageContentStream(contents.at(0));
-            }
         }
     }
 
@@ -94,6 +92,21 @@ public class PDPage extends PDPageTreeNode {
             return getDoubleArrayForBox(array);
         }
         return null;
+    }
+
+    public List<PDOutputIntent> getOutputIntents() {
+        COSObject base = getKey(ASAtom.OUTPUT_INTENTS);
+        if (base != null && base.getType() == COSObjType.COS_ARRAY) {
+            COSArray array = (COSArray) base.getDirectBase();
+            List<PDOutputIntent> result = new ArrayList<>(array.size());
+            for (COSObject obj : array) {
+                if (obj != null && obj.getType().isDictionaryBased()) {
+                    result.add(new PDOutputIntent(obj));
+                }
+            }
+            return Collections.unmodifiableList(result);
+        }
+        return Collections.emptyList();
     }
 
     public double[] getCropBox() {
@@ -174,6 +187,8 @@ public class PDPage extends PDPageTreeNode {
             COSObject resources = getInheritableResources();
             if (resources != null) {
                 this.resources = new PDResources(resources);
+            } else {
+                LOGGER.log(Level.WARNING, "Missing /Resources entry or inherited resources in the page dictionary");
             }
         }
 
@@ -277,7 +292,11 @@ public class PDPage extends PDPageTreeNode {
             }
             for (COSObject annot : (COSArray) annots.getDirectBase()) {
                 if (annot != null && annot.getType() == COSObjType.COS_DICT) {
-                    res.add(new PDAnnotation(annot));
+                    if (ASAtom.WIDGET.equals(annot.getNameKey(ASAtom.SUBTYPE))) {
+                        res.add(new PDWidgetAnnotation(annot));
+                    } else {
+                        res.add(new PDAnnotation(annot));
+                    }
                 }
             }
             return Collections.unmodifiableList(res);
@@ -335,5 +354,17 @@ public class PDPage extends PDPageTreeNode {
             return new PDNavigationNode(cosPresSteps);
         }
         return null;
+    }
+
+    public String getTabs() {
+        COSObject tabs = getKey(ASAtom.TABS);
+        if (tabs == null || tabs.empty()) {
+            return null;
+        }
+        if (tabs.getType() != COSObjType.COS_NAME) {
+            LOGGER.log(Level.WARNING, "Entry Tabs in page dictionary " + getObject().getKey() + " does not have type name");
+            return null;
+        }
+        return tabs.getString();
     }
 }

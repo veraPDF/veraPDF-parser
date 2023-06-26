@@ -35,6 +35,7 @@ import java.util.zip.Inflater;
 public class COSFilterFlateDecode extends ASBufferedInFilter {
 
     private Inflater inflater;
+    private int bufferSize;
 
     /**
      * Constructor from Flate encoded stream.
@@ -60,28 +61,49 @@ public class COSFilterFlateDecode extends ASBufferedInFilter {
     public int read(byte[] buffer, int size) throws IOException {
         int bytesFed = 0;
         if (inflater.getRemaining() == 0) {
-            bytesFed = (int) this.feedBuffer(getBufferCapacity());
+            bytesFed = this.feedBuffer(getBufferCapacity());
             if (bytesFed == -1) {
                 return -1;
             }
-            inflater.setInput(this.buffer, 0, bytesFed);
+            this.bufferSize = bytesFed;
+            inflater.setInput(this.buffer, 0, this.bufferSize);
         }
+        int startOffset = this.bufferSize - inflater.getRemaining();
         try {
             int res = inflater.inflate(buffer, 0, size);
             if (res == 0) {
-                long added = this.addToBuffer(BF_BUFFER_SIZE);
+                int added = this.addToBuffer(BF_BUFFER_SIZE);
                 if (added == -1) {
                     return -1;
                 } else {
-                    inflater.setInput(this.buffer, 0, (int) (bytesFed + added));
+                    this.bufferSize = bytesFed + added;
+                    inflater.setInput(this.buffer, 0, this.bufferSize);
                     return inflater.inflate(buffer, 0, size);
                 }
             } else {
                 return res;
             }
         } catch (DataFormatException e) {
-            throw new IOException("Can't decode Flate encoded data", e);
+            try {
+                return readByByte(buffer, startOffset, size);
+            } catch (IOException exp) {
+                throw new IOException("Can't decode Flate encoded data", e);
+            }
         }
+    }
+
+    public int readByByte(byte[] buffer, int startOffset, int size) throws IOException {
+        this.inflater.reset();
+        inflater.setInput(this.buffer, startOffset, this.bufferSize - startOffset);
+        int readBytesAmount = 0;
+        try {
+            while (readBytesAmount < size && inflater.inflate(buffer, readBytesAmount, 1) == 1) {
+                readBytesAmount++;
+            }
+        } catch (DataFormatException exp) {
+            return readBytesAmount == 0 ? -1 : readBytesAmount;
+        }
+        throw new IOException();
     }
 
     /**

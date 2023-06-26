@@ -252,23 +252,25 @@ public class PDFontDescriptor extends PDObject {
     public double[] getFontBoundingBox() {
         if (fontBoundingBox == null) {
             COSBase bbox = this.getObject().getKey(ASAtom.FONT_BBOX).get();
-            if (bbox != null && bbox.getType() == COSObjType.COS_ARRAY && bbox.size() == 4) {
-                double[] res = new double[4];
-                for (int i = 0; i < 4; ++i) {
-                    COSObject obj = bbox.at(i);
-                    if (obj.getType().isNumber()) {
-                        res[i] = obj.getReal();
-                    } else {
-                        LOGGER.log(Level.SEVERE, "Font bounding box array for font " + fontName +
-                                " contains " + obj.getType());
-                        return null;
+            if (bbox != null) {
+                if (bbox.getType() == COSObjType.COS_ARRAY && bbox.size() == 4) {
+                    double[] res = new double[4];
+                    for (int i = 0; i < 4; ++i) {
+                        COSObject obj = bbox.at(i);
+                        if (obj.getType().isNumber()) {
+                            res[i] = obj.getReal();
+                        } else {
+                            LOGGER.log(Level.SEVERE, "Font bounding box array for font " + fontName +
+                                                     " contains " + obj.getType());
+                            return null;
+                        }
                     }
+                    fontBoundingBox = res;
+                } else {
+                    LOGGER.log(Level.SEVERE, "Font bounding box array for font " + fontName +
+                                             " is not an array of 4 elements");
+                    return null;
                 }
-                fontBoundingBox = res;
-            } else {
-                LOGGER.log(Level.SEVERE, "Font bounding box array for font " + fontName +
-                        " is not an array of 4 elements");
-                return null;
             }
         }
         return fontBoundingBox;
@@ -282,7 +284,7 @@ public class PDFontDescriptor extends PDObject {
         if (italicAngle == null) {
             italicAngle = getRealKey(ASAtom.ITALIC_ANGLE);
         }
-        return italicAngle;
+        return italicAngle != null ? italicAngle : 0.0;
     }
 
     /**

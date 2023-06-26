@@ -55,14 +55,8 @@ public class Reader extends XRefReader {
 	public Reader(final COSDocument document, final String fileName) throws IOException {
 		super();
 		this.parser = new PDFParser(document, fileName);
-		try {
-			this.objectStreams = new HashMap<>();
-			init();
-		} catch (IOException e) {	// If exception is thrown in init() someone
-			// should close document stream
-			this.parser.closeInputStream();
-			throw e;
-		}
+		this.objectStreams = new HashMap<>();
+		init();
 	}
 
 	public Reader(final COSDocument document, final InputStream fileStream) throws IOException {
@@ -88,7 +82,7 @@ public class Reader extends XRefReader {
 		long offset = getOffset(key).longValue();
 		if (offset == 0) {
 			return new COSObject();
-		} else if(offset > 0) {
+		} else if (offset > 0) {
 			if (header.getHeaderOffset() > 0) {
 				offset += header.getHeaderOffset();
 			}
@@ -97,13 +91,15 @@ public class Reader extends XRefReader {
 			return result;
 		}
 		//TODO : set object key
+		//a negative number to identify a case of object stream from normal offset
+		//see method XrefStreamParser.parseStream and ISO 32000-2 7.5.7 and 7.5.8.3
 		DecodedObjectStreamParser parser = objectStreams.get(Long.valueOf(-offset));
-		if(parser != null) {
+		if (parser != null) {
 			return parser.getObject(key);
 		}
 		COSKey newKey = new COSKey(- (int)offset, 0);
-		COSObject object = getObject(newKey);
-		if(object == null || !object.getType().equals(COSObjType.COS_STREAM)) {
+		COSObject object = !newKey.equals(key) ? getObject(newKey) : null;
+		if (object == null || !object.getType().equals(COSObjType.COS_STREAM)) {
 			throw new IOException("Object number " + (-offset) + " should" +
 					" be object stream, but in fact it is " +
 					(object == null ? "null" : object.getType()));
@@ -143,14 +139,14 @@ public class Reader extends XRefReader {
 
 	// PRIVATE METHODS
 	private void init() throws IOException {
-		this.header = this.parser.getHeader();
+		try {
+			this.header = this.parser.getHeader();
 
-		List<COSXRefInfo> infos = new ArrayList<>();
-		this.parser.getXRefInfo(infos);
-		setXRefInfo(infos);
+			List<COSXRefInfo> infos = new ArrayList<>();
+			this.parser.getXRefInfo(infos);
+			setXRefInfo(infos);
 
-		if(this.parser.isEncrypted()) {
-			if(!docCanBeDecrypted()) {
+			if (this.parser.isEncrypted() && !docCanBeDecrypted()) {
 				this.getPDFSource().close();
 				if (this.parser.getDocument() != null) {
 					FileResourceHandler handler =
@@ -161,6 +157,10 @@ public class Reader extends XRefReader {
 				}
 				throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
 			}
+		} catch (IOException e) {	// If exception is thrown in init() someone
+			// should close document stream
+			this.parser.closeInputStream();
+			throw e;
 		}
 	}
 
@@ -176,7 +176,7 @@ public class Reader extends XRefReader {
 			}
 			StandardSecurityHandler ssh = new StandardSecurityHandler(encryption,
 					this.getTrailer().getID(), this.parser.getDocument());
-			boolean res = ssh.isEmptyStringPassword();
+			boolean res = ssh.checkPassword();
 			if (res) {
 				this.parser.getDocument().setStandardSecurityHandler(ssh);
 			}

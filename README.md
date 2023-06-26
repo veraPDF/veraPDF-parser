@@ -2,17 +2,15 @@ veraPDF-parser
 ==============
 *Greenfield PDF parser developed for veraPDF*
 
-[![Build Status](https://travis-ci.org/veraPDF/veraPDF-parser.svg?branch=integration)](https://travis-ci.org/veraPDF/parser "Travis-CI")
-[![Build Status](http://jenkins.openpreservation.org/buildStatus/icon?job=veraPDF-parser)](http://jenkins.openpreservation.org/job/veraPDF-parser/ "OPF Jenkins Release")
-[![Build Status](http://jenkins.openpreservation.org/buildStatus/icon?job=veraPDF-parser-dev)](http://jenkins.openpreservation.org/job/veraPDF-parser-dev/ "OPF Jenkins Development")
-[![Maven Central](https://img.shields.io/maven-central/v/org.verapdf/parser.svg)](http://repo1.maven.org/maven2/org/verapdf/parser/ "Maven central")
+[![Build Status](https://jenkins.openpreservation.org/job/veraPDF/job/1.24/job/parser/badge/icon)](https://jenkins.openpreservation.org/job/veraPDF/job/1.24/job/parser/ "OPF Jenkins")
+[![Maven Central](https://img.shields.io/maven-central/v/org.verapdf/parser.svg)](https://repo1.maven.org/maven2/org/verapdf/parser/ "Maven central")
 [![CodeCov Coverage](https://img.shields.io/codecov/c/github/veraPDF/veraPDF-parser.svg)](https://codecov.io/gh/veraPDF/veraPDF-parser/ "CodeCov coverage")
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c0cab187a06a4820bc0891dd2bf8db85)](https://www.codacy.com/app/veraPDF/veraPDF-parser?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=veraPDF/veraPDF-parser&amp;utm_campaign=Badge_Grade "Codacy grade")
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/6285400847ba461d8d5e331ffca08bff)](https://app.codacy.com/gh/veraPDF/veraPDF-parser/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade "Codacy coverage")
 
-[![GitHub issues](https://img.shields.io/github/issues/veraPDF/veraPDF-parser.svg)](https://github.com/veraPDF/veraPDF-parser/issues "Open issues on GitHub")
-[![GitHub issues](https://img.shields.io/github/issues-closed/veraPDF/veraPDF-parser.svg)](https://github.com/veraPDF/veraPDF-parser/issues-closed "Open issues on GitHub")
-[![GitHub issues](https://img.shields.io/github/issues-pr/veraPDF/veraPDF-parser.svg)](https://github.com/veraPDF/veraPDF-parser/issues-pr "Open issues on GitHub")
-[![GitHub issues](https://img.shields.io/github/issues-pr-closed/veraPDF/veraPDF-parser.svg)](https://github.com/veraPDF/veraPDF-parser/issues-pr-closed "Open issues on GitHub")
+[![GitHub issues](https://img.shields.io/github/issues/veraPDF/veraPDF-library.svg)](https://github.com/veraPDF/veraPDF-library/issues "Open issues on GitHub")
+[![GitHub issues](https://img.shields.io/github/issues-closed/veraPDF/veraPDF-library.svg)](https://github.com/veraPDF/veraPDF-library/issues?q=is%3Aissue+is%3Aclosed "Closed issues on GitHub")
+[![GitHub issues](https://img.shields.io/github/issues-pr/veraPDF/veraPDF-parser.svg)](https://github.com/veraPDF/veraPDF-parser/pulls "Open pull requests on GitHub")
+[![GitHub issues](https://img.shields.io/github/issues-pr-closed/veraPDF/veraPDF-parser.svg)](https://github.com/veraPDF/veraPDF-parser/pulls?q=is%3Apr+is%3Aclosed "Closed pull requests on GitHub")
 
 Licensing
 ---------
@@ -23,7 +21,7 @@ The veraPDF Parser is dual-licensed, see:
 
 Documentation
 -------------
-See the [veraPDF documentation site](http://docs.verapdf.org/).
+See the [veraPDF documentation site](https://docs.verapdf.org/).
 
 Quick Start
 -----------
@@ -31,7 +29,7 @@ Quick Start
 
 In order to build the parser you'll need:
 
- * Java 7, which can be downloaded [from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html), or for Linux users [OpenJDK](http://openjdk.java.net/install/index.html).
+ * Java 8 - 17, which can be downloaded [from Oracle](https://www.oracle.com/technetwork/java/javase/downloads/index.html), or for Linux users [OpenJDK](http://openjdk.java.net/install/index.html).
  * [Maven v3+](https://maven.apache.org/)
 
 ### Building the veraPDF Parser

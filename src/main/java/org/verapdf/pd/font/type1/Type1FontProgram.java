@@ -21,22 +21,24 @@
 package org.verapdf.pd.font.type1;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.Token;
 import org.verapdf.parser.postscript.PSObject;
+import org.verapdf.parser.postscript.PSOperator;
 import org.verapdf.parser.postscript.PSParser;
 import org.verapdf.parser.postscript.PostScriptException;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
+import org.verapdf.pd.function.PSOperatorsConstants;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,6 +59,47 @@ public class Type1FontProgram extends PSParser implements FontProgram {
             Type1StringConstants.CLEARTOMARK_STRING.getBytes(StandardCharsets.ISO_8859_1);
     private boolean attemptedParsing = false;
     private boolean successfullyParsed = false;
+
+    public static final Set<String> OPERATORS_KEYWORDS;
+
+    static {
+        Set<String> tempSet = new HashSet<>();
+        tempSet.add(PSOperatorsConstants.ABS);
+        tempSet.add(PSOperatorsConstants.FLOOR);
+        tempSet.add(PSOperatorsConstants.MOD);
+        tempSet.add(PSOperatorsConstants.ADD);
+        tempSet.add(PSOperatorsConstants.IDIV);
+        tempSet.add(PSOperatorsConstants.MUL);
+        tempSet.add(PSOperatorsConstants.DIV);
+        tempSet.add(PSOperatorsConstants.NEG);
+        tempSet.add(PSOperatorsConstants.SUB);
+        tempSet.add(PSOperatorsConstants.CEILING);
+        tempSet.add(PSOperatorsConstants.ROUND);
+        tempSet.add(PSOperatorsConstants.COPY);
+        tempSet.add(PSOperatorsConstants.EXCH);
+        tempSet.add(PSOperatorsConstants.POP);
+        tempSet.add(PSOperatorsConstants.DUP);
+        tempSet.add(PSOperatorsConstants.INDEX);
+        tempSet.add(PSOperatorsConstants.ROLL);
+        tempSet.add(PSOperatorsConstants.CLEAR);
+        tempSet.add(PSOperatorsConstants.COUNT);
+        tempSet.add(PSOperatorsConstants.MARK);
+        tempSet.add(PSOperatorsConstants.CLEARTOMARK);
+        tempSet.add(PSOperatorsConstants.COUNTTOMARK);
+        tempSet.add(PSOperatorsConstants.DICT);
+        tempSet.add(PSOperatorsConstants.BEGIN);
+        tempSet.add(PSOperatorsConstants.LENGTH);
+        tempSet.add(PSOperatorsConstants.DEF);
+        tempSet.add(PSOperatorsConstants.LOAD);
+        tempSet.add(PSOperatorsConstants.ARRAY);
+        tempSet.add(PSOperatorsConstants.PUT);
+        tempSet.add(PSOperatorsConstants.FOR);
+        tempSet.add(PSOperatorsConstants.STANDARD_ENCODING);
+        tempSet.add(PSOperatorsConstants.LEFT_ANGLE_BRACES);
+        tempSet.add(PSOperatorsConstants.RIGHT_ANGLE_BRACES);
+
+        OPERATORS_KEYWORDS = Collections.unmodifiableSet(tempSet);
+    }
 
     /**
      * {@inheritDoc}
@@ -112,7 +155,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     private void processObject(COSObject nextObject) throws IOException, PostScriptException {
         if (nextObject.getType() == COSObjType.COS_NAME &&
                 nextObject.getString().equals(Type1StringConstants.EEXEC_STRING)) {
-            this.skipSpaces();
+            this.skipSpacesExceptNullByte();
             Type1PrivateParser parser = null;
             try (ASInputStream eexecEncoded = this.source.getStreamUntilToken(
                     CLEAR_TO_MARK_BYTES)) {
@@ -129,7 +172,23 @@ public class Type1FontProgram extends PSParser implements FontProgram {
                 }
             }
         } else {
-            PSObject.getPSObject(nextObject).execute(operandStack, userDict);
+            toExecute(nextObject);
+        }
+    }
+
+    private void toExecute(COSObject next) throws PostScriptException {
+        PSObject operator = PSObject.getPSObject(next);
+        if (operator instanceof PSOperator) {
+            if (!OPERATORS_KEYWORDS.contains(((PSOperator) operator).getOperator())) {
+                COSObject dictEntry = userDict.get(ASAtom.getASAtom(((PSOperator) operator).getOperator()));
+                if (dictEntry != null) {
+                    toExecute(dictEntry);
+                }
+            } else {
+                operator.execute(operandStack, userDict);
+            }
+        } else {
+            operator.execute(operandStack, userDict);
         }
     }
 
@@ -152,6 +211,19 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     public float getWidth(String glyphName) {
         Integer res = this.glyphWidths.get(glyphName);
         return res == null ? -1 : res;
+    }
+
+    protected void skipSpacesExceptNullByte() throws IOException {
+        byte ch;
+        while (!this.source.isEOF()) {
+            ch = this.source.readByte();
+            if (CharTable.isSpace(ch) && ch != 0) {
+                continue;
+            }
+
+            this.source.unread();
+            break;
+        }
     }
 
     @Override
@@ -201,7 +273,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     private double[] getFontMatrix() {
         COSObject fontMatrixObject = this.getObjectFromUserDict(ASAtom.getASAtom(
                 Type1StringConstants.FONT_MATRIX_STRING));
-        if (fontMatrixObject != null && fontMatrixObject.getType() != COSObjType.COS_ARRAY) {
+        if (fontMatrixObject != null && fontMatrixObject.getType() == COSObjType.COS_ARRAY) {
             double[] res = new double[6];
             int pointer = 0;
             for (COSObject obj : ((COSArray) fontMatrixObject.get())) {
@@ -257,5 +329,25 @@ public class Type1FontProgram extends PSParser implements FontProgram {
      */
     public ASFileStreamCloser getFontProgramResource() {
         return new ASFileStreamCloser(this.source);
+    }
+
+    @Override
+    public String getWeight() {
+        return null;
+    }
+
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
+    }
+
+    @Override
+    public List<Integer> getCIDList() {
+        return Collections.emptyList();
     }
 }

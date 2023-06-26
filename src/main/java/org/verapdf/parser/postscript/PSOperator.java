@@ -1,7 +1,28 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.parser.postscript;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
+import org.verapdf.pd.function.PSOperatorsConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,15 +35,22 @@ import java.util.Stack;
  * @author Sergey Shemyakov
  */
 public class PSOperator extends PSObject {
-
-
     private Stack<COSObject> operandStack;
     private Map<ASAtom, COSObject> userDict;
-    private String operator;
+    private final String operator;
 
     public PSOperator(COSName operator) {
         super(operator);
         this.operator = operator.getString();
+    }
+
+    public PSOperator(COSObject operator) {
+        super(operator.get());
+        this.operator = operator.getString();
+    }
+
+    public String getOperator() {
+        return operator;
     }
 
     @Override
@@ -32,103 +60,155 @@ public class PSOperator extends PSObject {
         this.userDict = userDict;
         if (operator != null) {
             switch (operator) {
+                case PSOperatorsConstants.LEFT_CURLY_BRACE:
+                case PSOperatorsConstants.RIGHT_CURLY_BRACE:
+                    break;
+                // Conditional operators
+                case PSOperatorsConstants.IF:
+                    opIf();
+                    break;
+                case PSOperatorsConstants.IFELSE:
+                    opIfElse();
+                    break;
+
                 // Operand Stack Manipulation Operators
-                case "dup":
+                case PSOperatorsConstants.DUP:
                     operandStack.push(psCopyObject(operandStack.peek()));
                     break;
-                case "exch":
+                case PSOperatorsConstants.EXCH:
                     COSObject obj1 = operandStack.pop();
                     COSObject obj2 = operandStack.pop();
                     operandStack.push(obj1);
                     operandStack.push(obj2);
                     break;
-                case "pop":
+                case PSOperatorsConstants.POP:
                     operandStack.pop();
                     break;
-                case "copy":
+                case PSOperatorsConstants.COPY:
                     copy();
                     break;
-                case "index":
+                case PSOperatorsConstants.INDEX:
                     index();
                     break;
-                case "roll":
+                case PSOperatorsConstants.ROLL:
                     roll();
                     break;
-                case "clear":
+                case PSOperatorsConstants.CLEAR:
                     this.operandStack.clear();
                     break;
-                case "count":
+                case PSOperatorsConstants.COUNT:
                     COSObject stackSize = COSInteger.construct(this.operandStack.size());
                     this.operandStack.push(stackSize);
                     break;
-                case "mark":
+                case PSOperatorsConstants.MARK:
                     this.operandStack.push(PSStackMark.getInstance());
                     break;
-                case "cleartomark":
+                case PSOperatorsConstants.CLEARTOMARK:
                     COSObject topObject = this.operandStack.peek();
                     while (!operandStack.empty() && topObject != PSStackMark.getInstance()) {
                         operandStack.pop();
                         topObject = this.operandStack.peek();
                     }
                     break;
-                case "counttomark":
+                case PSOperatorsConstants.COUNTTOMARK:
                     counttomark();
                     break;
 
-                // Arithmetic and Math Operators
-                case "add":
-                case "div":
-                case "idiv":
-                case "mod":
-                case "mul":
-                case "sub":
-                    executeOperatorOnTopTwoNumbers(operator);
+                // Relational, boolean, and bitwise operator
+                case PSOperatorsConstants.AND:
+                case PSOperatorsConstants.OR:
+                case PSOperatorsConstants.XOR:
+                    executeOperatorOnTopTwoBooleans(operator);
                     break;
-                case "abs":
-                case "neg":
-                case "ceiling":
-                case "floor":
-                case "round":
+                case PSOperatorsConstants.NOT:
+                    operandStack.push(COSBoolean.construct(!getTopBoolean().getBoolean()));
+                    break;
+                case PSOperatorsConstants.TRUE:
+                    operandStack.push(COSBoolean.construct(true));
+                    break;
+                case PSOperatorsConstants.FALSE:
+                    operandStack.push(COSBoolean.construct(false));
+                    break;
+                case PSOperatorsConstants.BITSHIFT:
+
+                    // Arithmetic and Math Operators
+                case PSOperatorsConstants.ABS:
+                case PSOperatorsConstants.NEG:
+                case PSOperatorsConstants.CEILING:
+                case PSOperatorsConstants.FLOOR:
+                case PSOperatorsConstants.ROUND:
+                case PSOperatorsConstants.TRUNCATE:
+                case PSOperatorsConstants.SQRT:
+                case PSOperatorsConstants.COS:
+                case PSOperatorsConstants.ATAN:
+                case PSOperatorsConstants.SIN:
+                case PSOperatorsConstants.EXP:
+                case PSOperatorsConstants.CVI:
+                case PSOperatorsConstants.CVR:
+                case PSOperatorsConstants.LN:
+                case PSOperatorsConstants.LOG:
                     executeOperatorOnOneTopNumber(operator);
+                    break;
+                case PSOperatorsConstants.ADD:
+                case PSOperatorsConstants.DIV:
+                case PSOperatorsConstants.IDIV:
+                case PSOperatorsConstants.MOD:
+                case PSOperatorsConstants.MUL:
+                case PSOperatorsConstants.SUB:
+
+                    // Relational, boolean, and bitwise operator
+                case PSOperatorsConstants.EQ:
+                case PSOperatorsConstants.NE:
+                case PSOperatorsConstants.GT:
+                case PSOperatorsConstants.GE:
+                case PSOperatorsConstants.LT:
+                case PSOperatorsConstants.LE:
+                    executeOperatorOnTopTwoNumbers(operator);
                     break;
 
                 //Dictionary Operators
-                case "dict":
+                case PSOperatorsConstants.DICT:
                     // we use this for correct stack handling, no real dictionary
                     // processing is done
                     getTopNumber();
                     operandStack.push(COSDictionary.construct());
                     break;
-                case "begin":
+                case PSOperatorsConstants.BEGIN:
                     if (operandStack.size() > 0) {
                         operandStack.pop();
                     }
                     break;
-                case "length":
+                case PSOperatorsConstants.LENGTH:
                     length();
                     break;
-                case "def":
+                case PSOperatorsConstants.DEF:
                     def();
                     break;
-                case "load":
+                case PSOperatorsConstants.LOAD:
                     load();
+                    break;
+                case PSOperatorsConstants.LEFT_ANGLE_BRACES:
+                    mark();
+                    break;
+                case PSOperatorsConstants.RIGHT_ANGLE_BRACES:
+                    closeDictionary();
                     break;
 
                 // Array Operators
-                case "array":
+                case PSOperatorsConstants.ARRAY:
                     array();
                     break;
-                case "put":
+                case PSOperatorsConstants.PUT:
                     put();
                     break;
 
                 // Control Operators
-                case "for":
+                case PSOperatorsConstants.FOR:
                     opFor();
                     break;
 
                 // PS Font Encoding
-                case "StandardEncoding":
+                case PSOperatorsConstants.STANDARD_ENCODING:
                     if (operandStack.empty()) {
                         break;
                     }
@@ -146,6 +226,67 @@ public class PSOperator extends PSObject {
                         PSObject.getPSObject(dictEntry).execute(operandStack, userDict);
                     }
             }
+        }
+    }
+
+    private void closeDictionary() throws PostScriptException {
+        COSObject dictionary = COSDictionary.construct();
+        while (operandStack.size() > 1) {
+            COSObject value = operandStack.pop();
+            if (value == PSStackMark.getInstance()) {
+                operandStack.add(dictionary);
+                return;
+            }
+            COSObject key = operandStack.pop();
+            if (key == PSStackMark.getInstance()) {
+                throw new PostScriptException("Odd number of arguments between << and >> operators");
+            }
+            COSObjType keyType = key.getType();
+            if (keyType == COSObjType.COS_NAME || keyType == COSObjType.COS_STRING) {
+                // any object can be key, but we support only COSName and COSString
+                dictionary.setKey(ASAtom.getASAtom(key.getString()), value);
+            }
+        }
+        if (!operandStack.empty() && operandStack.pop() == PSStackMark.getInstance()) {
+            operandStack.add(dictionary);
+            return;
+        }
+        throw new PostScriptException("Missing << operator before >> operator");
+    }
+
+    private void opIfElse() throws PostScriptException {
+        if (operandStack.size() >= 3) {
+            COSObject falseProcedure = operandStack.pop();
+            COSObject trueProcedure = operandStack.pop();
+            COSObject bool = operandStack.pop();
+                if (falseProcedure instanceof PSProcedure && trueProcedure instanceof PSProcedure &&
+                        bool.getType() == COSObjType.COS_BOOLEAN) {
+                    if (bool.getBoolean()) {
+                        ((PSProcedure) trueProcedure).modifiedExecuteProcedure(operandStack, userDict);
+                    } else {
+                        ((PSProcedure) falseProcedure).modifiedExecuteProcedure(operandStack, userDict);
+                    }
+                } else {
+                    throw new PostScriptException("Can't execute ifelse operator");
+                }
+        } else {
+            throw new PostScriptException("No procedures for ifelse operator");
+        }
+    }
+
+    private void opIf() throws PostScriptException {
+        if (operandStack.size() >= 2) {
+            COSObject procedure = operandStack.pop();
+            COSObject bool = operandStack.pop();
+            if (procedure instanceof PSProcedure && bool.getType() == COSObjType.COS_BOOLEAN) {
+                if (bool.getBoolean()) {
+                    ((PSProcedure) procedure).modifiedExecuteProcedure(operandStack, userDict);
+                }
+            } else {
+                throw new PostScriptException("Can't execute if operator");
+            }
+        } else {
+            throw new PostScriptException("No procedures for if operator");
         }
     }
 
@@ -183,17 +324,27 @@ public class PSOperator extends PSObject {
         }
     }
 
-    private void roll() throws PostScriptException {    // TODO: check this
+    private void roll() throws PostScriptException {
         try {
             COSObject[] topTwoNumbers = getTopTwoNumbers();
             int j = topTwoNumbers[0].getInteger().intValue();
             int n = topTwoNumbers[1].getInteger().intValue();
+            if (j < 0) {
+                j = n - Math.abs(j) % n;
+            }
             int size = operandStack.size();
             if (size >= n) {
-                List<COSObject> lastElements = operandStack.subList(size - n, size);
-                int splitPoint = n - 1 - ((j - 1) % n);
-                operandStack.addAll(lastElements.subList(splitPoint - 1, size));
-                operandStack.addAll(lastElements.subList(0, splitPoint - 1));
+                List<COSObject> lastElements = new ArrayList<>();
+                for (int i = 0; i < n; ++i) {
+                    lastElements.add(operandStack.pop());
+                }
+                int splitPoint = (j - 1) % n;
+                for (int i = splitPoint; i >= 0; --i) {
+                    operandStack.push(lastElements.get(i));
+                }
+                for (int i = n - 1; i > splitPoint; --i) {
+                    operandStack.push(lastElements.get(i));
+                }
             } else {
                 throw new PostScriptException("Stack has less than n elements");
             }
@@ -219,23 +370,64 @@ public class PSOperator extends PSObject {
             COSObject[] topTwoNumbers = getTopTwoNumbers();
             COSObject res;
             switch (operator) {
-                case "add":
+                case PSOperatorsConstants.ADD:
                     res = COSReal.construct(topTwoNumbers[1].getReal() + topTwoNumbers[0].getReal());
                     break;
-                case "div":
+                case PSOperatorsConstants.DIV:
                     res = COSReal.construct(topTwoNumbers[1].getReal() / topTwoNumbers[0].getReal());
                     break;
-                case "idiv":
+                case PSOperatorsConstants.IDIV:
                     res = COSInteger.construct(topTwoNumbers[1].getInteger() / topTwoNumbers[0].getInteger());
                     break;
-                case "mod":
+                case PSOperatorsConstants.MOD:
                     res = COSInteger.construct(topTwoNumbers[1].getInteger() % topTwoNumbers[0].getInteger());
                     break;
-                case "mul":
+                case PSOperatorsConstants.MUL:
                     res = COSReal.construct(topTwoNumbers[1].getReal() * topTwoNumbers[0].getReal());
                     break;
-                case "sub":
+                case PSOperatorsConstants.SUB:
                     res = COSReal.construct(topTwoNumbers[1].getReal() - topTwoNumbers[0].getReal());
+                    break;
+                case PSOperatorsConstants.EQ:
+                    res = COSBoolean.construct(topTwoNumbers[1].getReal().equals(topTwoNumbers[0].getReal()));
+                    break;
+                case PSOperatorsConstants.NE:
+                    res = COSBoolean.construct(!topTwoNumbers[1].getReal().equals(topTwoNumbers[0].getReal()));
+                    break;
+                case PSOperatorsConstants.GT:
+                    res = COSBoolean.construct(topTwoNumbers[1].getReal() > topTwoNumbers[0].getReal());
+                    break;
+                case PSOperatorsConstants.GE:
+                    res = COSBoolean.construct(topTwoNumbers[1].getReal() >= topTwoNumbers[0].getReal());
+                    break;
+                case PSOperatorsConstants.LT:
+                    res = COSBoolean.construct(topTwoNumbers[1].getReal() < topTwoNumbers[0].getReal());
+                    break;
+                case PSOperatorsConstants.LE:
+                    res = COSBoolean.construct(topTwoNumbers[1].getReal() <= topTwoNumbers[0].getReal());
+                    break;
+                default:
+                    throw new PostScriptException("Unknown operator " + operator);
+            }
+            operandStack.push(res);
+        } catch (PostScriptException e) {
+            throw new PostScriptException("Can't execute " + operator + " operator", e);
+        }
+    }
+
+    private void executeOperatorOnTopTwoBooleans(String operator) throws PostScriptException {
+        try {
+            COSObject[] topTwoBooleans = getTopTwoBooleans();
+            COSObject res;
+            switch (operator) {
+                case PSOperatorsConstants.AND:
+                    res = COSBoolean.construct(topTwoBooleans[1].getBoolean() && topTwoBooleans[0].getBoolean());
+                    break;
+                case PSOperatorsConstants.OR:
+                    res = COSBoolean.construct(topTwoBooleans[1].getBoolean() || topTwoBooleans[0].getBoolean());
+                    break;
+                case PSOperatorsConstants.XOR:
+                    res = COSBoolean.construct(topTwoBooleans[1].getBoolean() ^ topTwoBooleans[0].getBoolean());
                     break;
                 default:
                     throw new PostScriptException("Unknown operator " + operator);
@@ -251,20 +443,53 @@ public class PSOperator extends PSObject {
             COSObject argument = getTopNumber();
             COSObject res;
             switch (operator) {
-                case "abs":
+                case PSOperatorsConstants.ABS:
                     res = COSReal.construct(Math.abs(argument.getReal()));
                     break;
-                case "neg":
+                case PSOperatorsConstants.NEG:
                     res = COSReal.construct(-argument.getReal());
                     break;
-                case "ceiling":
+                case PSOperatorsConstants.CEILING:
                     res = COSInteger.construct((long) Math.ceil(argument.getReal()));
                     break;
-                case "floor":
+                case PSOperatorsConstants.FLOOR:
                     res = COSInteger.construct((long) Math.floor(argument.getReal()));
                     break;
-                case "round":
+                case PSOperatorsConstants.ROUND:
                     res = COSInteger.construct(Math.round(argument.getReal()));
+                    break;
+                case PSOperatorsConstants.TRUNCATE:
+                    res = COSInteger.construct(argument.getReal().longValue());
+                    break;
+                case PSOperatorsConstants.SQRT:
+                    res = COSReal.construct(Math.sqrt(argument.getReal()));
+                    break;
+                case PSOperatorsConstants.COS:
+                    res = COSReal.construct(Math.cos(argument.getReal()));
+                    break;
+                case PSOperatorsConstants.ATAN:
+                    res = COSReal.construct(Math.atan(argument.getReal()));
+                    break;
+                case PSOperatorsConstants.SIN:
+                    res = COSReal.construct(Math.sin(argument.getReal()));
+                    break;
+                case PSOperatorsConstants.EXP:
+                    res = COSReal.construct(Math.exp(argument.getReal()));
+                    break;
+                case PSOperatorsConstants.CVI:
+                    res = COSInteger.construct(argument.getReal().intValue());
+                    break;
+                case PSOperatorsConstants.CVR:
+                    res = COSReal.construct(argument.getReal());
+                    break;
+                case PSOperatorsConstants.LN:
+                    res = COSReal.construct(Math.log(argument.getReal()));
+                    break;
+                case PSOperatorsConstants.LOG:
+                    res = COSReal.construct(Math.log10(argument.getReal()));
+                    break;
+                case PSOperatorsConstants.BITSHIFT:
+                    res = COSInteger.construct(argument.getInteger() >> 1);
                     break;
                 default:
                     throw new PostScriptException("Unknown operator " + operator);
@@ -310,8 +535,12 @@ public class PSOperator extends PSObject {
 
     private void array() throws PostScriptException {
         try {
-            COSObject arraySize = getTopNumber();
-            this.operandStack.push(COSArray.construct(arraySize.getInteger().intValue()));
+            int arraySize = getTopNumber().getInteger().intValue();
+            COSObject array = COSArray.construct(arraySize);
+            for (int i = 0; i < arraySize; i++) {
+                array.add(COSObject.getEmpty());
+            }
+            this.operandStack.push(array);
         } catch (PostScriptException e) {
             throw new PostScriptException("Can't execute array operator", e);
         }
@@ -324,8 +553,12 @@ public class PSOperator extends PSObject {
                 COSObject index = getTopNumber();
                 COSObject array = operandStack.pop();
                 if (array.getType() == COSObjType.COS_ARRAY) {
-                    array.remove(index.getInteger().intValue());
-                    array.insert(index.getInteger().intValue(), toPut);
+                    int intIndex = index.getInteger().intValue();
+                    if (array.size() <= intIndex || intIndex < 0) {
+                        throw new PostScriptException("Index greater than array size or less than 0");
+                    }
+                    array.remove(intIndex);
+                    array.insert(intIndex, toPut);
                     return;
                 }
             }
@@ -373,12 +606,33 @@ public class PSOperator extends PSObject {
         throw new PostScriptException("Stack doesn't have two elements or top two elements are not two numbers");
     }
 
+    private COSObject[] getTopTwoBooleans() throws PostScriptException {
+        if (operandStack.size() > 1) {
+            COSObject a = operandStack.pop();
+            if (a.getType().isBoolean()) {
+                COSObject b = operandStack.pop();
+                if (b.getType().isBoolean()) {
+                    return new COSObject[]{a, b};
+                }
+            }
+        }
+        throw new PostScriptException("Stack doesn't have two elements or top two elements are not two booleans");
+    }
+
     private COSObject getTopNumber() throws PostScriptException {
         COSObject object = popTopObject();
         if (object.getType().isNumber()) {
             return object;
         }
         throw new PostScriptException("Stack is empty or top element is not a number");
+    }
+
+    private COSObject getTopBoolean() throws PostScriptException {
+        COSObject object = popTopObject();
+        if (object.getType().isBoolean()) {
+            return object;
+        }
+        throw new PostScriptException("Stack is empty or top element is not a boolean");
     }
 
     private COSObject popTopObject() throws PostScriptException {

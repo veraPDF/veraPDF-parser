@@ -40,10 +40,6 @@ import java.util.List;
  */
 class XrefStreamParser {
 
-    private COSArray index;
-    private ASInputStream xrefInputStream;
-    private COSArray fieldSizes;
-    private List<Long> objIDs;
     private COSXRefInfo section;
     private COSStream xrefCOSStream;
 
@@ -65,19 +61,11 @@ class XrefStreamParser {
      * @throws IOException
      */
     void parseStreamAndTrailer() throws IOException {
-
-        try {
-            xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE);
-            fieldSizes = (COSArray) xrefCOSStream.getKey(ASAtom.W).getDirectBase();
-            if (fieldSizes.size() != 3) {
-                throw new IOException("W array in xref should have 3 elements.");
-            }
-            initializeIndex();
-            initializeObjIDs();
-            parseStream();
+        try (ASInputStream xrefInputStream = xrefCOSStream.getData(COSStream.FilterFlags.DECODE)) {
+            COSObject indexObject = initializeIndex();
+            List<Long> objIDs = initializeObjIDs(indexObject);
+            parseStream(xrefInputStream, objIDs);
             setTrailer();
-        } finally {
-            xrefInputStream.close();
         }
     }
 
@@ -86,33 +74,37 @@ class XrefStreamParser {
      *
      * @throws IOException
      */
-    private void initializeIndex()
-            throws IOException {
-        index = (COSArray) xrefCOSStream.getKey(ASAtom.INDEX).getDirectBase();
+    private COSObject initializeIndex() throws IOException {
+        COSObject indexObject = xrefCOSStream.getKey(ASAtom.INDEX);
 
-        if (index == null) {
+        if (indexObject.empty()) {
             COSObject[] defaultIndex = new COSObject[2];
             defaultIndex[0] = COSInteger.construct(0);
             defaultIndex[1] = xrefCOSStream.getKey(ASAtom.SIZE);
-            index = (COSArray) COSArray.construct(2, defaultIndex).getDirectBase();
-        } else if (index.size() % 2 != 0) {
+            indexObject = COSArray.construct(2, defaultIndex);
+        } else if (indexObject.getType() != COSObjType.COS_ARRAY || indexObject.size() % 2 != 0) {
             throw new IOException("Index array in xref stream has odd amount of elements.");
         }
+        return indexObject;
     }
 
     /**
      * This method calculates object ID for all objects, described in this xref
      * stream using Index array.
      */
-    private void initializeObjIDs() {
-        objIDs = new ArrayList<>();
-        for (int i = 0; i < index.size() / 2; ++i) {
-            COSInteger firstID = (COSInteger) index.at(2 * i).getDirectBase();
-            COSInteger lengthOfSubsection = (COSInteger) index.at(2 * i + 1).getDirectBase();
-            for (int j = 0; j < lengthOfSubsection.get(); ++j) {
-                objIDs.add(firstID.get() + j);
+    private List<Long> initializeObjIDs(COSObject indexObject) throws IOException {
+        List<Long> objIDs = new ArrayList<>();
+        for (int i = 0; i < indexObject.size(); i += 2) {
+            Long firstID = indexObject.at(i).getInteger();
+            Long lengthOfSubsection = indexObject.at(i + 1).getInteger();
+            if (firstID == null || lengthOfSubsection == null) {
+                throw new IOException("Failed to initialize objects ids");
+            }
+            for (int j = 0; j < lengthOfSubsection; ++j) {
+                objIDs.add(firstID + j);
             }
         }
+        return objIDs;
     }
 
     /**
@@ -120,10 +112,20 @@ class XrefStreamParser {
      *
      * @throws IOException
      */
-    private void parseStream() throws IOException {
-        byte[] field0 = new byte[fieldSizes.at(0).getInteger().intValue()];
-        byte[] field1 = new byte[fieldSizes.at(1).getInteger().intValue()];
-        byte[] field2 = new byte[fieldSizes.at(2).getInteger().intValue()];
+    private void parseStream(ASInputStream xrefInputStream, List<Long> objIDs) throws IOException {
+        COSObject sizesObject = xrefCOSStream.getKey(ASAtom.W);
+        if (sizesObject.getType() != COSObjType.COS_ARRAY || sizesObject.size() != 3) {
+            throw new IOException("W array in xref shall have 3 elements.");
+        }
+        Long field0Size = sizesObject.at(0).getInteger();
+        Long field1Size = sizesObject.at(1).getInteger();
+        Long field2Size = sizesObject.at(2).getInteger();
+        if (field0Size == null || field1Size == null || field2Size == null) {
+            throw new IOException("Object of W array shall contain an Integer");
+        }
+        byte[] field0 = new byte[field0Size.intValue()];
+        byte[] field1 = new byte[field1Size.intValue()];
+        byte[] field2 = new byte[field2Size.intValue()];
         byte[] buffer;
         byte[] remainedBytes = new byte[0];
         int objIdIndex = 0;
@@ -172,6 +174,8 @@ class XrefStreamParser {
                         break;
                     case 2:
                         xref = new COSXRefEntry();
+                        //a negative number to identify a case of object stream from normal offset
+                        //see method Reader.getObject(final COSKey key) and ISO 32000-2 7.5.7 and 7.5.8.3
                         xref.offset = -numberFromBytes(field1);
                         if (field2.length > 0) {
                             xref.generation = 0;

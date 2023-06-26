@@ -28,12 +28,17 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
 import org.verapdf.pd.PDResources;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Maksim Bezrukov
  */
 public class PDIndexed extends PDSpecialColorSpace {
+
+    private static final Logger LOGGER = Logger.getLogger(PDIndexed.class.getCanonicalName());
 
     public PDIndexed(COSObject obj) {
         this(obj, null);
@@ -77,5 +82,38 @@ public class PDIndexed extends PDSpecialColorSpace {
     @Override
     public ASAtom getType() {
         return ASAtom.INDEXED;
+    }
+
+    // See ISO 32000-2:2020, chapter 8.6.6.3
+    @Override
+    public double[] toRGB(double[] value) {
+        if (value.length > 1) {
+            throw new IllegalArgumentException("Indexed color spaces must have one color value");
+        }
+        int index = (int) Math.round(value[0]);
+        index = Math.max(index, 0);
+        index = Math.min(index, getHival().intValue());
+
+        int lookupDataLength = (int) (getBaseColorSpace().getNumberOfComponents() * (getHival() + 1));
+
+        int maxIndex = (int) Math.min(getHival(), 255);
+        int numComponents = getBaseColorSpace().getNumberOfComponents();
+
+        if (lookupDataLength / numComponents < maxIndex + 1) {
+            maxIndex = lookupDataLength / numComponents - 1;
+        }
+
+        double[][] colorTable = new double[maxIndex + 1][numComponents];
+        try {
+            for (int i = 0; i <= maxIndex; i++) {
+                for (int c = 0; c < numComponents; c++) {
+                    colorTable[i][c] = (getLookup().read() & 0xff) / 255d;
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error reading color table for PDIndexed", e);
+        }
+
+        return getBaseColorSpace().toRGB(colorTable[index]);
     }
 }

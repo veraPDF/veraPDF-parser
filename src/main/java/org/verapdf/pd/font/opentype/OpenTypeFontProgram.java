@@ -32,6 +32,7 @@ import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Represents OpenType font program.
@@ -197,5 +198,25 @@ public class OpenTypeFontProgram implements FontProgram {
         } else {
             return new ASFileStreamCloser(this.source);
         }
+    }
+
+    @Override
+    public String getWeight() {
+        return null;
+    }
+
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
+    }
+
+    @Override
+    public List<Integer> getCIDList() {
+        return font.getCIDList();
     }
 }

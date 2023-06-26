@@ -104,16 +104,27 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             } else if (supplementFirstByte == 29) {
                 rosOffset = 9;
             } else {
-                return false;
+                return isContainsROS(topDict);
             }
             if (topDict[rosOffset] == 12 && topDict[rosOffset + 1] == 30) {
                 isCIDFont = true;
                 return true;
             }
-            return false;
+            return isContainsROS(topDict);
         } catch (ArrayIndexOutOfBoundsException ex) {
-            return false;
+            return isContainsROS(topDict);
         }
+    }
+
+    private boolean isContainsROS(byte[] topDict) {
+        for (int rosOffset = 0; rosOffset < topDict.length - 2; rosOffset++) {
+            if (topDict[rosOffset] == 12 && topDict[rosOffset + 1] == 30) {
+                LOGGER.log(Level.WARNING, "The Top DICT does not begin with ROS operator");
+                isCIDFont = true;
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -134,7 +145,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
     @Override
     public String getGlyphName(int code) {
-        return this.font.getGlyphName(code);
+        return this.font != null ? this.font.getGlyphName(code) : null;
     }
 
     /**
@@ -173,6 +184,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         return font != null && font.isSuccessfulParsing();
     }
 
+    @Override
     public List<Integer> getCIDList() {
         if (this.font instanceof CFFCIDFontProgram) {
             return ((CFFCIDFontProgram) this.font).getCIDList();
@@ -195,5 +207,25 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         } else {
             return new ASFileStreamCloser(this.source);
         }
+    }
+
+    @Override
+    public String getWeight() {
+        try {
+            this.parseFont();
+        } catch (IOException exception) {
+            return null;
+        }
+        return font.getWeight();
+    }
+
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
     }
 }

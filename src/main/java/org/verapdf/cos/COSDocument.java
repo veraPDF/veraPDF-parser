@@ -25,6 +25,7 @@ import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.exceptions.LoopedException;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.io.IReader;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.Reader;
@@ -63,7 +64,9 @@ public class COSDocument {
 	private List<COSObject> changedObjects;
 	private List<COSObject> addedObjects;
 	private FileResourceHandler resourceHandler;
+	private String fileName;
 
+	private long fileSize;
 	private byte postEOFDataSize;
 
 	private boolean xrefEOLMarkersComplyPDFA = true;
@@ -86,6 +89,7 @@ public class COSDocument {
 
 	public COSDocument(final String fileName, final PDDocument document) throws IOException {
 		this.resourceHandler = new FileResourceHandler();
+		this.fileName = fileName;
 		initReader(fileName);
 
 		initCOSDocument(document);
@@ -207,6 +211,14 @@ public class COSDocument {
 		return result;
 	}
 
+	public COSObject getObject(final long offset) {
+		try {
+			return reader.getObject(offset);
+		} catch (IOException e) {
+			throw new VeraPDFParserException("Error while parsing object at offset " + offset, e);
+		}
+	}
+
 	public COSObject getObject(final COSKey key) {
 		try {
 			COSObject obj = this.body.get(key);
@@ -222,8 +234,8 @@ public class COSDocument {
 			return this.body.get(key);
 		} catch (IOException e) {
 			//TODO : maybe not runtime, maybe no exception at all
-			throw new RuntimeException("Error while parsing object : " + key.getNumber() +
-									   " " + key.getGeneration(), e);
+			throw new VeraPDFParserException("Error while parsing object : " + key.getNumber() +
+			                                 " " + key.getGeneration(), e);
 		}
 	}
 
@@ -243,7 +255,6 @@ public class COSDocument {
 		if (key == null) {
 			key = this.xref.next();
 			this.body.set(key, obj.isIndirect() ? obj.getDirect() : obj);
-			obj = COSIndirect.construct(key, this);
 		}
 
 		this.xref.newKey(key);
@@ -276,6 +287,14 @@ public class COSDocument {
 
 	public void setHeader(COSHeader header) {
 		this.header = header;
+	}
+
+	public long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(long fileSize) {
+		this.fileSize = fileSize;
 	}
 
 	public byte getPostEOFDataSize() {
@@ -377,7 +396,7 @@ public class COSDocument {
 	}
 
 	public void addObject(COSObject obj) {
-		if (obj != null && !obj.empty()) {
+		if (obj != null && !obj.empty() && !isObjectAdded(obj)) {
 			this.addedObjects.add(obj);
 		}
 	}
@@ -394,6 +413,10 @@ public class COSDocument {
 
 	public void removeChangedObject(COSObject obj) {
 		this.changedObjects.remove(obj);
+	}
+
+	public boolean isObjectAdded(COSObject obj) {
+		return listContainsObject(addedObjects, obj);
 	}
 
 	public boolean isObjectChanged(COSObject obj) {
@@ -432,5 +455,9 @@ public class COSDocument {
 
 	public SortedSet<Long> getStartXRefs() {
 		return this.reader.getStartXRefs();
+	}
+
+	public String getFileName() {
+		return fileName;
 	}
 }

@@ -34,5 +34,7 @@ public abstract class PDStructTreeNode extends PDObject {
 		super(obj);
 	}
 
-	public abstract List<PDStructElem> getChildren();
+	public abstract List<PDStructElem> getStructChildren();
+
+	public abstract List<Object> getChildren();
 }

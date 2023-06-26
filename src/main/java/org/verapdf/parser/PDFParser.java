@@ -218,7 +218,8 @@ public class PDFParser extends COSParser {
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         calculatePostEOFDataSize();
-        this.getXRefInfo(infos, new HashSet<Long>(), Long.valueOf(0L));
+        document.setFileSize(source.getStreamLength());
+        this.getXRefInfo(infos, new HashSet<Long>(), null);
     }
 
     public COSObject getObject(final long offset) throws IOException {
@@ -337,15 +338,17 @@ public class PDFParser extends COSParser {
         source.seekFromEnd(STARTXREF.length);
         byte[] buf = new byte[STARTXREF.length];
         while (source.getStreamLength() - source.getOffset() < 1024) {
-            long res = source.getOffset();
             source.read(buf);
             if (Arrays.equals(buf, STARTXREF)) {
                 nextToken();
                 return this.getToken().integer;
             }
+            if (source.getOffset() <= STARTXREF.length) {
+                throw new IOException("Document doesn't contain startxref keyword");
+            }
             source.seekFromCurrentPosition(-STARTXREF.length - 1);
         }
-        return Long.valueOf(0L);
+        return null;
     }
 
     private void calculatePostEOFDataSize() throws IOException {
@@ -425,7 +428,7 @@ public class PDFParser extends COSParser {
         }
     }
 
-    private void parseXrefTable(final COSXRefSection xrefs) throws IOException {
+    protected void parseXrefTable(final COSXRefSection xrefs) throws IOException {
         //check spacings after "xref" keyword
         //pdf/a-1b specification, clause 6.1.4
         byte space = this.source.readByte();
@@ -460,12 +463,48 @@ public class PDFParser extends COSParser {
                 nextToken();
                 xref.generation = (int) getToken().integer;
                 nextToken();
-                xref.free = getToken().getValue().charAt(0);
+                String value = getToken().getValue();
+                if (value.isEmpty()) {
+                    throw new IOException("Failed to parse xref table");
+                }
+                xref.free = value.charAt(0);
+                if (i == 0 && COSXRefEntry.FIRST_XREF_ENTRY.equals(xref) && number != 0) {
+                    number = 0;
+                    LOGGER.log(Level.WARNING, "Incorrect xref section");
+                }
                 xrefs.addEntry(number + i, xref);
+
+                checkXrefTableEntryLastBytes();
             }
             nextToken();
         }
         this.source.seekFromCurrentPosition(-7);
+    }
+
+    /**
+     * Checks that last bytes in the entry of Xref table should be:
+     * EOL(CRLF), or Space and LF, or Space and CR
+     *
+     * @throws IOException - incorrect reading from file
+     */
+    private void checkXrefTableEntryLastBytes() throws IOException {
+        boolean isLastBytesCorrect;
+
+        byte ch = this.source.readByte();
+        if (isCR(ch)) {
+            ch = this.source.readByte();
+            isLastBytesCorrect = isLF(ch);
+        } else if (ch == CharTable.ASCII_SPACE) {
+            ch = this.source.readByte();
+            isLastBytesCorrect = (isLF(ch) || isCR(ch));
+        } else {
+            isLastBytesCorrect = false;
+        }
+
+        if (!isLastBytesCorrect){
+            this.source.unread();
+            LOGGER.log(Level.WARNING, "Incorrect end of line in cross-reference table.");
+        }
     }
 
     private void parseXrefStream(final COSXRefInfo section) throws IOException {
@@ -478,8 +517,15 @@ public class PDFParser extends COSParser {
                 this.getToken().keyword != Token.Keyword.KW_OBJ) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
-        COSObject xrefCOSStream = getDictionary();
-        if (!(xrefCOSStream.getType() == COSObjType.COS_STREAM)) {
+        COSObject xrefCOSStream;
+        try {
+            xrefCOSStream = getDictionary();
+        } catch (Exception e) {
+            throw new IOException("PDFParser::GetXRefSection(...)" + "Exception during parsing xref stream at offset " +
+                    section.getStartXRef(), e);
+        }
+        if (xrefCOSStream.getType() != COSObjType.COS_STREAM ||
+                !COSName.construct(ASAtom.XREF).equals(xrefCOSStream.getKey(ASAtom.TYPE))) {
             throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.getDirectBase());
@@ -491,9 +537,9 @@ public class PDFParser extends COSParser {
     }
 
 	private void getXRefInfo(final List<COSXRefInfo> info, Set<Long> processedOffsets, Long offset) throws IOException {
-        if (offset.longValue() == 0) {
+        if (offset == null) {
 			offset = findLastXRef();
-			if (offset.longValue() == 0) {
+			if (offset == null) {
 				throw new IOException("PDFParser::GetXRefInfo(...)" + StringExceptions.START_XREF_VALIDATION);
 			}
 		}
@@ -522,12 +568,12 @@ public class PDFParser extends COSParser {
         COSTrailer trailer = section.getTrailer();
 
         offset = trailer.getXRefStm();
-        if (offset != null && offset.longValue() != 0) {
+        if (offset != null) {
             getXRefInfo(info, processedOffsets, offset);
         }
 
         offset = trailer.getPrev();
-		if (offset != null && offset.longValue() != 0) {
+		if (offset != null) {
             getXRefInfo(info, processedOffsets, offset);
 		}
 	}
@@ -535,6 +581,9 @@ public class PDFParser extends COSParser {
 	private void getTrailer(final COSTrailer trailer) throws IOException {
 		if (findKeyword(Token.Keyword.KW_TRAILER)) {
 			COSObject obj = nextObject();
+			if (obj.empty() || obj.getType() != COSObjType.COS_DICT) {
+				throw new IOException("Trailer is empty or has invalid type");
+			}
 			trailer.setObject(obj);
 		}
 

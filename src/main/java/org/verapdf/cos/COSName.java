@@ -24,6 +24,8 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * @author Timur Kamalov
  */
@@ -101,6 +103,10 @@ public class COSName extends COSDirect {
 		*/
     public String getString() {
         return this.value.getValue();
+    }
+
+    public String getUnicodeValue() {
+        return new String(this.getString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
     public boolean setString(final String value) {

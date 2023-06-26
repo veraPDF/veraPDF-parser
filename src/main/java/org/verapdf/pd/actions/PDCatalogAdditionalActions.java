@@ -28,27 +28,21 @@ import org.verapdf.cos.COSObject;
  */
 public class PDCatalogAdditionalActions extends PDAbstractAdditionalActions {
 
+	private static final String CATALOG_PARENT_TYPE = "Catalog";
+
+	private static final ASAtom[] actionNames = {ASAtom.WC, ASAtom.WS, ASAtom.DS, ASAtom.WP, ASAtom.DP};
+
 	public PDCatalogAdditionalActions(COSObject obj) {
 		super(obj);
 	}
 
-	public PDAction getWC() {
-		return getAction(ASAtom.WC);
+	@Override
+	public ASAtom[] getActionNames() {
+		return actionNames;
 	}
 
-	public PDAction getWS() {
-		return getAction(ASAtom.WS);
-	}
-
-	public PDAction getDS() {
-		return getAction(ASAtom.DS);
-	}
-
-	public PDAction getWP() {
-		return getAction(ASAtom.WP);
-	}
-
-	public PDAction getDP() {
-		return getAction(ASAtom.DP);
+	@Override
+	public String getParentType() {
+		return CATALOG_PARENT_TYPE;
 	}
 }

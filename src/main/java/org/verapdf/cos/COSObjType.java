@@ -40,6 +40,10 @@ public enum COSObjType {
 		return this == COS_INTEGER || this == COS_REAL;
 	}
 
+	public boolean isBoolean() {
+		return this == COS_BOOLEAN;
+	}
+
 	public boolean isDictionaryBased() {
 		return this == COS_DICT || this == COS_STREAM;
 	}

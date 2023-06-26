@@ -32,6 +32,8 @@ import org.verapdf.pd.colors.PDColorSpace;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,9 +87,11 @@ public class ICCProfile extends PDObject {
 	private static final int CREATION_MIN_OFFSET = 32;
 	/** Offset of creation sec byte */
 	private static final int CREATION_SEC_OFFSET = 34;
-
+	/** Offset of profile flags */
+	private static final int PROFILE_FLAGS_OFFSET = 44;
 
 	private byte[] profileHeader = new byte[0];
+	private byte[] md5ByteValue;
 	private Calendar creationDate;
 	private boolean isLooksValid = true;
 	private String description = null;
@@ -115,6 +119,64 @@ public class ICCProfile extends PDObject {
 		} catch (IOException e) {
 			this.isLooksValid = false;
 			LOGGER.log(Level.FINE, "Exception during obtaining ICCProfile header", e);
+		}
+	}
+
+	public String getMD5() {
+		String profileID = getProfileID();
+		if (profileID != null) {
+			return profileID;
+		}
+		if (md5ByteValue == null) {
+			int iccProfileSize = getSize(profileHeader);
+			try (ASInputStream data = this.getObject().getData(COSStream.FilterFlags.DECODE)) {
+				byte[] buffer = getICCProfileBytes(data, iccProfileSize);
+				if (buffer.length != iccProfileSize) {
+					md5ByteValue = new byte[0];
+					return null;
+				}
+				setZero(buffer, PROFILE_FLAGS_OFFSET, PROFILE_FLAGS_OFFSET + REQUIRED_LENGTH);
+				setZero(buffer, RENDERING_INTENT_OFFSET, RENDERING_INTENT_OFFSET + REQUIRED_LENGTH);
+				setZero(buffer, PROFILE_ID_OFFSET, PROFILE_ID_OFFSET + PROFILE_ID_LENGTH);
+				MessageDigest md5  = MessageDigest.getInstance("MD5");
+				md5.update(buffer);
+				md5ByteValue = md5.digest();
+			} catch (NoSuchAlgorithmException | IOException  e) {
+				LOGGER.log(Level.FINE, "Exception during calculating ICCProfile md5 value", e);
+				md5ByteValue = new byte[0];
+				return null;
+			}
+		}
+		if (md5ByteValue != null && isNotAllZero(md5ByteValue)) {
+			return new String(md5ByteValue, StandardCharsets.ISO_8859_1);
+		}
+		return null;
+	}
+
+	private static byte[] getICCProfileBytes(ASInputStream data, int iccProfileSize) throws IOException {
+		byte[] buffer = new byte[iccProfileSize];
+		int bufferSize = 2048;
+		byte[] temp = new byte[bufferSize];
+		int size = 0;
+		int read = data.read(temp, bufferSize);
+		while (read != -1) {
+			if (size + read >= iccProfileSize) {
+				System.arraycopy(temp, 0, buffer, size, iccProfileSize - size);
+				return buffer;
+			}
+			System.arraycopy(temp, 0, buffer, size, read);
+			size += read;
+			read = data.read(temp, bufferSize);
+		}
+		return Arrays.copyOf(buffer, size);
+	}
+
+	private void setZero(byte[] buffer, int offset, int end) {
+		if (end > buffer.length) {
+			return;
+		}
+		for (int i = offset;  i < end; i++) {
+			buffer[i] = 0;
 		}
 	}
 
@@ -292,6 +354,18 @@ public class ICCProfile extends PDObject {
 		int part = header[off] & 0xFF;
 		part <<= 8;
 		part += header[off + 1] & 0xFF;
+		return part;
+	}
+
+	private static int getSize(byte[] header) {
+		if (header.length < 4) {
+			return header.length;
+		}
+		int part = header[0] & 0xFF;
+		for (int i = 1; i < 4; i++) {
+			part <<= 8;
+			part += header[i] & 0xFF;
+		}
 		return part;
 	}
 

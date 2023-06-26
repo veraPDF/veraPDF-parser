@@ -77,23 +77,16 @@ public class COSFilterASCIIHexDecode extends ASBufferedInFilter {
     @Override
     public int read(byte[] buffer, int size) throws IOException {
         int pointer = 0;
-        byte[] twoBytes = reader.getNextBytes();
         byte res;
-        for(int i = 0; i < size - 1; ++i) {
-            if(twoBytes == null) {
+        for (int i = 0; i < size; ++i) {
+            byte[] twoBytes = reader.getNextBytes();
+            if (twoBytes == null) {
                 return pointer == 0 ? -1 : pointer;
             }
             res = (byte) (decodeLoHex(twoBytes[0]) << 4);
             res += decodeLoHex(twoBytes[1]);
             buffer[pointer++] = res;
-            twoBytes = reader.getNextBytes();
         }
-        if (pointer == 0) {
-            return -1;
-        }
-        res = (byte) (decodeLoHex(twoBytes[0]) << 4);
-        res += decodeLoHex(twoBytes[1]);
-        buffer[pointer++] = res;
         return pointer == 0 ? -1 : pointer;
     }
 

@@ -27,6 +27,8 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is base class for CFF CID font and CFF Type 1 font parsers.
@@ -34,6 +36,8 @@ import java.util.ArrayList;
  * @author Sergey Shemyakov
  */
 abstract class CFFFontBaseParser extends CFFFileBaseParser {
+
+    private static final Logger LOGGER = Logger.getLogger(CFFFontBaseParser.class.getCanonicalName());
 
     protected boolean attemptedParsing = false;
     protected boolean successfullyParsed = false;
@@ -49,11 +53,11 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected long privateDictSize;
     protected long topDictBeginOffset;
     protected long topDictEndOffset;
-    protected float[] fontMatrix = new float[6];
-    boolean fontMatrixRead = false;
+    protected float[] fontMatrix;
     protected long charStringsOffset;
     protected long charSetOffset;
     protected int charStringType;
+    protected String weight;
 
     //CharStrings
     protected int nGlyphs;
@@ -70,8 +74,6 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     public CFFFontBaseParser(SeekableInputStream source) {
         super(source);
         stack = new ArrayList<>(48);
-        System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,
-                DEFAULT_FONT_MATRIX.length);
         this.charStringType = 2;
         this.charSetOffset = 0; // default
     }
@@ -85,6 +87,11 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                 this.source.readByte();
                 if (next < 22) {
                     switch (next) {
+                        case 4:
+                            this.weight =
+                                    getStringBySID((int) this.stack.get(this.stack.size() - 1).getInteger());
+                            this.stack.clear();
+                            break;
                         case 15:    // charset
                             this.charSetOffset =
                                     this.stack.get(this.stack.size() - 1).getInteger();
@@ -106,11 +113,9 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                             next = this.source.readByte() & 0xFF;
                             switch (next) {
                                 case 7:     // FontMatrix
-                                    if (!fontMatrixRead) {
-                                        fontMatrixRead = true;
-                                        for (int i = 0; i < 6; ++i) {
-                                            fontMatrix[i] = this.stack.get(i).getReal();
-                                        }
+                                    fontMatrix = new float[6];
+                                    for (int i = 0; i < 6; ++i) {
+                                        fontMatrix[i] = this.stack.get(i).getReal();
                                     }
                                     this.stack.clear();
                                     break;
@@ -128,7 +133,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                     }
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             throw new IOException("Error with stack in processing Top DICT in CFF file", e);
         }
     }
@@ -155,19 +160,32 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
             if (next < 22) {
                 switch (next) {
                     case 20:    // defaultWidthX
-                        this.defaultWidthX = (int)
-                                this.stack.get(stack.size() - 1).getInteger();
-                        this.stack.clear();
+                        if (!this.stack.isEmpty()) {
+                            this.defaultWidthX = (int)
+                                    this.stack.get(stack.size() - 1).getInteger();
+                            this.stack.clear();
+                        } else {
+                            LOGGER.log(Level.FINE, "Empty arguments stack for defaultWidthX operator");
+                        }
                         break;
                     case 21:    // nominalWidthX
-                        this.nominalWidthX = (int)
-                                this.stack.get(stack.size() - 1).getInteger();
-                        this.stack.clear();
+                        if (!this.stack.isEmpty()) {
+                            this.nominalWidthX = (int)
+                                    this.stack.get(stack.size() - 1).getInteger();
+                            this.stack.clear();
+                        } else {
+                            LOGGER.log(Level.FINE, "Empty arguments stack for nominalWidthX operator");
+                        }
                         break;
                     case 19:    // Subrs
-                        this.subrsOffset = this.stack.get(stack.size() - 1).getInteger()
-                                + privateDictOffset;
-                        this.stack.clear();
+                        if (!this.stack.isEmpty()) {
+                            this.subrsOffset = this.stack.get(stack.size() - 1).getInteger()
+                                               + privateDictOffset;
+                            this.stack.clear();
+                        } else {
+                            LOGGER.log(Level.FINE, "Empty arguments stack for Subrs operator");
+                        }
+                        break;
                     default:
                         this.stack.clear();
                 }
@@ -188,5 +206,9 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
         } else {
             return new ASFileStreamCloser(this.source);
         }
+    }
+
+    public String getWeight() {
+        return weight;
     }
 }

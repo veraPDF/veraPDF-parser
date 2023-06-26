@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.tools;
 
 import org.verapdf.as.filters.io.ASBufferedInFilter;
@@ -7,6 +27,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -118,19 +139,33 @@ public class EncryptionToolsRevision5_6 {
     }
 
     public static void enableAES256() throws GeneralSecurityException {
-        try {   // Allow using of AES with 256-bit key.
-            Field field = Class.forName("javax.crypto.JceSecurity").
-                    getDeclaredField("isRestricted");
+        if (Cipher.getMaxAllowedKeyLength("AES") < 256) {
+            try {   // Allow using of AES with 256-bit key.
+                Field restrictedField = Class.forName("javax.crypto.JceSecurity").
+                        getDeclaredField("isRestricted");
 
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            modifiersField.setAccessible(false);
+                Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+                getDeclaredFields0.setAccessible(true);
+                Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
+                Field modifiersField = null;
+                for (Field field : fields) {
+                    if ("modifiers".equals(field.getName())) {
+                        modifiersField = field;
+                        break;
+                    }
+                }
+                if (modifiersField == null) {
+                    throw new IllegalStateException("Field \"modifiers\" is not declared in java.lang.reflect.Field");
+                }
+                modifiersField.setAccessible(true);
+                modifiersField.setInt(restrictedField, restrictedField.getModifiers() & ~Modifier.FINAL);
+                modifiersField.setAccessible(false);
 
-            field.setAccessible(true);
-            field.set(null, Boolean.FALSE);
-        } catch (Exception ex) {
-            throw new GeneralSecurityException("Can't enable using of 256-bit key for AES encryption", ex);
+                restrictedField.setAccessible(true);
+                restrictedField.set(null, Boolean.FALSE);
+            } catch (Exception ex) {
+                throw new GeneralSecurityException("Can't enable using of 256-bit key for AES encryption", ex);
+            }
         }
     }
 

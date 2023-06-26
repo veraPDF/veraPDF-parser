@@ -26,13 +26,14 @@ import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.exceptions.LoopedException;
+import org.verapdf.pd.structure.NameTreeIterator;
 
 import java.util.*;
 
 /**
  * @author Maksim Bezrukov
  */
-public class PDNameTreeNode extends PDObject {
+public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 
 	private Set<COSKey> parents = null;
 
@@ -92,16 +93,88 @@ public class PDNameTreeNode extends PDObject {
 		COSObject names = getKey(ASAtom.NAMES);
 		if (names != null && names.getType() == COSObjType.COS_ARRAY) {
 			Map<String, COSObject> res = new LinkedHashMap<>();
-			for (int i = 0; i < names.size(); i+=2) {
+			for (int i = 0; i < names.size(); i += 2) {
 				COSObject keyObj = names.at(i);
 				String key = keyObj == null ? null : keyObj.getString();
 				if (key != null) {
-					COSObject value = names.at(i+1);
+					COSObject value = names.at(i + 1);
 					res.put(key, value);
 				}
 			}
 			return res;
 		}
 		return Collections.emptyMap();
+	}
+
+	public String[] getLimitsArray() {
+		COSObject limits = this.getKey(ASAtom.LIMITS);
+		if (limits != null && !limits.empty() && limits.getType() == COSObjType.COS_ARRAY
+				&& limits.size() >= 2 && limits.at(0).getType() == COSObjType.COS_STRING
+				&& limits.at(1).getType() == COSObjType.COS_STRING) {
+			String[] res = new String[2];
+			res[0] = limits.at(0).getString();
+			res[1] = limits.at(1).getString();
+			return res;
+		}
+		return null;
+	}
+
+	public COSObject getObject(String key) {
+		HashSet<COSKey> visitedKeys = new HashSet<>();
+		COSKey objectKey = getObject().getObjectKey();
+		if (objectKey != null) {
+			visitedKeys.add(objectKey);
+		}
+		return getObject(key, visitedKeys);
+	}
+
+	private COSObject getObject(String key, Set<COSKey> visitedKeys) {
+		String[] limits = this.getLimitsArray();
+		if (limits != null && (key.compareTo(limits[0]) < 0 || key.compareTo(limits[1]) > 0)) {
+			// string not in the limits
+			return null;
+		}
+
+		if (this.knownKey(ASAtom.NAMES)) {
+			// just get object from names or check if it is not in names
+			Map<String, COSObject> names = getNames();
+			return names == null ? null : names.get(key);
+		}
+
+		if (this.knownKey(ASAtom.KIDS)) {
+			// find kid with mapping for given key
+			List<PDNameTreeNode> kids = getKids();
+			if (kids != null) {
+				COSObject res;
+				for (PDNameTreeNode kid : kids) {
+					COSKey kidObjectKey = kid.getObject().getObjectKey();
+					if (kidObjectKey != null) {
+						if (visitedKeys.contains(kidObjectKey)) {
+							throw new LoopedException("Loop inside name tree");
+						} else {
+							visitedKeys.add(kidObjectKey);
+						}
+					}
+					res = kid.getObject(key, visitedKeys);
+					if (res != null) {
+						return res;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public NameTreeIterator iterator() {
+		return new NameTreeIterator(this);
+	}
+
+	public Long size() {
+		long i = 0;
+		NameTreeIterator iterator = iterator();
+		for (; iterator.hasNext(); i++) {
+			iterator.next();
+		}
+		return i;
 	}
 }

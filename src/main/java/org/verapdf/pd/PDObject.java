@@ -62,7 +62,8 @@ public class PDObject {
 	}
 
 	public boolean knownKey(final ASAtom key) {
-		return object.knownKey(key);
+		Boolean flag = object.knownKey(key);
+		return flag != null ? flag : false;
 	}
 
 	public COSObject getKey(final ASAtom key) {
@@ -83,6 +84,10 @@ public class PDObject {
 
 	public ASAtom getNameKey(final ASAtom key) {
 		return object.getNameKey(key);
+	}
+
+	public String getNameKeyStringValue(final ASAtom key) {
+		return object.getNameKeyStringValue(key);
 	}
 
 	public void setNameKey(final ASAtom key, final ASAtom value) {

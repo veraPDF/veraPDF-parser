@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.pd.structure;
 
 import org.verapdf.as.ASAtom;
@@ -15,7 +35,7 @@ import java.util.*;
  *
  * @author Sergey Shemyakov
  */
-public class PDNumberTreeNode extends PDObject {
+public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
 
     /**
      * Constructor from number tree node dictionary.
@@ -33,7 +53,8 @@ public class PDNumberTreeNode extends PDObject {
     public long[] getLimitsArray() {
         COSObject limits = this.getKey(ASAtom.LIMITS);
         if (limits != null && !limits.empty() && limits.getType() == COSObjType.COS_ARRAY
-                && limits.size() >= 2) {
+                && limits.size() >= 2 && limits.at(0).getType() == COSObjType.COS_INTEGER
+                && limits.at(1).getType() == COSObjType.COS_INTEGER) {
             long[] res = new long[2];
             res[0] = limits.at(0).getInteger();
             res[1] = limits.at(1).getInteger();
@@ -55,7 +76,7 @@ public class PDNumberTreeNode extends PDObject {
             }
             return Collections.unmodifiableList(res);
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**
@@ -76,7 +97,7 @@ public class PDNumberTreeNode extends PDObject {
             }
             return Collections.unmodifiableMap(res);
         }
-        return null;
+        return Collections.emptyMap();
     }
 
     /**
@@ -95,7 +116,7 @@ public class PDNumberTreeNode extends PDObject {
         return getObject(key, visitedKeys);
     }
 
-    public COSObject getObject(Long key, Set<COSKey> visitedKeys) {
+    private COSObject getObject(Long key, Set<COSKey> visitedKeys) {
         long[] limits = this.getLimitsArray();
         if (limits != null) {
             if (key < limits[0] || key > limits[1]) {
@@ -117,10 +138,12 @@ public class PDNumberTreeNode extends PDObject {
                 COSObject res;
                 for (PDNumberTreeNode kid : kids) {
                     COSKey kidObjectKey = kid.getObject().getObjectKey();
-                    if (visitedKeys.contains(kidObjectKey)) {
-                        throw new LoopedException("Loop inside number tree");
-                    } else {
-                        visitedKeys.add(kidObjectKey);
+                    if (kidObjectKey != null) {
+                        if (visitedKeys.contains(kidObjectKey)) {
+                            throw new LoopedException("Loop inside number tree");
+                        } else {
+                            visitedKeys.add(kidObjectKey);
+                        }
                     }
                     res = kid.getObject(key, visitedKeys);
                     if (res != null) {
@@ -131,5 +154,18 @@ public class PDNumberTreeNode extends PDObject {
         }
 
         return null;
+    }
+
+    public NumberTreeIterator iterator() {
+        return new NumberTreeIterator(this);
+    }
+
+    public Long size() {
+        long i = 0;
+        NumberTreeIterator iterator = iterator();
+        for (; iterator.hasNext(); i++) {
+            iterator.next();
+        }
+        return i;
     }
 }

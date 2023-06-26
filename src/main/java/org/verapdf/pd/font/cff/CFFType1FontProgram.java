@@ -25,9 +25,7 @@ import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Instance of this class represent a Type1 font from FontSet of
@@ -63,6 +61,9 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
         this.topDictEndOffset = topDictEndOffset;
         this.externalCMap = externalCMap;
         this.isSubset = isSubset;
+        fontMatrix = new float[6];
+        System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,
+                DEFAULT_FONT_MATRIX.length);
     }
 
     /**
@@ -223,28 +224,31 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     @Override
     public String getGlyphName(int code) {
-        if(isStandardEncoding) {
+        if (code < 0) {
+            return NOTDEF_STRING;
+        }
+        if (isStandardEncoding) {
             if (code < CFFPredefined.STANDARD_ENCODING.length) {
                 return CFFPredefined.STANDARD_STRINGS[CFFPredefined.STANDARD_ENCODING[code]];
             }
         } else if (isExpertEncoding) {
             if (code < CFFPredefined.EXPERT_ENCODING.length) {
-                int sid = CFFPredefined.EXPERT_ENCODING[code];
-                if (sid == CFFPredefined.SPACE_SID_EXPERT) {
-                    return CFFPredefined.EXPERT_CHARSET[CFFPredefined.SPACE_SID_EXPERT];
-                } else if (sid < CFFPredefined.ISO_ADOBE_CHARSET.length) {
-                    return CFFPredefined.STANDARD_STRINGS[sid];
-                } else if (sid <= CFFPredefined.EXPERT_ENCODING_LAST_SID) {
-                    return CFFPredefined.EXPERT_CHARSET[sid -
-                            CFFPredefined.ISO_ADOBE_CHARSET.length - 2];
-                }
+                return CFFPredefined.STANDARD_STRINGS[CFFPredefined.EXPERT_ENCODING[code]];
             }
-        } else {
-            if (code < encoding.length) {
-                return inverseCharSet.get(encoding[code] + 1);
-            }
+        } else if (code < encoding.length && encoding[code] + 1 < inverseCharSet.size()) {
+            return inverseCharSet.get(encoding[code] + 1);
         }
         return NOTDEF_STRING;
+    }
+
+    @Override
+    public Double getAscent() {
+        return null;
+    }
+
+    @Override
+    public Double getDescent() {
+        return null;
     }
 
     /**
@@ -380,5 +384,10 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
             }
         }
         return null;
+    }
+
+    @Override
+    public List<Integer> getCIDList() {
+        return Collections.emptyList();
     }
 }

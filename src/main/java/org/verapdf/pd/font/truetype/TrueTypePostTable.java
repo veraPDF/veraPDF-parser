@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class does parsing of True Type "post" table and extracts all the data
@@ -37,6 +39,7 @@ import java.util.Map;
  */
 class TrueTypePostTable extends TrueTypeTable {
 
+    private static final Logger LOGGER = Logger.getLogger(TrueTypePostTable.class.getCanonicalName());
     private long length;
     private int numGlyphs;
     private Map<String, Integer> stringToGid;
@@ -66,7 +69,11 @@ class TrueTypePostTable extends TrueTypeTable {
                 4               // maxMemType1
         );
         if (format == 2.0f) {
-            this.source.skip(2);    // numGlyphs
+            int numGlyphs = this.readUShort();
+            if (this.numGlyphs != numGlyphs) {
+                setNumGlyphs(numGlyphs);
+                LOGGER.log(Level.WARNING, "Embedded TrueType font program is incorrect: numberOfGlyphs field of 'post' table does not match numGlyphs field of the 'maxp' table");
+            }
             int[] glyphNameIndexInt = new int[this.numGlyphs];
             for (int i = 0; i < this.numGlyphs; ++i) {
                 glyphNameIndexInt[i] = this.readUShort();

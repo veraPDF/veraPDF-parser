@@ -23,6 +23,7 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.pd.function.PDFunction;
 
 /**
  * @author Maksim Bezrukov
@@ -51,5 +52,9 @@ public class PDHalftone extends PDObject {
             return base.getName().getValue();
         }
         return base.getStringKey(ASAtom.HALFTONE_NAME);
+    }
+
+    public PDFunction getCustomTransferFunction() {
+        return PDFunction.createFunction(getObject().getKey(ASAtom.TRANSFER_FUNCTION));
     }
 }

@@ -179,7 +179,7 @@ public class CMapParser extends PSParser {
                 cMap.shortestCodeSpaceLength = begin.length;
             }
         } else {
-            LOGGER.log(Level.FINE, "CMap " + cMap.getName() + " has overlapping codespace ranges.");
+            LOGGER.log(Level.WARNING, "CMap " + cMap.getName() + " has overlapping codespace ranges.");
         }
     }
 
@@ -264,9 +264,15 @@ public class CMapParser extends PSParser {
             nextToken();    // skip ]
         } else {
             byte[] token = getToken().getByteValue();
+            if (token.length == 0) {
+                LOGGER.log(Level.WARNING, "Incorrect bfrange in toUnicode CMap: " +
+                        "string is empty.");
+                return;
+            }
             int lastByte = token[token.length - 1] & 0xFF;
             if (lastByte > 255 - bfRangeEnd + bfRangeBegin) {
-                bfRangeEnd = 255 + bfRangeBegin - lastByte;
+                LOGGER.log(Level.WARNING, "Incorrect bfrange in toUnicode CMap: " +
+                        "the last byte of the string incremented past 255.");
             }
             this.cMap.addUnicodeInterval(new ToUnicodeInterval(bfRangeBegin, bfRangeEnd,
                     getToken().getByteValue()));
@@ -283,22 +289,25 @@ public class CMapParser extends PSParser {
 
     private static long getBfrangeEndFromBytes(byte[] endRange, byte[] beginRange) {
         long res = 0;
-        for (int i = 0; i < endRange.length; ++i) {
-            if (i < endRange.length - 1) {
-                // getting first hex digits of begin range string.
-                // see PDF 32000 2008, 9.10.3: these digits should be the same as
-                // in end range strings.
-                byte endRangeByte = endRange[i];
-                byte beginRangeByte = beginRange[i];
-                if (endRangeByte != beginRangeByte) {
-                    LOGGER.log(Level.WARNING, "Incorrect bfrange in toUnicode CMap: " +
-                            "bfrange contains more than 256 code.");
-                }
-                res += (beginRangeByte & 0x00FF) << ((endRange.length - i - 1) * 8);
-            } else {    // getting last two hex digits of end range string
-                res += (endRange[i] & 0x00FF) << ((endRange.length - i - 1) * 8);
+        int length = Math.max(beginRange.length, endRange.length);
+        byte[] correctBeginRange = new byte[length];
+        byte[] correctEndRange = new byte[length];
+        System.arraycopy(beginRange, 0, correctBeginRange, length - beginRange.length, beginRange.length);
+        System.arraycopy(endRange, 0, correctEndRange, length - endRange.length, endRange.length);
+        int i = 0;
+        for (; i < length - 1; ++i) {
+            // getting first hex digits of begin range string.
+            // see PDF 32000 2008, 9.10.3: these digits should be the same as
+            // in end range strings.
+            byte endRangeByte = correctEndRange[i];
+            byte beginRangeByte = correctBeginRange[i];
+            if (endRangeByte != beginRangeByte) {
+                LOGGER.log(Level.WARNING, "Incorrect bfrange in toUnicode CMap: " +
+                        "bfrange contains more than 256 code.");
             }
+            res += (beginRangeByte & 0x00FF) << ((length - i - 1) * 8);
         }
+        res += (correctEndRange[i] & 0x00FF) << ((length - i - 1) * 8);
         return res;
     }
 
@@ -310,6 +319,9 @@ public class CMapParser extends PSParser {
             byte[] token = getToken().getByteValue();
             if (token.length == 1) {
                 return new String(token, StandardCharsets.ISO_8859_1);
+            }
+            if (token.length == 2 && token[0] == (byte) 0xFF && token[1] == (byte) 0xFE) {
+                return "\uFFFE";
             }
             return new String(token, StandardCharsets.UTF_16BE);
         }

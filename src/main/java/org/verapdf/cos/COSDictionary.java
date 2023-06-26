@@ -31,6 +31,9 @@ import java.util.*;
  */
 public class COSDictionary extends COSDirect {
 
+    public static final String SIZE = "size";
+    public static final String DICTIONARY = "dictionary";
+
     private Map<ASAtom, COSObject> entries;
 
     protected COSDictionary() {
@@ -150,7 +153,7 @@ public class COSDictionary extends COSDirect {
     }
 
     public boolean setKey(final ASAtom key, final COSObject value) {
-        if (value.empty()) {
+        if (value.empty() || value.get() instanceof COSNull) {
             this.entries.remove(key);
         } else {
             this.entries.put(key, value);
@@ -170,7 +173,6 @@ public class COSDictionary extends COSDirect {
     }
 
     public Long getIntegerKey(final ASAtom key) {
-
         return getKey(key).getInteger();
     }
 
@@ -193,7 +195,11 @@ public class COSDictionary extends COSDirect {
     }
 
     public String getStringKey(final ASAtom key) {
-        return getKey(key).getString();
+        COSObject object = getKey(key);
+        if (object.getType() == COSObjType.COS_NAME) {
+            return null;
+        }
+        return object.getString();
     }
 
     public boolean setStringKey(final ASAtom key, final String value) {
@@ -205,6 +211,11 @@ public class COSDictionary extends COSDirect {
 
     public final ASAtom getNameKey(final ASAtom key) {
         return getKey(key).getName();
+    }
+
+    public final String getNameKeyStringValue(final ASAtom key) {
+        ASAtom value = getNameKey(key);
+        return value != null ? value.getValue() : null;
     }
 
     public boolean setNameKey(final ASAtom key, final ASAtom value) {
@@ -306,4 +317,10 @@ public class COSDictionary extends COSDirect {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return DICTIONARY + "(" + SIZE + " = " + size() + ")";
+    }
+
 }

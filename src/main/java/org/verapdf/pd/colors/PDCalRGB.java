@@ -46,6 +46,39 @@ public class PDCalRGB extends PDCIEDictionaryBased {
         return ASAtom.CALRGB;
     }
 
+    // See ISO 32000-2:2020, chapter 8.6.5.3
+    @Override
+    public double[] toRGB(double[] value) {
+        if (wpX == 1 && wpY == 1 && wpZ == 1) {
+            double a = value[0];
+            double b = value[1];
+            double c = value[2];
+
+            double[] gamma = getGamma();
+            double powAR = Math.pow(a, gamma[0]);
+            double powBG = Math.pow(b, gamma[1]);
+            double powCB = Math.pow(c, gamma[2]);
+
+            double[] matrix = getMatrix();
+            double mXA = matrix[0];
+            double mYA = matrix[1];
+            double mZA = matrix[2];
+            double mXB = matrix[3];
+            double mYB = matrix[4];
+            double mZB = matrix[5];
+            double mXC = matrix[6];
+            double mYC = matrix[7];
+            double mZC = matrix[8];
+
+            double x = mXA * powAR + mXB * powBG + mXC * powCB;
+            double y = mYA * powAR + mYB * powBG + mYC * powCB;
+            double z = mZA * powAR + mZB * powBG + mZC * powCB;
+            return convXYZtoRGB(x, y, z);
+        } else {
+            return new double[]{value[0], value[1], value[2]};
+        }
+    }
+
     public double[] getGamma() {
         double[] res = TypeConverter.getRealArray(this.dictionary.getKey(ASAtom.GAMMA), 3, "Gamma");
         return res != null ? res : new double[]{1, 1, 1};

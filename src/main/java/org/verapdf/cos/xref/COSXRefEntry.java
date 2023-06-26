@@ -28,6 +28,8 @@ package org.verapdf.cos.xref;
  */
 public class COSXRefEntry {
 
+	public final static COSXRefEntry FIRST_XREF_ENTRY = new COSXRefEntry(0, 65535, 'f');
+
 	/**
 	 * Is offset of object in the document.
 	 */
@@ -70,5 +72,17 @@ public class COSXRefEntry {
 		this.offset = offset;
 		this.generation = generation;
 		this.free = free;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		COSXRefEntry entry = (COSXRefEntry) o;
+		return offset == entry.offset && generation == entry.generation && free == entry.free;
 	}
 }

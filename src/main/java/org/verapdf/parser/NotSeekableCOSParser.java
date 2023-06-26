@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.parser;
 
 import org.verapdf.as.exceptions.StringExceptions;
@@ -153,12 +173,12 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
                 this.flag = false;
                 return getDictionary();
             case TT_CLOSEDICT:
-                return new COSObject();
+                return getCloseDictionary();
             case TT_EOF:
                 return new COSObject();
             case TT_STARTPROC:
                 this.flag = false;
-                COSObject proc =  getArray();
+                COSObject proc = getArray();
                 return PSObject.getPSObject(proc, true);
         }
         return new COSObject();
@@ -202,6 +222,10 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
             return new COSObject();
         }
         return COSName.construct(token.getValue());
+    }
+
+    protected COSObject getCloseDictionary() {
+        return new COSObject();
     }
 
     protected COSObject getDictionary() throws IOException {

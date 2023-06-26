@@ -79,4 +79,16 @@ public class PDAction extends PDObject {
 	public ASAtom getN() {
 		return getObject().getNameKey(ASAtom.N);
 	}
+
+	public COSObject getRendition() {
+		return getObject().getKey(ASAtom.R);
+	}
+
+	public COSObject getDestination() {
+		return getObject().getKey(ASAtom.D);
+	}
+
+	public COSObject getStructureDestination() {
+		return getObject().getKey(ASAtom.SD);
+	}
 }

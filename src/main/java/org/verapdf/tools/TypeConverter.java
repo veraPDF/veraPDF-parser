@@ -55,7 +55,7 @@ public class TypeConverter {
 				return getErrorDateFormat("Incorrect year data.");
 			}
 			int year = Integer.parseInt(toParse.substring(2, 6));
-			int month = 1;
+			int month = 0;
 			int day = 1;
 			int hour = 0;
 			int minutes = 0;

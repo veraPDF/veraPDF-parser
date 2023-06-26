@@ -37,7 +37,12 @@ public class PDStructTreeRoot extends PDStructTreeNode {
 	}
 
 	@Override
-	public List<PDStructElem> getChildren() {
+	public List<PDStructElem> getStructChildren() {
+		return TaggedPDFHelper.getStructTreeRootStructChildren(getObject(), getRoleMap());
+	}
+
+	@Override
+	public List<Object> getChildren() {
 		return TaggedPDFHelper.getStructTreeRootChildren(getObject(), getRoleMap());
 	}
 

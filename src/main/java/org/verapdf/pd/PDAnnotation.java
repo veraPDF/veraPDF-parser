@@ -49,6 +49,10 @@ public class PDAnnotation extends PDObject {
 		return getObject().getIntegerKey(ASAtom.F);
 	}
 
+	public Long getStructParent() {
+		return getObject().getIntegerKey(ASAtom.STRUCT_PARENT);
+	}
+
 	public String getContents() {
 		return getStringKey(ASAtom.CONTENTS);
 	}
@@ -59,6 +63,22 @@ public class PDAnnotation extends PDObject {
 
 	public String getModDate() {
 		return getStringKey(ASAtom.M);
+	}
+
+	public String getTU() {
+		return getStringKey(ASAtom.TU);
+	}
+
+	public COSObject getParent(){
+		COSObject res = getKey(ASAtom.PARENT);
+		if (res != null && res.getType() == COSObjType.COS_DICT) {
+			return res;
+		}
+		return null;
+	}
+
+	public COSObject getBM() {
+		return this.getKey(ASAtom.BM);
 	}
 
 	public Double getCA() {
@@ -118,6 +138,10 @@ public class PDAnnotation extends PDObject {
 			return new PDAnnotation(popup);
 		}
 		return null;
+	}
+
+	public COSObject getDestination() {
+		return getKey(ASAtom.DEST);
 	}
 
 	public double[] getColor() {
@@ -209,6 +233,23 @@ public class PDAnnotation extends PDObject {
 		COSObject aa = getKey(ASAtom.AA);
 		if (aa != null && aa.getType() == COSObjType.COS_DICT) {
 			return new PDAnnotationAdditionalActions(aa);
+		}
+		return null;
+	}
+
+	public PD3DStream get3DD() {
+		COSObject object = getKey(ASAtom.key3DD);
+		if (object != null && (object.getType() == COSObjType.COS_DICT)) {
+			ASAtom type = object.getNameKey(ASAtom.TYPE);
+			if (ASAtom.key3DRef.equals(type)) {
+				object = object.getKey(ASAtom.key3DD);
+			}
+		}
+		if (object != null && object.getType() == COSObjType.COS_STREAM) {
+			ASAtom type = object.getNameKey(ASAtom.TYPE);
+			if (ASAtom.key3D.equals(type)) {
+				return new PD3DStream(object);
+			}
 		}
 		return null;
 	}

@@ -51,18 +51,36 @@ public class PDDocument {
 	private COSDocument document;
 
 	public PDDocument() throws IOException {
-		this.catalog = new PDCatalog();
-		this.constructDocument();
+		try {
+			this.catalog = new PDCatalog();
+			this.constructDocument();
+			checkPages();
+		} catch (Throwable t) {
+			this.close();
+			throw t;
+		}
 	}
 
 	public PDDocument(final String filename) throws IOException {
-		this.catalog = new PDCatalog();
-		this.document = new COSDocument(filename, this);
+		try {
+			this.catalog = new PDCatalog();
+			this.document = new COSDocument(filename, this);
+			checkPages();
+		} catch (Throwable t) {
+			this.close();
+			throw t;
+		}
 	}
 
 	public PDDocument(final InputStream fileStream) throws IOException {
-		this.catalog = new PDCatalog();
-		this.document = new COSDocument(fileStream, this);
+		try {
+			this.catalog = new PDCatalog();
+			this.document = new COSDocument(fileStream, this);
+			checkPages();
+		} catch (Throwable t) {
+			this.close();
+			throw t;
+		}
 	}
 
 	private void constructDocument() {
@@ -226,5 +244,11 @@ public class PDDocument {
 
 	public SeekableInputStream getPDFSource() {
 		return this.document.getPDFSource();
+	}
+
+	private void checkPages() throws IOException {
+		if (getNumberOfPages() == 0) {
+			throw new IOException("Pages not found");
+		}
 	}
 }

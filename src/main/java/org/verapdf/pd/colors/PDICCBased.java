@@ -23,6 +23,7 @@ package org.verapdf.pd.colors;
 import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSStream;
@@ -80,6 +81,33 @@ public class PDICCBased extends PDColorSpace {
 	@Override
 	public ASAtom getType() {
 		return ASAtom.ICCBASED;
+	}
+
+	@Override
+	public double[] toRGB(double[] value) {
+		return getAlternate().toRGB(value);
+	}
+
+	public String getColorSpaceType() {
+		String colorSpaceType = null;
+		if (iccProfile != null) {
+			colorSpaceType = iccProfile.getColorSpace();
+		}
+		return colorSpaceType;
+	}
+
+	public String getICCProfileIndirect() {
+		if (iccProfile != null) {
+			COSKey key = this.iccProfile.getObject().getKey();
+			if (key != null) {
+				return String.valueOf(key.getNumber() + " " + key.getGeneration());
+			}
+		}
+		return null;
+	}
+
+	public String getICCProfileMD5() {
+		return iccProfile != null ? this.iccProfile.getMD5() : null;
 	}
 
 	public double[] getRange() {

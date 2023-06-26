@@ -30,6 +30,7 @@ import org.verapdf.pd.font.cff.CFFFontProgram;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -47,7 +48,7 @@ public class OpenTypeCFFTest {
                 encoding, null, true);
         font.parseFont();
         assertTrue(font.getFont() instanceof CFFFontProgram);
-        assertTrue(!((CFFFontProgram) font.getFont()).isCIDFont());
+        assertFalse(((CFFFontProgram) font.getFont()).isCIDFont());
     }
 
 }

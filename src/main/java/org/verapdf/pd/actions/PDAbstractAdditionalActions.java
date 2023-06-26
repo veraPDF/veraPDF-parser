@@ -25,6 +25,10 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDObject;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * @author Maksim Bezrukov
  */
@@ -41,4 +45,26 @@ public abstract class PDAbstractAdditionalActions extends PDObject {
         }
         return null;
     }
+
+    public ASAtom[] getActionNames() {
+        return null;
+    }
+
+    public List<PDAction> getActions() {
+        ASAtom[] actionNames = getActionNames();
+        if (actionNames == null) {
+            return Collections.emptyList();
+        }
+        List<PDAction> actions = new ArrayList<>(actionNames.length);
+        PDAction action;
+        for (ASAtom name : actionNames) {
+            action = getAction(name);
+            if (name != null) {
+                actions.add(action);
+            }
+        }
+        return actions;
+    }
+
+    public abstract String getParentType();
 }

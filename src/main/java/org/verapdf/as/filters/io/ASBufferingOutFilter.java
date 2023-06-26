@@ -30,7 +30,8 @@ public class ASBufferingOutFilter extends ASOutFilter {
 
     private int bufferCapacity;
     protected byte [] internalBuffer;
-    private int bufferWriter, bufferEnd;
+    private int bufferWriter;
+    private int bufferEnd;
 
     public ASBufferingOutFilter(ASOutputStream stream) {
         this(stream, ASBufferedInFilter.BF_BUFFER_SIZE);

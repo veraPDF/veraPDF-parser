@@ -24,6 +24,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.pd.font.CFFNumber;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * This class parses charstring data in font Type 1 files after it was
@@ -38,6 +39,10 @@ public class Type1CharStringParser extends BaseCharStringParser {
      */
     public Type1CharStringParser(ASInputStream decodedCharString) throws IOException {
         super(decodedCharString);
+    }
+
+    public Type1CharStringParser(ASInputStream decodedCharString, Map<Integer, CFFNumber> subrWidths) throws IOException {
+        super(decodedCharString, subrWidths);
     }
 
     /**
@@ -71,13 +76,22 @@ public class Type1CharStringParser extends BaseCharStringParser {
                     popStack(6);
                     break;
                 case 13:    //hsbw
-                    if(!this.stack.empty()) {
+                    if (!this.stack.empty()) {
                         this.setWidth(this.stack.pop());
                         popStack(1);
                     }
                     return true;
                 case 10:    // callsubr
-                    //TODO: should we parse this?
+                    if (!this.stack.empty()) {
+                        CFFNumber number = this.stack.pop();
+                        if (subrWidths != null) {
+                            CFFNumber width = subrWidths.get((int) number.getInteger());
+                            if (width != null) {
+                                this.setWidth(width);
+                                return true;
+                            }
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -106,14 +120,19 @@ public class Type1CharStringParser extends BaseCharStringParser {
                     break;
                 case 7:     // sbw
                     popStack(1);
-                    this.setWidth(this.stack.pop());
-                    popStack(2);
+                    if (!this.stack.empty()) {
+                        this.setWidth(this.stack.pop());
+                        popStack(2);
+                    }
                     return true;
                 case 12:    // div
-                    int num2 = (int) this.stack.pop().getInteger();
-                    int num1 = (int) this.stack.pop().getInteger();
-                    this.stack.push(new CFFNumber(num1 / num2));  // That is not exactly what we should do, pushed number should be real. But we know that
-                    break;  // width is integer, so the result of division is not needed.
+                    if (this.stack.size() > 1) {
+                        int num2 = (int) this.stack.pop().getInteger();
+                        int num1 = (int) this.stack.pop().getInteger();
+                        this.stack.push(new CFFNumber(num1 / num2));  // That is not exactly what we should do, pushed number should be real. But we know that
+                        // width is integer, so the result of division is not needed.
+                    }
+                    break;
                 default:
                     break;
             }
@@ -136,4 +155,5 @@ public class Type1CharStringParser extends BaseCharStringParser {
         res |= buf[3] & 0xFF;
         return new CFFNumber(res);
     }
+
 }

@@ -192,12 +192,7 @@ public class PDType1Font extends PDSimpleFont {
      */
     public Boolean isStandard() {
         if (this.isStandard == null) {
-            if (!isEmbedded() && isNameStandard()) {
-                isStandard = Boolean.valueOf(true);
-                return isStandard;
-            }
-            isStandard = Boolean.valueOf(false);
-            return isStandard;
+            isStandard = !isEmbedded() && isNameStandard();
         }
         return this.isStandard;
     }
@@ -226,16 +221,16 @@ public class PDType1Font extends PDSimpleFont {
      */
     @Override
     public Double getWidth(int code) {
-        if (getFontProgram() != null) {
-            return super.getWidth(code);
+        Double width = super.getWidth(code);
+        if (width != null) {
+            return width;
         }
         if (fontMetrics != null) {
-            StandardFontMetrics metrics =
-                    StandardFontMetricsFactory.getFontMetrics(this.getName());
             Encoding enc = this.getEncodingMapping();
-            if (metrics != null) {
-                return Double.valueOf(metrics.getWidth(enc.getName(code)));
+            if (Encoding.empty().equals(enc)) {
+                enc = new Encoding(fontMetrics.getEncodingScheme());
             }
+            return (double) fontMetrics.getWidth(enc.getName(code));
         }
         // should not get here
         LOGGER.log(Level.FINE, "Can't get standard metrics");
@@ -260,6 +255,11 @@ public class PDType1Font extends PDSimpleFont {
             }
         }
         return this.getFontProgram().containsCode(code);
+    }
+
+    @Override
+    public double[] getBoundingBox() {
+        return fontMetrics != null && fontMetrics.getFontBBox() != null ? fontMetrics.getFontBBox() : super.getBoundingBox();
     }
 
     private boolean isEmbedded() {

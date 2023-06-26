@@ -39,4 +39,6 @@ public abstract class PDColorSpace extends PDResource {
     public abstract int getNumberOfComponents();
 
     public abstract ASAtom getType();
+
+    public abstract double[] toRGB(double[] value);
 }

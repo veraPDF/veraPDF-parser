@@ -65,7 +65,8 @@ public class ASBufferedInFilter extends ASInFilter {
 
     private final int bufferCapacity;
     protected byte[] buffer;
-    private int bufferBegin, bufferEnd;
+    private int bufferBegin;
+    private int bufferEnd;
 
     public ASBufferedInFilter(ASInputStream stream) throws IOException {
         this(stream, BF_BUFFER_SIZE);
@@ -161,14 +162,14 @@ public class ASBufferedInFilter extends ASInFilter {
      * @param bytesToRead amount of bytes to read.
      * @return amount of bytes actually placed into buffer.
      */
-    public long feedBuffer(int bytesToRead) throws IOException {
+    public int feedBuffer(int bytesToRead) throws IOException {
         if (this.getInputStream() == null) {
             return -1;
         }
         bytesToRead = Math.min(bytesToRead, bufferCapacity);
-        long actuallyRead = this.getInputStream().read(buffer, bytesToRead);
+        int actuallyRead = this.getInputStream().read(buffer, bytesToRead);
         bufferBegin = 0;
-        bufferEnd = (int) actuallyRead;
+        bufferEnd = actuallyRead;
         return actuallyRead;
     }
 
@@ -187,13 +188,13 @@ public class ASBufferedInFilter extends ASInFilter {
      * @param bytesToAdd amount of bytes to read.
      * @return amount of bytes actually appended to buffer.
      */
-    public long addToBuffer(int bytesToAdd) throws IOException {
+    public int addToBuffer(int bytesToAdd) throws IOException {
         if (this.getInputStream() == null) {
             return -1;
         }
         bytesToAdd = Math.min(bytesToAdd, bufferCapacity - bufferEnd);
         byte[] toAdd = new byte[bytesToAdd];
-        long actuallyRead = this.getInputStream().read(toAdd, bytesToAdd);
+        int actuallyRead = this.getInputStream().read(toAdd, bytesToAdd);
         System.arraycopy(toAdd, 0, this.buffer, bufferEnd, bytesToAdd);
         bufferEnd += bytesToAdd;
         return actuallyRead;

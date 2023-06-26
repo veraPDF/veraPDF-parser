@@ -356,6 +356,17 @@ public class BaseParser {
 		}
 	}
 
+	protected void nextLine() throws IOException {
+		byte ch;
+		while (!this.source.isEOF()) {
+			ch = this.source.readByte();
+			if (isEOL(ch)) {
+				skipEOL();
+				return;
+			}
+		}
+	}
+
 	protected boolean isEOL(byte ch) throws IOException {
 		if (isLF(ch)) {
 			return true; // EOL == LF
@@ -536,7 +547,8 @@ public class BaseParser {
 
 			// if ch == # (0x23)
 			if (ch == 0x23) {
-				byte ch1, ch2;
+				byte ch1;
+				byte ch2;
 				byte dc;
 				ch1 = this.source.readByte();
 				if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.ER) {

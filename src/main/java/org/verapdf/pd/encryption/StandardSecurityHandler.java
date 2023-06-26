@@ -29,6 +29,7 @@ import org.verapdf.cos.filters.COSFilterAESDecryptionDefault;
 import org.verapdf.cos.filters.COSFilterRC4DecryptionDefault;
 import org.verapdf.tools.EncryptionToolsRevision4;
 import org.verapdf.tools.EncryptionToolsRevision5_6;
+import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class StandardSecurityHandler {
 
     private PDEncryption pdEncryption;
     private COSObject id;
-    private Boolean isEmptyStringPassword;
+    private Boolean isPasswordCorrect;
     private byte[] encryptionKey;
     private boolean isRC4Decryption;
     private ASAtom method;
@@ -78,12 +79,12 @@ public class StandardSecurityHandler {
     }
 
     /**
-     * Checks if empty string is a user password to this PDF document and sets
+     * Checks if a given password is a user password to this PDF document and sets
      * encryption key if password is successfully checked.
      *
-     * @return true if empty string is a password to this PDF document.
+     * @return true if a given password is a password to this PDF document.
      */
-    public Boolean authenticateEmptyPassword() {
+    public boolean authenticatePassword(String password) {
         byte[] o = getO();
         Long p = pdEncryption.getP();
         byte[] id = getID();
@@ -94,49 +95,55 @@ public class StandardSecurityHandler {
         if (o != null && p != null && id != null && revision != null && u != null) {
             try {
                 if (revision <= 4) {
-                    this.encryptionKey = EncryptionToolsRevision4.authenticateUserPassword("",
-                            o, p.intValue(), id, revision.intValue(), encMetadata,
-                            length, u);
+                    this.encryptionKey = EncryptionToolsRevision4.authenticateUserPassword(password,
+                                                                                           o, p.intValue(), id, revision.intValue(), encMetadata,
+                                                                                           length, u);
                 } else if (revision >= 5) {    //   Revision 5 should not be used
-                    this.encryptionKey = EncryptionToolsRevision5_6.getFileEncryptionKey("".getBytes(), o, u,
-                            getOE(), getUE(), revision);
+                    this.encryptionKey = EncryptionToolsRevision5_6.getFileEncryptionKey(password.getBytes(), o, u,
+                                                                                         getOE(), getUE(), revision);
                 }
-                this.isEmptyStringPassword =
-                        Boolean.valueOf(this.encryptionKey != null);
-                return this.isEmptyStringPassword;
+                this.isPasswordCorrect = this.encryptionKey != null;
+                return this.isPasswordCorrect;
             } catch (GeneralSecurityException e) {
                 LOGGER.log(Level.FINE, "Caught Security Exception while document decryption", e);
-                this.isEmptyStringPassword = Boolean.valueOf(false);
-                return this.isEmptyStringPassword;
+                this.isPasswordCorrect = false;
+                return false;
             }
         }
         LOGGER.log(Level.FINE, "Can't authenticate password in encrypted PDF, something is null.");
-        this.isEmptyStringPassword = Boolean.valueOf(false);
-        return this.isEmptyStringPassword;
+        this.isPasswordCorrect = false;
+        return false;
     }
 
     /**
-     * @return encryption key for this security handler. If empty string is not
-     * a valid password returns null.
+     * @return encryption key for this security handler. If password given by the user
+     * or empty string (if user's password is null)
+     * is not a valid password returns null.
      */
     public byte[] getEncryptionKey() {
-        if (this.isEmptyStringPassword == null) {
-            authenticateEmptyPassword();
+        if (isPasswordCorrect == null) {
+            checkPassword();
         }
-        if (!this.isEmptyStringPassword.booleanValue()) {
+        if (!isPasswordCorrect) {
             return null;
         }
         return this.encryptionKey;
     }
 
     /**
-     * @return true if empty string is a valid password for this PDF document.
+     * @return true if the password given by the user or an empty string (if user's password is null)
+     * is a valid password for this PDF document.
      */
-    public boolean isEmptyStringPassword() {
-        if (this.isEmptyStringPassword == null) {
-            authenticateEmptyPassword();
+    public boolean checkPassword() {
+        if (isPasswordCorrect != null) {
+            return isPasswordCorrect;
         }
-        return this.isEmptyStringPassword.booleanValue();
+        if (StaticResources.getPassword() == null) {
+            authenticatePassword("");
+        } else if (!authenticatePassword(StaticResources.getPassword())) {
+            LOGGER.log(Level.WARNING, "Your password for this document is incorrect.");
+        }
+        return isPasswordCorrect;
     }
 
     /**

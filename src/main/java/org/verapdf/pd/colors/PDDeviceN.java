@@ -24,9 +24,11 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDResources;
+import org.verapdf.pd.function.PDFunction;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -53,13 +55,31 @@ public class PDDeviceN extends PDSpecialColorSpace {
         return super.getBaseColorSpace();
     }
 
+    public List<PDColorSpace> getColorants() {
+        List<PDColorSpace> colorants = new LinkedList<>();
+        COSObject attributes = getAttributes();
+        if (attributes != null && attributes.getType() == COSObjType.COS_DICT) {
+            COSObject colorantsDict = attributes.getKey(ASAtom.COLORANTS);
+            if (colorantsDict.getType() == COSObjType.COS_DICT) {
+                for (COSObject value : colorantsDict.getValues()) {
+                    colorants.add(org.verapdf.factory.colors.ColorSpaceFactory.getColorSpace(value, getResources()));
+                }
+            }
+        }
+        return colorants;
+    }
+
     @Override
     protected COSObject getBaseColorSpaceObject() {
         return getObject().at(2);
     }
 
-    public COSObject getTintTransform() {
+    public COSObject getCosTintTransform() {
         return getObject().at(3);
+    }
+
+    public PDFunction getTintTransform() {
+        return PDFunction.createFunction(getCosTintTransform());
     }
 
     public COSObject getAttributes() {
@@ -85,5 +105,11 @@ public class PDDeviceN extends PDSpecialColorSpace {
             return Collections.unmodifiableList(names);
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public double[] toRGB(double[] value) {
+        double[] altValue = getDoubleArrayResult(value, getTintTransform());
+        return getAlternateSpace().toRGB(altValue);
     }
 }

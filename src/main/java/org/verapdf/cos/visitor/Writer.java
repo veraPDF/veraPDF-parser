@@ -29,6 +29,7 @@ import org.verapdf.cos.xref.COSXRefEntry;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefRange;
 import org.verapdf.cos.xref.COSXRefSection;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
 
@@ -108,7 +109,6 @@ public class Writer implements IVisitor {
 	}
 
 	private List<COSKey> prepareAddedObjects(List<COSObject> addedObjects) {
-		int cosKeyNumber = this.document.getLastKeyNumber() + 1;
 		List<COSKey> res = new ArrayList<>();
 		for (COSObject obj : addedObjects) {
 			if (!obj.isIndirect()) {
@@ -233,7 +233,7 @@ public class Writer implements IVisitor {
 			this.write(EOL);
 			this.write("endstream");
 		} catch (IOException e) {
-			throw new RuntimeException(StringExceptions.WRITE_ERROR);
+			throw new VeraPDFParserException(StringExceptions.WRITE_ERROR);
 		}
 	}
 
@@ -278,7 +278,7 @@ public class Writer implements IVisitor {
 			this.write(key);
 			this.write(" R");
 		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
+			throw new VeraPDFParserException(e.getMessage());
 		}
 	}
 
@@ -305,6 +305,7 @@ public class Writer implements IVisitor {
 
 	public void writeBody() {
 		try {
+			this.write("\r\n");
 			while (!this.toWrite.isEmpty()) {
 				final COSKey key = this.toWrite.get(0);
 
@@ -314,7 +315,7 @@ public class Writer implements IVisitor {
 				write(key, this.document.getObject(key));
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(StringExceptions.WRITE_ERROR);
+			throw new VeraPDFParserException(StringExceptions.WRITE_ERROR);
 		}
 	}
 

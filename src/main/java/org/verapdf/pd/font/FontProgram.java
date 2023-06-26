@@ -23,6 +23,7 @@ package org.verapdf.pd.font;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Interface for all fonts in pdflib.
@@ -99,4 +100,12 @@ public interface FontProgram {
      * stream or null if stream is memory stream.
      */
     ASFileStreamCloser getFontProgramResource();
+
+    String getWeight();
+
+    Double getAscent();
+
+    Double getDescent();
+
+    public List<Integer> getCIDList();
 }

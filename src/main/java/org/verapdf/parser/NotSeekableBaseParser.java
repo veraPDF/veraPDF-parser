@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
@@ -28,6 +48,9 @@ public class NotSeekableBaseParser implements Closeable {
 
     private static final byte ASCII_ZERO = 48;
     private static final byte ASCII_NINE = 57;
+
+    // max string length in bytes
+    private static final int MAX_STRING_LENGTH = 65535;
 
     // indicates if this parser is a postscript parser
     protected boolean isPSParser = false;
@@ -288,7 +311,7 @@ public class NotSeekableBaseParser implements Closeable {
 
             if (isEndOfComment(ch)) {
                 ch = this.source.readByte();
-                if (isLF(ch)) { // EOL == CR
+                if (!isLF(ch)) { // EOL == CR
                     this.source.unread();
                 } // else EOL == CRLF
                 return;
@@ -398,6 +421,60 @@ public class NotSeekableBaseParser implements Closeable {
                     break;
                 }
             }
+            ch = source.readByte();
+            if (token.getSize() > MAX_STRING_LENGTH) {
+                LOGGER.log(Level.WARNING, "Content stream string token exceeds " + MAX_STRING_LENGTH + " bytes");
+                break;
+            }
+        }
+        while (!this.source.isEOF()) {
+            switch (ch) {
+                default:
+                    break;
+                case '(':
+                    parenthesesDepth++;
+                    break;
+                case ')':
+                    if (parenthesesDepth == 0) {
+                        return;
+                    }
+                    parenthesesDepth--;
+                    break;
+                case '\\': {
+                    ch = this.source.readByte();
+                    switch (ch) {
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7': {
+                            if (!isPSParser) {
+                                // look for 1, 2, or 3 octal characters
+                                for (int i = 1; i < 3; i++) {
+                                    ch = this.source.readByte();
+                                    if (ch < '0' || ch > '7') {
+                                        this.source.unread();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case ASCII_CR:
+                            ch = this.source.readByte();
+                            if (ch != ASCII_LF) {
+                                this.source.unread();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                }
+            }
 
             ch = source.readByte();
         }
@@ -491,7 +568,8 @@ public class NotSeekableBaseParser implements Closeable {
             }
 
             if (ch == '#' && !isPSParser) {
-                byte ch1, ch2;
+                byte ch1;
+                byte ch2;
                 byte dc;
                 ch1 = this.source.readByte();
                 if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.ER) {
@@ -548,7 +626,9 @@ public class NotSeekableBaseParser implements Closeable {
                     this.token.type = Token.Type.TT_REAL;
                     appendToToken(ch);
                 } else if (ch == '#' && isPSParser) {
-                    radix = (int) this.token.integer;
+                    if (this.token.type == Token.Type.TT_INTEGER) {
+                        radix = Integer.valueOf(this.token.getValue());
+                    }
                     token.clearValue();
                 } else {
                     this.source.unread();

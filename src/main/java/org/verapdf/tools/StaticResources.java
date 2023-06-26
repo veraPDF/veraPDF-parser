@@ -1,6 +1,28 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.tools;
 
 import org.verapdf.cos.COSKey;
+import org.verapdf.parser.PDFFlavour;
+import org.verapdf.pd.PDDocument;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.structure.PDStructureNameSpace;
@@ -22,9 +44,14 @@ public class StaticResources {
 
 	private static final Logger LOGGER = Logger.getLogger(StaticResources.class.getCanonicalName());
 
-	private static ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
-	private static ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
-	private static ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
+	private static final ThreadLocal<PDFFlavour> flavour = new ThreadLocal<>();
+	private static final ThreadLocal<PDDocument> document = new ThreadLocal<>();
+
+	private static final ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
+	private static final ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
+	private static final ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
+
+	private static final ThreadLocal<String> password = new ThreadLocal<>();
 
 	private StaticResources() {
 	}
@@ -38,6 +65,14 @@ public class StaticResources {
 	public static void cacheCMap(String name, CMap cMap) {
 		checkForNull(cMapCache);
 		cMapCache.get().put(name, cMap);
+	}
+
+	public static PDDocument getDocument() {
+		return document.get();
+	}
+
+	public static void setDocument(PDDocument document) {
+		StaticResources.document.set(document);
 	}
 
 	/**
@@ -111,6 +146,9 @@ public class StaticResources {
 		StaticResources.cMapCache.set(new HashMap<>());
 		StaticResources.structureNameSpaceCache.set(new HashMap<>());
 		StaticResources.cachedFonts.set(new HashMap<>());
+		StaticResources.flavour.set(null);
+		StaticResources.document.set(null);
+		StaticResources.setPassword(null);
 	}
 
 	private static void checkForNull(ThreadLocal variable) {
@@ -141,5 +179,21 @@ public class StaticResources {
 
 	public static void setCachedFonts(Map<String, FontProgram> cachedFonts) {
 		StaticResources.cachedFonts.set(cachedFonts);
+	}
+
+	public static PDFFlavour getFlavour() {
+		return flavour.get();
+	}
+
+	public static void setFlavour(PDFFlavour flavour) {
+		StaticResources.flavour.set(flavour);
+	}
+
+	public static String getPassword() {
+		return password.get();
+	}
+
+	public static void setPassword(String password) {
+		StaticResources.password.set(password);
 	}
 }

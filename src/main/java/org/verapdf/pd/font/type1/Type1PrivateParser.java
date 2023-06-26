@@ -25,6 +25,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
+import org.verapdf.pd.font.CFFNumber;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +53,8 @@ class Type1PrivateParser extends BaseParser {
     private Map<String, Integer> glyphWidths;
     private double[] fontMatrix;
     private boolean isDefaultFontMatrix;
+    private boolean charStringsFound;
+    private Map<Integer, CFFNumber> subrWidths;
 
     /**
      * {@inheritDoc}
@@ -62,6 +65,7 @@ class Type1PrivateParser extends BaseParser {
         isDefaultFontMatrix = Arrays.equals(this.fontMatrix,
                 Type1FontProgram.DEFAULT_FONT_MATRIX);
         this.lenIV = 4;
+        this.charStringsFound = false;
     }
 
     /**
@@ -73,7 +77,7 @@ class Type1PrivateParser extends BaseParser {
         skipSpaces(true);
 
         while (getToken().type != Token.Type.TT_EOF &&
-                (getToken().getValue() == null || !getToken().getValue().startsWith(Type1StringConstants.CLOSEFILE))) {
+                (getToken().getValue() == null || !charStringsFound || !getToken().getValue().startsWith(Type1StringConstants.CLOSEFILE))) {
             nextToken();
             processToken();
         }
@@ -99,13 +103,19 @@ class Type1PrivateParser extends BaseParser {
             case TT_NAME:
                 switch (this.getToken().getValue()) {
                     case Type1StringConstants.CHAR_STRINGS_STRING:
+                        charStringsFound = true;
                         nextToken();
+                        if (this.getToken().type != Token.Type.TT_INTEGER) {
+                            break;
+                        }
                         int amountOfGlyphs = (int) this.getToken().integer;
                         nextToken();    // reading "dict"
                         nextToken();    // reading "dup"
                         nextToken();    // reading "begin"
                         for (int i = 0; i < amountOfGlyphs; ++i) {
-                            decodeCharString();
+                            if (!decodeCharString()) {
+                                break;
+                            }
                         }
                         break;
                     case Type1StringConstants.LEN_IV_STRING:
@@ -114,8 +124,11 @@ class Type1PrivateParser extends BaseParser {
                             this.lenIV = (int) this.getToken().integer;
                         }
                         break;
-                    case Type1StringConstants.SUBRS:    // skipping binary data that can be bad for parser
+                    case Type1StringConstants.SUBRS:
                         nextToken();
+                        if (subrWidths == null) {
+                            subrWidths = new HashMap<>();
+                        }
                         int amountOfSubrs = (int) this.getToken().integer;
                         nextToken();    // reading "array"
                         for (int i = 0; i < amountOfSubrs; ++i) {
@@ -124,11 +137,21 @@ class Type1PrivateParser extends BaseParser {
                                 break;
                             }
                             nextToken();    // reading number
+                            long number = this.getToken().integer;
                             nextToken();
                             long toSkip = this.getToken().integer;
                             skipRD();
                             this.skipSpaces();
+                            long beginOffset = this.source.getOffset();
                             this.source.skip(toSkip);
+                            try (ASInputStream chunk = this.source.getStream(beginOffset, toSkip);
+                                 ASInputStream eexecDecode = new EexecFilterDecode(
+                                         chunk, true, this.lenIV); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
+                                Type1CharStringParser parser = new Type1CharStringParser(decodedCharString, subrWidths);
+                                if (parser.getWidth() != null) {
+                                    subrWidths.put((int) number, parser.getWidth());
+                                }
+                            }
                             this.nextToken();   // reading "NP"
                             // some fonts have 'noaccess put' instead of 'NP'. Supporting this case as well
                             if (this.getToken().getValue().equals(Type1StringConstants.NOACCESS)) {
@@ -142,7 +165,7 @@ class Type1PrivateParser extends BaseParser {
         }
     }
 
-    private void decodeCharString() throws IOException {
+    private boolean decodeCharString() throws IOException {
         if (glyphWidths == null) {
             this.glyphWidths = new HashMap<>();
         }
@@ -153,8 +176,8 @@ class Type1PrivateParser extends BaseParser {
             // There are files with wrong charstring amount specified. Actual
             // amount can be determined from "end" keyword.
             if (getToken().type == Token.Type.TT_KEYWORD && getToken().getValue().equals("end")) {
-                LOGGER.log(Level.FINE, "Error in parsing private data in Type 1 font: incorrect amount of charstings specified.");
-                return;
+                LOGGER.log(Level.WARNING, "Error in parsing private data in Type 1 font: incorrect amount of charstings specified.");
+                return false;
             } else {
                 throw e;
             }
@@ -170,7 +193,7 @@ class Type1PrivateParser extends BaseParser {
         try (ASInputStream chunk = this.source.getStream(beginOffset, charstringLength);
              ASInputStream eexecDecode = new EexecFilterDecode(
                      chunk, true, this.lenIV); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
-            Type1CharStringParser parser = new Type1CharStringParser(decodedCharString);
+            Type1CharStringParser parser = new Type1CharStringParser(decodedCharString, subrWidths);
             if (parser.getWidth() != null) {
                 if (!isDefaultFontMatrix) {
                     glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getReal()));
@@ -180,6 +203,7 @@ class Type1PrivateParser extends BaseParser {
             }
             this.nextToken();
         }
+        return true;
     }
 
     private void checkTokenType(Token.Type expectedType) throws IOException {

@@ -25,6 +25,7 @@ import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSString;
+import org.verapdf.cos.COSKey;
 import org.verapdf.tools.TaggedPDFHelper;
 
 import java.util.List;
@@ -74,12 +75,45 @@ public class PDStructElem extends PDStructTreeNode {
 		return StructureType.createStructureType(getKey(ASAtom.S), getKey(ASAtom.NS));
 	}
 
+	public COSObject getActualText() {
+		return getKey(ASAtom.ACTUAL_TEXT);
+	}
+
+	public String getAlternateDescription() {
+		return getStringKey(ASAtom.ALT);
+	}
+
+	public String getExpandedAbbreviation() {
+		return getStringKey(ASAtom.E);
+	}
+
+	public PDStructElem getParent() {
+		COSObject parentObject = getKey(ASAtom.P);
+		if (parentObject != null) {
+			return new PDStructElem(parentObject, this.rootRoleMap);
+		}
+		return null;
+	}
+
+	public COSKey getPageObjectNumber() {
+		COSObject object = getObject().getKey(ASAtom.PG);
+		if (object != null) {
+			return object.getKey();
+		}
+		return null;
+	}
+
 	public StructureType getDefaultStructureType() {
 		return TaggedPDFHelper.getDefaultStructureType(this.getStructureType(), this.rootRoleMap);
 	}
 
 	@Override
-	public List<PDStructElem> getChildren() {
+	public List<PDStructElem> getStructChildren() {
+		return TaggedPDFHelper.getStructElemStructChildren(getObject(), rootRoleMap);
+	}
+
+	@Override
+	public List<Object> getChildren() {
 		return TaggedPDFHelper.getStructElemChildren(getObject(), rootRoleMap);
 	}
 }

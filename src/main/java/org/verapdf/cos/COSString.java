@@ -27,6 +27,7 @@ import org.verapdf.tools.PDFDocEncoding;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -100,12 +101,15 @@ public class COSString extends COSDirect {
 
     public String getString() {
         if (value.length > 2) {
-            if ((value[0] & 0xff) == 0xFE && (value[1] & 0xff) == 0xFF) {
+            if ((value[0] & 0xFF) == 0xFE && (value[1] & 0xFF) == 0xFF) {
                 return new String(value, 2, value.length - 2, StandardCharsets.UTF_16BE);
+            }
+            if ((value[0] & 0xFF) == 0xFF && (value[1] & 0xFF) == 0xFE) {
+                LOGGER.log(Level.WARNING, "String object uses encoding UTF16-LE not supported by PDF");
             }
         }
         if (value.length > 3) {
-            if ((value[0] & 0xff) == 0xEF && (value[1] & 0xff) == 0xBB && (value[2] & 0xff) == 0xBF) {
+            if ((value[0] & 0xFF) == 0xEF && (value[1] & 0xFF) == 0xBB && (value[2] & 0xFF) == 0xBF) {
                 return new String(value, 3, value.length - 3, StandardCharsets.UTF_8);
             }
         }
@@ -186,6 +190,39 @@ public class COSString extends COSDirect {
         result.append('>');
 
         return result.toString();
+    }
+
+    public boolean isASCIIString() {
+        for (byte b : value) {
+            if ((b & 0xFF) >= 128) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public String getASCIIString() {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : value) {
+            if ((b & 0xFF) < 128) {
+                sb.append((char)(b & 0xFF));
+            }
+        }
+        return sb.toString();
+    }
+
+    public boolean isTextString() {
+        if (value.length > 2) {
+            if ((value[0] & 0xFF) == 0xFE && (value[1] & 0xFF) == 0xFF) {
+                return true;
+            }
+        }
+        if (value.length > 3) {
+            if ((value[0] & 0xFF) == 0xEF && (value[1] & 0xFF) == 0xBB && (value[2] & 0xFF) == 0xBF) {
+                return true;
+            }
+        }
+        return PDFDocEncoding.isPDFDocEncodingString(value);
     }
 
     protected String toLitString() {

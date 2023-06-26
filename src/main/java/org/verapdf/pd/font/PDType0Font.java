@@ -21,10 +21,8 @@
 package org.verapdf.pd.font;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.cmap.PDCMap;
 
@@ -45,6 +43,7 @@ public class PDType0Font extends PDCIDFont {
     private static final String IDENTITY_V = "Identity-V";
     private static final String JAPAN_1 = "Japan1";
     private static final String KOREA_1 = "Korea1";
+    private static final String KR_9 = "KR";
     private static final String GB_1 = "GB1";
     private static final String CNS_1 = "CNS1";
     private static final String ADOBE = "Adobe";
@@ -72,11 +71,11 @@ public class PDType0Font extends PDCIDFont {
         if (this.pdcMap == null) {
             COSObject cMap = this.type0FontDict.getKey(ASAtom.ENCODING);
             if (!cMap.empty()) {
-                org.verapdf.pd.font.cmap.PDCMap pdcMap = new org.verapdf.pd.font.cmap.PDCMap(cMap);
+                PDCMap pdcMap = new PDCMap(cMap);
                 this.pdcMap = pdcMap;
                 return pdcMap;
             }
-            return null;
+            throw new VeraPDFParserException("There is no Encoding entry in Type0 font dictionary");
         }
         return this.pdcMap;
     }
@@ -147,7 +146,6 @@ public class PDType0Font extends PDCIDFont {
         }
         PDCMap pdcMap = this.getCMap();
         if (pdcMap != null && pdcMap.getCMapFile() != null) {
-            int cid = pdcMap.getCMapFile().toCID(code);
             String registry = pdcMap.getRegistry();
             String ordering = pdcMap.getOrdering();
             String ucsName = registry + "-" + ordering + "-" + UCS2;
@@ -155,6 +153,7 @@ public class PDType0Font extends PDCIDFont {
             CMap ucsCMap = pdUCSCMap.getCMapFile();
             if (ucsCMap != null) {
                 this.ucsCMap = pdUCSCMap;
+                int cid = pdcMap.getCMapFile().toCID(code);
                 return ucsCMap.getUnicode(cid);
             }
             LOGGER.log(Level.FINE, "Can't load CMap " + ucsName);
@@ -169,8 +168,8 @@ public class PDType0Font extends PDCIDFont {
             String registry = cidSystemInfo.getRegistry();
             if (ADOBE.equals(registry)) {
                 String ordering = cidSystemInfo.getOrdering();
-                if (JAPAN_1.equals(ordering) || CNS_1.equals(ordering) ||
-                        KOREA_1.equals(ordering) || GB_1.equals(ordering)) {
+                if (JAPAN_1.equals(ordering) || CNS_1.equals(ordering) || GB_1.equals(ordering) ||
+                        KOREA_1.equals(ordering) || KR_9.equals(ordering)) {
                     String ucsName = "Adobe-" + ordering + "-" + UCS2;
                     this.ucsCMap = new PDCMap(COSName.construct(ucsName));
                 }

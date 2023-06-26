@@ -69,7 +69,7 @@ public class EexecFilterDecode extends ASBufferedInFilter {
      * @param stream       is eexec-encoded stream.
      * @param isCharstring is true if passed stream is encoded charstring.
      */
-    EexecFilterDecode(ASInputStream stream, boolean isCharstring) throws IOException {
+    public EexecFilterDecode(ASInputStream stream, boolean isCharstring) throws IOException {
         this(stream, isCharstring, EEXEC_NUMBER_OF_RANDOM_BYTES);
     }
 
@@ -84,7 +84,7 @@ public class EexecFilterDecode extends ASBufferedInFilter {
      */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
-        int bytesRead = (int) this.feedBuffer(bytesToDiscard + size);
+        int bytesRead = this.feedBuffer(bytesToDiscard + size);
         int res = bytesRead - bytesToDiscard;
         if (bytesRead <= 0) {
             return -1;

@@ -29,7 +29,8 @@ import java.util.logging.Logger;
  * @author Sergey Shemyakov
  */
 class CodeSpace {
-    private byte[] begin, end;
+    private byte[] begin;
+    private byte[] end;
 
     private static final Logger LOGGER = Logger.getLogger(CodeSpace.class.getCanonicalName());
 

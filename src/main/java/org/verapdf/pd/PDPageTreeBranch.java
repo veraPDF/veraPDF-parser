@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.cos.*;
 import org.verapdf.exceptions.LoopedException;
+import org.verapdf.exceptions.VeraPDFParserException;
 
 import java.util.*;
 
@@ -51,6 +52,14 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		this.leafCount = 0;
 		this.children = new ArrayList<>();
 
+		super.setObject(obj);
+	}
+
+	public PDPageTreeBranch(final COSObject obj, final PDPageTreeBranch parentTreeBranch) {
+		this.isTerminal = true;
+		this.leafCount = 0;
+		this.children = new ArrayList<>();
+		setParent(parentTreeBranch);
 		super.setObject(obj);
 	}
 
@@ -142,11 +151,11 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 				if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGE) {
 					kid_i = new PDPage(obj);
 				} else if (obj.getNameKey(ASAtom.TYPE) == ASAtom.PAGES) {
-					kid_i = new PDPageTreeBranch(obj);
+					kid_i = new PDPageTreeBranch(obj, this);
 					isTerminal = false;
 				} else {
 					//TODO : ASException
-					throw new RuntimeException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
+					throw new VeraPDFParserException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
 				}
 
 				kid_i.setParent(this);
@@ -165,16 +174,24 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		Set<COSKey> res = new HashSet<>();
 		PDPageTreeNode curr = this;
 		while (curr != null) {
-			COSObject object = curr.getObject();
-			COSKey objectKey = object.getObjectKey();
+			COSKey objectKey = curr.getObject().getObjectKey();
 			if (res.contains(objectKey)) {
 				throw new LoopedException("Page tree loop found");
 			}
 			res.add(objectKey);
-			curr = this.getParent();
+			curr = curr.getParent();
 		}
 		return Collections.unmodifiableSet(res);
 	}
+
+//	PDPageTreeNode parent = getParent();
+//	Set<COSKey> res = parent != null ? new HashSet<>(parent.parentKeys) : new HashSet<>();
+//	COSKey objectKey = this.getObject().getObjectKey();
+//		if (res.contains(objectKey)) {
+//		throw new LoopedException("Page tree loop found");
+//	}
+//		res.add(objectKey);
+//		return Collections.unmodifiableSet(res);
 
 	protected void updateToObject() {
 		COSObject branch = getObject();

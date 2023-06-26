@@ -30,6 +30,8 @@ import java.util.Map;
  */
 public class Token {
 
+	private static final Map<String, Keyword> KEYWORDS = new HashMap<>();
+
 	public Type type;
 	public Keyword keyword;
 
@@ -44,7 +46,7 @@ public class Token {
 
 	public void toKeyword() {
 		this.type = Type.TT_KEYWORD;
-		this.keyword = getKeyword(token.toString());
+		this.keyword = getKeyword(getValue());
 	}
 
 	public void append(int c) {
@@ -61,6 +63,10 @@ public class Token {
 
 	public void clearValue() {
 		this.token.reset();
+	}
+
+	public int getSize() {
+		return token.size();
 	}
 
 	public enum Type {
@@ -96,8 +102,6 @@ public class Token {
 		KW_STARTXREF,
 		KW_TRAILER
 	}
-
-	private static final Map<String, Keyword> KEYWORDS = new HashMap<>();
 
 	static {
 		KEYWORDS.put("null", Keyword.KW_NULL);

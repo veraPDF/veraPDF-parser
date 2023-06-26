@@ -111,7 +111,7 @@ public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
 
         try {
             if (this.bufferSize() <= 0) {
-                int bytesFed = (int) this.feedBuffer(getBufferCapacity());
+                int bytesFed = this.feedBuffer(getBufferCapacity());
                 if (bytesFed == -1) {
                     isDecryptFinished = true;
                     this.decryptedBytes = this.aes.doFinal();
