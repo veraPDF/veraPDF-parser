@@ -557,7 +557,7 @@ public class PDFParser extends COSParser {
         }
 
         //we will skip eol marker in any case
-        source.seek(offset.longValue() - 1);
+        source.seek(Math.max(0, offset - 1));
 
 		COSXRefInfo section = new COSXRefInfo();
 		info.add(0, section);
