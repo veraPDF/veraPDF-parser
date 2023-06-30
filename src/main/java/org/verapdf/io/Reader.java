@@ -155,7 +155,7 @@ public class Reader extends XRefReader {
 						handler.close();
 					}
 				}
-				throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF_NOT_SUPPORTED);
+				throw new InvalidPasswordException("Reader::init(...)" + StringExceptions.ENCRYPTED_PDF);
 			}
 		} catch (IOException e) {	// If exception is thrown in init() someone
 			// should close document stream
