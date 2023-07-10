@@ -59,6 +59,10 @@ public class PDInlineImage extends PDResource {
 		return value != null ? value.booleanValue() : false;
 	}
 
+	public Long getBitsPerComponent() {
+		return getObject().getIntegerKey(ASAtom.BITS_PER_COMPONENT);
+	}
+
 	public List<COSName> getCOSFilters() {
 		COSObject filters = getKey(ASAtom.F);
 		if (filters == null || filters.empty()) {
