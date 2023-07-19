@@ -205,7 +205,7 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
 
         if (token.type != Token.Type.TT_CLOSEARRAY && !(isPSParser && token.type == Token.Type.TT_ENDPROC)) {
             // TODO : replace with ASException
-            throw new IOException("PDFParser::GetArray()" + StringExceptions.INVALID_PDF_ARRAY);
+            throw new IOException(StringExceptions.INVALID_PDF_ARRAY);
         }
 
         return arr;
@@ -250,7 +250,7 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
 
         if (token.type != Token.Type.TT_CLOSEDICT) {
             // TODO : replace with ASException
-            throw new IOException("PDFParser::GetDictionary()" + StringExceptions.INVALID_PDF_DICTONARY);
+            throw new IOException(StringExceptions.INVALID_PDF_DICTONARY);
         }
 
         // Don't parse COSStreams here.

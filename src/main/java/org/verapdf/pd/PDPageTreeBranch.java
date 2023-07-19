@@ -155,7 +155,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 					isTerminal = false;
 				} else {
 					//TODO : ASException
-					throw new VeraPDFParserException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
+					throw new VeraPDFParserException(StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
 				}
 
 				kid_i.setParent(this);
@@ -183,15 +183,6 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		}
 		return Collections.unmodifiableSet(res);
 	}
-
-//	PDPageTreeNode parent = getParent();
-//	Set<COSKey> res = parent != null ? new HashSet<>(parent.parentKeys) : new HashSet<>();
-//	COSKey objectKey = this.getObject().getObjectKey();
-//		if (res.contains(objectKey)) {
-//		throw new LoopedException("Page tree loop found");
-//	}
-//		res.add(objectKey);
-//		return Collections.unmodifiableSet(res);
 
 	protected void updateToObject() {
 		COSObject branch = getObject();

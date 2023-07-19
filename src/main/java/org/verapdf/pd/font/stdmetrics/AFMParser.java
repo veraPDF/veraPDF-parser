@@ -72,8 +72,7 @@ public class AFMParser extends BaseParser {
         } while (this.getToken().type != Token.Type.TT_EOF &&
                 !this.getToken().getValue().equals(START_CHAR_METRICS_STRING));
         if (this.getToken().type == Token.Type.TT_EOF) {
-            throw new IOException("Can't parse font metrics for predefined font "
-                    + fontName);
+            throw new IOException(getErrorMessage("Can't parse font metrics for predefined font " + fontName));
         }
     }
 
@@ -90,8 +89,8 @@ public class AFMParser extends BaseParser {
                         }
                     } else {    // Actually in this case we can try read until
                         // EndCharMetrics, but we are sure that files are perfect.
-                        throw new IOException("Can't parse font metrics for predefined font "
-                                + fontName);
+                        throw new IOException(getErrorMessage("Can't parse font metrics for predefined font "
+                                + fontName));
                     }
                     break;
                 case FONT_NAME_STRING:
@@ -108,8 +107,8 @@ public class AFMParser extends BaseParser {
                                 getToken().type == Token.Type.TT_REAL) {
                             bbox[i] = getToken().real;
                         } else {
-                            throw new IOException("Font BBox in AFM file for " + fontName +
-                                    " doesn't contain 4 entries");
+                            throw new IOException(getErrorMessage("Font BBox in AFM file for " + fontName +
+                                    " doesn't contain 4 entries"));
                         }
                     }
                     res.setFontBBox(bbox);
@@ -159,8 +158,8 @@ public class AFMParser extends BaseParser {
                 getToken().type == Token.Type.TT_REAL) {
             return getToken().real;
         } else {
-            throw new IOException(errorDescription + " entry in AFM file for "
-                    + fontName + "is not a number");
+            throw new IOException(getErrorMessage(errorDescription + " entry in AFM file for "
+                    + fontName + "is not a number"));
         }
     }
 }

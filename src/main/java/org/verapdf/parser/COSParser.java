@@ -207,7 +207,7 @@ public class COSParser extends BaseParser {
 
 		if (token.type != Token.Type.TT_CLOSEARRAY) {
 			// TODO : replace with ASException
-			throw new IOException("PDFParser::GetArray()" + StringExceptions.INVALID_PDF_ARRAY);
+			throw new IOException(getErrorMessage(StringExceptions.INVALID_PDF_ARRAY));
 		}
 
 		return arr;
@@ -242,13 +242,16 @@ public class COSParser extends BaseParser {
 		COSObject key = getName();
 		while (!key.empty()) {
 			COSObject obj = nextObject();
+			if (dict.getKeySet().contains(key.getName())) {
+				LOGGER.log(Level.WARNING, getErrorMessage("Dictionary/Stream contains duplicated key " + key));
+			}
 			dict.setKey(key.getName(), obj);
 			key = getName();
 		}
 
 		if (token.type != Token.Type.TT_CLOSEDICT) {
 			// TODO : replace with ASException
-			throw new IOException("PDFParser::GetDictionary()" + StringExceptions.INVALID_PDF_DICTONARY);
+			throw new IOException(getErrorMessage(StringExceptions.INVALID_PDF_DICTONARY));
 		}
 
 		long reset = this.source.getOffset();
@@ -286,8 +289,8 @@ public class COSParser extends BaseParser {
 
 		COSObject length = dict.getKey(ASAtom.LENGTH);
 		if (this.keyOfCurrentObject != null && this.keyOfCurrentObject.equals(length.getKey())) {
-			throw new VeraPDFParserException("Object with key " + this.keyOfCurrentObject + " has stream length value" +
-			                                 " which references to its own object key");
+			throw new VeraPDFParserException(getErrorMessage("Object has stream length value" +
+					" which references to its own object key"));
 		}
 		Long size = length.getInteger();
 		source.seek(streamStartOffset);
@@ -348,7 +351,7 @@ public class COSParser extends BaseParser {
 				}
 			}
 			if (realStreamSize == -1) {
-				throw new IOException("End of stream is not found");
+				throw new IOException(getErrorMessage("End of stream is not found"));
 			}
 		}
 
@@ -367,7 +370,7 @@ public class COSParser extends BaseParser {
 				source.unread();
 			}
 		} else if (!isLF(whiteSpace)) {
-			LOGGER.log(Level.WARNING, "Stream at " + source.getOffset() + " offset has no EOL marker.");
+			LOGGER.log(Level.WARNING, getErrorMessage("Stream has no EOL marker."));
 			stream.setStreamKeywordCRLFCompliant(false);
 			source.unread();
 		}
@@ -375,7 +378,7 @@ public class COSParser extends BaseParser {
 
 	private boolean checkStreamLength(Long streamLength) throws IOException {
 		if (streamLength == null) {
-			LOGGER.log(Level.WARNING, "Stream length is missing");
+			LOGGER.log(Level.WARNING, getErrorMessage("Stream length is missing"));
 			return false;
 		}
 		boolean validLength = true;
@@ -383,7 +386,7 @@ public class COSParser extends BaseParser {
 		long expectedEndstreamOffset = start + streamLength;
 		if (expectedEndstreamOffset > source.getStreamLength()) {
 			validLength = false;
-			LOGGER.log(Level.WARNING, "Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
+			LOGGER.log(Level.WARNING, getErrorMessage("Couldn't find expected endstream keyword", expectedEndstreamOffset));
 		} else {
 			source.seek(expectedEndstreamOffset);
 
@@ -392,7 +395,7 @@ public class COSParser extends BaseParser {
 			if (token.type != Token.Type.TT_KEYWORD ||
 					token.keyword != Token.Keyword.KW_ENDSTREAM) {
 				validLength = false;
-				LOGGER.log(Level.WARNING, "Couldn't find expected endstream keyword at offset " + expectedEndstreamOffset);
+				LOGGER.log(Level.WARNING, getErrorMessage("Couldn't find expected endstream keyword", expectedEndstreamOffset));
 			}
 
 			source.seek(start);
@@ -420,7 +423,7 @@ public class COSParser extends BaseParser {
 		} else if (secondSymbol == 13) {
 			eolCount = 1;
 		} else {
-			LOGGER.log(Level.FINE, "End of stream at " + source.getOffset() + " offset doesn't contain EOL marker.");
+			LOGGER.log(Level.FINE, getErrorMessage("End of stream doesn't contain EOL marker."));
 			stream.setEndstreamKeywordCRLFCompliant(false);
 		}
 
@@ -439,8 +442,16 @@ public class COSParser extends BaseParser {
             ssh.decryptString((COSString) string.getDirectBase(), this.keyOfCurrentObject);
             return string;
         } catch (IOException | GeneralSecurityException e) {
-            LOGGER.log(Level.WARNING, "Can't decrypt string in object " + this.keyOfCurrentObject);
+            LOGGER.log(Level.WARNING, getErrorMessage("Can't decrypt string in object"));
             return string;
         }
+	}
+
+	@Override
+	protected String getErrorMessage(String message) {
+		if (keyOfCurrentObject == null) {
+			return message + "(object key = " + keyOfCurrentObject + ", offset = " + source.getCurrentOffset() + ")";
+		}
+		return super.getErrorMessage(message);
 	}
 }

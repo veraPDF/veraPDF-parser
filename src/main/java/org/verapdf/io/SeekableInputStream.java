@@ -52,6 +52,8 @@ public abstract class SeekableInputStream extends ASInputStream {
      */
     public abstract long getOffset() throws IOException;
 
+    public abstract long getCurrentOffset();
+
     /**
      * Gets total length of stream.
      *

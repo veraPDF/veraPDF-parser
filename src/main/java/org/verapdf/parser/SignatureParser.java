@@ -103,15 +103,14 @@ public class SignatureParser extends COSParser {
         if (!isDigit()) {
             return;
         }
-        source.getOffset();
         COSObject generationNumber = nextObject();
         skipSpaces();
         skipExpectedCharacter('R');
         if (number.getType() != COSObjType.COS_INTEGER) {
-            throw new IOException("expected number at offset " + numOffset + " but got" + number.getType());
+            throw new IOException(getErrorMessage("expected number but got" + number.getType(), numOffset));
         }
         if (generationNumber.getType() != COSObjType.COS_INTEGER) {
-            throw new IOException("expected number at offset " + numOffset + " but got" + generationNumber.getType());
+            throw new IOException(getErrorMessage("expected number but got" + generationNumber.getType(), numOffset));
         }
     }
 
@@ -140,7 +139,7 @@ public class SignatureParser extends COSParser {
     private boolean parseSignatureNameValuePair() throws IOException {
         COSObject key = getName();
         if (key.getType() != COSObjType.COS_NAME) {
-            LOGGER.log(Level.FINE, "Invalid signature dictionary");
+            LOGGER.log(Level.FINE, getErrorMessage("Invalid signature dictionary"));
             return false;
         }
         if (key.getName() != ASAtom.CONTENTS) {
@@ -168,10 +167,10 @@ public class SignatureParser extends COSParser {
         int c = source.read();
         if (c == 'R') {  // Indirect reference
             if (number.getType() != COSObjType.COS_INTEGER) {
-                throw new IOException("expected number at offset " + numOffset1 + " but got" + number.getType());
+                throw new IOException(getErrorMessage("expected number but got" + number.getType(), numOffset1));
             }
             if (generationNumber.getType() != COSObjType.COS_INTEGER) {
-                throw new IOException("expected number at offset " + genOffset + " but got" + generationNumber.getType());
+                throw new IOException(getErrorMessage("expected number but got" + generationNumber.getType(), genOffset));
             }
             COSKey key = new COSKey(number.getInteger().intValue(),
                     generationNumber.getInteger().intValue());
@@ -189,7 +188,7 @@ public class SignatureParser extends COSParser {
             byteRange[1] = numOffset1;
             byteRange[2] = numOffset2;
         } else {
-            throw new IOException("\"R\" or \"obj\" expected, but \'" + (char) c + "\' found.");
+            throw new IOException(getErrorMessage("\"R\" or \"obj\" expected, but \'" + (char) c + "\' found."));
         }
     }
 
