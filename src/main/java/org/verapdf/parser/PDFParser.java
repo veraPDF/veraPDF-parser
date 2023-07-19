@@ -122,7 +122,7 @@ public class PDFParser extends COSParser {
             if (header.length() < HEADER_PATTERN.length() + 3) {
                 // No version number at all, set to 1.4 as default
                 header = HEADER_PATTERN + PDF_DEFAULT_VERSION;
-                LOGGER.log(Level.WARNING, "No version found, set to " + PDF_DEFAULT_VERSION + " as default.");
+                LOGGER.log(Level.WARNING, getErrorMessage("No version found, set to " + PDF_DEFAULT_VERSION + " as default."));
             } else {
                 // trying to parse header version if it has some garbage
                 Integer pos = null;
@@ -144,7 +144,7 @@ public class PDFParser extends COSParser {
                 headerVersion = Float.parseFloat(headerParts[1]);
             }
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.FINE, "Can't parse the document header.", e);
+            LOGGER.log(Level.FINE, getErrorMessage("Can't parse the document header."), e);
         }
 
         result.setVersion(headerVersion);
@@ -291,7 +291,7 @@ public class PDFParser extends COSParser {
                                     (int) generation));
                 }
             } catch (GeneralSecurityException e) {
-                throw new IOException("Stream " + this.keyOfCurrentObject + " cannot be decrypted", e);
+                throw new IOException(getErrorMessage("Stream cannot be decrypted"), e);
             }
         }
 
@@ -313,7 +313,7 @@ public class PDFParser extends COSParser {
         if (token.type != Token.Type.TT_KEYWORD &&
                 token.keyword != Token.Keyword.KW_ENDOBJ) {
             // TODO : replace with ASException
-            LOGGER.log(Level.WARNING, "No endobj keyword at offset " + offsetBeforeEndobj);
+            LOGGER.log(Level.WARNING, getErrorMessage("No endobj keyword" + offsetBeforeEndobj));
             this.source.seek(offsetBeforeEndobj);
         }
 
@@ -418,7 +418,7 @@ public class PDFParser extends COSParser {
         if ((getToken().type != Token.Type.TT_KEYWORD ||
                 getToken().keyword != Token.Keyword.KW_XREF) &&
                 (getToken().type != Token.Type.TT_INTEGER)) {
-            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+            throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         if (this.getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
             parseXrefTable(section.getXRefSection());
@@ -465,12 +465,12 @@ public class PDFParser extends COSParser {
                 nextToken();
                 String value = getToken().getValue();
                 if (value.isEmpty()) {
-                    throw new IOException("Failed to parse xref table");
+                    throw new IOException(getErrorMessage("Failed to parse xref table"));
                 }
                 xref.free = value.charAt(0);
                 if (i == 0 && COSXRefEntry.FIRST_XREF_ENTRY.equals(xref) && number != 0) {
                     number = 0;
-                    LOGGER.log(Level.WARNING, "Incorrect xref section");
+                    LOGGER.log(Level.WARNING, getErrorMessage("Incorrect xref section"));
                 }
                 xrefs.addEntry(number + i, xref);
 
@@ -503,30 +503,29 @@ public class PDFParser extends COSParser {
 
         if (!isLastBytesCorrect){
             this.source.unread();
-            LOGGER.log(Level.WARNING, "Incorrect end of line in cross-reference table.");
+            LOGGER.log(Level.WARNING, getErrorMessage("Incorrect end of line in cross-reference table."));
         }
     }
 
     private void parseXrefStream(final COSXRefInfo section) throws IOException {
         nextToken();
         if (this.getToken().type != Token.Type.TT_INTEGER) {
-            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+            throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         nextToken();
         if (this.getToken().type != Token.Type.TT_KEYWORD ||
                 this.getToken().keyword != Token.Keyword.KW_OBJ) {
-            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+            throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         COSObject xrefCOSStream;
         try {
             xrefCOSStream = getDictionary();
         } catch (Exception e) {
-            throw new IOException("PDFParser::GetXRefSection(...)" + "Exception during parsing xref stream at offset " +
-                    section.getStartXRef(), e);
+            throw new IOException(getErrorMessage("Exception during parsing xref stream"), e);
         }
         if (xrefCOSStream.getType() != COSObjType.COS_STREAM ||
                 !COSName.construct(ASAtom.XREF).equals(xrefCOSStream.getKey(ASAtom.TYPE))) {
-            throw new IOException("PDFParser::GetXRefSection(...)" + StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+            throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
         }
         XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.getDirectBase());
         xrefStreamParser.parseStreamAndTrailer();
@@ -540,12 +539,12 @@ public class PDFParser extends COSParser {
         if (offset == null) {
 			offset = findLastXRef();
 			if (offset == null) {
-				throw new IOException("PDFParser::GetXRefInfo(...)" + StringExceptions.START_XREF_VALIDATION);
+				throw new IOException(StringExceptions.START_XREF_VALIDATION);
 			}
 		}
 
         if (processedOffsets.contains(offset)) {
-            throw new LoopedException("XRef loop");
+            throw new LoopedException(getErrorMessage("XRef loop"));
         }
         processedOffsets.add(offset);
 
@@ -582,7 +581,7 @@ public class PDFParser extends COSParser {
 		if (findKeyword(Token.Keyword.KW_TRAILER)) {
 			COSObject obj = nextObject();
 			if (obj.empty() || obj.getType() != COSObjType.COS_DICT) {
-				throw new IOException("Trailer is empty or has invalid type");
+				throw new IOException(getErrorMessage("Trailer is empty or has invalid type"));
 			}
 			trailer.setObject(obj);
 		}

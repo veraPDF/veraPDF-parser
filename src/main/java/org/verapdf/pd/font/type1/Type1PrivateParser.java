@@ -176,7 +176,7 @@ class Type1PrivateParser extends BaseParser {
             // There are files with wrong charstring amount specified. Actual
             // amount can be determined from "end" keyword.
             if (getToken().type == Token.Type.TT_KEYWORD && getToken().getValue().equals("end")) {
-                LOGGER.log(Level.WARNING, "Error in parsing private data in Type 1 font: incorrect amount of charstings specified.");
+                LOGGER.log(Level.WARNING, getErrorMessage("Error in parsing private data in Type 1 font: incorrect amount of charstings specified."));
                 return false;
             } else {
                 throw e;
@@ -208,8 +208,8 @@ class Type1PrivateParser extends BaseParser {
 
     private void checkTokenType(Token.Type expectedType) throws IOException {
         if (this.getToken().type != expectedType) {
-            throw new IOException("Error in parsing Private dictionary of font 1" +
-                    " file, expected type " + expectedType + ", but got " + this.getToken().type);
+            throw new IOException(getErrorMessage("Error in parsing Private dictionary of font 1" +
+                    " file, expected type " + expectedType + ", but got " + this.getToken().type));
         }
     }
 
@@ -227,7 +227,7 @@ class Type1PrivateParser extends BaseParser {
         if (getToken().type == Token.Type.TT_INTEGER) { // we read "-" of "-|"
             int next = this.source.read();
             if (next != 124) {
-                LOGGER.log(Level.FINE, "Error in Type1 private parser in parsing RD in Subrs.");
+                LOGGER.log(Level.FINE, getErrorMessage("Error in Type1 private parser in parsing RD in Subrs."));
             }
         }
     }

@@ -113,7 +113,7 @@ public class FunctionParser extends BaseParser {
                 break;
             case TT_KEYWORD:
                 if (!FUNCTION_KEYWORDS.contains(this.getToken().getValue())) {
-                    LOGGER.log(Level.WARNING, "Invalid keyword in Function");
+                    LOGGER.log(Level.WARNING, getErrorMessage("Invalid keyword in Function"));
                 } else {
                     operators.add(new PSOperator(COSName.construct(this.getToken().getValue())));
                 }
@@ -125,7 +125,7 @@ public class FunctionParser extends BaseParser {
                 operators.add(COSReal.construct(this.getToken().real));
                 break;
             default:
-                LOGGER.log(Level.WARNING, "Invalid object type in Function");
+                LOGGER.log(Level.WARNING, getErrorMessage("Invalid object type in Function"));
                 break;
         }
     }

@@ -50,14 +50,14 @@ public class BaseParser {
 	private Token token;
 
 	public BaseParser(SeekableInputStream stream) throws IOException {
-		if(stream == null) {
-			throw new IOException("Can't create SeekableStream, passed seekableeStream is null");
+		if (stream == null) {
+			throw new IOException("Can't create SeekableStream, passed seekableStream is null");
 		}
 		this.source = stream;
 	}
 
 	public BaseParser(String fileName) throws IOException {
-		if(fileName == null) {
+		if (fileName == null) {
 			throw new FileNotFoundException("Can't create SeekableStream from file, filename is null");
 		}
 		this.source = new InternalInputStream(fileName);
@@ -150,8 +150,7 @@ public class BaseParser {
 
 	// lookUpSize starts from current offset
 	protected boolean findKeyword(final Token.Keyword keyword, final int lookUpSize) throws IOException {
-		long endOffset = this.source.getOffset() + lookUpSize < this.source.getStreamLength()
-				? this.source.getOffset() + lookUpSize : this.source.getStreamLength();
+		long endOffset = Math.min(this.source.getOffset() + lookUpSize, this.source.getStreamLength());
 
 		nextToken();
 		while (this.token.type != Token.Type.TT_EOF && (this.token.type != Token.Type.TT_KEYWORD || this.token.keyword != keyword)) {
@@ -200,7 +199,7 @@ public class BaseParser {
 				if (ch == '>') {
 					this.token.type = Token.Type.TT_CLOSEDICT;
 				} else {
-					throw new IOException("Unknown symbol " + ch + " after \'>\'");
+					throw new IOException(getErrorMessage("Unknown symbol " + ch + " after \'>\'"));
 				}
 				break;
 			case '[':
@@ -648,9 +647,17 @@ public class BaseParser {
 
 	protected void skipExpectedCharacter(char exp) throws IOException {
 		char c = (char) this.source.readByte();
-		if(c != exp) {
-			throw new IOException("Unexpected character on byte " + (this.source.getOffset() - 1) +
-			"; expected " + exp + " but got " + c);
+		if (c != exp) {
+			throw new IOException(getErrorMessage("Unexpected character: expected " + exp + " but got " + c,
+					this.source.getCurrentOffset() - 1));
 		}
+	}
+
+	protected String getErrorMessage(String message) {
+		return getErrorMessage(message, source.getCurrentOffset());
+	}
+
+	protected String getErrorMessage(String message, long offset) {
+		return message + "(offset = " + offset + ")";
 	}
 }

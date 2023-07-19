@@ -54,11 +54,11 @@ public class DecodedObjectStreamParser extends COSParser {
         super(doc, inputStream);
         this.objectStream = objectStream;
         this.internalOffsets = new HashMap<>();
+        keyOfCurrentObject = streamKey;
         try {
             calculateInternalOffsets();
         } catch (IOException e) {
-            throw new IOException("Object stream " + streamKey.getNumber() + " "
-                    + streamKey.getGeneration() + " has invalid N value", e);
+            throw new IOException(getErrorMessage("Object stream has invalid N value"), e);
         }
     }
 

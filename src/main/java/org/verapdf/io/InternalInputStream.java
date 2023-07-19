@@ -211,6 +211,11 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	@Override
+	public long getCurrentOffset() {
+		return fromOffset + offset;
+	}
+
+	@Override
 	public ASInputStream getStream(long startOffset, long length) throws IOException {
 		return new InternalInputStream(this.stream, fromOffset + startOffset, length, numOfFileUsers, filePath, isTempFile);
 	}
@@ -259,7 +264,7 @@ public class InternalInputStream extends SeekableInputStream {
 			return -1;
 		}
 
-		long realOffset = fromOffset + offset;
+		long realOffset = getCurrentOffset();
 		if (this.stream.getFilePointer() != realOffset) {
 			this.stream.seek(realOffset);
 		}
