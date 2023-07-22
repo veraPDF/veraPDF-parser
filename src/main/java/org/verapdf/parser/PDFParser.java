@@ -159,12 +159,10 @@ public class PDFParser extends COSParser {
         try {
             COSObject linDict = findFirstDictionary();
 
-            if (linDict != null && !linDict.empty() && linDict.getType() == COSObjType.COS_DICT) {
-                if (linDict.knownKey(ASAtom.LINEARIZED).booleanValue()) {
-                    long length = linDict.getIntegerKey(ASAtom.L).longValue();
-                    if (length != 0) {
-                        return length == this.source.getStreamLength() && this.source.getOffset() < LINEARIZATION_DICTIONARY_LOOKUP_SIZE;
-                    }
+            if (isLinearizationDictionary(linDict)) {
+                long length = linDict.getIntegerKey(ASAtom.L);
+                if (length != 0) {
+                    return length == this.source.getStreamLength() && this.source.getOffset() < LINEARIZATION_DICTIONARY_LOOKUP_SIZE;
                 }
             }
         } catch (IOException e) {
@@ -172,6 +170,22 @@ public class PDFParser extends COSParser {
         }
 
         return false;
+    }
+
+    public COSObject getLinearizationDictionary() {
+        try {
+            COSObject linDict = findFirstDictionary();
+            if (isLinearizationDictionary(linDict)) {
+                return linDict;
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "IO error while trying to find linearization dictionary", e);
+        }
+        return null;
+    }
+
+    private static boolean isLinearizationDictionary(COSObject object) {
+        return object != null && !object.empty() && object.getType() == COSObjType.COS_DICT && object.knownKey(ASAtom.LINEARIZED);
     }
 
     private COSObject findFirstDictionary() throws IOException {

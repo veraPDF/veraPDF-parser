@@ -437,6 +437,11 @@ public class COSDocument {
 		return this.reader.getLastTrailerOffset();
 	}
 
+	public COSObject getLinearizationDictionary() {
+		return reader.getLinearizationDictionary();
+	}
+
+
 	public int getLastKeyNumber() {
 		return this.reader.getGreatestKeyNumberFromXref();
 	}
