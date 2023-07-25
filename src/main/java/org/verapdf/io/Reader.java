@@ -137,6 +137,12 @@ public class Reader extends XRefReader {
 		return res;
 	}
 
+	@Override
+	public COSObject getLinearizationDictionary() {
+		return this.parser.getLinearizationDictionary();
+	}
+
+
 	// PRIVATE METHODS
 	private void init() throws IOException {
 		try {
