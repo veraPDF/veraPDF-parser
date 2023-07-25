@@ -63,5 +63,7 @@ public interface IReader extends Closeable {
 
 	COSObject getLinearizationDictionary();
 
+	List<COSObject> getObjectStreamsList();
+
 	int getGreatestKeyNumberFromXref();
 }

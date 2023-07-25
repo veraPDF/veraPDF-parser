@@ -441,6 +441,9 @@ public class COSDocument {
 		return reader.getLinearizationDictionary();
 	}
 
+	public List<COSObject> getObjectStreamsList() {
+		return reader.getObjectStreamsList();
+	}
 
 	public int getLastKeyNumber() {
 		return this.reader.getGreatestKeyNumberFromXref();
