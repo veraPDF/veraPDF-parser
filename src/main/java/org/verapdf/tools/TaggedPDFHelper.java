@@ -155,6 +155,9 @@ public class TaggedPDFHelper {
 	}
 
 	public static StructureType getDefaultStructureType(StructureType type, Map<ASAtom, ASAtom> rootRoleMap) {
+		if (type == null) {
+			return null;
+		}
 		visitedWithNS.clear();
 		visitedWithoutNS.clear();
 		addVisited(type);
