@@ -238,7 +238,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			// ID operator
 			case 'I': {
 				//looking for an ID operator
-				if (source.readByte() != 'I' && source.readByte() != 'D') {
+				if (source.readByte() != 'I' || source.readByte() != 'D') {
 					//TODO : change
 					throw new IOException("Corrupted inline image operator");
 				}
