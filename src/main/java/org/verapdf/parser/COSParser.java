@@ -288,7 +288,7 @@ public class COSParser extends BaseParser {
 		long streamStartOffset = source.getOffset();
 
 		COSObject length = dict.getKey(ASAtom.LENGTH);
-		if (this.keyOfCurrentObject != null && this.keyOfCurrentObject.equals(length.getKey())) {
+		if (this.keyOfCurrentObject != null && length.isIndirect() && this.keyOfCurrentObject.equals(length.getKey())) {
 			throw new VeraPDFParserException(getErrorMessage("Object has stream length value" +
 					" which references to its own object key"));
 		}

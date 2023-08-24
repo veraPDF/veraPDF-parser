@@ -21,18 +21,13 @@
 package org.verapdf.pd.images;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
 import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDResource;
 import org.verapdf.pd.PDResources;
 import org.verapdf.pd.colors.PDColorSpace;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +35,9 @@ import java.util.logging.Logger;
  * @author Maksim Bezrukov
  */
 public class PDInlineImage extends PDResource {
+
+	private static Map<ASAtom, ASAtom> abbreviationsMap = new HashMap<>();
+	private static Map<ASAtom, ASAtom> abbreviationsFiltersAndColorSpaceMap = new HashMap<>();
 
 	private static final Logger LOGGER = Logger.getLogger(PDInlineImage.class.getCanonicalName());
 
@@ -54,20 +52,18 @@ public class PDInlineImage extends PDResource {
 	}
 
 	public boolean isInterpolate() {
-		Boolean value = getObject().getBooleanKey(ASAtom.I);
-		value = value == null ? getObject().getBooleanKey(ASAtom.INTERPOLATE) : value;
-		return value != null ? value.booleanValue() : false;
+		COSObject interpolate = getInlineImageKey(getObject().get(), ASAtom.INTERPOLATE);
+		Boolean result = interpolate.getBoolean();
+		return result != null ? result.booleanValue() : false;
 	}
 
 	public Long getBitsPerComponent() {
-		return getObject().getIntegerKey(ASAtom.BITS_PER_COMPONENT);
+		COSObject bitsPerComponent = getInlineImageKey(getObject().get(), ASAtom.BITS_PER_COMPONENT);
+		return bitsPerComponent.getInteger();
 	}
 
 	public List<COSName> getCOSFilters() {
-		COSObject filters = getKey(ASAtom.F);
-		if (filters == null || filters.empty()) {
-			filters = getKey(ASAtom.FILTER);
-		}
+		COSObject filters = getInlineImageKey(getObject().get(), ASAtom.FILTER);
 
 		if (filters != null) {
 			List<COSName> res = new ArrayList<>();
@@ -88,10 +84,7 @@ public class PDInlineImage extends PDResource {
 	}
 
 	public PDColorSpace getImageCS() {
-		COSObject cs = getKey(ASAtom.CS);
-		if (cs.empty()) {
-			cs = getKey(ASAtom.COLORSPACE);
-		}
+		COSObject cs = getInlineImageKey(getObject().get(), ASAtom.COLORSPACE);
 		if (cs != null && cs.getType() == COSObjType.COS_NAME) {
 			replaceAbbreviation((COSName) cs.getDirectBase());
 			PDColorSpace result = getDefaultColorSpace(cs.getName());
@@ -107,12 +100,18 @@ public class PDInlineImage extends PDResource {
 	}
 
 	public boolean getImageMask() {
-		COSObject im = getKey(ASAtom.IM);
-		if (im.empty()) {
-			im = getKey(ASAtom.IMAGE_MASK);
-		}
+		COSObject im = getInlineImageKey(getObject().get(), ASAtom.IMAGE_MASK);
 		Boolean result = im.getBoolean();
 		return result != null ? result.booleanValue() : false;
+	}
+
+	public static COSObject getInlineImageKey(COSBase inlineImage, ASAtom key) {
+		if (inlineImage == null) {
+			return COSObject.getEmpty();
+		}
+		ASAtom abbreviation = abbreviationsMap.get(key);
+		return abbreviation != null && inlineImage.knownKey(abbreviation) ?
+				inlineImage.getKey(abbreviation) : inlineImage.getKey(key);
 	}
 
 	private PDColorSpace getDefaultColorSpace(ASAtom name) {
@@ -137,13 +136,10 @@ public class PDInlineImage extends PDResource {
 				ASAtom.DEVICEGRAY.equals(name) || ASAtom.DEVICECMYK.equals(name);
 	}
 
-	private static void replaceAbbreviation(final COSName abbreviation) {
-		if (abbreviation.getName() == ASAtom.CMYK) {
-			abbreviation.set(ASAtom.DEVICECMYK);
-		} else if (abbreviation.getName() == ASAtom.RGB) {
-			abbreviation.set(ASAtom.DEVICERGB);
-		} else if (abbreviation.getName() == ASAtom.G) {
-			abbreviation.set(ASAtom.DEVICEGRAY);
+	public static void replaceAbbreviation(final COSName abbreviation) {
+		ASAtom name = abbreviationsFiltersAndColorSpaceMap.get(abbreviation.getName());
+		if (name != null) {
+			abbreviation.set(name);
 		}
 	}
 
@@ -153,6 +149,31 @@ public class PDInlineImage extends PDResource {
 			return (COSName) object.getDirectBase();
 		}
 		return null;
+	}
+
+	static {
+		abbreviationsMap.put(ASAtom.BITS_PER_COMPONENT, ASAtom.BPC);
+		abbreviationsMap.put(ASAtom.COLORSPACE, ASAtom.CS);
+		abbreviationsMap.put(ASAtom.DECODE, ASAtom.D);
+		abbreviationsMap.put(ASAtom.DECODE_PARMS, ASAtom.DP);
+		abbreviationsMap.put(ASAtom.FILTER, ASAtom.F);
+		abbreviationsMap.put(ASAtom.HEIGHT, ASAtom.H);
+		abbreviationsMap.put(ASAtom.IMAGE_MASK, ASAtom.IM);
+		abbreviationsMap.put(ASAtom.INTERPOLATE, ASAtom.I);
+		abbreviationsMap.put(ASAtom.LENGTH, ASAtom.L);
+		abbreviationsMap.put(ASAtom.WIDTH, ASAtom.W);
+
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.G, ASAtom.DEVICEGRAY);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.RGB, ASAtom.DEVICERGB);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.CMYK, ASAtom.DEVICECMYK);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.I, ASAtom.INDEXED);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.ASCII_HEX_DECODE_ABBREVIATION, ASAtom.ASCII_HEX_DECODE);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.ASCII85_DECODE_ABBREVIATION, ASAtom.ASCII85_DECODE);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.LZW_DECODE_ABBREVIATION, ASAtom.LZW_DECODE);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.FLATE_DECODE_ABBREVIATION, ASAtom.FLATE_DECODE);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.RUN_LENGTH_DECODE_ABBREVIATION, ASAtom.RUN_LENGTH_DECODE);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.CCITTFAX_DECODE_ABBREVIATION, ASAtom.CCITTFAX_DECODE);
+		abbreviationsFiltersAndColorSpaceMap.put(ASAtom.DCT_DECODE_ABBREVIATION, ASAtom.DCT_DECODE);
 	}
 
 }
