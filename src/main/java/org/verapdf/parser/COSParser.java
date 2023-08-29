@@ -449,7 +449,7 @@ public class COSParser extends BaseParser {
 
 	@Override
 	protected String getErrorMessage(String message) {
-		if (keyOfCurrentObject == null) {
+		if (keyOfCurrentObject != null) {
 			return message + "(object key = " + keyOfCurrentObject + ", offset = " + source.getCurrentOffset() + ")";
 		}
 		return super.getErrorMessage(message);
