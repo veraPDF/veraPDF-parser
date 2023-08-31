@@ -370,7 +370,7 @@ public class COSParser extends BaseParser {
 				source.unread();
 			}
 		} else if (!isLF(whiteSpace)) {
-			LOGGER.log(Level.WARNING, getErrorMessage("Stream has no EOL marker."));
+			LOGGER.log(Level.WARNING, getErrorMessage("Stream has no EOL marker"));
 			stream.setStreamKeywordCRLFCompliant(false);
 			source.unread();
 		}
@@ -423,7 +423,7 @@ public class COSParser extends BaseParser {
 		} else if (secondSymbol == 13) {
 			eolCount = 1;
 		} else {
-			LOGGER.log(Level.FINE, getErrorMessage("End of stream doesn't contain EOL marker."));
+			LOGGER.log(Level.FINE, getErrorMessage("End of stream doesn't contain EOL marker"));
 			stream.setEndstreamKeywordCRLFCompliant(false);
 		}
 
@@ -448,10 +448,10 @@ public class COSParser extends BaseParser {
 	}
 
 	@Override
-	protected String getErrorMessage(String message) {
+	protected String getErrorMessage(String message, long offset) {
 		if (keyOfCurrentObject != null) {
-			return message + "(object key = " + keyOfCurrentObject + ", offset = " + source.getCurrentOffset() + ")";
+			return message + "(object key = " + keyOfCurrentObject + ", offset = " + offset + ")";
 		}
-		return super.getErrorMessage(message);
+		return super.getErrorMessage(message, offset);
 	}
 }

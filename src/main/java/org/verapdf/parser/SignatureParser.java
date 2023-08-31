@@ -188,7 +188,7 @@ public class SignatureParser extends COSParser {
             byteRange[1] = numOffset1;
             byteRange[2] = numOffset2;
         } else {
-            throw new IOException(getErrorMessage("\"R\" or \"obj\" expected, but \'" + (char) c + "\' found."));
+            throw new IOException(getErrorMessage("\"R\" or \"obj\" expected, but \'" + (char) c + "\' found"));
         }
     }
 

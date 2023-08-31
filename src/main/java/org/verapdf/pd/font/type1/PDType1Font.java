@@ -148,7 +148,7 @@ public class PDType1Font extends PDSimpleFont {
                         this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                         if (fontProgram == null) {
                             try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
-                                this.fontProgram = new Type1FontProgram(fontData);
+                                this.fontProgram = new Type1FontProgram(fontData, key);
                                 StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                             }
                         }

@@ -23,6 +23,7 @@ package org.verapdf.pd.font.type1;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.COSKey;
 import org.verapdf.parser.BaseParser;
 import org.verapdf.parser.Token;
 import org.verapdf.pd.font.CFFNumber;
@@ -56,16 +57,19 @@ class Type1PrivateParser extends BaseParser {
     private boolean charStringsFound;
     private Map<Integer, CFFNumber> subrWidths;
 
+    private COSKey key;
+
     /**
      * {@inheritDoc}
      */
-    Type1PrivateParser(InputStream stream, double[] fontMatrix) throws IOException {
+    Type1PrivateParser(InputStream stream, double[] fontMatrix, COSKey key) throws IOException {
         super(stream);
         this.fontMatrix = fontMatrix;
         isDefaultFontMatrix = Arrays.equals(this.fontMatrix,
                 Type1FontProgram.DEFAULT_FONT_MATRIX);
         this.lenIV = 4;
         this.charStringsFound = false;
+        this.key = key;
     }
 
     /**
@@ -176,7 +180,7 @@ class Type1PrivateParser extends BaseParser {
             // There are files with wrong charstring amount specified. Actual
             // amount can be determined from "end" keyword.
             if (getToken().type == Token.Type.TT_KEYWORD && getToken().getValue().equals("end")) {
-                LOGGER.log(Level.WARNING, getErrorMessage("Error in parsing private data in Type 1 font: incorrect amount of charstings specified."));
+                LOGGER.log(Level.WARNING, getErrorMessage("Error in parsing private data in Type 1 font: incorrect amount of charstings specified"));
                 return false;
             } else {
                 throw e;
@@ -227,8 +231,16 @@ class Type1PrivateParser extends BaseParser {
         if (getToken().type == Token.Type.TT_INTEGER) { // we read "-" of "-|"
             int next = this.source.read();
             if (next != 124) {
-                LOGGER.log(Level.FINE, getErrorMessage("Error in Type1 private parser in parsing RD in Subrs."));
+                LOGGER.log(Level.FINE, getErrorMessage("Error in Type1 private parser in parsing RD in Subrs"));
             }
         }
+    }
+
+    @Override
+    protected String getErrorMessage(String message, long offset) {
+        if (key != null) {
+            return message + "(offset = " + offset + " in stream " + key + ")";
+        }
+        return super.getErrorMessage(message, offset);
     }
 }

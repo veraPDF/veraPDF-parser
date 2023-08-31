@@ -122,7 +122,7 @@ public class PDFParser extends COSParser {
             if (header.length() < HEADER_PATTERN.length() + 3) {
                 // No version number at all, set to 1.4 as default
                 header = HEADER_PATTERN + PDF_DEFAULT_VERSION;
-                LOGGER.log(Level.WARNING, getErrorMessage("No version found, set to " + PDF_DEFAULT_VERSION + " as default."));
+                LOGGER.log(Level.WARNING, getErrorMessage("No version found, set to " + PDF_DEFAULT_VERSION + " as default"));
             } else {
                 // trying to parse header version if it has some garbage
                 Integer pos = null;
@@ -144,7 +144,7 @@ public class PDFParser extends COSParser {
                 headerVersion = Float.parseFloat(headerParts[1]);
             }
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.FINE, getErrorMessage("Can't parse the document header."), e);
+            LOGGER.log(Level.FINE, getErrorMessage("Can't parse the document header"), e);
         }
 
         result.setVersion(headerVersion);
@@ -517,7 +517,7 @@ public class PDFParser extends COSParser {
 
         if (!isLastBytesCorrect){
             this.source.unread();
-            LOGGER.log(Level.WARNING, getErrorMessage("Incorrect end of line in cross-reference table."));
+            LOGGER.log(Level.WARNING, getErrorMessage("Incorrect end of line in cross-reference table"));
         }
     }
 
