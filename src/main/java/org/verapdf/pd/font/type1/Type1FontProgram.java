@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.parser.Token;
@@ -52,6 +53,8 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     public static final Logger LOGGER =
             Logger.getLogger(Type1FontProgram.class.getCanonicalName());
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
+
+    private COSKey key;
 
     private String[] encoding;
     private Map<String, Integer> glyphWidths;
@@ -104,10 +107,11 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     /**
      * {@inheritDoc}
      */
-    public Type1FontProgram(ASInputStream fileStream)
+    public Type1FontProgram(ASInputStream fileStream, COSKey key)
             throws IOException {
         super(fileStream);
         encoding = new String[256];
+        this.key = key;
     }
 
     /**
@@ -162,7 +166,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
                 try (ASInputStream eexecDecoded = new EexecFilterDecode(
                         eexecEncoded, false)) {
                     parser = new Type1PrivateParser(
-                            eexecDecoded, getFontMatrix());
+                            eexecDecoded, getFontMatrix(), key);
                     parser.parse();
                     this.glyphWidths = parser.getGlyphWidths();
                 } finally {
@@ -235,7 +239,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     @Override
     public boolean containsGlyph(String glyphName) {
         return this.glyphWidths != null &&
-                this.glyphWidths.keySet().contains(glyphName) &&
+                this.glyphWidths.containsKey(glyphName) &&
                 !glyphName.equals(TrueTypePredefined.NOTDEF_STRING);
     }
 
