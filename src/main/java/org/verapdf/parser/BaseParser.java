@@ -230,6 +230,9 @@ public class BaseParser {
 				this.source.unread();
 				readNumber();
 				break;
+			case '+':
+				readNumber();
+				break;
 			case '-':
 				readNumber();
 				this.token.integer = -this.token.integer;
