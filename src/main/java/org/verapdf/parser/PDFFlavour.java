@@ -14,5 +14,6 @@ public enum PDFFlavour {
 	PDFA_4_F,
 	PDFA_4_E,
 	PDFUA_1,
+	PDFUA_2,
 	WCAG2_1;
 }
