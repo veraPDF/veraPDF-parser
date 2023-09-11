@@ -296,10 +296,11 @@ public class InternalInputStream extends SeekableInputStream {
 				output.write(buffer, 0, n);
 			}
 			return tmpFile;
-		} finally {
+		} catch (IOException | VeraPDFParserException e) {
 			if (!tmpFile.delete()) {
 				tmpFile.deleteOnExit();
 			}
+			throw e;
 		}
 	}
 }
