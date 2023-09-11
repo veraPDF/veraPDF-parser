@@ -44,7 +44,7 @@ public class InternalInputStreamTest {
         File file = temporaryFolder.newFile();
         Files.write(file.toPath(), new byte[] { 1, 2, 3 });
 
-        try (InternalInputStream stream = InternalInputStream.createConcatenated(buf, Files.newInputStream(file.toPath()))) {
+        try (InternalInputStream stream = InternalInputStream.createConcatenated(buf, Files.newInputStream(file.toPath()), null)) {
             assertEquals(0, stream.getOffset());
         }
     }

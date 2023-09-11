@@ -22,6 +22,7 @@ package org.verapdf.io;
 
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.tools.IntReference;
 
 import java.io.*;
@@ -108,9 +109,9 @@ public class InternalInputStream extends SeekableInputStream {
 	 *                       beginning of stream.
 	 * @param stream is data left in stream.
      */
-	public static InternalInputStream createConcatenated(byte[] alreadyRead,
-	                                                     final InputStream stream) throws IOException {
-		File temp = createTempFile(alreadyRead, stream);
+	public static InternalInputStream createConcatenated(byte[] alreadyRead, final InputStream stream,
+														 Integer maxStreamSize) throws IOException {
+		File temp = createTempFile(alreadyRead, stream, maxStreamSize);
 		return new InternalInputStream(temp, true);
 	}
 
@@ -278,24 +279,27 @@ public class InternalInputStream extends SeekableInputStream {
 		return size;
 	}
 
-	private static File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
+	private static File createTempFile(byte[] alreadyRead, InputStream input, Integer maxStreamSize) throws IOException {
 		File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
 		try (FileOutputStream output = new FileOutputStream(tmpFile)) {
 			output.write(alreadyRead);
+			int totalRead = alreadyRead.length;
 
 			//copy stream content
 			byte[] buffer = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
 			int n;
 			while ((n = input.read(buffer, 0, ASBufferedInFilter.BF_BUFFER_SIZE)) != -1) {
+				totalRead += n;
+				if (maxStreamSize != null && totalRead > maxStreamSize) {
+					throw new VeraPDFParserException("Maximum allowed stream size exceeded");
+				}
 				output.write(buffer, 0, n);
 			}
-
 			return tmpFile;
-		} catch (IOException e) {
+		} finally {
 			if (!tmpFile.delete()) {
 				tmpFile.deleteOnExit();
 			}
-			throw e;
 		}
 	}
 }
