@@ -23,6 +23,7 @@ package org.verapdf.io;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.exceptions.VeraPDFParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -163,10 +164,15 @@ public abstract class SeekableInputStream extends ASInputStream {
             seekableStream.seekFromEnd(0);
             return result;
         }
+        return getSeekableStream(stream, null);
+    }
+
+    public static SeekableInputStream getSeekableStream(InputStream stream, Integer maxStreamSize) throws IOException {
         int totalRead = 0;
         byte[] buffer = new byte[0];
         byte[] temp = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
-        while (MAX_BUFFER_SIZE < 0 || totalRead < MAX_BUFFER_SIZE) {
+        int maximumSize = maxStreamSize == null ? MAX_BUFFER_SIZE : Math.min(MAX_BUFFER_SIZE, maxStreamSize + 1);
+        while (totalRead < maximumSize) {
             int read = stream.read(temp);
             if (read == -1) {
                 return new ASMemoryInStream(buffer, buffer.length, false);
@@ -174,6 +180,10 @@ public abstract class SeekableInputStream extends ASInputStream {
             buffer = ASBufferedInFilter.concatenate(buffer, buffer.length, temp, read);
             totalRead += read;
         }
-        return InternalInputStream.createConcatenated(buffer, stream);
+        if (maxStreamSize != null && totalRead > maxStreamSize) {
+            throw new VeraPDFParserException("Maximum allowed stream size exceeded");
+        }
+        return InternalInputStream.createConcatenated(buffer, stream, maxStreamSize);
     }
+
 }
