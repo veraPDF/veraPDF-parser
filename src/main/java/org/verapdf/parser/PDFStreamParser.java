@@ -28,6 +28,7 @@ import org.verapdf.cos.*;
 import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.operator.InlineImageOperator;
 import org.verapdf.operator.Operator;
+import org.verapdf.pd.images.PDInlineImage;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -293,25 +294,44 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 
 	private ASInputStream readInlineImage() throws IOException {
 		source.resetReadCounter();
+		Long l = this.lastInlineImageDict == null ? Long.valueOf(0) : PDInlineImage.getInlineImageKey(lastInlineImageDict, ASAtom.LENGTH).getInteger();
 		ArrayList<Byte> image = new ArrayList<>(INLINE_IMAGE_BUFFER_SIZE);
 		byte previousByte = source.readByte();
 		byte currentByte = source.readByte();
-		image.add(previousByte);
-		image.add(currentByte);
-		Long l = this.lastInlineImageDict == null ? new Long(0) : lastInlineImageDict.getIntegerKey(ASAtom.L);
-		if (l == null) {
-			l = lastInlineImageDict.getIntegerKey(ASAtom.LENGTH);
-		}
+		boolean imageEndFound = false;
 		while (!(this.source.isEOF())) {
 			if (previousByte == 'E' && currentByte == 'I' && isSourceAfterImage(l) && CharTable.isSpace(source.peek())) {
-			    break;
+				if (checkInlineImage()) {
+					imageEndFound = true;
+					break;
+				} else {
+					LOGGER.log(Level.WARNING, "Inline image content contains EI inside");
+				}
             }
+			image.add(previousByte);
 			previousByte = currentByte;
 			currentByte = source.readByte();
-			image.add(currentByte);
+		}
+		if (!imageEndFound) {
+			LOGGER.log(Level.WARNING, "End of inline image not found");
 		}
 		return new ASMemoryInStream(getByteArrayFromArrayList(image),
 				source.getReadCounter(), false);
+	}
+
+	private boolean checkInlineImage() throws IOException {
+		int readCounter = source.getReadCounter();
+		try {
+			Object token = parseNextToken();
+			if (token instanceof Operator && !Operators.operators.contains(((Operator)token).getOperator())) {
+				return false;
+			}
+		} catch (IOException e) {
+			return false;
+		} finally {
+			source.unread(source.getReadCounter() - readCounter);
+		}
+		return true;
 	}
 
 	private boolean isSourceAfterImage(Long length) {
