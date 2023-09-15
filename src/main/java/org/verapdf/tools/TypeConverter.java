@@ -23,6 +23,9 @@ package org.verapdf.tools;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -217,5 +220,18 @@ public class TypeConverter {
 			return res;
 		}
 		return null;
+	}
+
+	public static byte[] inputStreamToByteArray(InputStream is) throws IOException {
+		if (is == null) {
+			return new byte[0];
+		}
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] bytes = new byte[1024];
+		int length;
+		while ((length = is.read(bytes)) != -1) {
+			baos.write(bytes, 0, length);
+		}
+		return baos.toByteArray();
 	}
 }

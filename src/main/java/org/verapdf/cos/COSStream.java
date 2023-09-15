@@ -29,6 +29,7 @@ import org.verapdf.cos.visitor.IVisitor;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
+import org.verapdf.tools.TypeConverter;
 
 import java.io.File;
 import java.io.IOException;
@@ -140,6 +141,14 @@ public class COSStream extends COSDictionary {
 	@Override
 	public ASInputStream getData() {
 		return getData(FilterFlags.RAW_DATA);
+	}
+
+	public COSString getStringFromTextStream() {
+		try {
+			return (COSString)COSString.construct(TypeConverter.inputStreamToByteArray(getData())).get();
+		} catch (IOException e) {
+			return new COSString();
+		}
 	}
 
 	@Override
@@ -269,13 +278,13 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(this == obj) {
+		if (this == obj) {
 			return true;
 		}
-		if(obj == null) {
+		if (obj == null) {
 			return false;
 		}
-		if(obj instanceof COSObject) {
+		if (obj instanceof COSObject) {
 			return this.equals(((COSObject) obj).get());
 		}
 		List<COSBasePair> checkedObjects = new LinkedList<>();
@@ -289,7 +298,7 @@ public class COSStream extends COSDictionary {
 		if (obj == null) {
 			return false;
 		}
-		if(obj instanceof COSObject) {
+		if (obj instanceof COSObject) {
 			return this.equals(((COSObject) obj).get());
 		}
 		if (COSBasePair.listContainsPair(checkedObjects, this, (COSBase) obj)) {
@@ -301,33 +310,33 @@ public class COSStream extends COSDictionary {
 		}
 		COSStream that = (COSStream) obj;
 
-		for(Map.Entry<ASAtom, COSObject> entry : this.getEntrySet()) {
-			if(entry.getKey() == ASAtom.FILTER ||
+		for (Map.Entry<ASAtom, COSObject> entry : this.getEntrySet()) {
+			if (entry.getKey() == ASAtom.FILTER ||
 					entry.getKey() == ASAtom.DECODE_PARMS ||
 					entry.getKey() == ASAtom.LENGTH) {
 				continue;
 			}
 			COSBase cosBase = that.getKey(entry.getKey()).get();
-			if(!entry.getValue().get().equals(cosBase, checkedObjects)) {
+			if (!entry.getValue().get().equals(cosBase, checkedObjects)) {
 				return false;
 			}
 		}
 
-		for(Map.Entry<ASAtom, COSObject> entry : that.getEntrySet()) {
-			if(entry.getKey() == ASAtom.FILTER ||
-					entry.getKey() == ASAtom.DECODE_PARMS ||
+		for (Map.Entry<ASAtom, COSObject> entry : that.getEntrySet()) {
+			if (entry.getKey() == ASAtom.FILTER || entry.getKey() == ASAtom.DECODE_PARMS ||
 					entry.getKey() == ASAtom.LENGTH) {
 				continue;
 			}
 			COSBase cosBase = this.getKey(entry.getKey()).get();
-			if(!entry.getValue().get().equals(cosBase, checkedObjects)) {
+			if (!entry.getValue().get().equals(cosBase, checkedObjects)) {
 				return false;
 			}
 		}
 
 		try {
-			if (stream != null ? !equalsStreams(stream, that.stream) :
-					that.stream != null) return false;
+			if (stream != null ? !equalsStreams(stream, that.stream) : that.stream != null) {
+				return false;
+			}
 		} catch (IOException e) {
 			LOGGER.log(Level.FINE, "Exception during comparing streams", e);
 			return false;
