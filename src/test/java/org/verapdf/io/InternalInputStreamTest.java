@@ -22,8 +22,10 @@ package org.verapdf.io;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +35,7 @@ import java.nio.file.Path;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.verapdf.exceptions.VeraPDFParserException;
 
 public class InternalInputStreamTest {
     @Rule
@@ -245,5 +248,87 @@ public class InternalInputStreamTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void shouldNotThrowExceptionWhenAlreadyReadIsNotLargerThanMaxSizeAndStreamIsEmpty() throws IOException {
+        byte[] alreadyRead = "ab".getBytes();
+        ByteArrayInputStream stream = new ByteArrayInputStream("".getBytes());
+        try (InternalInputStream input = InternalInputStream.createConcatenated(alreadyRead, stream, 2)) {
+            assertEquals(2, input.getStreamLength());
+        }
+    }
+
+    @Test
+    public void shouldNotThrowExceptionWhenStreamIsNotLargerThanMaxSizeAndAlreadyReadIsEmpty() throws IOException {
+        byte[] alreadyRead = "".getBytes();
+        ByteArrayInputStream stream = new ByteArrayInputStream("ab".getBytes());
+        try (InternalInputStream input = InternalInputStream.createConcatenated(alreadyRead, stream, 2)) {
+            assertEquals(2, input.getStreamLength());
+        }
+    }
+
+    @Test
+    public void shouldNotThrowExceptionWhenSumOfInputsIsNotLargerThanMaxSize() throws IOException {
+        byte[] alreadyRead = "a".getBytes();
+        ByteArrayInputStream stream = new ByteArrayInputStream("b".getBytes());
+        try (InternalInputStream input = InternalInputStream.createConcatenated(alreadyRead, stream, 2)) {
+            assertEquals(2, input.getStreamLength());
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenAlreadyReadIsLargerThanMaxSizeAndStreamIsEmpty() {
+        byte[] alreadyRead = "abc".getBytes();
+        ByteArrayInputStream stream = new ByteArrayInputStream("".getBytes());
+        VeraPDFParserException thrown = assertThrows(
+            VeraPDFParserException.class,
+            () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
+        );
+        assertTrue(thrown.getMessage().contains("size exceeded"));
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenAlreadyReadIsLargerThanMaxSizeAndStreamIsNotEmpty() {
+        byte[] alreadyRead = "abc".getBytes();
+        ByteArrayInputStream stream = new ByteArrayInputStream("1".getBytes());
+        VeraPDFParserException thrown = assertThrows(
+            VeraPDFParserException.class,
+            () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
+        );
+        assertTrue(thrown.getMessage().contains("size exceeded"));
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenStreamIsLargerThanMaxSizeAndAlreadyReadIsEmpty() {
+        byte[] alreadyRead = "".getBytes();
+        ByteArrayInputStream stream = new ByteArrayInputStream("abc".getBytes());
+        VeraPDFParserException thrown = assertThrows(
+            VeraPDFParserException.class,
+            () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
+        );
+        assertTrue(thrown.getMessage().contains("size exceeded"));
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenStreamIsLargerThanMaxSizeAndAlreadyReadIsNotEmpty() {
+        byte[] alreadyRead = "1".getBytes();
+        ByteArrayInputStream stream = new ByteArrayInputStream("abc".getBytes());
+        VeraPDFParserException thrown = assertThrows(
+            VeraPDFParserException.class,
+            () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
+        );
+        assertTrue(thrown.getMessage().contains("size exceeded"));
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenSumOfAlreadyReadAndStreamIsLargerThanMaxSize() {
+        byte[] alreadyRead = "ab".getBytes();
+        ByteArrayInputStream stream = new ByteArrayInputStream("cd".getBytes());
+        VeraPDFParserException thrown = assertThrows(
+            VeraPDFParserException.class,
+            () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
+        );
+        assertTrue(thrown.getMessage().contains("size exceeded"));
     }
 }

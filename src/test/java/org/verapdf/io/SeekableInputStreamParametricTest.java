@@ -26,6 +26,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.exceptions.VeraPDFParserException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -38,6 +39,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Tests behaviour of SeekableInputStreams, build from different kinds of source streams.
@@ -423,5 +425,19 @@ public class SeekableInputStreamParametricTest {
                 assertEquals(i + 1, seekable.getOffset());
             }
         }
+    }
+
+    @Test
+    public void shouldNotThrowExceptionsAboutExceedingMaxSizeWhenNotExeedingMaxSize() throws IOException {
+        try (
+            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input, size);
+        ) {
+            assertEquals(seekable.getOffset(), 0);
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionsAboutExceedingMaxSizeWhenExeedingMaxSize() {
+        assertThrows(VeraPDFParserException.class, () -> SeekableInputStream.getSeekableStream(input, size - 1));
     }
 }
