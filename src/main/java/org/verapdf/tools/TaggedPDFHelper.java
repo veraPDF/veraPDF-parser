@@ -218,7 +218,6 @@ public class TaggedPDFHelper {
 		ASAtom structType = type.getType();
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {
-			COSKey key = nameSpace.getObject().getObjectKey();
 			Set<COSKey> nameSpaces;
 			if (visitedWithNS.containsKey(structType)) {
 				nameSpaces = visitedWithNS.get(structType);
@@ -226,6 +225,7 @@ public class TaggedPDFHelper {
 				nameSpaces = new HashSet<>();
 				visitedWithNS.put(structType, nameSpaces);
 			}
+			COSKey key = nameSpace.getObject().getObjectKey();
 			nameSpaces.add(key);
 		} else {
 			visitedWithoutNS.add(structType);
