@@ -273,6 +273,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom FORM = new ASAtom("Form");
     public static final ASAtom FORMTYPE = new ASAtom("FormType");
     public static final ASAtom FRM = new ASAtom("FRM");
+    public static final ASAtom FS = new ASAtom("FS");
     public static final ASAtom FT = new ASAtom("FT");
     public static final ASAtom FUNCTION = new ASAtom("Function");
     public static final ASAtom FUNCTION_TYPE = new ASAtom("FunctionType");
