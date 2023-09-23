@@ -200,7 +200,7 @@ public class COSParser extends BaseParser {
 		COSObject arr = COSArray.construct();
 
 		COSObject obj = nextObject();
-		while(!obj.empty()) {
+		while (!obj.empty()) {
 			arr.add(obj);
 			obj = nextObject();
 		}
