@@ -158,7 +158,7 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
             case TT_HEXSTRING:
                 COSObject res = COSString.construct(token.getByteValue(), true,
                         token.getHexCount().longValue(), token.isContainsOnlyHex());
-                if(this.document == null || !this.document.isEncrypted()) {
+                if (this.document == null || !this.document.isEncrypted()) {
                     return res;
                 }
                 return this.decryptCOSString(res);
@@ -198,7 +198,7 @@ public class NotSeekableCOSParser extends NotSeekableBaseParser {
         COSObject arr = COSArray.construct();
 
         COSObject obj = nextObject();
-        while(!obj.empty()) {
+        while (!obj.empty()) {
             arr.add(obj);
             obj = nextObject();
         }

@@ -30,7 +30,7 @@ import java.util.*;
  */
 public class TaggedPDFRoleMapHelper {
 
-	private Map<ASAtom, ASAtom> roleMap;
+	private final Map<ASAtom, ASAtom> roleMap;
 
 	/**
 	 * Creates new TaggedPDFRoleMapHelper
@@ -100,5 +100,9 @@ public class TaggedPDFRoleMapHelper {
 			res = roleMap.get(res);
 		}
 		return false;
+	}
+
+	public Map<ASAtom, ASAtom> getRoleMap() {
+		return roleMap;
 	}
 }

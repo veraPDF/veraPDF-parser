@@ -20,6 +20,7 @@
  */
 package org.verapdf.tools;
 
+import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSKey;
 import org.verapdf.parser.PDFFlavour;
 import org.verapdf.pd.PDDocument;
@@ -46,6 +47,8 @@ public class StaticResources {
 
 	private static final ThreadLocal<PDFFlavour> flavour = new ThreadLocal<>();
 	private static final ThreadLocal<PDDocument> document = new ThreadLocal<>();
+
+	private static final ThreadLocal<TaggedPDFRoleMapHelper> roleMapHelper = new ThreadLocal<>();
 
 	private static final ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
 	private static final ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
@@ -149,6 +152,7 @@ public class StaticResources {
 		StaticResources.flavour.set(null);
 		StaticResources.document.set(null);
 		StaticResources.setPassword(null);
+		StaticResources.roleMapHelper.set(null);
 	}
 
 	private static void checkForNull(ThreadLocal variable) {
@@ -195,5 +199,17 @@ public class StaticResources {
 
 	public static void setPassword(String password) {
 		StaticResources.password.set(password);
+	}
+
+	public static TaggedPDFRoleMapHelper getRoleMapHelper() {
+		return roleMapHelper.get();
+	}
+
+	public static void setRoleMapHelper(Map<ASAtom, ASAtom> roleMap) {
+		roleMapHelper.set(new TaggedPDFRoleMapHelper(roleMap));
+	}
+
+	public static void setRoleMapHelper(TaggedPDFRoleMapHelper roleMapHelper) {
+		StaticResources.roleMapHelper.set(roleMapHelper);
 	}
 }
