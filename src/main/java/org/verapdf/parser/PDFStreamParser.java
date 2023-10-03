@@ -312,6 +312,9 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			previousByte = currentByte;
 			currentByte = source.readByte();
 		}
+		if (previousByte == 'E' && currentByte == 'I') {
+			imageEndFound = true;
+		}
 		if (!imageEndFound) {
 			LOGGER.log(Level.WARNING, "End of inline image not found");
 		}
