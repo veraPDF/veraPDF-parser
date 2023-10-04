@@ -9,7 +9,16 @@ public class AttributeHelper {
 
 	public static final String PRINT_FIELD = "PrintField";
 	public static final String LAYOUT = "Layout";
+	public static final String LIST = "List";
+	public static final String NONE = "None";
 
+	public static String getListNumbering(org.verapdf.pd.PDObject simplePDObject) {
+		return AttributeHelper.getNameAttributeValue(simplePDObject, ASAtom.LIST_NUMBERING, LIST, NONE);
+	}
+
+	public static String getNoteType(org.verapdf.pd.PDObject simplePDObject) {
+		return AttributeHelper.getNameAttributeValue(simplePDObject, ASAtom.NOTE_TYPE, TaggedPDFConstants.FENOTE, NONE);
+	}
 	public static Long getColSpan(org.verapdf.pd.PDObject simplePDObject) {
 		return AttributeHelper.getIntegerAttributeValue(simplePDObject, ASAtom.COL_SPAN, TaggedPDFConstants.TABLE, 1L);
 	}

@@ -348,6 +348,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom LENGTH2 = new ASAtom("Length2");
     public static final ASAtom LIGHTEN = new ASAtom("Lighten");
     public static final ASAtom LIMITS = new ASAtom("Limits");
+    public static final ASAtom LIST_NUMBERING = new ASAtom("ListNumbering");
     public static final ASAtom LJ = new ASAtom("LJ");
     public static final ASAtom LL = new ASAtom("LL");
     public static final ASAtom LLE = new ASAtom("LLE");
@@ -391,6 +392,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom NON_EFONT_NO_WARN = new ASAtom("NonEFontNoWarn");
     public static final ASAtom NON_FULL_SCREEN_PAGE_MODE = new ASAtom("NonFullScreenPageMode");
     public static final ASAtom NONE = new ASAtom("None");
+    public static final ASAtom NOTE_TYPE = new ASAtom("NoteType");
     public static final ASAtom NORMAL = new ASAtom("Normal");
     public static final ASAtom NS = new ASAtom("NS");
     public static final ASAtom NUMS = new ASAtom("Nums");

@@ -187,6 +187,10 @@ public class PDFormField extends PDObject {
 		return getStringKey(ASAtom.TU);
 	}
 
+	public Long getFf() {
+		return getIntegerKey(ASAtom.FF);
+	}
+
 	public Long getStructParent() {
 		return getIntegerKey(ASAtom.STRUCT_PARENT);
 	}

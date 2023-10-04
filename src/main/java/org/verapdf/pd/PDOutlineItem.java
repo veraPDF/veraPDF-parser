@@ -59,6 +59,10 @@ public class PDOutlineItem extends PDOutlineDictionary {
 		return null;
 	}
 
+	public COSObject getDestination() {
+		return getKey(ASAtom.DEST);
+	}
+
 	public double[] getColor() {
 		COSObject arr = getKey(ASAtom.C);
 		if (arr != null && arr.getType() == COSObjType.COS_ARRAY) {

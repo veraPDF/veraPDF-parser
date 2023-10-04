@@ -147,6 +147,7 @@ public class COSStream extends COSDictionary {
 		try {
 			return (COSString)COSString.construct(TypeConverter.inputStreamToByteArray(getData())).get();
 		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Exception during creation string from stream (object key = " + getKey() + ")");
 			return new COSString();
 		}
 	}
