@@ -91,4 +91,9 @@ public class PDAction extends PDObject {
 	public COSObject getStructureDestination() {
 		return getObject().getKey(ASAtom.SD);
 	}
+
+	public boolean containsStructureDestination() {
+		return getObject().knownKey(ASAtom.SD);
+	}
+
 }

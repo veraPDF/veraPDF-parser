@@ -124,6 +124,10 @@ public class PDCatalog extends PDObject {
 		return null;
 	}
 
+	public COSObject getDests() {
+		return getKey(ASAtom.DESTS);
+	}
+
 	public PDCatalogAdditionalActions getAdditionalActions() {
 		COSObject aaDict = getKey(ASAtom.AA);
 		if (aaDict != null && aaDict.getType() == COSObjType.COS_DICT) {

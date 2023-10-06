@@ -79,6 +79,14 @@ public class PDStructElem extends PDStructTreeNode {
 		return getKey(ASAtom.ACTUAL_TEXT);
 	}
 
+	public COSObject getRef() {
+		return getKey(ASAtom.REF);
+	}
+	
+	public boolean containsRef() {
+		return knownKey(ASAtom.REF);
+	}
+
 	public String getAlternateDescription() {
 		return getStringKey(ASAtom.ALT);
 	}
