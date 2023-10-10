@@ -31,6 +31,8 @@ public final class TaggedPDFConstants {
     public static final String PDF2_NAMESPACE = "http://iso.org/pdf2/ssn";
     public static final String MATH_ML_NAMESPACE = "http://www.w3.org/1998/Math/MathML";
 
+    public static final String MATH_ML = "MathML";
+
     // Common standard structure types for PDF 1.7 and 2.0
     public static final String DOCUMENT = "Document";
     public static final String PART = "Part";
