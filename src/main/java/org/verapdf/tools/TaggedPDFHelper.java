@@ -175,6 +175,29 @@ public class TaggedPDFHelper {
 		return null;
 	}
 
+	public static String getRoleMapToSameNamespaceTag(StructureType type, Map<ASAtom, ASAtom> rootRoleMap) {
+		if (type == null) {
+			return null;
+		}
+		visitedWithNS.clear();
+		visitedWithoutNS.clear();
+		addVisited(type);
+		StructureType prev = type;
+		StructureType curr = getEquivalent(prev, rootRoleMap);
+		while (curr != null) {
+			if (curr.getNameSpaceURI() != null && curr.getNameSpaceURI().equals(prev.getNameSpaceURI())) {
+				return curr.getNameSpaceURI();
+			}
+			if (isVisited(curr) || isStandardType(curr)) {
+				return null;
+			}
+			addVisited(curr);
+			prev = curr;
+			curr = getEquivalent(prev, rootRoleMap);
+		}
+		return null;
+	}
+	
 	private static StructureType getEquivalent(StructureType type, Map<ASAtom, ASAtom> rootRoleMap) {
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {

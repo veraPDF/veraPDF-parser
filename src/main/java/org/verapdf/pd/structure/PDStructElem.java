@@ -119,6 +119,10 @@ public class PDStructElem extends PDStructTreeNode {
 	public List<PDStructElem> getStructChildren() {
 		return TaggedPDFHelper.getStructElemStructChildren(getObject(), rootRoleMap);
 	}
+	
+	public String getRoleMapToSameNamespaceTag() {
+		return TaggedPDFHelper.getRoleMapToSameNamespaceTag(getStructureType(), rootRoleMap);
+	}
 
 	@Override
 	public List<Object> getChildren() {
