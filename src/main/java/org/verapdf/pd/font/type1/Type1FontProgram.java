@@ -161,7 +161,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
                 nextObject.getString().equals(Type1StringConstants.EEXEC_STRING)) {
             this.skipSpacesExceptNullByte();
             Type1PrivateParser parser = null;
-            try (ASInputStream eexecEncoded = this.source.getStreamUntilToken(
+            try (ASInputStream eexecEncoded = this.getSource().getStreamUntilToken(
                     CLEAR_TO_MARK_BYTES)) {
                 try (ASInputStream eexecDecoded = new EexecFilterDecode(
                         eexecEncoded, false)) {
@@ -332,7 +332,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
      * program.
      */
     public ASFileStreamCloser getFontProgramResource() {
-        return new ASFileStreamCloser(this.source);
+        return new ASFileStreamCloser(this.getSource());
     }
 
     @Override

@@ -146,9 +146,9 @@ class Type1PrivateParser extends SeekableBaseParser {
                             long toSkip = this.getToken().integer;
                             skipRD();
                             this.skipSpaces();
-                            long beginOffset = this.source.getOffset();
-                            this.source.skip(toSkip);
-                            try (ASInputStream chunk = this.source.getStream(beginOffset, toSkip);
+                            long beginOffset = this.getSource().getOffset();
+                            this.getSource().skip(toSkip);
+                            try (ASInputStream chunk = this.getSource().getStream(beginOffset, toSkip);
                                  ASInputStream eexecDecode = new EexecFilterDecode(
                                          chunk, true, this.lenIV); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
                                 Type1CharStringParser parser = new Type1CharStringParser(decodedCharString, subrWidths);
@@ -192,9 +192,9 @@ class Type1PrivateParser extends SeekableBaseParser {
         long charstringLength = this.getToken().integer;
         this.skipRD();
         this.skipSingleSpace();
-        long beginOffset = this.source.getOffset();
+        long beginOffset = this.getSource().getOffset();
         this.source.skip((int) charstringLength);
-        try (ASInputStream chunk = this.source.getStream(beginOffset, charstringLength);
+        try (ASInputStream chunk = this.getSource().getStream(beginOffset, charstringLength);
              ASInputStream eexecDecode = new EexecFilterDecode(
                      chunk, true, this.lenIV); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
             Type1CharStringParser parser = new Type1CharStringParser(decodedCharString, subrWidths);

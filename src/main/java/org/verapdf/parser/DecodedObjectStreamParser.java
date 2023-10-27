@@ -108,7 +108,7 @@ public class DecodedObjectStreamParser extends SeekableCOSParser {
         if (!this.internalOffsets.containsKey(objNum)) {
             return new COSObject();
         }
-        this.source.seek(internalOffsets.get(objNum));
+        this.getSource().seek(internalOffsets.get(objNum));
         this.flag = true;
         this.objects.clear();   // In case if some COSInteger was read before.
         this.integers.clear();

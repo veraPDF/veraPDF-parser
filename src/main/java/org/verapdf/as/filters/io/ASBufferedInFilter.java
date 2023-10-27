@@ -23,6 +23,7 @@ package org.verapdf.as.filters.io;
 import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.parser.BaseParserInputStream;
 import org.verapdf.parser.NotSeekableBaseParser;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class ASBufferedInFilter extends ASInFilter {
+public class ASBufferedInFilter extends ASInFilter implements BaseParserInputStream {
 
     public static final int START_BUFFER_SIZE = 10240;
     public static final int BF_BUFFER_SIZE = 2048;

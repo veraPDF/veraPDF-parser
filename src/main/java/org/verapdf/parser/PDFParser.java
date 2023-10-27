@@ -81,7 +81,7 @@ public class PDFParser extends SeekableCOSParser {
     }
 
     public SeekableInputStream getPDFSource() {
-        return this.source;
+        return this.getSource();
     }
 
     private COSHeader parseHeader() throws IOException {
@@ -104,7 +104,7 @@ public class PDFParser extends SeekableCOSParser {
         source.readByte();
 
         final int headerStart = header.indexOf(HEADER_PATTERN);
-        final long headerOffset = source.getOffset() - header.length() + headerStart;
+        final long headerOffset = getSource().getOffset() - header.length() + headerStart;
 
         this.offsetShift = headerOffset;
         result.setHeaderOffset(headerOffset);
@@ -151,7 +151,7 @@ public class PDFParser extends SeekableCOSParser {
         checkComment(result);
 
         // rewind
-        source.seek(0);
+        getSource().seek(0);
         return result;
     }
 
@@ -162,7 +162,7 @@ public class PDFParser extends SeekableCOSParser {
             if (isLinearizationDictionary(linDict)) {
                 long length = linDict.getIntegerKey(ASAtom.L);
                 if (length != 0) {
-                    return length == this.source.getStreamLength() && this.source.getOffset() < LINEARIZATION_DICTIONARY_LOOKUP_SIZE;
+                    return length == this.getSource().getStreamLength() && this.getSource().getOffset() < LINEARIZATION_DICTIONARY_LOOKUP_SIZE;
                 }
             }
         } catch (IOException e) {
@@ -189,7 +189,7 @@ public class PDFParser extends SeekableCOSParser {
     }
 
     private COSObject findFirstDictionary() throws IOException {
-        source.seek(0L);
+        getSource().seek(0L);
         if (findKeyword(Token.Keyword.KW_OBJ, LINEARIZATION_DICTIONARY_LOOKUP_SIZE)) {
             source.unread(7);
 
@@ -199,7 +199,7 @@ public class PDFParser extends SeekableCOSParser {
             while (!CharTable.isSpace(this.source.read())) {
                 source.unread(2);
             }
-            return getObject(source.getOffset());
+            return getObject(getSource().getOffset());
         }
 		return null;
     }
@@ -232,14 +232,14 @@ public class PDFParser extends SeekableCOSParser {
 
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         calculatePostEOFDataSize();
-        document.setFileSize(source.getStreamLength());
+        document.setFileSize(getSource().getStreamLength());
         this.getXRefInfo(infos, new HashSet<Long>(), null);
     }
 
     public COSObject getObject(final long offset) throws IOException {
         clear();
 
-        source.seek(offset);
+        getSource().seek(offset);
 
         final Token token = getToken();
 
@@ -250,7 +250,7 @@ public class PDFParser extends SeekableCOSParser {
         //Check that if offset doesn't point to obj key there is eol character before obj key
         //pdf/a-1b spec, clause 6.1.8
         skipSpaces(false);
-        source.seek(source.getOffset() - 1);
+        getSource().seek(getSource().getOffset() - 1);
         if (!isNextByteEOL()) {
             headerOfObjectComplyPDFA = false;
         }
@@ -309,16 +309,16 @@ public class PDFParser extends SeekableCOSParser {
             }
         }
 
-        long beforeSkip = this.source.getOffset();
+        long beforeSkip = this.getSource().getOffset();
         skipSpaces();
-        if (this.source.getOffset() != beforeSkip) {
+        if (this.getSource().getOffset() != beforeSkip) {
             this.source.unread();
         }
         if (!isNextByteEOL()) {
             endOfObjectComplyPDFA = false;
         }
 
-        long offsetBeforeEndobj = this.source.getOffset();
+        long offsetBeforeEndobj = this.getSource().getOffset();
         if (this.flag) {
             nextToken();
         }
@@ -328,7 +328,7 @@ public class PDFParser extends SeekableCOSParser {
                 token.keyword != Token.Keyword.KW_ENDOBJ) {
             // TODO : replace with ASException
             LOGGER.log(Level.WARNING, getErrorMessage("No endobj keyword" + offsetBeforeEndobj));
-            this.source.seek(offsetBeforeEndobj);
+            this.getSource().seek(offsetBeforeEndobj);
         }
 
         if (!isNextByteEOL()) {
@@ -349,29 +349,29 @@ public class PDFParser extends SeekableCOSParser {
     }
 
     private Long findLastXRef() throws IOException {
-        source.seekFromEnd(STARTXREF.length);
+        getSource().seekFromEnd(STARTXREF.length);
         byte[] buf = new byte[STARTXREF.length];
-        while (source.getStreamLength() - source.getOffset() < 1024) {
+        while (getSource().getStreamLength() - getSource().getOffset() < 1024) {
             source.read(buf);
             if (Arrays.equals(buf, STARTXREF)) {
                 nextToken();
                 return this.getToken().integer;
             }
-            if (source.getOffset() <= STARTXREF.length) {
+            if (getSource().getOffset() <= STARTXREF.length) {
                 throw new IOException("Document doesn't contain startxref keyword");
             }
-            source.seekFromCurrentPosition(-STARTXREF.length - 1);
+            getSource().seekFromCurrentPosition(-STARTXREF.length - 1);
         }
         return null;
     }
 
     private void calculatePostEOFDataSize() throws IOException {
-        long size = source.getStreamLength();
+        long size = getSource().getStreamLength();
         final int lookupSize = 1024 > size ? (int) size : 1024;
 
-        source.seekFromEnd(lookupSize);
+        getSource().seekFromEnd(lookupSize);
         byte[] buffer = new byte[lookupSize];
-        source.read(buffer, lookupSize);
+        getSource().read(buffer, lookupSize);
 
         byte postEOFDataSize = -1;
 
@@ -426,7 +426,7 @@ public class PDFParser extends SeekableCOSParser {
 
     private void getXRefSectionAndTrailer(final COSXRefInfo section) throws IOException {
         if (this.lastTrailerOffset == 0) {
-            this.lastTrailerOffset = this.source.getOffset();
+            this.lastTrailerOffset = this.getSource().getOffset();
         }
         nextToken();
         if ((getToken().type != Token.Type.TT_KEYWORD ||
@@ -492,7 +492,7 @@ public class PDFParser extends SeekableCOSParser {
             }
             nextToken();
         }
-        this.source.seekFromCurrentPosition(-7);
+        this.getSource().seekFromCurrentPosition(-7);
     }
 
     /**
@@ -570,7 +570,7 @@ public class PDFParser extends SeekableCOSParser {
         }
 
         //we will skip eol marker in any case
-        source.seek(Math.max(0, offset - 1));
+        getSource().seek(Math.max(0, offset - 1));
 
 		COSXRefInfo section = new COSXRefInfo();
 		info.add(0, section);

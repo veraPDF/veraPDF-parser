@@ -97,7 +97,7 @@ public class SignatureParser extends SeekableCOSParser {
      * @throws IOException If there is an error parsing the dictionary object.
      */
     private void passCOSDictionaryValue() throws IOException {
-        long numOffset = source.getOffset();
+        long numOffset = getSource().getOffset();
         COSObject number = nextObject();
         skipSpaces();
         if (!isDigit()) {
@@ -120,7 +120,7 @@ public class SignatureParser extends SeekableCOSParser {
      * @return array of 4 longs, which is byte range array.
      */
     public long[] getByteRangeBySignatureOffset(long signatureOffset) throws IOException {
-        source.seek(signatureOffset);
+        getSource().seek(signatureOffset);
         skipID();
         byteRange[0] = 0;
         parseDictionary();
@@ -152,16 +152,16 @@ public class SignatureParser extends SeekableCOSParser {
 
     private void parseSignatureValue() throws IOException {
         skipSpaces();
-        long numOffset1 = source.getOffset();
+        long numOffset1 = getSource().getOffset();
         COSObject number = nextObject();
-        long numOffset2 = source.getOffset();
+        long numOffset2 = getSource().getOffset();
         skipSpaces();
         if (!isDigit()) {
             byteRange[1] = numOffset1;
             byteRange[2] = numOffset2;
             return;
         }
-        long genOffset = source.getOffset();
+        long genOffset = getSource().getOffset();
         COSObject generationNumber = nextObject();
         skipSpaces();
         int c = source.read();
@@ -175,16 +175,16 @@ public class SignatureParser extends SeekableCOSParser {
             COSKey key = new COSKey(number.getInteger().intValue(),
                     generationNumber.getInteger().intValue());
             long keyOffset = this.document.getOffset(key).longValue();
-            source.seek(keyOffset + document.getHeader().getHeaderOffset());
+            getSource().seek(keyOffset + document.getHeader().getHeaderOffset());
             parseSignatureValue();    // Recursive parsing to get to the contents hex string itself
         }
         if (c == 'o') {    // Object itself
             skipExpectedCharacter('b');
             skipExpectedCharacter('j');
             skipSpaces();
-            numOffset1 = source.getOffset();
+            numOffset1 = getSource().getOffset();
             nextObject();
-            numOffset2 = source.getOffset();
+            numOffset2 = getSource().getOffset();
             byteRange[1] = numOffset1;
             byteRange[2] = numOffset2;
         } else {
@@ -209,7 +209,7 @@ public class SignatureParser extends SeekableCOSParser {
      */
     private long getOffsetOfNextEOF(long currentOffset) throws IOException {
         byte[] buffer = new byte[EOF_STRING.length];
-        source.seek(currentOffset + document.getHeader().getHeaderOffset());
+        getSource().seek(currentOffset + document.getHeader().getHeaderOffset());
         source.read(buffer);
         source.unread(buffer.length - 1);
         isStream = false;
@@ -228,14 +228,14 @@ public class SignatureParser extends SeekableCOSParser {
 			}
 
             if (source.isEOF()) {
-                source.seek(currentOffset + document.getHeader().getHeaderOffset());
-                return source.getStreamLength();
+                getSource().seek(currentOffset + document.getHeader().getHeaderOffset());
+                return getSource().getStreamLength();
             }
             if (unreadLength > 0) {
 				source.unread(unreadLength);
 			}
         }
-        long result = source.getOffset() - 1 + buffer.length;   // byte right after '%%EOF'
+        long result = getSource().getOffset() - 1 + buffer.length;   // byte right after '%%EOF'
         this.source.skip(EOF_STRING.length - 1);
         this.floatingBytesNumber = 0;
         this.isStreamEnd = false;
@@ -257,7 +257,7 @@ public class SignatureParser extends SeekableCOSParser {
         if (nextByte == -1) {
             this.isStreamEnd = true;
         }
-        source.seek(currentOffset + document.getHeader().getHeaderOffset());
+        getSource().seek(currentOffset + document.getHeader().getHeaderOffset());
         return result;
     }
 
@@ -265,18 +265,18 @@ public class SignatureParser extends SeekableCOSParser {
         if (!Arrays.equals(buffer, EOF_STRING)) {
             return false;
         }
-        long pointer = this.source.getOffset();
+        long pointer = this.getSource().getOffset();
         this.source.unread(2);
         int byteBeforeEOF = this.source.peek();
         while (!isLF(byteBeforeEOF)) {
             this.source.unread();
             byteBeforeEOF = this.source.peek();
             if (byteBeforeEOF != CharTable.ASCII_SPACE) {
-                this.source.seek(pointer);
+                this.getSource().seek(pointer);
                 return false;
             }
         }
-        this.source.seek(pointer);
+        this.getSource().seek(pointer);
         return true;
     }
 

@@ -254,7 +254,7 @@ public class SeekableCOSParser extends SeekableBaseParser {
 			throw new IOException(getErrorMessage(StringExceptions.INVALID_PDF_DICTONARY));
 		}
 
-		long reset = this.source.getOffset();
+		long reset = this.getSource().getOffset();
 		if (this.flag) {
 			nextToken();
 		}
@@ -264,7 +264,7 @@ public class SeekableCOSParser extends SeekableBaseParser {
 				token.keyword == Token.Keyword.KW_STREAM) {
 			return getStream(dict);
 		}
-		this.source.seek(reset);
+		this.getSource().seek(reset);
 		this.flag = true;
 
 		return dict;
@@ -285,7 +285,7 @@ public class SeekableCOSParser extends SeekableBaseParser {
 		}
 
 		checkStreamSpacings(dict);
-		long streamStartOffset = source.getOffset();
+		long streamStartOffset = getSource().getOffset();
 
 		COSObject length = dict.getKey(ASAtom.LENGTH);
 		if (this.keyOfCurrentObject != null && length.isIndirect() && this.keyOfCurrentObject.equals(length.getKey())) {
@@ -293,7 +293,7 @@ public class SeekableCOSParser extends SeekableBaseParser {
 					" which references to its own object key"));
 		}
 		Long size = length.getInteger();
-		source.seek(streamStartOffset);
+		getSource().seek(streamStartOffset);
 
 		boolean streamLengthValid = checkStreamLength(size);
 
@@ -312,27 +312,27 @@ public class SeekableCOSParser extends SeekableBaseParser {
 			int eolLength = 0;
 			boolean isPrevCR = false;
 			while (realStreamSize == -1 && !source.isEOF()) {
-				long bytesRead = source.read(buffer, bufferLength);
+				long bytesRead = getSource().read(buffer, bufferLength);
 				for (int i = 0; i < bytesRead; i++) {
 					if (buffer[i] == 101) {
-						long reset = source.getOffset();
+						long reset = getSource().getOffset();
 						long possibleEndStreamOffset = reset - bytesRead + i - eolLength;
-						source.seek(possibleEndStreamOffset);
+						getSource().seek(possibleEndStreamOffset);
 						nextToken();
 						if (token.type == Token.Type.TT_KEYWORD &&
 								token.keyword == Token.Keyword.KW_ENDSTREAM) {
 							realStreamSize = possibleEndStreamOffset - streamStartOffset;
 							dict.setRealStreamSize(realStreamSize);
-							source.seek(streamStartOffset);
+							getSource().seek(streamStartOffset);
 							ASInputStream stm = super.getRandomAccess(realStreamSize);
 							dict.setData(stm);
-							source.seek(possibleEndStreamOffset);
+							getSource().seek(possibleEndStreamOffset);
 							if (stm instanceof InternalInputStream) {
 								this.document.addFileResource(new ASFileStreamCloser(stm));
 							}
 							break;
 						}
-						source.seek(reset);
+						getSource().seek(reset);
 					}
 
 					//we need to subtract eol before endstream length from stream length
@@ -382,13 +382,13 @@ public class SeekableCOSParser extends SeekableBaseParser {
 			return false;
 		}
 		boolean validLength = true;
-		long start = source.getOffset();
+		long start = getSource().getOffset();
 		long expectedEndstreamOffset = start + streamLength;
-		if (expectedEndstreamOffset > source.getStreamLength()) {
+		if (expectedEndstreamOffset > getSource().getStreamLength()) {
 			validLength = false;
 			LOGGER.log(Level.WARNING, getErrorMessage("Couldn't find expected endstream keyword", expectedEndstreamOffset));
 		} else {
-			source.seek(expectedEndstreamOffset);
+			getSource().seek(expectedEndstreamOffset);
 
 			nextToken();
 			final Token token = getToken();
@@ -398,7 +398,7 @@ public class SeekableCOSParser extends SeekableBaseParser {
 				LOGGER.log(Level.WARNING, getErrorMessage("Couldn't find expected endstream keyword", expectedEndstreamOffset));
 			}
 
-			source.seek(start);
+			getSource().seek(start);
 		}
 		return validLength;
 	}
@@ -407,7 +407,7 @@ public class SeekableCOSParser extends SeekableBaseParser {
 		skipSpaces();
 
 		byte eolCount = 0;
-		long approximateLength = source.getOffset() - streamStartOffset;
+		long approximateLength = getSource().getOffset() - streamStartOffset;
 		long expected = expectedLength == null ? 0 : expectedLength;
 		long diff = approximateLength - expected;
 
