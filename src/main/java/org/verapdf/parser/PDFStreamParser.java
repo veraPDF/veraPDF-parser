@@ -54,7 +54,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 
 	public PDFStreamParser(ASInputStream stream) throws IOException {
 		super(stream);
-		initializeToken();
+		getBaseParser().initializeToken();
 	}
 
 	public void parseTokens() throws IOException {
@@ -125,8 +125,8 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	public Object parseNextToken() throws IOException {
 		Object result = null;
 
-		skipSpaces(true);
-		int nextByte = source.peek();
+		getBaseParser().skipSpaces(true);
+		int nextByte = getSource().peek();
 		if (nextByte == -1) {
 			return null;
 		}
@@ -135,20 +135,20 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 
 		switch (c) {
 			case '(':
-                nextToken();
-                result = COSString.construct(getToken().getByteValue());
+                getBaseParser().nextToken();
+                result = COSString.construct(getBaseParser().getToken().getByteValue());
                 break;
             case '<': {
 				//check brackets
-				source.readByte();
-				c = source.peek();
-				source.unread();
+				getSource().readByte();
+				c = getSource().peek();
+				getSource().unread();
 
 				if (c == '<') {
 					result = getDictionary();
 				} else {
-					nextToken();
-					Token token = getToken();
+					getBaseParser().nextToken();
+					Token token = getBaseParser().getToken();
 					result = COSString.construct(token.getByteValue(), true, token.getHexCount(), token.isContainsOnlyHex());
 				}
 				break;
@@ -163,7 +163,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 				break;
 			case 'n': {
 				// null
-				String nullString = readUntilDelimiter();
+				String nullString = getBaseParser().readUntilDelimiter();
 				if (nullString.equals("null")) {
 					result = new COSObject(COSNull.NULL);
 				} else {
@@ -173,7 +173,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			}
 			case 't':
 			case 'f': {
-				String line = readUntilDelimiter();
+				String line = getBaseParser().readUntilDelimiter();
 				if (line.equals("true")) {
 					result = new COSObject(COSBoolean.TRUE);
 					break;
@@ -196,8 +196,8 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			case '8':
 			case '9':
 			case '-': {
-				Token token = getToken();
-				nextToken();
+				Token token = getBaseParser().getToken();
+				getBaseParser().nextToken();
 				if (token.type.equals(Token.Type.TT_REAL)) {
 					result = COSReal.construct(token.real);
 				} else if (token.type.equals(Token.Type.TT_INTEGER)) {
@@ -207,8 +207,8 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			}
 			// BI operator
 			case 'B': {
-				Token token = getToken();
-				nextToken();
+				Token token = getBaseParser().getToken();
+				getBaseParser().nextToken();
 				result = Operator.getOperator(token.getValue());
 				if (result instanceof InlineImageOperator) {
 					InlineImageOperator imageOperator = (InlineImageOperator) result;
@@ -239,12 +239,12 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			// ID operator
 			case 'I': {
 				//looking for an ID operator
-				if (source.readByte() != 'I' || source.readByte() != 'D') {
+				if (getSource().readByte() != 'I' || getSource().readByte() != 'D') {
 					//TODO : change
 					throw new IOException("Corrupted inline image operator");
 				}
-				if (CharTable.isSpace(source.peek())) {
-					source.readByte();
+				if (CharTable.isSpace(getSource().peek())) {
+					getSource().readByte();
 				}
 				ASInputStream imageDataStream = readInlineImage();
 				result = Operator.getOperator("ID");
@@ -266,25 +266,25 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	}
 
 	protected String nextOperator() throws IOException {
-		skipSpaces();
+		getBaseParser().skipSpaces();
 
 		//maximum possible length of an operator is 3 and we'll leave some space for invalid cases
 		StringBuilder buffer = new StringBuilder(5);
-		int nextByte = source.peek();
-		while (!source.isEOF() &&
+		int nextByte = getSource().peek();
+		while (!getSource().isEOF() &&
 				!CharTable.isSpace(nextByte) && nextByte != ']' &&
 				nextByte != '[' && nextByte != '<' &&
 				nextByte != '(' && nextByte != '/' &&
 				(nextByte < '0' || nextByte > '9'))	{
-			byte currentByte = source.readByte();
+			byte currentByte = getSource().readByte();
 			buffer.append((char) currentByte);
 
-			if (!source.isEOF()) {
+			if (!getSource().isEOF()) {
 				// d0 and d1 operators
-				nextByte = source.peek();
+				nextByte = getSource().peek();
 				if (currentByte == 'd' && (nextByte == '0' || nextByte == '1')) {
-					buffer.append((char) source.readByte());
-					nextByte = source.peek();
+					buffer.append((char) getSource().readByte());
+					nextByte = getSource().peek();
 				}
 			}
 		}
@@ -296,11 +296,11 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		getSource().resetReadCounter();
 		Long l = this.lastInlineImageDict == null ? Long.valueOf(0) : PDInlineImage.getInlineImageKey(lastInlineImageDict, ASAtom.LENGTH).getInteger();
 		ArrayList<Byte> image = new ArrayList<>(INLINE_IMAGE_BUFFER_SIZE);
-		byte previousByte = source.readByte();
-		byte currentByte = source.readByte();
+		byte previousByte = getSource().readByte();
+		byte currentByte = getSource().readByte();
 		boolean imageEndFound = false;
-		while (!(this.source.isEOF())) {
-			if (previousByte == 'E' && currentByte == 'I' && isSourceAfterImage(l) && CharTable.isSpace(source.peek())) {
+		while (!(this.getSource().isEOF())) {
+			if (previousByte == 'E' && currentByte == 'I' && isSourceAfterImage(l) && CharTable.isSpace(getSource().peek())) {
 				if (checkInlineImage()) {
 					imageEndFound = true;
 					break;
@@ -310,7 +310,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
             }
 			image.add(previousByte);
 			previousByte = currentByte;
-			currentByte = source.readByte();
+			currentByte = getSource().readByte();
 		}
 		if (previousByte == 'E' && currentByte == 'I') {
 			imageEndFound = true;
@@ -332,7 +332,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		} catch (IOException e) {
 			return false;
 		} finally {
-			source.unread(getSource().getReadCounter() - readCounter);
+			getSource().unread(getSource().getReadCounter() - readCounter);
 		}
 		return true;
 	}

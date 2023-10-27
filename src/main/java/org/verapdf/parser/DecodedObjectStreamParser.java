@@ -68,12 +68,12 @@ public class DecodedObjectStreamParser extends SeekableCOSParser {
         for (int i = 0; i < n; ++i) {
             Long objNum;
             Long objOffset;
-            skipSpaces(false);
-            readNumber();
-            objNum = getToken().integer;
-            skipSpaces(false);
-            readNumber();
-            objOffset = getToken().integer;
+            getBaseParser().skipSpaces(false);
+            getBaseParser().readNumber();
+            objNum = getBaseParser().getToken().integer;
+            getBaseParser().skipSpaces(false);
+            getBaseParser().readNumber();
+            objOffset = getBaseParser().getToken().integer;
             internalOffsets.put(objNum.intValue(), objOffset + first);
         }
     }

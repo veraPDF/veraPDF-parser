@@ -33,15 +33,13 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
-public class SeekableCOSParser extends SeekableBaseParser {
+public class SeekableCOSParser extends COSParser {
 
 	private static final Logger LOGGER = Logger.getLogger(SeekableCOSParser.class.getCanonicalName());
 
@@ -50,23 +48,16 @@ public class SeekableCOSParser extends SeekableBaseParser {
 	 */
 	protected final int LINEARIZATION_DICTIONARY_LOOKUP_SIZE = 1024;
 
-	protected COSDocument document;
-	protected Queue<COSObject> objects = new LinkedList<>();
-	protected Queue<Long> integers = new LinkedList<>();
-    protected COSKey keyOfCurrentObject;
-
-	protected boolean flag = true;
-
 	public SeekableCOSParser(final SeekableInputStream seekableInputStream) throws IOException {
-		super(seekableInputStream);
+		super(new SeekableBaseParser(seekableInputStream));
 	}
 
 	public SeekableCOSParser(final String filename) throws IOException {
-		super(filename);
+		super(new SeekableBaseParser(filename));
 	}
 
 	public SeekableCOSParser(final InputStream fileStream) throws IOException {
-		super(fileStream);
+		super(new SeekableBaseParser(fileStream));
 	}
 
 	public SeekableCOSParser(final COSDocument document, final String filename) throws IOException { //tmp ??
@@ -79,159 +70,13 @@ public class SeekableCOSParser extends SeekableBaseParser {
 		this.document = document;
 	}
 
-	public COSObject nextObject() throws IOException {
-		if (!this.objects.isEmpty()) {
-			COSObject result = this.objects.peek();
-			this.objects.remove();
-			return result;
-		}
-
-		if (this.flag) {
-			initializeToken();
-			nextToken();
-		}
-		this.flag = true;
-
-		final Token token = getToken();
-
-		if (token.type == Token.Type.TT_INTEGER) {  // looking for indirect reference
-			this.integers.add(Long.valueOf(token.integer));
-			if (this.integers.size() == 3) {
-				COSObject result = COSInteger.construct(this.integers.peek().longValue());
-				this.integers.remove();
-				return result;
-			}
-			return nextObject();
-		}
-
-		if (token.type == Token.Type.TT_KEYWORD
-				&& token.keyword == Token.Keyword.KW_R
-				&& this.integers.size() == 2) {
-			final int number = this.integers.peek().intValue();
-			this.integers.remove();
-			final int generation = this.integers.peek().intValue();
-			this.integers.remove();
-			return COSIndirect.construct(new COSKey(number, generation), document);
-		}
-
-		if (!this.integers.isEmpty()) {
-			COSObject result = COSInteger.construct(this.integers.peek().longValue());
-			this.integers.remove();
-			while (!this.integers.isEmpty()) {
-				this.objects.add(COSInteger.construct(this.integers.peek().longValue()));
-				this.integers.remove();
-			}
-			this.flag = false;
-			return result;
-		}
-
-		switch (token.type) {
-			case TT_NONE:
-				break;
-			case TT_KEYWORD: {
-				if (token.keyword == null) {
-					break;
-				}
-				switch (token.keyword) {
-					case KW_NONE:
-						break;
-					case KW_NULL:
-						return COSNull.construct();
-					case KW_TRUE:
-						return COSBoolean.construct(true);
-					case KW_FALSE:
-						return COSBoolean.construct(false);
-					case KW_STREAM:
-					case KW_ENDSTREAM:
-					case KW_OBJ:
-					case KW_ENDOBJ:
-					case KW_R:
-					case KW_N:
-					case KW_F:
-					case KW_XREF:
-					case KW_STARTXREF:
-					case KW_TRAILER:
-						break;
-				}
-				break;
-			}
-			case TT_INTEGER: //should not enter here
-				break;
-			case TT_REAL:
-				return COSReal.construct(token.real);
-			case TT_LITSTRING:
-				return COSString.construct(token.getByteValue());
-			case TT_HEXSTRING:
-				COSObject res = COSString.construct(token.getByteValue(), true,
-						token.getHexCount().longValue(), token.isContainsOnlyHex());
-				if (this.document == null || !this.document.isEncrypted()) {
-					return res;
-				}
-			return this.decryptCOSString(res);
-			case TT_NAME:
-				return COSName.construct(token.getValue());
-			case TT_OPENARRAY:
-				this.flag = false;
-				return getArray();
-			case TT_CLOSEARRAY:
-				return new COSObject();
-			case TT_OPENDICT:
-				this.flag = false;
-				return getDictionary();
-			case TT_CLOSEDICT:
-				return new COSObject();
-			case TT_EOF:
-				return new COSObject();
-		}
-		return new COSObject();
-	}
-
-	protected COSObject getArray() throws IOException {
-		if (this.flag) {
-			nextToken();
-		}
-		this.flag = true;
-
-		final Token token = getToken();
-		if (token.type != Token.Type.TT_OPENARRAY) {
-			return new COSObject();
-		}
-
-		COSObject arr = COSArray.construct();
-
-		COSObject obj = nextObject();
-		while (!obj.empty()) {
-			arr.add(obj);
-			obj = nextObject();
-		}
-
-		if (token.type != Token.Type.TT_CLOSEARRAY) {
-			// TODO : replace with ASException
-			throw new IOException(getErrorMessage(StringExceptions.INVALID_PDF_ARRAY));
-		}
-
-		return arr;
-	}
-
-	protected COSObject getName() throws IOException {
-		if (this.flag) {
-			nextToken();
-		}
-		this.flag = true;
-
-		final Token token = getToken();
-		if (token.type != Token.Type.TT_NAME) {
-			return new COSObject();
-		}
-		return COSName.construct(token.getValue());
-	}
-
+	@Override
 	protected COSObject getDictionary() throws IOException {
 		if (this.flag) {
-			nextToken();
+			getBaseParser().nextToken();
 		}
 		this.flag = true;
-		final Token token = getToken();
+		final Token token = getBaseParser().getToken();
 
 		if (token.type != Token.Type.TT_OPENDICT) {
 			return new COSObject();
@@ -256,7 +101,7 @@ public class SeekableCOSParser extends SeekableBaseParser {
 
 		long reset = this.getSource().getOffset();
 		if (this.flag) {
-			nextToken();
+			getBaseParser().nextToken();
 		}
 		this.flag = false;
 
@@ -272,11 +117,11 @@ public class SeekableCOSParser extends SeekableBaseParser {
 
 	protected COSObject getStream(COSObject dict) throws IOException {
 		if (this.flag) {
-			nextToken();
+			getBaseParser().nextToken();
 		}
 		this.flag = true;
 
-		final Token token = getToken();
+		final Token token = getBaseParser().getToken();
 
 		if (token.type != Token.Type.TT_KEYWORD ||
 				token.keyword != Token.Keyword.KW_STREAM) {
@@ -299,7 +144,7 @@ public class SeekableCOSParser extends SeekableBaseParser {
 
 		if (streamLengthValid) {
 			dict.setRealStreamSize(size);
-			ASInputStream stm = super.getRandomAccess(size);
+			ASInputStream stm = getBaseParser().getRandomAccess(size);
 			dict.setData(stm);
 			if (stm instanceof InternalInputStream) {
 				this.document.addFileResource(new ASFileStreamCloser(stm));
@@ -311,20 +156,20 @@ public class SeekableCOSParser extends SeekableBaseParser {
 			byte[] buffer = new byte[bufferLength];
 			int eolLength = 0;
 			boolean isPrevCR = false;
-			while (realStreamSize == -1 && !source.isEOF()) {
+			while (realStreamSize == -1 && !getSource().isEOF()) {
 				long bytesRead = getSource().read(buffer, bufferLength);
 				for (int i = 0; i < bytesRead; i++) {
 					if (buffer[i] == 101) {
 						long reset = getSource().getOffset();
 						long possibleEndStreamOffset = reset - bytesRead + i - eolLength;
 						getSource().seek(possibleEndStreamOffset);
-						nextToken();
+						getBaseParser().nextToken();
 						if (token.type == Token.Type.TT_KEYWORD &&
 								token.keyword == Token.Keyword.KW_ENDSTREAM) {
 							realStreamSize = possibleEndStreamOffset - streamStartOffset;
 							dict.setRealStreamSize(realStreamSize);
 							getSource().seek(streamStartOffset);
-							ASInputStream stm = super.getRandomAccess(realStreamSize);
+							ASInputStream stm = getBaseParser().getRandomAccess(realStreamSize);
 							dict.setData(stm);
 							getSource().seek(possibleEndStreamOffset);
 							if (stm instanceof InternalInputStream) {
@@ -336,12 +181,12 @@ public class SeekableCOSParser extends SeekableBaseParser {
 					}
 
 					//we need to subtract eol before endstream length from stream length
-					if (isCR(buffer[i])) {
+					if (BaseParser.isCR(buffer[i])) {
 						// if current byte is CR, then this is the 1st byte of eol
 						eolLength = 1;
 						isPrevCR = true;
 					} else {
-						if (isLF(buffer[i])) {
+						if (BaseParser.isLF(buffer[i])) {
 							eolLength = isPrevCR ? 2 : 1;
 						} else {
 							eolLength = 0;
@@ -362,17 +207,17 @@ public class SeekableCOSParser extends SeekableBaseParser {
 
 
 	private void checkStreamSpacings(COSObject stream) throws IOException {
-		byte whiteSpace = source.readByte();
-		if (isCR(whiteSpace)) {
-			whiteSpace = source.readByte();
-			if (!isLF(whiteSpace)) {
+		byte whiteSpace = getSource().readByte();
+		if (BaseParser.isCR(whiteSpace)) {
+			whiteSpace = getSource().readByte();
+			if (!BaseParser.isLF(whiteSpace)) {
 				stream.setStreamKeywordCRLFCompliant(false);
-				source.unread();
+				getSource().unread();
 			}
-		} else if (!isLF(whiteSpace)) {
+		} else if (!BaseParser.isLF(whiteSpace)) {
 			LOGGER.log(Level.WARNING, getErrorMessage("Stream has no EOL marker"));
 			stream.setStreamKeywordCRLFCompliant(false);
-			source.unread();
+			getSource().unread();
 		}
 	}
 
@@ -390,8 +235,8 @@ public class SeekableCOSParser extends SeekableBaseParser {
 		} else {
 			getSource().seek(expectedEndstreamOffset);
 
-			nextToken();
-			final Token token = getToken();
+			getBaseParser().nextToken();
+			final Token token = getBaseParser().getToken();
 			if (token.type != Token.Type.TT_KEYWORD ||
 					token.keyword != Token.Keyword.KW_ENDSTREAM) {
 				validLength = false;
@@ -404,16 +249,16 @@ public class SeekableCOSParser extends SeekableBaseParser {
 	}
 
 	private void checkEndstreamSpacings(COSObject stream, long streamStartOffset, Long expectedLength) throws IOException {
-		skipSpaces();
+		getBaseParser().skipSpaces();
 
 		byte eolCount = 0;
 		long approximateLength = getSource().getOffset() - streamStartOffset;
 		long expected = expectedLength == null ? 0 : expectedLength;
 		long diff = approximateLength - expected;
 
-		source.unread(2);
-		int firstSymbol = source.readByte();
-		int secondSymbol = source.readByte();
+		getSource().unread(2);
+		int firstSymbol = getSource().readByte();
+		int secondSymbol = getSource().readByte();
 		if (secondSymbol == 10) {
 			if (firstSymbol == 13) {
 				eolCount = (byte) (diff > 1 ? 2 : 1);
@@ -428,7 +273,7 @@ public class SeekableCOSParser extends SeekableBaseParser {
 		}
 
 		stream.setRealStreamSize(approximateLength - eolCount);
-		nextToken();
+		getBaseParser().nextToken();
 	}
 
 	public COSDocument getDocument() {
@@ -447,11 +292,28 @@ public class SeekableCOSParser extends SeekableBaseParser {
         }
 	}
 
-	@Override
+	protected String getErrorMessage(String message) {
+		return getBaseParser().getErrorMessage(message);
+	}
+
 	protected String getErrorMessage(String message, long offset) {
 		if (keyOfCurrentObject != null) {
 			return message + "(object key = " + keyOfCurrentObject + ", offset = " + offset + ")";
 		}
-		return super.getErrorMessage(message, offset);
+		return getBaseParser().getErrorMessage(message, offset);
+	}
+
+	@Override
+	public SeekableBaseParser getBaseParser() {
+		return (SeekableBaseParser) super.getBaseParser();
+	}
+
+	@Override
+	public SeekableInputStream getSource() {
+		return getBaseParser().getSource();
+	}
+
+	public void closeInputStream() throws IOException {
+		getBaseParser().closeInputStream();
 	}
 }

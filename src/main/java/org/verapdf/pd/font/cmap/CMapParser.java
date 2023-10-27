@@ -56,7 +56,7 @@ public class CMapParser extends PSParser {
      * {@inheritDoc}
      */
     public CMapParser(ASInputStream fileStream) throws IOException {
-        super(fileStream);
+        super(new CMapBaseParser(fileStream));
         cMap = new CMap();
     }
 
@@ -72,15 +72,15 @@ public class CMapParser extends PSParser {
      */
     public void parse() throws IOException, PostScriptException {
         try {
-            initializeToken();
+            getBaseParser().initializeToken();
             //Skipping starting comments
-            skipSpaces(true);
-            while (getToken().type != Token.Type.TT_EOF) {
+            getBaseParser().skipSpaces(true);
+            while (getBaseParser().getToken().type != Token.Type.TT_EOF) {
                 COSObject nextObject = nextObject();
                 processObject(nextObject);
             }
         } finally {
-            this.source.close();    // We close stream after first reading attempt
+            this.getSource().close();    // We close stream after first reading attempt
         }
         setValuesFromUserDict(this.cMap);
     }
@@ -88,17 +88,17 @@ public class CMapParser extends PSParser {
     private void processObject(COSObject object) throws IOException, PostScriptException {
         switch (object.getType()) {
             case COS_INTEGER:
-                int listLength = (int) getToken().integer;
+                int listLength = (int) getBaseParser().getToken().integer;
                 COSObject nextObject = nextObject();
-                if (getToken().type != Token.Type.TT_KEYWORD ||
-                        !processList(listLength, getToken().getValue())) {
+                if (getBaseParser().getToken().type != Token.Type.TT_KEYWORD ||
+                        !processList(listLength, getBaseParser().getToken().getValue())) {
                     PSObject.getPSObject(object).execute(operandStack, userDict);
                     PSObject.getPSObject(nextObject).execute(operandStack, userDict);
                     break;
                 }
                 break;
             case COS_NAME:
-                if (getToken().getValue().equals("usecmap")) {
+                if (getBaseParser().getToken().getValue().equals("usecmap")) {
                     CMap usedCMap = new PDCMap(lastCOSName).getCMapFile();
                     if (usedCMap != null) {
                         this.cMap.useCMap(usedCMap);
@@ -148,21 +148,21 @@ public class CMapParser extends PSParser {
                     return false;
             }
         }
-        nextToken();
-        if (!getToken().getValue().equals("end" + key)) {
+        getBaseParser().nextToken();
+        if (!getBaseParser().getToken().getValue().equals("end" + key)) {
             LOGGER.log(Level.FINE, "Unexpected end of " + key + " in CMap");
         }
         return true;
     }
 
     private void readLineCodeSpaceRange() throws IOException {
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "codespacerange list");
-        byte[] begin = getToken().getByteValue();
+        byte[] begin = getBaseParser().getToken().getByteValue();
 
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "codespacerange list");
-        byte[] end = getToken().getByteValue();
+        byte[] end = getBaseParser().getToken().getByteValue();
 
         CodeSpace codeSpace = new CodeSpace(begin, end);
 
@@ -184,86 +184,86 @@ public class CMapParser extends PSParser {
     }
 
     private void readLineCIDRange() throws IOException {
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "cidrange list");
-        long cidRangeStart = numberFromBytes(getToken().getByteValue());
+        long cidRangeStart = numberFromBytes(getBaseParser().getToken().getByteValue());
 
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "cidrange list");
-        long cidRangeEnd = numberFromBytes(getToken().getByteValue());
+        long cidRangeEnd = numberFromBytes(getBaseParser().getToken().getByteValue());
 
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "cidrange list");
         this.cMap.addCidInterval(new CIDInterval((int) cidRangeStart,
-                (int) cidRangeEnd, (int) getToken().integer));
+                (int) cidRangeEnd, (int) getBaseParser().getToken().integer));
     }
 
     private void readLineNotDefRange() throws IOException {
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "notdef list");
-        long notDefRangeStart = numberFromBytes(getToken().getByteValue());
+        long notDefRangeStart = numberFromBytes(getBaseParser().getToken().getByteValue());
 
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "notdef list");
-        long notDefRangeEnd = numberFromBytes(getToken().getByteValue());
+        long notDefRangeEnd = numberFromBytes(getBaseParser().getToken().getByteValue());
 
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "notdef list");
         this.cMap.addNotDefInterval(new NotDefInterval((int) notDefRangeStart,
-                (int) notDefRangeEnd, (int) getToken().integer));
+                (int) notDefRangeEnd, (int) getBaseParser().getToken().integer));
     }
 
     private void readSingleCharMapping() throws IOException {
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "cidchar");
-        long charCode = numberFromBytes(getToken().getByteValue());
+        long charCode = numberFromBytes(getBaseParser().getToken().getByteValue());
 
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "cidchar");
         this.cMap.addSingleCidMapping(new SingleCIDMapping((int) charCode,
-                (int) getToken().integer));
+                (int) getBaseParser().getToken().integer));
     }
 
     private void readSingleNotDefMapping() throws IOException {
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "notdefchar");
-        long notDefCharCode = numberFromBytes(getToken().getByteValue());
+        long notDefCharCode = numberFromBytes(getBaseParser().getToken().getByteValue());
 
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_INTEGER, "notdefchar");
         this.cMap.addSingleNotDefMapping(new SingleCIDMapping((int) notDefCharCode,
-                (int) getToken().integer));
+                (int) getBaseParser().getToken().integer));
     }
 
     private void readSingleToUnicodeMapping() throws IOException {
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "bfchar");
-        long bfCharCode = numberFromBytes(getToken().getByteValue());
+        long bfCharCode = numberFromBytes(getBaseParser().getToken().getByteValue());
 
         String unicodeName = this.readStringFromUnicodeSequenceToken();
         this.cMap.addUnicodeMapping((int) bfCharCode, unicodeName);
     }
 
     private void readLineBFRange() throws IOException {
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "bfrange");
-        byte[] rangeBegin = getToken().getByteValue();
+        byte[] rangeBegin = getBaseParser().getToken().getByteValue();
         long bfRangeBegin = numberFromBytes(rangeBegin);
 
-        nextToken();
+        getBaseParser().nextToken();
         checkTokenType(Token.Type.TT_HEXSTRING, "bfrange");
-        long bfRangeEnd = getBfrangeEndFromBytes(getToken().getByteValue(), rangeBegin);
+        long bfRangeEnd = getBfrangeEndFromBytes(getBaseParser().getToken().getByteValue(), rangeBegin);
 
-        nextToken();    // skip [
-        if (getToken().type == Token.Type.TT_OPENARRAY) {
+        getBaseParser().nextToken();    // skip [
+        if (getBaseParser().getToken().type == Token.Type.TT_OPENARRAY) {
 
             for (long i = bfRangeBegin; i <= bfRangeEnd; ++i) {
                 this.cMap.addUnicodeMapping((int) i, readStringFromUnicodeSequenceToken());
             }
 
-            nextToken();    // skip ]
+            getBaseParser().nextToken();    // skip ]
         } else {
-            byte[] token = getToken().getByteValue();
+            byte[] token = getBaseParser().getToken().getByteValue();
             if (token.length == 0) {
                 LOGGER.log(Level.WARNING, "Incorrect bfrange in toUnicode CMap: " +
                         "string is empty.");
@@ -275,7 +275,7 @@ public class CMapParser extends PSParser {
                         "the last byte of the string incremented past 255.");
             }
             this.cMap.addUnicodeInterval(new ToUnicodeInterval(bfRangeBegin, bfRangeEnd,
-                    getToken().getByteValue()));
+                    getBaseParser().getToken().getByteValue()));
         }
     }
 
@@ -312,11 +312,11 @@ public class CMapParser extends PSParser {
     }
 
     private String readStringFromUnicodeSequenceToken() throws IOException {
-        nextToken();
-        if (getToken().type == Token.Type.TT_NAME) {
-            return this.getToken().getValue();
-        } else if (getToken().type == Token.Type.TT_HEXSTRING) {
-            byte[] token = getToken().getByteValue();
+        getBaseParser().nextToken();
+        if (getBaseParser().getToken().type == Token.Type.TT_NAME) {
+            return this.getBaseParser().getToken().getValue();
+        } else if (getBaseParser().getToken().type == Token.Type.TT_HEXSTRING) {
+            byte[] token = getBaseParser().getToken().getByteValue();
             if (token.length == 1) {
                 return new String(token, StandardCharsets.ISO_8859_1);
             }
@@ -326,19 +326,14 @@ public class CMapParser extends PSParser {
             return new String(token, StandardCharsets.UTF_16BE);
         }
         throw new IOException("CMap contains invalid entry in bfchar. Expected "
-                + Token.Type.TT_NAME + " or " + Token.Type.TT_HEXSTRING + " but got " + getToken().type);
+                + Token.Type.TT_NAME + " or " + Token.Type.TT_HEXSTRING + " but got " + getBaseParser().getToken().type);
     }
 
     private void checkTokenType(Token.Type type, String where) throws IOException {
-        if (getToken().type != type) {
+        if (getBaseParser().getToken().type != type) {
             throw new IOException("CMap contains invalid entry in " + where +
-                    ". Expected " + type + " but got " + getToken().type);
+                    ". Expected " + type + " but got " + getBaseParser().getToken().type);
         }
-    }
-
-    @Override
-    protected boolean isEndOfComment(byte ch) {
-        return isCR(ch) || isFF(ch);
     }
 
     private void setValuesFromUserDict(CMap cMap) {

@@ -26,11 +26,11 @@ public abstract class BaseParser {
 
     protected BaseParserInputStream source;
 
-    protected Token getToken() {
+    public Token getToken() {
         return this.token;
     }
 
-    protected void initializeToken() {
+    public void initializeToken() {
         if (this.token == null) {
             this.token = new Token();
         }
@@ -110,11 +110,11 @@ public abstract class BaseParser {
         return CharTable.ASCII_LF == c;
     }
 
-    protected static boolean isCR(int c) {
+    public static boolean isCR(int c) {
         return CharTable.ASCII_CR == c;
     }
 
-    protected static boolean isFF(int c) {
+    public static boolean isFF(int c) {
         return CharTable.ASCII_FF == c;
     }
 
@@ -134,7 +134,7 @@ public abstract class BaseParser {
         }
     }
 
-    protected void nextToken() throws IOException {
+    public void nextToken() throws IOException {
         skipSpaces(true);
         if (this.source.isEOF()) {
             this.token.type = Token.Type.TT_EOF;
@@ -520,5 +520,9 @@ public abstract class BaseParser {
 
     protected BaseParserInputStream getSource() {
         return source;
+    }
+    
+    protected boolean isPSParser() {
+        return isPSParser;
     }
 }
