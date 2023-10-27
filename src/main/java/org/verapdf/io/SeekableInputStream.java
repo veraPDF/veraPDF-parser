@@ -24,6 +24,7 @@ import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.exceptions.VeraPDFParserException;
+import org.verapdf.parser.BaseParserInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +36,7 @@ import java.io.InputStream;
  *
  * @author Sergey Shemyakov
  */
-public abstract class SeekableInputStream extends ASInputStream {
+public abstract class SeekableInputStream extends ASInputStream implements BaseParserInputStream {
 
     private static final int MAX_BUFFER_SIZE = 10240;
 

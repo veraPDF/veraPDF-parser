@@ -293,7 +293,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	}
 
 	private ASInputStream readInlineImage() throws IOException {
-		source.resetReadCounter();
+		getSource().resetReadCounter();
 		Long l = this.lastInlineImageDict == null ? Long.valueOf(0) : PDInlineImage.getInlineImageKey(lastInlineImageDict, ASAtom.LENGTH).getInteger();
 		ArrayList<Byte> image = new ArrayList<>(INLINE_IMAGE_BUFFER_SIZE);
 		byte previousByte = source.readByte();
@@ -319,11 +319,11 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			LOGGER.log(Level.WARNING, "End of inline image not found");
 		}
 		return new ASMemoryInStream(getByteArrayFromArrayList(image),
-				source.getReadCounter(), false);
+				getSource().getReadCounter(), false);
 	}
 
 	private boolean checkInlineImage() throws IOException {
-		int readCounter = source.getReadCounter();
+		int readCounter = getSource().getReadCounter();
 		try {
 			Object token = parseNextToken();
 			if (token instanceof Operator && !Operators.operators.contains(((Operator)token).getOperator())) {
@@ -332,13 +332,13 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		} catch (IOException e) {
 			return false;
 		} finally {
-			source.unread(source.getReadCounter() - readCounter);
+			source.unread(getSource().getReadCounter() - readCounter);
 		}
 		return true;
 	}
 
 	private boolean isSourceAfterImage(Long length) {
-		 return length == null || source.getReadCounter() >= length;
+		 return length == null || getSource().getReadCounter() >= length;
 	}
 
 	public List<Closeable> getImageDataStreams() {
