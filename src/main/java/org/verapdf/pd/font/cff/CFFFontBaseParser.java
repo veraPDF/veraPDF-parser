@@ -80,7 +80,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
 
     protected void readTopDictUnit() throws IOException {
         try {
-            int next = this.source.peek() & 0xFF;
+            int next = this.source.peek();
             if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
                 this.stack.add(readNumber());
             } else {
@@ -152,7 +152,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     }
 
     protected void readPrivateDictUnit() throws IOException {
-        int next = this.source.peek() & 0xFF;
+        int next = this.source.peek();
         if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
             this.stack.add(readNumber());
         } else {

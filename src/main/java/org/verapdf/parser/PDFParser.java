@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 /**
  * @author Timur Kamalov
  */
-public class PDFParser extends COSParser {
+public class PDFParser extends SeekableCOSParser {
 
     private static final Logger LOGGER = Logger.getLogger(PDFParser.class.getCanonicalName());
 

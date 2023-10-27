@@ -126,12 +126,12 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		Object result = null;
 
 		skipSpaces(true);
-		byte nextByte = source.peek();
+		int nextByte = source.peek();
 		if (nextByte == -1) {
 			return null;
 		}
 
-		byte c = nextByte;
+		int c = nextByte;
 
 		switch (c) {
 			case '(':
@@ -270,7 +270,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 
 		//maximum possible length of an operator is 3 and we'll leave some space for invalid cases
 		StringBuilder buffer = new StringBuilder(5);
-		byte nextByte = source.peek();
+		int nextByte = source.peek();
 		while (!source.isEOF() &&
 				!CharTable.isSpace(nextByte) && nextByte != ']' &&
 				nextByte != '[' && nextByte != '<' &&

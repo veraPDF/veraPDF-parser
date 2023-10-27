@@ -296,7 +296,7 @@ public class NotSeekableBaseParser implements Closeable {
         return isDigit(this.source.peek());
     }
 
-    protected static boolean isDigit(byte c) {
+    protected static boolean isDigit(int c) {
         return c >= ASCII_ZERO && c <= ASCII_NINE;
     }
 

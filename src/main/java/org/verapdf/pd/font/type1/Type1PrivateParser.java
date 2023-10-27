@@ -24,7 +24,7 @@ import org.verapdf.as.CharTable;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSKey;
-import org.verapdf.parser.BaseParser;
+import org.verapdf.parser.SeekableBaseParser;
 import org.verapdf.parser.Token;
 import org.verapdf.pd.font.CFFNumber;
 
@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  *
  * @author Sergey Shemyakov
  */
-class Type1PrivateParser extends BaseParser {
+class Type1PrivateParser extends SeekableBaseParser {
 
     private static final Logger LOGGER = Logger.getLogger(Type1PrivateParser.class.getCanonicalName());
 

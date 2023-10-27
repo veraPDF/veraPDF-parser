@@ -39,9 +39,9 @@ import static org.verapdf.as.CharTable.*;
 /**
  * @author Timur Kamalov
  */
-public class BaseParser {
+public class SeekableBaseParser {
 
-	private static final Logger LOGGER = Logger.getLogger(BaseParser.class.getCanonicalName());
+	private static final Logger LOGGER = Logger.getLogger(SeekableBaseParser.class.getCanonicalName());
 
 	private static final byte ASCII_ZERO = 48;
 	private static final byte ASCII_NINE = 57;
@@ -49,21 +49,21 @@ public class BaseParser {
 	protected SeekableInputStream source;
 	private Token token;
 
-	public BaseParser(SeekableInputStream stream) throws IOException {
+	public SeekableBaseParser(SeekableInputStream stream) throws IOException {
 		if (stream == null) {
 			throw new IOException("Can't create SeekableStream, passed seekableStream is null");
 		}
 		this.source = stream;
 	}
 
-	public BaseParser(String fileName) throws IOException {
+	public SeekableBaseParser(String fileName) throws IOException {
 		if (fileName == null) {
 			throw new FileNotFoundException("Can't create SeekableStream from file, filename is null");
 		}
 		this.source = new InternalInputStream(fileName);
 	}
 
-	public BaseParser(InputStream fileStream) throws IOException {
+	public SeekableBaseParser(InputStream fileStream) throws IOException {
 		if (fileStream == null) {
 			throw new IOException("Can't create SeekableStream, fileStream is null");
 		}

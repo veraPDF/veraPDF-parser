@@ -24,7 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.*;
-import org.verapdf.parser.COSParser;
+import org.verapdf.parser.SeekableCOSParser;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDFontDescriptor;
@@ -97,7 +97,7 @@ public class PDType1Font extends PDSimpleFont {
                 ASMemoryInStream stream =
                         new ASMemoryInStream(descriptorCharSetString.getBytes(StandardCharsets.ISO_8859_1));
                 Set<String> descriptorCharSet = new TreeSet<>();
-                COSParser parser = new COSParser(stream);
+                SeekableCOSParser parser = new SeekableCOSParser(stream);
                 COSObject glyphName = parser.nextObject();
                 while (!glyphName.empty()) {
                     if (glyphName.getType() == COSObjType.COS_NAME) {
