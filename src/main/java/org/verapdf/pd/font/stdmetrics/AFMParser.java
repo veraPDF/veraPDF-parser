@@ -21,7 +21,7 @@
 package org.verapdf.pd.font.stdmetrics;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.parser.BaseParser;
+import org.verapdf.parser.SeekableBaseParser;
 import org.verapdf.parser.Token;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.io.IOException;
  *
  * @author Sergey Shemyakov
  */
-public class AFMParser extends BaseParser {
+public class AFMParser extends SeekableBaseParser {
 
     private static final String START_CHAR_METRICS_STRING = "StartCharMetrics";
     private static final String FONT_NAME_STRING = "FontName";

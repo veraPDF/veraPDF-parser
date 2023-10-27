@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-public class DecodedObjectStreamParser extends COSParser {
+public class DecodedObjectStreamParser extends SeekableCOSParser {
 
     private COSStream objectStream;
     private Map<Integer, Long> internalOffsets;

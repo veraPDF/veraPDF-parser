@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FunctionParser extends BaseParser {
+public class FunctionParser extends SeekableBaseParser {
 
     private static final Logger LOGGER = Logger.getLogger(FunctionParser.class.getCanonicalName());
 

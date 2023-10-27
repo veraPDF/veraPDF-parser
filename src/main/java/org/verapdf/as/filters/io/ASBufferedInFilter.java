@@ -324,11 +324,11 @@ public class ASBufferedInFilter extends ASInFilter {
         return skipped;
     }
 
-    public byte peek() throws IOException {
+    public int peek() throws IOException {
         return peek(0);
     }
 
-    public byte peek(int i) throws IOException {
+    public int peek(int i) throws IOException {
         int index = pos + i;
         if (index > buffer.length || index < 0) {
             throw new IOException("Can't peek at index " + index + " in buffer in ASBufferingInputStream.");
@@ -336,7 +336,7 @@ public class ASBufferedInFilter extends ASInFilter {
         if (eod != -1 && index >= eod) {
             return -1;
         }
-        return this.buffer[index];
+        return this.buffer[index] & 0xFF;
     }
 
     public void unread() throws IOException {

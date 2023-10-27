@@ -41,9 +41,9 @@ import java.util.logging.Logger;
 /**
  * @author Timur Kamalov
  */
-public class COSParser extends BaseParser {
+public class SeekableCOSParser extends SeekableBaseParser {
 
-	private static final Logger LOGGER = Logger.getLogger(COSParser.class.getCanonicalName());
+	private static final Logger LOGGER = Logger.getLogger(SeekableCOSParser.class.getCanonicalName());
 
 	/**
 	 * Linearization dictionary must be in first 1024 bytes of document
@@ -57,24 +57,24 @@ public class COSParser extends BaseParser {
 
 	protected boolean flag = true;
 
-	public COSParser(final SeekableInputStream seekableInputStream) throws IOException {
+	public SeekableCOSParser(final SeekableInputStream seekableInputStream) throws IOException {
 		super(seekableInputStream);
 	}
 
-	public COSParser(final String filename) throws IOException {
+	public SeekableCOSParser(final String filename) throws IOException {
 		super(filename);
 	}
 
-	public COSParser(final InputStream fileStream) throws IOException {
+	public SeekableCOSParser(final InputStream fileStream) throws IOException {
 		super(fileStream);
 	}
 
-	public COSParser(final COSDocument document, final String filename) throws IOException { //tmp ??
+	public SeekableCOSParser(final COSDocument document, final String filename) throws IOException { //tmp ??
 		this(filename);
 		this.document = document;
 	}
 
-	public COSParser(final COSDocument document, final InputStream fileStream) throws IOException { //tmp ??
+	public SeekableCOSParser(final COSDocument document, final InputStream fileStream) throws IOException { //tmp ??
 		this(fileStream);
 		this.document = document;
 	}

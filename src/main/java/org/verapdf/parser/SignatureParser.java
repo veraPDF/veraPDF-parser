@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  *
  * @author Sergey Shemyakov
  */
-public class SignatureParser extends COSParser {
+public class SignatureParser extends SeekableCOSParser {
 
 
     private static final Logger LOGGER = Logger.getLogger(SignatureParser.class.getCanonicalName());
