@@ -126,21 +126,21 @@ public class Type1FontProgram extends PSParser implements FontProgram {
                 attemptedParsing = true;
 
                 // PFB format check
-                byte first = this.source.readByte();
+                byte first = this.getSource().readByte();
                 if (first == -128) {
-                    byte second = this.source.readByte();
+                    byte second = this.getSource().readByte();
                     if (second == 1) {
                         LOGGER.log(Level.WARNING, "Type 1 fonts in PFB format are not permitted");
                     }
-                    this.source.unread();
+                    this.getSource().unread();
                 }
-                this.source.unread();
+                this.getSource().unread();
 
-                initializeToken();
+                getBaseParser().initializeToken();
 
-                skipSpaces(true);
+                getBaseParser().skipSpaces(true);
 
-                while (getToken().type != Token.Type.TT_EOF) {
+                while (getBaseParser().getToken().type != Token.Type.TT_EOF) {
                     processObject(nextObject());
                 }
                 initializeEncoding();
@@ -151,7 +151,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
             } catch (PostScriptException e) {
                 throw new IOException("Error in PostScript parsing", e);
             } finally {
-                this.source.close();    // We close stream after first reading attempt
+                this.getSource().close();    // We close stream after first reading attempt
             }
         }
     }
@@ -219,13 +219,13 @@ public class Type1FontProgram extends PSParser implements FontProgram {
 
     protected void skipSpacesExceptNullByte() throws IOException {
         byte ch;
-        while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+        while (!this.getSource().isEOF()) {
+            ch = this.getSource().readByte();
             if (CharTable.isSpace(ch) && ch != 0) {
                 continue;
             }
 
-            this.source.unread();
+            this.getSource().unread();
             break;
         }
     }

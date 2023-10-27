@@ -73,14 +73,14 @@ public class SignatureParser extends SeekableCOSParser {
      */
     private void parseDictionary()
             throws IOException {
-        skipSpaces();
-        skipExpectedCharacter('<');
-        skipExpectedCharacter('<');
-        skipSpaces();
+        getBaseParser().skipSpaces();
+        getBaseParser().skipExpectedCharacter('<');
+        getBaseParser().skipExpectedCharacter('<');
+        getBaseParser().skipSpaces();
         boolean done = false;
         while (!done) {
-            skipSpaces();
-            char c = (char) source.peek();
+            getBaseParser().skipSpaces();
+            char c = (char) getSource().peek();
             if (c == '>') {
                 done = true;
             } else {
@@ -99,13 +99,13 @@ public class SignatureParser extends SeekableCOSParser {
     private void passCOSDictionaryValue() throws IOException {
         long numOffset = getSource().getOffset();
         COSObject number = nextObject();
-        skipSpaces();
-        if (!isDigit()) {
+        getBaseParser().skipSpaces();
+        if (!getBaseParser().isDigit()) {
             return;
         }
         COSObject generationNumber = nextObject();
-        skipSpaces();
-        skipExpectedCharacter('R');
+        getBaseParser().skipSpaces();
+        getBaseParser().skipExpectedCharacter('R');
         if (number.getType() != COSObjType.COS_INTEGER) {
             throw new IOException(getErrorMessage("expected number but got" + number.getType(), numOffset));
         }
@@ -151,20 +151,20 @@ public class SignatureParser extends SeekableCOSParser {
     }
 
     private void parseSignatureValue() throws IOException {
-        skipSpaces();
+        getBaseParser().skipSpaces();
         long numOffset1 = getSource().getOffset();
         COSObject number = nextObject();
         long numOffset2 = getSource().getOffset();
-        skipSpaces();
-        if (!isDigit()) {
+        getBaseParser().skipSpaces();
+        if (!getBaseParser().isDigit()) {
             byteRange[1] = numOffset1;
             byteRange[2] = numOffset2;
             return;
         }
         long genOffset = getSource().getOffset();
         COSObject generationNumber = nextObject();
-        skipSpaces();
-        int c = source.read();
+        getBaseParser().skipSpaces();
+        int c = getSource().read();
         if (c == 'R') {  // Indirect reference
             if (number.getType() != COSObjType.COS_INTEGER) {
                 throw new IOException(getErrorMessage("expected number but got" + number.getType(), numOffset1));
@@ -179,9 +179,9 @@ public class SignatureParser extends SeekableCOSParser {
             parseSignatureValue();    // Recursive parsing to get to the contents hex string itself
         }
         if (c == 'o') {    // Object itself
-            skipExpectedCharacter('b');
-            skipExpectedCharacter('j');
-            skipSpaces();
+            getBaseParser().skipExpectedCharacter('b');
+            getBaseParser().skipExpectedCharacter('j');
+            getBaseParser().skipSpaces();
             numOffset1 = getSource().getOffset();
             nextObject();
             numOffset2 = getSource().getOffset();
@@ -210,48 +210,48 @@ public class SignatureParser extends SeekableCOSParser {
     private long getOffsetOfNextEOF(long currentOffset) throws IOException {
         byte[] buffer = new byte[EOF_STRING.length];
         getSource().seek(currentOffset + document.getHeader().getHeaderOffset());
-        source.read(buffer);
-        source.unread(buffer.length - 1);
+        getSource().read(buffer);
+        getSource().unread(buffer.length - 1);
         isStream = false;
         while (isStream || !isEOFFound(buffer)) {
             byte[] streamCheck = isStream ? ENDSTREAM_STRING : STREAM_STRING;
             byte[] streamCheckBuff = new byte[streamCheck.length];
-            int unreadLength = source.read(streamCheckBuff);
+            int unreadLength = getSource().read(streamCheckBuff);
             if (Arrays.equals(streamCheck, streamCheckBuff)) {
 				isStream = !isStream;
 				System.arraycopy(streamCheckBuff, 0, buffer, 0, EOF_STRING.length);
 				unreadLength = -1;
 			} else {
-				source.unread(unreadLength);
-				source.read(buffer);
+                getSource().unread(unreadLength);
+                getSource().read(buffer);
 				unreadLength = buffer.length - 1;
 			}
 
-            if (source.isEOF()) {
+            if (getSource().isEOF()) {
                 getSource().seek(currentOffset + document.getHeader().getHeaderOffset());
                 return getSource().getStreamLength();
             }
             if (unreadLength > 0) {
-				source.unread(unreadLength);
+                getSource().unread(unreadLength);
 			}
         }
         long result = getSource().getOffset() - 1 + buffer.length;   // byte right after '%%EOF'
-        this.source.skip(EOF_STRING.length - 1);
+        this.getSource().skip(EOF_STRING.length - 1);
         this.floatingBytesNumber = 0;
         this.isStreamEnd = false;
-        int nextByte = this.source.read();
-        if (isLF(nextByte)) { // allows single LF, CR or CR-LF after %%EOF
+        int nextByte = this.getSource().read();
+        if (BaseParser.isLF(nextByte)) { // allows single LF, CR or CR-LF after %%EOF
             result++;
             this.floatingBytesNumber++;
-            nextByte = this.source.peek();
-        } else if (isCR(nextByte)) {
+            nextByte = this.getSource().peek();
+        } else if (BaseParser.isCR(nextByte)) {
             result++;
             this.floatingBytesNumber++;
-            nextByte = this.source.read();
-            if (isLF(nextByte)) {
+            nextByte = this.getSource().read();
+            if (BaseParser.isLF(nextByte)) {
                 result++;
                 this.floatingBytesNumber++;
-                nextByte = this.source.peek();
+                nextByte = this.getSource().peek();
             }
         }
         if (nextByte == -1) {
@@ -266,11 +266,11 @@ public class SignatureParser extends SeekableCOSParser {
             return false;
         }
         long pointer = this.getSource().getOffset();
-        this.source.unread(2);
-        int byteBeforeEOF = this.source.peek();
-        while (!isLF(byteBeforeEOF)) {
-            this.source.unread();
-            byteBeforeEOF = this.source.peek();
+        this.getSource().unread(2);
+        int byteBeforeEOF = this.getSource().peek();
+        while (!BaseParser.isLF(byteBeforeEOF)) {
+            this.getSource().unread();
+            byteBeforeEOF = this.getSource().peek();
             if (byteBeforeEOF != CharTable.ASCII_SPACE) {
                 this.getSource().seek(pointer);
                 return false;

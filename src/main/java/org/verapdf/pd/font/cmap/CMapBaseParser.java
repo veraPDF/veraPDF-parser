@@ -18,33 +18,27 @@
  * If a copy of the MPL was not distributed with this file, you can obtain one at
  * http://mozilla.org/MPL/2.0/.
  */
-package org.verapdf.parser;
+package org.verapdf.pd.font.cmap;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.parser.BaseParser;
+import org.verapdf.parser.NotSeekableBaseParser;
 
-import org.verapdf.cos.xref.COSXRefEntry;
-import org.verapdf.cos.xref.COSXRefSection;
 import java.io.IOException;
 
 /**
- * @author Maxim Plushchov
+ * This class parses CMap files and constructs CMap objects.
+ *
+ * @author Sergey Shemyakov
  */
-public class PDFParserTest {
-    final private String xrefPath = "src/test/resources/org/verapdf/parser/xref";
+public class CMapBaseParser extends NotSeekableBaseParser {
 
-    @Test
-    public void testXrefParsing() {
-        try {
-            PDFParser pdfParser = new PDFParser(xrefPath);
-            COSXRefSection section = new COSXRefSection();
-            pdfParser.getBaseParser().initializeToken();
-            pdfParser.parseXrefTable(section);
-            Assert.assertEquals(COSXRefEntry.FIRST_XREF_ENTRY, section.getEntry(0));
-        } catch (IOException ex) {
-            System.out.println("Parsing error: ");
-            ex.printStackTrace();
-        }
+    public CMapBaseParser(ASInputStream stream) throws IOException {
+        super(stream, true);
     }
 
+    @Override
+    protected boolean isEndOfComment(byte ch) {
+        return BaseParser.isCR(ch) || BaseParser.isFF(ch);
+    }
 }
