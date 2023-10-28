@@ -27,12 +27,10 @@ import org.verapdf.cos.*;
 import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
-import org.verapdf.pd.encryption.StandardSecurityHandler;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,11 +40,6 @@ import java.util.logging.Logger;
 public class SeekableCOSParser extends COSParser {
 
 	private static final Logger LOGGER = Logger.getLogger(SeekableCOSParser.class.getCanonicalName());
-
-	/**
-	 * Linearization dictionary must be in first 1024 bytes of document
-	 */
-	protected final int LINEARIZATION_DICTIONARY_LOOKUP_SIZE = 1024;
 
 	public SeekableCOSParser(final SeekableInputStream seekableInputStream) throws IOException {
 		super(new SeekableBaseParser(seekableInputStream));
@@ -280,20 +273,9 @@ public class SeekableCOSParser extends COSParser {
 		return document;
 	}
 
-	private COSObject decryptCOSString(COSObject string) {
-		StandardSecurityHandler ssh =
-				this.document.getStandardSecurityHandler();
-        try {
-            ssh.decryptString((COSString) string.getDirectBase(), this.keyOfCurrentObject);
-            return string;
-        } catch (IOException | GeneralSecurityException e) {
-            LOGGER.log(Level.WARNING, getErrorMessage("Can't decrypt string in object"));
-            return string;
-        }
-	}
-
+	@Override
 	protected String getErrorMessage(String message) {
-		return getBaseParser().getErrorMessage(message);
+		return getErrorMessage(message, getSource().getCurrentOffset());
 	}
 
 	protected String getErrorMessage(String message, long offset) {

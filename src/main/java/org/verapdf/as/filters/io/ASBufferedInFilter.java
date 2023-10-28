@@ -209,7 +209,7 @@ public class ASBufferedInFilter extends ASInFilter implements BaseParserInputStr
     }
 
     /**
-     * @return index of the end of of valid unread data in buffer.
+     * @return index of the end of valid unread data in buffer.
      */
     public int getBufferEnd() {
         return bufferEnd;
@@ -369,7 +369,7 @@ public class ASBufferedInFilter extends ASInFilter implements BaseParserInputStr
         int read = getInputStream().read(buffer, offset, len);
         this.bufferEnd = read;
         if (read < len) {
-            // TODO: in fact, read may be less then len even if eof is not reached.
+            // TODO: in fact, read may be less than len even if eof is not reached.
             // Fix problem for this case.
             eod = offset + (read == -1 ? 0 : read);
         }

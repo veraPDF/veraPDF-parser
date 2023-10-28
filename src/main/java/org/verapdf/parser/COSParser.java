@@ -231,18 +231,20 @@ public abstract class COSParser {
     }
 
     private COSObject decryptCOSString(COSObject string) {
-        StandardSecurityHandler ssh =
-                this.document.getStandardSecurityHandler();
+        StandardSecurityHandler ssh = this.document.getStandardSecurityHandler();
         try {
             ssh.decryptString((COSString) string.getDirectBase(), this.keyOfCurrentObject);
             return string;
         } catch (IOException | GeneralSecurityException e) {
-            LOGGER.log(Level.WARNING, getErrorMessage("Can't decrypt string in object " + this.keyOfCurrentObject));
+            LOGGER.log(Level.WARNING, getErrorMessage("Can't decrypt string"));
             return string;
         }
     }
 
     protected String getErrorMessage(String message) {
+        if (keyOfCurrentObject != null) {
+            return message + "(object key = " + keyOfCurrentObject + ")";
+        }
         return getBaseParser().getErrorMessage(message);
     }
 

@@ -48,6 +48,10 @@ public class PDFParser extends SeekableCOSParser {
 
     private static final Logger LOGGER = Logger.getLogger(PDFParser.class.getCanonicalName());
 
+    /**
+     * Linearization dictionary must be in first 1024 bytes of document
+     */
+    protected final int LINEARIZATION_DICTIONARY_LOOKUP_SIZE = 1024;
     private static final String HEADER_PATTERN = "%PDF-";
     private static final String PDF_DEFAULT_VERSION = "1.4";
     private static final byte[] STARTXREF = "startxref".getBytes(StandardCharsets.ISO_8859_1);

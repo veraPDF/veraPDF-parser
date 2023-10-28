@@ -43,7 +43,7 @@ public class CMapParser extends PSParser {
     private static final Logger LOGGER = Logger.getLogger(CMapParser.class.getCanonicalName());
     private COSObject lastCOSName;
 
-    private CMap cMap;
+    private final CMap cMap;
 
     private static final String WMODE_STRING = "WMode";
     private static final String REGISTRY_SRTRING = "Registry";
