@@ -192,7 +192,7 @@ public class InternalInputStream extends SeekableInputStream {
 		if (offset > this.getStreamLength()) {
 			throw new IllegalArgumentException("Destination offset is greater than stream length");
 		}
-		this.offset = offset < 0 ? 0 : offset;
+		this.offset = offset;
 	}
 
 	@Override

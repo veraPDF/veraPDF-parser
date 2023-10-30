@@ -195,6 +195,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			case '7':
 			case '8':
 			case '9':
+			case '+':
 			case '-': {
 				Token token = getBaseParser().getToken();
 				getBaseParser().nextToken();
