@@ -151,7 +151,7 @@ public class COSDocument {
 					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
 							" " + key.getGeneration(), e);
 				} catch (StackOverflowError e) {
-					// TODO: double check this StackOverfrow catching
+					// TODO: double check this StackOverflow catching
 					throw new LoopedException("Loop in getting object from reader", e);
 				}
 			}
@@ -435,6 +435,14 @@ public class COSDocument {
 
 	public long getLastTrailerOffset() {
 		return this.reader.getLastTrailerOffset();
+	}
+
+	public COSObject getLastXRefStream() {
+		return reader.getLastXrefStream();
+	}
+
+	public boolean isContainsXRefStream() {
+		return reader.isContainsXRefStream();
 	}
 
 	public COSObject getLinearizationDictionary() {

@@ -34,10 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,6 +60,9 @@ public class PDFParser extends SeekableCOSParser {
     private boolean isEncrypted;
     private COSObject encryption;
     private Long lastTrailerOffset = 0L;
+    
+    private COSObject lastXRefStream;
+    private boolean containsXRefStream;
 
     public PDFParser(final String filename) throws IOException {
         super(filename);
@@ -429,7 +429,9 @@ public class PDFParser extends SeekableCOSParser {
     }
 
     private void getXRefSectionAndTrailer(final COSXRefInfo section) throws IOException {
+        boolean isLastTrailer = false;
         if (this.lastTrailerOffset == 0) {
+            isLastTrailer = true;
             this.lastTrailerOffset = this.getSource().getOffset();
         }
         getBaseParser().nextToken();
@@ -442,7 +444,7 @@ public class PDFParser extends SeekableCOSParser {
             parseXrefTable(section.getXRefSection());
             getTrailer(section.getTrailer());
         } else {
-            parseXrefStream(section);
+            parseXrefStream(section, isLastTrailer);
         }
     }
 
@@ -525,7 +527,7 @@ public class PDFParser extends SeekableCOSParser {
         }
     }
 
-    private void parseXrefStream(final COSXRefInfo section) throws IOException {
+    private void parseXrefStream(final COSXRefInfo section, boolean isLastTrailer) throws IOException {
         getBaseParser().nextToken();
         if (this.getBaseParser().getToken().type != Token.Type.TT_INTEGER) {
             throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
@@ -544,6 +546,10 @@ public class PDFParser extends SeekableCOSParser {
         if (xrefCOSStream.getType() != COSObjType.COS_STREAM ||
                 !COSName.construct(ASAtom.XREF).equals(xrefCOSStream.getKey(ASAtom.TYPE))) {
             throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+        }
+        this.containsXRefStream = true;
+        if (isLastTrailer) {
+            this.lastXRefStream = xrefCOSStream;
         }
         XrefStreamParser xrefStreamParser = new XrefStreamParser(section, (COSStream) xrefCOSStream.getDirectBase());
         xrefStreamParser.parseStreamAndTrailer();
@@ -620,5 +626,13 @@ public class PDFParser extends SeekableCOSParser {
 
     public Long getLastTrailerOffset() {
         return lastTrailerOffset;
+    }
+
+    public COSObject getLastXRefStream() {
+        return lastXRefStream;
+    }
+
+    public boolean isContainsXRefStream() {
+        return containsXRefStream;
     }
 }
