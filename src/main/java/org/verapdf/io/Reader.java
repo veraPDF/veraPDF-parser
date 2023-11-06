@@ -194,6 +194,16 @@ public class Reader extends XRefReader {
 	}
 
 	@Override
+	public COSObject getLastXrefStream() {
+		return parser.getLastXRefStream();
+	}
+
+	@Override
+	public boolean isContainsXRefStream() {
+		return parser.isContainsXRefStream();
+	}
+
+	@Override
 	public int getGreatestKeyNumberFromXref() {
 		int res = 1;
 		for (COSKey key : this.getKeys()) {
