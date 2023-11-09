@@ -21,14 +21,12 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.io.ASInputStream;
-import org.verapdf.cos.filters.COSFilterASCII85Decode;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.SeekableInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import static org.verapdf.as.CharTable.*;
 
@@ -207,15 +205,9 @@ public class SeekableBaseParser extends BaseParser {
 			}
 			b = source.readByte();
 		}
-		ASInputStream ascii85 = this.getSource().getStream(ascii85Start, ascii85End - ascii85Start);
-		COSFilterASCII85Decode ascii85Decode = new COSFilterASCII85Decode(ascii85);
-		byte[] buf = new byte[(int) (ascii85End - ascii85Start)];
-		int read = ascii85Decode.read(buf);
-		buf = Arrays.copyOf(buf, read);
-
-		this.token.setContainsOnlyHex(false);
-		this.token.setHexCount(Long.valueOf(0));
-		this.token.setByteValue(buf);
+		try (ASInputStream ascii85 = this.getSource().getStream(ascii85Start, ascii85End - ascii85Start)) {
+			decodeASCII85(ascii85, (int) (ascii85End - ascii85Start));
+		}
 	}
 
 	public static byte[] getRawBytes(String string) {
