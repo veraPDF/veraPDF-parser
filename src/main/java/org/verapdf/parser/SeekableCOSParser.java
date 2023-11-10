@@ -21,7 +21,6 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.*;
 import org.verapdf.exceptions.VeraPDFParserException;
@@ -65,32 +64,12 @@ public class SeekableCOSParser extends COSParser {
 
 	@Override
 	protected COSObject getDictionary() throws IOException {
-		if (this.flag) {
-			getBaseParser().nextToken();
+		COSObject dict = super.getDictionary();
+		if (dict.getType() != COSObjType.COS_DICT) {
+			return dict;
 		}
-		this.flag = true;
+
 		final Token token = getBaseParser().getToken();
-
-		if (token.type != Token.Type.TT_OPENDICT) {
-			return new COSObject();
-		}
-
-		COSObject dict = COSDictionary.construct();
-
-		COSObject key = getName();
-		while (!key.empty()) {
-			COSObject obj = nextObject();
-			if (dict.getKeySet().contains(key.getName())) {
-				LOGGER.log(Level.WARNING, getErrorMessage("Dictionary/Stream contains duplicated key " + key));
-			}
-			dict.setKey(key.getName(), obj);
-			key = getName();
-		}
-
-		if (token.type != Token.Type.TT_CLOSEDICT) {
-			// TODO : replace with ASException
-			throw new IOException(getErrorMessage(StringExceptions.INVALID_PDF_DICTONARY));
-		}
 
 		long reset = this.getSource().getOffset();
 		if (this.flag) {

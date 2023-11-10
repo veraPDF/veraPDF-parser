@@ -1,9 +1,12 @@
 package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.filters.COSFilterASCII85Decode;
 import org.verapdf.cos.filters.COSFilterASCIIHexDecode;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +36,12 @@ public abstract class BaseParser {
     public void initializeToken() {
         if (this.token == null) {
             this.token = new Token();
+        }
+    }
+
+    protected void appendToToken(final int ch, final boolean append) {
+        if (append) {
+            appendToToken(ch);
         }
     }
 
@@ -119,6 +128,22 @@ public abstract class BaseParser {
     }
 
     protected abstract void readASCII85() throws IOException;
+    
+    protected void decodeASCII85(ASInputStream ascii85, int length) throws IOException {
+        try (COSFilterASCII85Decode ascii85Decode = new COSFilterASCII85Decode(ascii85)) {
+            byte[] buf = new byte[length];
+            int read = ascii85Decode.read(buf);
+
+            this.token.setContainsOnlyHex(false);
+            this.token.setHexCount(Long.valueOf(0));
+            if (read == -1) {
+				LOGGER.log(Level.WARNING, "Invalid ASCII85 string");
+                this.token.clearValue();
+            } else {
+                this.token.setByteValue(Arrays.copyOf(buf, read));
+            }
+        }
+    }
 
     private void readToken() throws IOException {
         this.token.clearValue();
@@ -337,16 +362,18 @@ public abstract class BaseParser {
         this.token.clearValue();
 
         int parenthesesDepth = 0;
+        
+        boolean append = true;
 
         byte ch = this.source.readByte();
         while (!this.source.isEOF()) {
             switch (ch) {
                 default:
-                    appendToToken(ch);
+                    appendToToken(ch, append);
                     break;
                 case '(':
                     parenthesesDepth++;
-                    appendToToken(ch);
+                    appendToToken(ch, append);
                     break;
                 case ')':
                     if (parenthesesDepth == 0) {
@@ -354,31 +381,31 @@ public abstract class BaseParser {
                     }
 
                     parenthesesDepth--;
-                    appendToToken(ch);
+                    appendToToken(ch, append);
                     break;
                 case '\\': {
                     ch = this.source.readByte();
                     switch (ch) {
                         case '(':
-                            appendToToken(CharTable.ASCII_LEFT_PAR);
+                            appendToToken(CharTable.ASCII_LEFT_PAR, append);
                             break;
                         case ')':
-                            appendToToken(CharTable.ASCII_RIGHT_PAR);
+                            appendToToken(CharTable.ASCII_RIGHT_PAR, append);
                             break;
                         case 'n':
-                            appendToToken(CharTable.ASCII_LF);
+                            appendToToken(CharTable.ASCII_LF, append);
                             break;
                         case 'r':
-                            appendToToken(CharTable.ASCII_CR);
+                            appendToToken(CharTable.ASCII_CR, append);
                             break;
                         case 't':
-                            appendToToken(CharTable.ASCII_HT);
+                            appendToToken(CharTable.ASCII_HT, append);
                             break;
                         case 'b':
-                            appendToToken(CharTable.ASCII_BS);
+                            appendToToken(CharTable.ASCII_BS, append);
                             break;
                         case 'f':
-                            appendToToken(CharTable.ASCII_FF);
+                            appendToToken(CharTable.ASCII_FF, append);
                             break;
                         case '0':
                         case '1':
@@ -399,7 +426,7 @@ public abstract class BaseParser {
                                     }
                                     ch1 = (char) ((ch1 << 3) + (ch - '0'));
                                 }
-                                appendToToken(ch1);
+                                appendToToken(ch1, append);
                             }
                             break;
                         }
@@ -412,68 +439,17 @@ public abstract class BaseParser {
                             }
                             break;
                         default:
-                            appendToToken(ch);
+                            appendToToken(ch, append);
                             break;
                     }
                     break;
                 }
             }
             ch = source.readByte();
-            if (token.getSize() > MAX_STRING_LENGTH) {
+            if (append && token.getSize() > MAX_STRING_LENGTH) {
                 LOGGER.log(Level.WARNING, getErrorMessage("Content stream string token exceeds " + MAX_STRING_LENGTH + " bytes"));
-                break;
+                append = false;
             }
-        }
-        while (!this.source.isEOF()) {
-            switch (ch) {
-                default:
-                    break;
-                case '(':
-                    parenthesesDepth++;
-                    break;
-                case ')':
-                    if (parenthesesDepth == 0) {
-                        return;
-                    }
-                    parenthesesDepth--;
-                    break;
-                case '\\': {
-                    ch = this.source.readByte();
-                    switch (ch) {
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7': {
-                            if (!isPSParser) {
-                                // look for 1, 2, or 3 octal characters
-                                for (int i = 1; i < 3; i++) {
-                                    ch = this.source.readByte();
-                                    if (ch < '0' || ch > '7') {
-                                        this.source.unread();
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                        case CharTable.ASCII_CR:
-                            ch = this.source.readByte();
-                            if (ch != CharTable.ASCII_LF) {
-                                this.source.unread();
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                }
-            }
-
-            ch = source.readByte();
         }
     }
 

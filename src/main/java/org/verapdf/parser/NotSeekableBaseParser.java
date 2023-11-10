@@ -23,12 +23,10 @@ package org.verapdf.parser;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.cos.filters.COSFilterASCII85Decode;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.verapdf.as.CharTable.*;
@@ -144,19 +142,8 @@ public class NotSeekableBaseParser extends BaseParser implements Closeable {
             readByte = this.source.readByte();
         }
         this.source.readByte();
-        try (ASMemoryInStream ascii85Data = new ASMemoryInStream(Arrays.copyOf(buf, pointer));
-             COSFilterASCII85Decode decoder = new COSFilterASCII85Decode(ascii85Data)) {
-            byte[] res = new byte[buf.length];
-            int read = decoder.read(res);
-
-            this.token.setContainsOnlyHex(false);
-            this.token.setHexCount(Long.valueOf(0));
-            if (read == -1) {
-                LOGGER.log(Level.WARNING, "Invalid ASCII85 string");
-                this.token.clearValue();
-            } else {
-                this.token.setByteValue(Arrays.copyOf(res, read));
-            }
+        try (ASMemoryInStream ascii85Data = new ASMemoryInStream(Arrays.copyOf(buf, pointer))) {
+            decodeASCII85(ascii85Data, buf.length);
         }
     }
 
