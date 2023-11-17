@@ -104,7 +104,7 @@ public class CMap {
     }
 
     /**
-     * Reads character code from input stream and returnes it's CID. This uses
+     * Reads character code from input stream and returns it's CID. This uses
      * codespace information from CMap. Details are described in PDF32000 in
      * 9.7.6.2 "CMap Mapping".
      *
