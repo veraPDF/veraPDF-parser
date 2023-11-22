@@ -52,6 +52,8 @@ public class TaggedPDFHelper {
 		tempSet.add(TaggedPDFConstants.PART);
 		tempSet.add(TaggedPDFConstants.DIV);
 		tempSet.add(TaggedPDFConstants.CAPTION);
+		tempSet.add(TaggedPDFConstants.SECT);
+		tempSet.add(TaggedPDFConstants.NON_STRUCT);
 
 		// Standard structure types for paragraphlike elements PDF 1.4, 1.7 and 2.0
 		tempSet.add(TaggedPDFConstants.H);
@@ -84,12 +86,10 @@ public class TaggedPDFHelper {
 
 		// Standard structure types for grouping elements PDF 1.7 and 1.4
 		pdf_1_7.add(TaggedPDFConstants.ART);
-		pdf_1_7.add(TaggedPDFConstants.SECT);
 		pdf_1_7.add(TaggedPDFConstants.BLOCK_QUOTE);
 		pdf_1_7.add(TaggedPDFConstants.TOC);
 		pdf_1_7.add(TaggedPDFConstants.TOCI);
 		pdf_1_7.add(TaggedPDFConstants.INDEX);
-		pdf_1_7.add(TaggedPDFConstants.NON_STRUCT);
 		pdf_1_7.add(TaggedPDFConstants.PRIVATE);
 
 		// Standard structure types for inline-level structure elements PDF 1.7 and 1.4
