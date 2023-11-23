@@ -132,9 +132,13 @@ public abstract class PDFont extends PDResource {
      */
     public Encoding getEncodingMapping() {
         if (this.encoding == null) {
-            this.encoding = getEncodingMappingFromCOSObject(this.getEncoding());
+            this.encoding = calculateEncodingMapping();
         }
         return this.encoding;
+    }
+    
+    protected Encoding calculateEncodingMapping() {
+        return getEncodingMappingFromCOSObject(this.getEncoding());
     }
 
     public Double getFontWeight() {
