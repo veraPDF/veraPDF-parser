@@ -80,7 +80,7 @@ public abstract class PDSimpleFont extends PDFont {
             }
             return null;
         }
-        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code" + code + " in font " + this.getName());
+        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code " + code + " in font " + this.getName());
         return null;
     }
 }

@@ -227,14 +227,20 @@ public class PDType1Font extends PDSimpleFont {
         }
         if (fontMetrics != null) {
             Encoding enc = this.getEncodingMapping();
-            if (Encoding.empty().equals(enc)) {
-                enc = new Encoding(fontMetrics.getEncodingScheme());
-            }
             return (double) fontMetrics.getWidth(enc.getName(code));
         }
         // should not get here
         LOGGER.log(Level.FINE, "Can't get standard metrics");
         return null;
+    }
+
+    @Override
+    protected Encoding calculateEncodingMapping() {
+        Encoding encoding = super.calculateEncodingMapping();
+        if (encoding.getSize() == 0) {
+            encoding = new Encoding(fontMetrics.getEncodingScheme(), getDifferences());
+        }
+        return encoding;
     }
 
     @Override
@@ -303,7 +309,7 @@ public class PDType1Font extends PDSimpleFont {
             }
             return null;
         }
-        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code" + code + " in font " + this.getName());
+        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code " + code + " in font " + this.getName());
         return null;
     }
 

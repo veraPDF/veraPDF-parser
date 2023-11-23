@@ -63,12 +63,13 @@ public class Encoding {
         }
     }
 
-    public Encoding(String predefinedEncoding) {
+    public Encoding(String predefinedEncoding, Map<Integer, String> differences) {
         if (ADOBE_STANDARD_ENCODING.equals(predefinedEncoding)) {
             this.predefinedEncoding = TrueTypePredefined.STANDARD_ENCODING;
         } else {
             this.predefinedEncoding = new String[0];
         }
+        this.differences = differences != null ? differences : new HashMap<>();
     }
 
     /**
@@ -81,11 +82,7 @@ public class Encoding {
      */
     public Encoding(ASAtom baseEncoding, Map<Integer, String> differences) {
         this(baseEncoding);
-        if (differences != null) {
-            this.differences = differences;
-        } else {
-            this.differences = new HashMap<>();
-        }
+        this.differences = differences != null ? differences : new HashMap<>();
     }
 
     public static Encoding empty() {
@@ -131,5 +128,13 @@ public class Encoding {
             return true;
         }
         return code < predefinedEncoding.length;
+    }
+    
+    public int getSize() {
+        return predefinedEncoding.length;
+    }
+
+    public Map<Integer, String> getDifferences() {
+        return differences;
     }
 }
