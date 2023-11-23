@@ -3,9 +3,9 @@
 %%IncludeResource: ProcSet (CIDInit)
 %%BeginResource: CMap (Adobe-CNS1-UCS2)
 %%Title: (Adobe-CNS1-UCS2 Adobe CNS1 7)
-%%Version: 14.001
+%%Version: 15.000
 %%Copyright: -----------------------------------------------------------
-%%Copyright: Copyright 1990-2019 Adobe. All rights reserved.
+%%Copyright: Copyright 1990-2020 Adobe. All rights reserved.
 %%Copyright:
 %%Copyright: Redistribution and use in source and binary forms, with or
 %%Copyright: without modification, are permitted provided that the
@@ -54,7 +54,7 @@ end def
 
 /CMapName /Adobe-CNS1-UCS2 def
 
-/CMapVersion 14.001 def
+/CMapVersion 15.000 def
 /CMapType 2 def
 
 /XUID [1 10 25335 1212] def
@@ -79,7 +79,7 @@ endcodespacerange
 <006b> <ff1f>
 <006c> <ff01>
 <006d> <fe30>
-<006e> <22ef>
+<006e> <2026>
 <006f> <2025>
 <0073> <00b7>
 <0078> <ff5c>
@@ -115,7 +115,7 @@ endcodespacerange
 <00c0> <25bc>
 <00c1> <32a3>
 <00c2> <2105>
-<00c3> <203e>
+<00c3> <00af>
 <00c4> <ffe3>
 <00c5> <ff3f>
 <00c6> <02cd>
@@ -132,7 +132,7 @@ endcodespacerange
 <00dc> <221e>
 <00dd> <2252>
 <00de> <2261>
-<00e4> <223c>
+<00e4> <ff5e>
 <00e7> <22a5>
 <00e8> <2220>
 <00e9> <221f>
@@ -146,7 +146,7 @@ endcodespacerange
 <00f1> <2640>
 <00f2> <2642>
 <00f3> <2295>
-<00f4> <2609>
+<00f4> <2299>
 <00f5> <2191>
 <00f6> <2193>
 <00f7> <2192>
@@ -160,7 +160,7 @@ endcodespacerange
 <0101> <ff0f>
 <0102> <ff3c>
 <0103> <ff04>
-<0104> <00a5>
+<0104> <ffe5>
 <0105> <3012>
 <0108> <ff05>
 <0109> <ff20>
@@ -12567,11 +12567,12 @@ endbfchar
 <354d> <9f98>
 <354e> <fe19>
 <354f> <223c>
+<3550> <2002>
 <35af> <fe33>
 <35b0> <2574>
 <35b1> <fe34>
 <35b2> <fe4f>
-<35b3> <0308>
+<35b3> <00a8>
 <35b4> <ff3e>
 <35b9> <fffd>
 <35bd> <30fc>
@@ -12628,13 +12629,13 @@ endbfchar
 <36db> <fffd>
 <36dc> <fffd>
 <36dd> <fffd>
-<36de> <fffd>
 endbfchar
 
 100 beginbfchar
+<36de> <fffd>
 <36df> <fffd>
 <36e0> <fffd>
-<36e1> <00ac>
+<36e1> <ffe2>
 <36e2> <ffe4>
 <36e3> <ff07>
 <36e4> <ff02>
@@ -12731,10 +12732,10 @@ endbfchar
 <3744> <54b2>
 <3745> <d857dc01>
 <3746> <7b0b>
-<3747> <7b55>
 endbfchar
 
 100 beginbfchar
+<3747> <7b55>
 <3748> <7b29>
 <3749> <d854df0e>
 <374a> <d857dcfe>
@@ -12834,10 +12835,10 @@ endbfchar
 <37ac> <6a53>
 <37ad> <d852de65>
 <37ae> <d852de95>
-<37af> <447a>
 endbfchar
 
 100 beginbfchar
+<37af> <447a>
 <37b0> <8229>
 <37b1> <d85ade52>
 <37b2> <d84fdd7e>
@@ -12852,7 +12853,7 @@ endbfchar
 <37bb> <d84fddf8>
 <37bc> <82aa>
 <37bd> <691b>
-<37be> <d87edd94>
+<37be> <82b3fe00>
 <37bf> <41db>
 <37c0> <854b>
 <37c1> <82d0>
@@ -12937,10 +12938,10 @@ endbfchar
 <3810> <87da>
 <3811> <880f>
 <3812> <5661>
-<3813> <866c>
 endbfchar
 
 100 beginbfchar
+<3813> <866c>
 <3814> <6856>
 <3815> <460f>
 <3818> <d85ddde0>
@@ -12989,7 +12990,7 @@ endbfchar
 <3845> <8c9b>
 <3846> <d85fdd54>
 <3847> <d85fdd8f>
-<3848> <d87eddd4>
+<3848> <8cabfe00>
 <3849> <3725>
 <384a> <d85fdd53>
 <384b> <8cd6>
@@ -13040,10 +13041,10 @@ endbfchar
 <3878> <d85edebe>
 <3879> <9061>
 <387a> <d861dd6c>
-<387b> <d861de0b>
 endbfchar
 
 100 beginbfchar
+<387b> <d861de0b>
 <387c> <90a8>
 <387d> <d861df13>
 <387e> <90c4>
@@ -13143,10 +13144,10 @@ endbfchar
 <38dc> <97ee>
 <38dd> <741c>
 <38de> <d865dc33>
-<38df> <fffd>
 endbfchar
 
 100 beginbfchar
+<38df> <fffd>
 <38e0> <97f5>
 <38e1> <d865dc1d>
 <38e2> <d85edd7a>
@@ -13246,10 +13247,10 @@ endbfchar
 <3940> <9f02>
 <3941> <9f08>
 <3942> <4b96>
-<3943> <9424>
 endbfchar
 
 100 beginbfchar
+<3943> <9424>
 <3944> <d85bdda2>
 <3945> <9f17>
 <3946> <d87ede1b>
@@ -13349,10 +13350,10 @@ endbfchar
 <39a4> <569e>
 <39a5> <d859deb1>
 <39a6> <5692>
-<39a7> <d843dfdf>
 endbfchar
 
 100 beginbfchar
+<39a7> <d843dfdf>
 <39a8> <d842dfa8>
 <39a9> <d843de0d>
 <39aa> <fffd>
@@ -13452,10 +13453,10 @@ endbfchar
 <3a08> <363e>
 <3a09> <58cb>
 <3a0a> <5a99>
-<3a0b> <d862de46>
 endbfchar
 
 100 beginbfchar
+<3a0b> <d862de46>
 <3a0c> <d845defa>
 <3a0d> <d845df6f>
 <3a0e> <d845df10>
@@ -13555,10 +13556,10 @@ endbfchar
 <3a6e> <3bf4>
 <3a6f> <d84cdc8e>
 <3a70> <d84cdead>
-<3a71> <d852dd89>
 endbfchar
 
 100 beginbfchar
+<3a71> <d852dd89>
 <3a72> <d84cdeab>
 <3a73> <550d>
 <3a74> <d84cdee0>
@@ -13658,10 +13659,10 @@ endbfchar
 <3ad2> <d84fdef8>
 <3ad3> <d84dde5f>
 <3ad4> <d852de4a>
-<3ad5> <d852dd17>
 endbfchar
 
 100 beginbfchar
+<3ad5> <d852dd17>
 <3ad6> <d857dfe1>
 <3ad7> <3f06>
 <3ad8> <3eb1>
@@ -13761,10 +13762,10 @@ endbfchar
 <3b38> <5a0d>
 <3b39> <d840de5b>
 <3b3a> <78f0>
-<3b3b> <5a2a>
 endbfchar
 
 100 beginbfchar
+<3b3b> <5a2a>
 <3b3c> <d856dfc6>
 <3b3d> <7afe>
 <3b3e> <41f9>
@@ -13842,7 +13843,7 @@ endbfchar
 <3b86> <5ae4>
 <3b87> <d846dcd8>
 <3b88> <86a0>
-<3b89> <d87eddbc>
+<3b89> <8728fe00>
 <3b8a> <d84fdd8f>
 <3b8b> <882d>
 <3b8c> <d85ddc22>
@@ -13864,10 +13865,10 @@ endbfchar
 <3b9c> <d862ddf9>
 <3b9d> <3ead>
 <3b9e> <84a3>
-<3b9f> <46f5>
 endbfchar
 
 100 beginbfchar
+<3b9f> <46f5>
 <3ba0> <46cf>
 <3ba1> <37f2>
 <3ba2> <8a3d>
@@ -13967,10 +13968,10 @@ endbfchar
 <3c00> <d862dfc5>
 <3c01> <d852deb2>
 <3c02> <981f>
-<3c03> <d865dcda>
 endbfchar
 
 100 beginbfchar
+<3c03> <d865dcda>
 <3c04> <92f6>
 <3c05> <d865ddd7>
 <3c06> <91e5>
@@ -14070,10 +14071,10 @@ endbfchar
 <3c64> <9277>
 <3c65> <944d>
 <3c66> <4fe4>
-<3c67> <3440>
 endbfchar
 
 100 beginbfchar
+<3c67> <3440>
 <3c68> <9064>
 <3c69> <d855dd5d>
 <3c6a> <783d>
@@ -14173,10 +14174,10 @@ endbfchar
 <3cc8> <56a4>
 <3cc9> <d841de1a>
 <3cca> <d842dfeb>
-<3ccb> <d843dcb8>
 endbfchar
 
 100 beginbfchar
+<3ccb> <d843dcb8>
 <3ccc> <5502>
 <3ccd> <79c4>
 <3cce> <d845dffa>
@@ -14276,10 +14277,10 @@ endbfchar
 <3d2c> <83ed>
 <3d2d> <d85bdc80>
 <3d2e> <d85cdc53>
-<3d2f> <d845dfdb>
 endbfchar
 
 100 beginbfchar
+<3d2f> <d845dfdb>
 <3d30> <5989>
 <3d31> <5a82>
 <3d32> <d845dfb3>
@@ -14320,7 +14321,7 @@ endbfchar
 <3d55> <d850dfe9>
 <3d56> <3da5>
 <3d57> <6cdf>
-<3d58> <d87edc25>
+<3d58> <52c7fe01>
 <3d59> <59eb>
 <3d5a> <5f5c>
 <3d5b> <d84cdf00>
@@ -14379,10 +14380,10 @@ endbfchar
 <3d92> <82fd>
 <3d93> <89a5>
 <3d94> <8fa0>
-<3d95> <97b8>
 endbfchar
 
 100 beginbfchar
+<3d95> <97b8>
 <3d96> <9847>
 <3d97> <9abd>
 <3d98> <5fb1>
@@ -14459,7 +14460,7 @@ endbfchar
 <3ddf> <d855dfe1>
 <3de0> <6195>
 <3de1> <5a27>
-<3de2> <d87edccd>
+<3de2> <6649fe00>
 <3de3> <d87edc06>
 <3de4> <d851dd21>
 <3de5> <4e6a>
@@ -14482,10 +14483,10 @@ endbfchar
 <3df6> <7983>
 <3df7> <5d2c>
 <3df8> <d84ddd19>
-<3df9> <fffd>
 endbfchar
 
 100 beginbfchar
+<3df9> <fffd>
 <3dfa> <46d0>
 <3dfb> <753b>
 <3dfc> <8865>
@@ -14585,10 +14586,10 @@ endbfchar
 <3e5a> <3deb>
 <3e5b> <d84fdcb7>
 <3e5c> <d858de58>
-<3e5d> <56bf>
 endbfchar
 
 100 beginbfchar
+<3e5d> <56bf>
 <3e5e> <8e0e>
 <3e5f> <5b6d>
 <3e60> <63de>
@@ -14688,10 +14689,10 @@ endbfchar
 <3ebe> <40fa>
 <3ebf> <9c5d>
 <3ec0> <651f>
-<3ec1> <48f3>
 endbfchar
 
 100 beginbfchar
+<3ec1> <48f3>
 <3ec2> <d851dfe0>
 <3ec3> <d867dd7c>
 <3ec4> <fffd>
@@ -14791,10 +14792,10 @@ endbfchar
 <3f22> <9c2e>
 <3f23> <9f5a>
 <3f24> <5573>
-<3f25> <5bc3>
 endbfchar
 
 100 beginbfchar
+<3f25> <5bc3>
 <3f26> <4ffd>
 <3f27> <9e98>
 <3f28> <4ff2>
@@ -14894,10 +14895,10 @@ endbfchar
 <3f86> <6282>
 <3f87> <d860df7d>
 <3f88> <8e28>
-<3f89> <8e75>
 endbfchar
 
 100 beginbfchar
+<3f89> <8e75>
 <3f8a> <7ad3>
 <3f8b> <7a3e>
 <3f8c> <78d8>
@@ -14997,10 +14998,10 @@ endbfchar
 <3fea> <d859dfcc>
 <3feb> <7553>
 <3fec> <87a9>
-<3fed> <87ce>
 endbfchar
 
 100 beginbfchar
+<3fed> <87ce>
 <3fee> <81c8>
 <3fef> <878c>
 <3ff0> <8a49>
@@ -15100,10 +15101,10 @@ endbfchar
 <404e> <3cdc>
 <404f> <51d3>
 <4050> <d852dea6>
-<4051> <51b3>
 endbfchar
 
 100 beginbfchar
+<4051> <51b3>
 <4052> <fffd>
 <4053> <fffd>
 <4054> <51ed>
@@ -15203,10 +15204,10 @@ endbfchar
 <40b2> <d850dc3a>
 <40b3> <4552>
 <40b4> <d851dc35>
-<40b5> <66b3>
 endbfchar
 
 100 beginbfchar
+<40b5> <66b3>
 <40b6> <d844dcb4>
 <40b7> <5637>
 <40b8> <66cd>
@@ -15306,10 +15307,10 @@ endbfchar
 <4116> <5b9d>
 <4117> <4d10>
 <4118> <5c05>
-<4119> <d846df44>
 endbfchar
 
 100 beginbfchar
+<4119> <d846df44>
 <411a> <5c13>
 <411b> <73ce>
 <411c> <5c14>
@@ -15359,7 +15360,7 @@ endbfchar
 <4148> <941b>
 <4149> <5f0d>
 <414a> <d840ddc1>
-<414b> <d87edc94>
+<414b> <5f22fe00>
 <414c> <3ade>
 <414d> <d844df3a>
 <414e> <5f3a>
@@ -15401,7 +15402,7 @@ endbfchar
 <4172> <5aa0>
 <4173> <6164>
 <4174> <6142>
-<4175> <d87edca6>
+<4175> <6148fe00>
 <4176> <d85bded2>
 <4177> <6181>
 <4178> <51f4>
@@ -15409,10 +15410,10 @@ endbfchar
 <417a> <6187>
 <417b> <5baa>
 <417c> <d84fdfb7>
-<417d> <d84adc5f>
 endbfchar
 
 100 beginbfchar
+<417d> <d84adc5f>
 <417e> <61d3>
 <417f> <d862df9d>
 <4180> <d866dd5d>
@@ -15512,10 +15513,10 @@ endbfchar
 <41e2> <3b80>
 <41e3> <67ac>
 <41e4> <6961>
-<41e5> <d862de4a>
 endbfchar
 
 100 beginbfchar
+<41e5> <d862de4a>
 <41e6> <42fc>
 <41e7> <6936>
 <41e8> <6998>
@@ -15615,10 +15616,10 @@ endbfchar
 <4246> <6f9f>
 <4247> <d850dd44>
 <4248> <6fd3>
-<4249> <d850dc91>
 endbfchar
 
 100 beginbfchar
+<4249> <d850dc91>
 <424a> <d850dd55>
 <424b> <d850dc39>
 <424c> <d84fdff0>
@@ -15718,10 +15719,10 @@ endbfchar
 <42ae> <d852de8c>
 <42af> <d850dd5f>
 <42b0> <d852de79>
-<42b1> <d862df8f>
 endbfchar
 
 100 beginbfchar
+<42b1> <d862df8f>
 <42b2> <5b46>
 <42b3> <d863dc03>
 <42b4> <d846dc9e>
@@ -15821,10 +15822,10 @@ endbfchar
 <4312> <8e46>
 <4313> <d853ddb8>
 <4314> <d865dce5>
-<4315> <fffd>
 endbfchar
 
 100 beginbfchar
+<4315> <fffd>
 <4316> <d860dcbe>
 <4317> <777a>
 <4318> <d84bdc38>
@@ -15924,10 +15925,10 @@ endbfchar
 <4376> <3992>
 <4377> <3a06>
 <4378> <d860de9b>
-<4379> <3578>
 endbfchar
 
 100 beginbfchar
+<4379> <3578>
 <437a> <d857de49>
 <437b> <d848dcc7>
 <437c> <fffd>
@@ -16018,7 +16019,7 @@ endbfchar
 <43d1> <3fd7>
 <43d2> <fffd>
 <43d3> <7680>
-<43d4> <768c>
+<43d4> <d853df5c>
 <43d5> <40a8>
 <43d6> <7839>
 <43d7> <4103>
@@ -16027,10 +16028,10 @@ endbfchar
 <43da> <7ced>
 <43db> <7f93>
 <43dc> <7fae>
-<43dd> <fffd>
 endbfchar
 
 100 beginbfchar
+<43dd> <fffd>
 <43de> <82ff>
 <43df> <585f>
 <43e0> <86b2>
@@ -16086,7 +16087,7 @@ endbfchar
 <44df> <f538>
 <44e0> <5902>
 <44e1> <d846dfc1>
-<44e2> <d87edc78>
+<44e2> <5c6efe01>
 <44e3> <9751>
 <44e4> <d840dc86>
 <44e5> <4e5b>
@@ -16130,10 +16131,10 @@ endbfchar
 <450b> <d863de0f>
 <450c> <97e6>
 <450d> <9875>
-<450e> <98ce>
 endbfchar
 
 100 beginbfchar
+<450e> <98ce>
 <450f> <98de>
 <4510> <9963>
 <4511> <d866dc10>
@@ -16141,7 +16142,7 @@ endbfchar
 <4513> <9e1f>
 <4514> <9ec4>
 <4515> <6b6f>
-<4516> <f907>
+<4516> <9f9cfe00>
 <4517> <4e37>
 <4518> <d840dc87>
 <4519> <961d>
@@ -16233,10 +16234,10 @@ endbfchar
 <457c> <d867ddf6>
 <457d> <d85cdc0e>
 <457e> <9e0a>
-<457f> <d868dd33>
 endbfchar
 
 100 beginbfchar
+<457f> <d868dd33>
 <4580> <35c1>
 <4581> <6e9a>
 <4582> <823e>
@@ -16336,10 +16337,10 @@ endbfchar
 <45e2> <54cc>
 <45e3> <82c4>
 <45e4> <55b9>
-<45e5> <d867dec3>
 endbfchar
 
 100 beginbfchar
+<45e5> <d867dec3>
 <45e6> <9c26>
 <45e7> <9ab6>
 <45e8> <d84bddee>
@@ -16439,10 +16440,10 @@ endbfchar
 <464a> <65ff>
 <464b> <6653>
 <464c> <3af2>
-<464d> <6692>
 endbfchar
 
 100 beginbfchar
+<464d> <6692>
 <464e> <3b22>
 <464f> <6716>
 <4650> <3b42>
@@ -16542,10 +16543,10 @@ endbfchar
 <46b0> <d861debc>
 <46b1> <d861dd01>
 <46b2> <3af0>
-<46b3> <708f>
 endbfchar
 
 100 beginbfchar
+<46b3> <708f>
 <46b4> <d849de7a>
 <46b5> <d85adda8>
 <46b6> <d850de4b>
@@ -16645,10 +16646,10 @@ endbfchar
 <4716> <7851>
 <4717> <7866>
 <4718> <8448>
-<4719> <d855dd35>
 endbfchar
 
 100 beginbfchar
+<4719> <d855dd35>
 <471a> <7933>
 <471b> <7932>
 <471c> <4109>
@@ -16748,10 +16749,10 @@ endbfchar
 <477e> <8cd4>
 <477f> <8cf2>
 <4780> <8d1c>
-<4781> <4798>
 endbfchar
 
 100 beginbfchar
+<4781> <4798>
 <4782> <8dc3>
 <4783> <47ed>
 <4784> <8e3a>
@@ -16851,14 +16852,14 @@ endbfchar
 <47e4> <d841de76>
 <47e5> <d845deba>
 <47e6> <5757>
-<47e7> <7173>
 endbfchar
 
 100 beginbfchar
+<47e7> <7173>
 <47e8> <d842dec2>
 <47e9> <d842decd>
 <47ea> <d842dfbf>
-<47eb> <d87edc3b>
+<47eb> <5406fe00>
 <47ec> <d842dfcb>
 <47ed> <549e>
 <47ee> <d842dffb>
@@ -16954,10 +16955,10 @@ endbfchar
 <4848> <d850df96>
 <4849> <d851dc04>
 <484a> <d851dcd6>
-<484b> <5788>
 endbfchar
 
 100 beginbfchar
+<484b> <5788>
 <484c> <d851de74>
 <484d> <d851df2f>
 <484e> <d852dc12>
@@ -17057,10 +17058,10 @@ endbfchar
 <48ae> <8fd0>
 <48af> <d865dce7>
 <48b0> <d865ddb0>
-<48b1> <d865ddb8>
 endbfchar
 
 100 beginbfchar
+<48b1> <d865ddb8>
 <48b2> <d865df32>
 <48b3> <d866dcd1>
 <48b4> <d866dd49>
@@ -17160,10 +17161,10 @@ endbfchar
 <4912> <d84cdcda>
 <4913> <d844dea9>
 <4914> <57a7>
-<4915> <d852dd63>
 endbfchar
 
 100 beginbfchar
+<4915> <d852dd63>
 <4916> <d85cdcae>
 <4917> <d845df6c>
 <4918> <d85cdd64>
@@ -17181,7 +17182,7 @@ endbfchar
 <4924> <717a>
 <4925> <d852de77>
 <4926> <d862de5a>
-<4927> <d87edc40>
+<4927> <54a2fe00>
 <4928> <d846dc3b>
 <4929> <d858dd59>
 <492a> <d84cdff5>
@@ -17263,10 +17264,10 @@ endbfchar
 <4976> <0251>
 <4977> <0113>
 <4978> <00e9>
-<4979> <011b>
 endbfchar
 
 100 beginbfchar
+<4979> <011b>
 <497a> <00e8>
 <497b> <012b>
 <497c> <00ed>
@@ -17366,10 +17367,10 @@ endbfchar
 <49dc> <5fc2>
 <49dd> <d849df12>
 <49de> <658b>
-<49df> <d84cdff9>
 endbfchar
 
 100 beginbfchar
+<49df> <d84cdff9>
 <49e0> <6919>
 <49e1> <6a43>
 <49e2> <d84fdc63>
@@ -17469,10 +17470,10 @@ endbfchar
 <4a42> <d847dd5e>
 <4a43> <5aa4>
 <4a44> <3625>
-<4a45> <d867deb0>
 endbfchar
 
 100 beginbfchar
+<4a45> <d867deb0>
 <4a46> <5ad1>
 <4a47> <5bb7>
 <4a48> <5cfc>
@@ -17572,10 +17573,10 @@ endbfchar
 <4aa6> <9218>
 <4aa7> <79d0>
 <4aa8> <7a32>
-<4aa9> <6660>
 endbfchar
 
-65 beginbfchar
+66 beginbfchar
+<4aa9> <6660>
 <4aaa> <6a29>
 <4aab> <889d>
 <4aac> <744c>
@@ -17675,7 +17676,7 @@ endbfchar
 <00df> <00e3> <fe62>
 <00e5> <00e6> <2229>
 <00f9> <00fa> <2196>
-<0106> <0107> <00a2>
+<0106> <0107> <ffe0>
 <010c> <010e> <fe69>
 <0110> <0112> <339c>
 <0115> <0116> <338e>
@@ -18240,7 +18241,7 @@ endbfrange
 <352d> <352e> <9a66>
 <3539> <353a> <9480>
 <3547> <3548> <7069>
-<3550> <35ae> <0020>
+<3551> <35ae> <0021>
 <35b5> <35b6> <30fd>
 <35b7> <35b8> <309d>
 <35ba> <35bc> <3005>
@@ -18265,7 +18266,7 @@ endbfrange
 <3d6b> <3d6c> <8fbb>
 <41b2> <41b3> <d84cddf7>
 <41b5> <41b6> <d84cdda4>
-<4250> <4251> <e251>
+<4250> <4251> <d850dd56>
 <4259> <425a> <70d5>
 <4400> <445e> <0020>
 <4462> <44c0> <0020>
