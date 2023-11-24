@@ -237,7 +237,7 @@ public class PDType1Font extends PDSimpleFont {
     @Override
     protected Encoding calculateEncodingMapping() {
         Encoding encoding = super.calculateEncodingMapping();
-        if (encoding.getSize() == 0) {
+        if (fontMetrics != null && encoding.getSize() == 0) {
             encoding = new Encoding(fontMetrics.getEncodingScheme(), getDifferences());
         }
         return encoding;
