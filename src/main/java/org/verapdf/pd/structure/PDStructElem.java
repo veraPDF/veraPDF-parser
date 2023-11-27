@@ -26,6 +26,9 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSString;
 import org.verapdf.cos.COSKey;
+import org.verapdf.parser.PDFFlavour;
+import org.verapdf.tools.StaticResources;
+import org.verapdf.tools.TaggedPDFConstants;
 import org.verapdf.tools.TaggedPDFHelper;
 
 import java.util.List;
@@ -127,5 +130,35 @@ public class PDStructElem extends PDStructTreeNode {
 	@Override
 	public List<Object> getChildren() {
 		return TaggedPDFHelper.getStructElemChildren(getObject(), rootRoleMap);
+	}
+
+	public static StructureType getStructureElementStandardStructureType(PDStructElem pdStructElem) {
+		PDFFlavour flavour = StaticResources.getFlavour();
+		if (flavour == PDFFlavour.PDFA_4 || flavour == PDFFlavour.PDFA_4_E || flavour == PDFFlavour.PDFA_4_F || 
+				flavour == PDFFlavour.PDFUA_2 || flavour == PDFFlavour.WCAG2_1) {
+			StructureType defaultStructureType = pdStructElem.getDefaultStructureType();
+			if (defaultStructureType != null) {
+				return defaultStructureType;
+			}
+		}
+		if (flavour != PDFFlavour.PDFA_4 && flavour != PDFFlavour.PDFA_4_E && flavour != PDFFlavour.PDFA_4_F &&
+				flavour != PDFFlavour.PDFUA_2) {
+			StructureType type = pdStructElem.getStructureType();
+			if (type != null) {
+				return StructureType.createStructureType(ASAtom.getASAtom(
+						StaticResources.getRoleMapHelper().getStandardType(type.getType())));
+			}
+		}
+		return null;
+	}
+
+	public static String getStructureElementStandardType(PDStructElem pdStructElem) {
+		StructureType type = getStructureElementStandardStructureType(pdStructElem);
+		return type != null ? type.getType().getValue() : null;
+	}
+
+	public static boolean isMathStandardType(StructureType standardStructureType) {
+		return StaticResources.getFlavour() == PDFFlavour.PDFUA_2 && standardStructureType != null &&
+				TaggedPDFConstants.MATH_ML_NAMESPACE.equals(standardStructureType.getNameSpaceURI());
 	}
 }
