@@ -52,7 +52,7 @@ public class TaggedPDFRoleMapHelper {
 		}
 		Set<String> currentStandardTypes;
 		boolean isFastStop;
-		if (StaticResources.getFlavour() == PDFFlavour.PDFA_1_A || StaticResources.getFlavour() == PDFFlavour.PDFA_1_B) {
+		if (StaticResources.getFlavour().getSpecification() == PDFFlavour.Specification.ISO_19005_1) {
 			currentStandardTypes = TaggedPDFHelper.getPdf14StandardRoleTypes();
 			isFastStop = true;
 		} else {
