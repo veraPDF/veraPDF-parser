@@ -141,7 +141,7 @@ public class PDStructElem extends PDStructTreeNode {
 				return defaultStructureType;
 			}
 		}
-		if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_4 && flavour != PDFFlavour.PDFUA_2) {
+		if (flavour.getSpecification() != PDFFlavour.Specification.ISO_19005_4 && flavour != PDFFlavour.PDFUA_2) {
 			StructureType type = pdStructElem.getStructureType();
 			if (type != null) {
 				return StructureType.createStructureType(ASAtom.getASAtom(
