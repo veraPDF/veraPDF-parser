@@ -67,21 +67,46 @@ public class AttributeHelper {
 	}
 
 	private static COSObject getAttributeValue(org.verapdf.pd.PDObject simplePDObject, ASAtom attributeName, String O,
-	                                           COSObjType type) {
-		COSObject aValue = simplePDObject.getKey(ASAtom.A);
-		if (aValue == null) {
-			return COSObject.getEmpty();
+											   COSObjType type) {
+		COSObject attributeValue = getAttributeValue(simplePDObject.getKey(ASAtom.A), attributeName, O, type);
+		if (attributeValue == null) {
+			COSObject className = simplePDObject.getKey(ASAtom.C);
+			COSObject classMap = StaticResources.getDocument().getStructTreeRoot().getClassMap();
+			if (className != null && classMap != null) {
+				if (className.getType() == COSObjType.COS_NAME) {
+					attributeValue = getAttributeValue(classMap.getKey(className.getName()), 
+							attributeName, O, type);
+				} else if (className.getType() == COSObjType.COS_ARRAY) {
+					for (COSObject entry : (COSArray)className.getDirectBase()) {
+						if (entry != null && entry.getType() == COSObjType.COS_NAME) {
+							attributeValue = getAttributeValue(classMap.getKey(entry.getName()),
+									attributeName, O, type);
+							if (attributeValue != null) {
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
-		if (aValue.getType() == COSObjType.COS_ARRAY) {
-			for (COSObject object : (COSArray) aValue.getDirectBase()) {
+		return attributeValue != null ? attributeValue : COSObject.getEmpty();
+	}
+	
+	private static COSObject getAttributeValue(COSObject attributeObject, ASAtom attributeName, String O,
+	                                           COSObjType type) {
+		if (attributeObject == null) {
+			return null;
+		}
+		if (attributeObject.getType() == COSObjType.COS_ARRAY) {
+			for (COSObject object : (COSArray) attributeObject.getDirectBase()) {
 				COSObject value = getAttributeValue(object, attributeName, O);
 				if (value.getType() == type) {
 					return value;
 				}
 			}
 		}
-		COSObject value = getAttributeValue(aValue, attributeName, O);
-		return value.getType() == type ? value : COSObject.getEmpty();
+		COSObject value = getAttributeValue(attributeObject, attributeName, O);
+		return value.getType() == type ? value : null;
 	}
 
 	private static COSObject getAttributeValue(COSObject object, ASAtom attributeName, String O) {
