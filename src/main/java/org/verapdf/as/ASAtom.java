@@ -134,6 +134,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom CID_TO_GID_MAP = new ASAtom("CIDToGIDMap");
     public static final ASAtom CID_SET = new ASAtom("CIDSet");
     public static final ASAtom CID_SYSTEM_INFO = new ASAtom("CIDSystemInfo");
+    public static final ASAtom CLASS_MAP = new ASAtom("ClassMap");
     public static final ASAtom CLR_F = new ASAtom("ClrF");
     public static final ASAtom CLR_FF = new ASAtom("ClrFf");
     public static final ASAtom CMAP = new ASAtom("CMap");
