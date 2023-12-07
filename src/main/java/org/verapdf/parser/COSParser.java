@@ -17,8 +17,8 @@ public abstract class COSParser {
     private static final Logger LOGGER = Logger.getLogger(COSParser.class.getCanonicalName());
 
     protected COSDocument document;
-    protected Queue<COSObject> objects = new LinkedList<>();
-    protected Queue<Long> integers = new LinkedList<>();
+    protected final Queue<COSObject> objects = new LinkedList<>();
+    protected final Queue<Long> integers = new LinkedList<>();
     protected COSKey keyOfCurrentObject;
     
     private final BaseParser baseParser;
@@ -54,9 +54,9 @@ public abstract class COSParser {
         final Token token = getBaseParser().getToken();
 
         if (token.type == Token.Type.TT_INTEGER) {  // looking for indirect reference
-            this.integers.add(Long.valueOf(token.integer));
+            this.integers.add(token.integer);
             if (this.integers.size() == 3) {
-                COSObject result = COSInteger.construct(this.integers.peek().longValue());
+                COSObject result = COSInteger.construct(this.integers.peek());
                 this.integers.remove();
                 return result;
             }
@@ -74,10 +74,10 @@ public abstract class COSParser {
         }
 
         if (!this.integers.isEmpty()) {
-            COSObject result = COSInteger.construct(this.integers.peek().longValue());
+            COSObject result = COSInteger.construct(this.integers.peek());
             this.integers.remove();
             while (!this.integers.isEmpty()) {
-                this.objects.add(COSInteger.construct(this.integers.peek().longValue()));
+                this.objects.add(COSInteger.construct(this.integers.peek()));
                 this.integers.remove();
             }
             this.flag = false;
@@ -126,7 +126,7 @@ public abstract class COSParser {
                 return COSString.construct(token.getByteValue());
             case TT_HEXSTRING:
                 COSObject res = COSString.construct(token.getByteValue(), true,
-                        token.getHexCount().longValue(), token.isContainsOnlyHex());
+                        token.getHexCount(), token.isContainsOnlyHex());
                 if (this.document == null || !this.document.isEncrypted()) {
                     return res;
                 }
@@ -222,7 +222,7 @@ public abstract class COSParser {
 
         if (token.type != Token.Type.TT_CLOSEDICT) {
             // TODO : replace with ASException
-            throw new IOException(getErrorMessage(StringExceptions.INVALID_PDF_DICTONARY));
+            throw new IOException(getErrorMessage(StringExceptions.INVALID_PDF_DICTIONARY));
         }
 
         // Don't parse COSStreams here.
@@ -243,7 +243,7 @@ public abstract class COSParser {
 
     protected String getErrorMessage(String message) {
         if (keyOfCurrentObject != null) {
-            return message + "(object key = " + keyOfCurrentObject + ")";
+            return message + "(object key = " + keyOfCurrentObject + ')';
         }
         return getBaseParser().getErrorMessage(message);
     }

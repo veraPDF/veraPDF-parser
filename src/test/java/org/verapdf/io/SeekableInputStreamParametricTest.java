@@ -144,7 +144,7 @@ public class SeekableInputStreamParametricTest {
 
     private static byte[] buildOffsetBuffer(int offset, int size) {
         byte[] buf = new byte[size + offset];
-        byte[] deadbeef = new byte[] {(byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef};
+        byte[] deadbeef = {(byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef};
         for (int i = 0; i < offset; i++) {
             buf[i] = deadbeef[offset % deadbeef.length];
         }
@@ -169,7 +169,7 @@ public class SeekableInputStreamParametricTest {
         Path path = Files.createTempFile("test", "bin");
         path.toFile().deleteOnExit();
         try (OutputStream out = Files.newOutputStream(path)) {
-            byte[] deadbeef = new byte[] {(byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef};
+            byte[] deadbeef = {(byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef};
             for (int i = 0; i < offset; i++) {
                 out.write(deadbeef[i % deadbeef.length]);
             }
@@ -183,9 +183,7 @@ public class SeekableInputStreamParametricTest {
     @Test
     public void seekableStreamShouldHaveSameContentsAsOriginal() throws IOException {
         input.mark(Integer.MAX_VALUE);
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             input.reset();
             while (true) {
                 int a = input.read();
@@ -200,9 +198,7 @@ public class SeekableInputStreamParametricTest {
 
     @Test
     public void closingTheOriginalStreamDoesNotCloseASeekableStreamBasedOnIt() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             input.close();
             assertEquals(0, seekable.read());
             assertEquals(1, seekable.read());
@@ -212,9 +208,7 @@ public class SeekableInputStreamParametricTest {
     @Test
     public void closingASeekableStreamDoesNotCloseTheStreamItIsBasedOn() throws IOException {
         input.mark(Integer.MAX_VALUE);
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             input.reset();
             seekable.close();
             assertEquals(0, input.read());
@@ -223,9 +217,7 @@ public class SeekableInputStreamParametricTest {
 
     @Test
     public void creatingSeekableStreamShouldConsumeOriginal() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(-1, input.read());
             assertEquals(0, seekable.read());
         }
@@ -233,10 +225,8 @@ public class SeekableInputStreamParametricTest {
 
     @Test
     public void creatingSeekableStreamFromSeekableShouldConsumeIntermediary() throws IOException {
-        try (
-            SeekableInputStream seekable1 = SeekableInputStream.getSeekableStream(input);
-            SeekableInputStream seekable2 = SeekableInputStream.getSeekableStream(seekable1);
-        ) {
+        try (SeekableInputStream seekable1 = SeekableInputStream.getSeekableStream(input);
+            SeekableInputStream seekable2 = SeekableInputStream.getSeekableStream(seekable1)) {
             assertEquals(-1, seekable1.read());
             assertEquals(0, seekable2.read());
         }
@@ -247,9 +237,7 @@ public class SeekableInputStreamParametricTest {
         for (int i = 0; i < 5; i++) {
             input.read();
         }
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(5, seekable.read());
             assertEquals(6, seekable.read());
         }
@@ -257,9 +245,7 @@ public class SeekableInputStreamParametricTest {
 
     @Test
     public void shouldReportCorrectLengthWhenCreatedFromStreamAtStart() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(size, seekable.getStreamLength());
         }
     }
@@ -267,19 +253,15 @@ public class SeekableInputStreamParametricTest {
     @Test
     public void shouldReportCorrectLengthWhenCreatedFromStreamAtOffset() throws IOException {
         input.read();
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(size - 1, seekable.getStreamLength());
         }
     }
 
     @Test
     public void shouldReportCorrectPositionAfterSmallRead() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
-            byte buf[] = new byte[SMALL_INPUT_SIZE - 1];
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
+            byte[] buf = new byte[SMALL_INPUT_SIZE - 1];
 
             assertEquals(0, seekable.getOffset());
 
@@ -298,10 +280,8 @@ public class SeekableInputStreamParametricTest {
         if (size < LARGE_INPUT_SIZE) {  // Skip this test for small inputs
             return;
         }
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
-            byte buf[] = new byte[LARGE_INPUT_SIZE - 1];
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
+            byte[] buf = new byte[LARGE_INPUT_SIZE - 1];
 
             assertEquals(0, seekable.getOffset());
 
@@ -319,9 +299,7 @@ public class SeekableInputStreamParametricTest {
 
     @Test
     public void shouldReportCorrectPositionAfterAbsoluteSeek() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(0, seekable.getOffset());
 
             seekable.seek(5);
@@ -332,9 +310,7 @@ public class SeekableInputStreamParametricTest {
     @Test
     public void shouldReportCorrectPositionAfterAbsoluteSeekWhenInputIsAtAnOffset() throws IOException {
         input.read();
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(0, seekable.getOffset());
 
             seekable.seek(5);
@@ -344,9 +320,7 @@ public class SeekableInputStreamParametricTest {
 
     @Test
     public void shouldReportCorrectPositionAfterRelativeSeek() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(0, seekable.getOffset());
 
             seekable.seekFromCurrentPosition(5);
@@ -357,9 +331,7 @@ public class SeekableInputStreamParametricTest {
     @Test
     public void shouldReportCorrectPositionAfterRelativeSeekWhenInputIsAtAnOffset() throws IOException {
         input.read();
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(0, seekable.getOffset());
 
             seekable.seekFromCurrentPosition(5);
@@ -369,9 +341,7 @@ public class SeekableInputStreamParametricTest {
 
     @Test
     public void shouldReportCorrectPositionAfterSeekFromEnd() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(0, seekable.getOffset());
             seekable.seekFromEnd(1);
             assertEquals(size - 1, seekable.getOffset());
@@ -381,9 +351,7 @@ public class SeekableInputStreamParametricTest {
     @Test
     public void shouldReportCorrectPositionAfterSeekFromEndWhenInputIsAtAnOffset() throws IOException {
         input.read();
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(0, seekable.getOffset());
             seekable.seekFromEnd(1);
             assertEquals(size - 2, seekable.getOffset());
@@ -395,9 +363,7 @@ public class SeekableInputStreamParametricTest {
         assertEquals(0, input.read());
         input.mark(Integer.MAX_VALUE);
         assertEquals(1, input.read());
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             assertEquals(2, seekable.read());
         }
         input.reset();
@@ -406,18 +372,14 @@ public class SeekableInputStreamParametricTest {
 
     @Test(expected = IOException.class)
     public void shouldNotBeAbleToUnreadAtStart() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             seekable.unread();
         }
     }
 
     @Test
     public void peekShouldReturnCorrectData() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input);
-        ) {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
             for (int i = 0; i < size; i++) {
                 int peeked = seekable.peek();
                 int read = seekable.read();
@@ -429,10 +391,8 @@ public class SeekableInputStreamParametricTest {
 
     @Test
     public void shouldNotThrowExceptionsAboutExceedingMaxSizeWhenNotExeedingMaxSize() throws IOException {
-        try (
-            SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input, size);
-        ) {
-            assertEquals(seekable.getOffset(), 0);
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input, size)) {
+            assertEquals(0, seekable.getOffset());
         }
     }
 

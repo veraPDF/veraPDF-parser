@@ -106,7 +106,7 @@
         </plugins>
 
         <resources>
-            <!-- regular resource processsing for everything except logback.xml -->
+            <!-- regular resource processing for everything except logback.xml -->
             <resource>
                 <directory>src/main/resources</directory>
             </resource>

@@ -40,8 +40,8 @@ import java.util.Stack;
  */
 public class PSParser extends NotSeekableCOSParser {
 
-    protected Map<ASAtom, COSObject> userDict = new HashMap<>();
-    protected Stack<COSObject> operandStack = new Stack<>();
+    protected final Map<ASAtom, COSObject> userDict = new HashMap<>();
+    protected final Stack<COSObject> operandStack = new Stack<>();
 
     public PSParser(ASInputStream fileStream) throws IOException {
         super(fileStream, true);

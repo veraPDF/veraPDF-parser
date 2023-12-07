@@ -107,5 +107,5 @@ public interface FontProgram {
 
     Double getDescent();
 
-    public List<Integer> getCIDList();
+    List<Integer> getCIDList();
 }

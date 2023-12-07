@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 import static org.verapdf.pd.function.PDFunctionTestHelper.EPSILON;
 
 class PDType2FunctionTest {
-    PDType2Function func = new PDType2Function(new COSObject());
+    final PDType2Function func = new PDType2Function(new COSObject());
 
     @ParameterizedTest
     @MethodSource("provideParameters")

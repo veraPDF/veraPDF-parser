@@ -32,10 +32,10 @@ import java.io.*;
  */
 public class InternalOutputStream implements ASOutputStream, Closeable {
 
-	private final static String READ_WRITE_MODE = "rw";
+	private static final String READ_WRITE_MODE = "rw";
 
-	private RandomAccessFile os;
-	private File file;
+	private final RandomAccessFile os;
+	private final File file;
 	/**
 	 * Creates temp file and opens output stream into it. File path can be
 	 * obtained after.
@@ -57,6 +57,7 @@ public class InternalOutputStream implements ASOutputStream, Closeable {
 		this.file = file;
 	}
 
+	@Override
 	public long write(final byte[] buffer) throws IOException {
 		long oldPos = this.os.getFilePointer();
 		this.os.write(buffer);
@@ -69,12 +70,14 @@ public class InternalOutputStream implements ASOutputStream, Closeable {
 		return getOffset() - oldPos;
 	}
 
+	@Override
 	public long write(final byte[] buffer, final int offset, final int size) throws IOException {
 		long oldPos = this.os.getFilePointer();
 		this.os.write(buffer, offset, size);
 		return getOffset() - oldPos;
 	}
 
+	@Override
 	public long write(ASInputStream stream) throws IOException {
 		byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
 		int read = stream.read(buf, buf.length);
@@ -87,6 +90,7 @@ public class InternalOutputStream implements ASOutputStream, Closeable {
 		return res;
 	}
 
+	@Override
 	public void close() throws IOException {
 		this.os.close();
 	}

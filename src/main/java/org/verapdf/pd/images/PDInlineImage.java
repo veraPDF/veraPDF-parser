@@ -36,13 +36,13 @@ import java.util.logging.Logger;
  */
 public class PDInlineImage extends PDResource {
 
-	private static Map<ASAtom, ASAtom> abbreviationsMap = new HashMap<>();
-	private static Map<ASAtom, ASAtom> abbreviationsFiltersAndColorSpaceMap = new HashMap<>();
+	private static final Map<ASAtom, ASAtom> abbreviationsMap = new HashMap<>();
+	private static final Map<ASAtom, ASAtom> abbreviationsFiltersAndColorSpaceMap = new HashMap<>();
 
 	private static final Logger LOGGER = Logger.getLogger(PDInlineImage.class.getCanonicalName());
 
-	private PDResources imageResources;
-	private PDResources pageResources;
+	private final PDResources imageResources;
+	private final PDResources pageResources;
 
 	public PDInlineImage(COSObject obj, PDResources imageResources,
 						 PDResources pageResources) {

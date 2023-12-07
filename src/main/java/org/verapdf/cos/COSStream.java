@@ -147,7 +147,7 @@ public class COSStream extends COSDictionary {
 		try {
 			return (COSString)COSString.construct(TypeConverter.inputStreamToByteArray(getData())).get();
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Exception during creation string from stream (object key = " + getKey() + ")");
+			LOGGER.log(Level.WARNING, "Exception during creation string from stream (object key = " + getKey() + ')');
 			return new COSString();
 		}
 	}
@@ -196,7 +196,7 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public Boolean isStreamKeywordCRLFCompliant() {
-		return Boolean.valueOf(streamKeywordCRLFCompliant);
+		return streamKeywordCRLFCompliant;
 	}
 
 	@Override
@@ -207,7 +207,7 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public Boolean isEndstreamKeywordCRLFCompliant() {
-		return Boolean.valueOf(endstreamKeywordCRLFCompliant);
+		return endstreamKeywordCRLFCompliant;
 	}
 
 	@Override
@@ -218,7 +218,7 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public Long getRealStreamSize() {
-		return Long.valueOf(realStreamSize);
+		return realStreamSize;
 	}
 
 	@Override
@@ -254,7 +254,7 @@ public class COSStream extends COSDictionary {
 	}
 
 	public long getLength() {
-		return getIntegerKey(ASAtom.LENGTH).longValue();
+		return getIntegerKey(ASAtom.LENGTH);
 	}
 
     public void setLength(final long length) {
@@ -264,7 +264,7 @@ public class COSStream extends COSDictionary {
 	public void setIndirectLength(final long length) {
 		COSObject obj = getKey(ASAtom.LENGTH);
 		obj.setInteger(length);
-		if (obj.isIndirect().booleanValue()) {
+		if (obj.isIndirect()) {
 			obj = COSIndirect.construct(obj);
 			setKey(ASAtom.LENGTH, obj);
 		}
@@ -292,6 +292,7 @@ public class COSStream extends COSDictionary {
 		return this.equals(obj, checkedObjects);
 	}
 
+	@Override
 	boolean equals(Object obj, List<COSBasePair> checkedObjects) {
 		if (this == obj) {
 			return true;
@@ -365,7 +366,7 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public String toString() {
-		return STREAM + "(" + SIZE + " = " + realStreamSize + ")";
+		return STREAM + '(' + SIZE + " = " + realStreamSize + ')';
 	}
 
 }

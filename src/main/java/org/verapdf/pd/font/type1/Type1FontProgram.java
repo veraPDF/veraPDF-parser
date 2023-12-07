@@ -54,7 +54,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
             Logger.getLogger(Type1FontProgram.class.getCanonicalName());
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
 
-    private COSKey key;
+    private final COSKey key;
 
     private String[] encoding;
     private Map<String, Integer> glyphWidths;
@@ -267,7 +267,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     }
 
     /**
-     * @return charset from embedded program, i. e. set of all glyph names
+     * @return charset from embedded program, i.e. set of all glyph names
      * defined in the embedded font program.
      */
     public Set<String> getCharSet() {
@@ -331,6 +331,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
      * @return the closeable object that closes source stream of this font
      * program.
      */
+    @Override
     public ASFileStreamCloser getFontProgramResource() {
         return new ASFileStreamCloser(this.getSource());
     }

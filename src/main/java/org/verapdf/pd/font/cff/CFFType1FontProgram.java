@@ -37,9 +37,9 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     private static final String NOTDEF_STRING = ".notdef";
 
-    private CMap externalCMap;  // in case if font is embedded into Type0 font
+    private final CMap externalCMap;  // in case if font is embedded into Type0 font
     private long encodingOffset;
-    private int[] encoding;     // array with mapping code -> gid
+    private final int[] encoding;     // array with mapping code -> gid
     private boolean isStandardEncoding = false;
     private boolean isExpertEncoding = false;
     private Map<String, Integer> charSet;   // mappings glyphName -> gid
@@ -282,7 +282,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     @Override
     public boolean containsGlyph(String glyphName) {
-        return this.charSet.keySet().contains(glyphName);
+        return this.charSet.containsKey(glyphName);
     }
 
     /**
@@ -302,7 +302,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
      */
     @Override
     public boolean containsCode(int code) {
-        return this.charSet.keySet().contains(this.getGlyphName(code));
+        return this.charSet.containsKey(this.getGlyphName(code));
     }
 
     @Override
@@ -325,10 +325,8 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
                 this.encodingStrings[i] =
                         glyphName == null ? NOTDEF_STRING : glyphName;
             }
-            return this.encodingStrings;
-        } else {
-            return this.encodingStrings;
         }
+        return this.encodingStrings;
     }
 
     /**

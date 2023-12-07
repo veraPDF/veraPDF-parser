@@ -34,7 +34,7 @@ import java.util.Stack;
  */
 public class PSLiteralObject extends PSObject {
 
-    private COSObject object;
+    private final COSObject object;
 
     public PSLiteralObject(COSObject object) {
         super(object.get());

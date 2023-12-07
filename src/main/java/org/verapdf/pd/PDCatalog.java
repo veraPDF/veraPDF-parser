@@ -45,7 +45,7 @@ public class PDCatalog extends PDObject {
 
 	private static final Logger LOGGER = Logger.getLogger(PDCatalog.class.getCanonicalName());
 
-	private PDPageTree pages;
+	private final PDPageTree pages;
 
 	public PDCatalog() {
 		super();

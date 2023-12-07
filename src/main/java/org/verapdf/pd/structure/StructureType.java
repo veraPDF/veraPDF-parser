@@ -29,8 +29,8 @@ import org.verapdf.tools.TaggedPDFConstants;
  * @author Maksim Bezrukov
  */
 public class StructureType {
-	private ASAtom type;
-	private PDStructureNameSpace nameSpace;
+	private final ASAtom type;
+	private final PDStructureNameSpace nameSpace;
 
 	private StructureType(ASAtom type, PDStructureNameSpace nameSpace) {
 		this.type = type;
@@ -44,7 +44,8 @@ public class StructureType {
 		COSObjType objType = object.getType();
 		if (objType == COSObjType.COS_NAME) {
 			return createStructureType(object, null);
-		} else if (objType == COSObjType.COS_ARRAY && object.size() >= 2) {
+		}
+		if (objType == COSObjType.COS_ARRAY && object.size() >= 2) {
 			return createStructureType(object.at(0), object.at(1));
 		}
 		return null;

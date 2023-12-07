@@ -140,7 +140,7 @@ public class TypeConverter {
 			}
 
 			TimeZone zone;
-			if (!sign.equals("Z")) {
+			if (!"Z".equals(sign)) {
 				zone = TimeZone.getTimeZone(String.format(
 						"GMT%s%d:%02d", sign, timeZoneHours, timeZoneMins));
 			} else if (timeZoneHours == 0 && timeZoneMins == 0) {
@@ -202,7 +202,7 @@ public class TypeConverter {
 		}
 
 		if (array != null && array.getType() == COSObjType.COS_ARRAY) {
-			int size = array.size().intValue();
+			int size = array.size();
 
 			if (checkSize && size != estimatedSize) {
 				LOGGER.log(Level.FINE, arrayName + " array doesn't consist of " + estimatedSize + " elements");
@@ -215,7 +215,7 @@ public class TypeConverter {
 					LOGGER.log(Level.FINE, arrayName + " array contains non number value");
 					return null;
 				}
-				res[i] = number.getReal().doubleValue();
+				res[i] = number.getReal();
 			}
 			return res;
 		}

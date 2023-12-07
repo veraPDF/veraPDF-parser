@@ -45,7 +45,7 @@ public class AFMParser extends SeekableBaseParser {
     private static final String DESCEND_STRING = "Descender";
     private static final String ITALIC_ANGLE_STRING = "ItalicAngle";
 
-    private String fontName;
+    private final String fontName;
 
     public AFMParser(ASInputStream asInputStream, String fontName) throws IOException {
         super(asInputStream);
@@ -155,13 +155,12 @@ public class AFMParser extends SeekableBaseParser {
         if (getToken().type == Token.Type.TT_INTEGER ||
                 getToken().type == Token.Type.TT_REAL) {
             return getToken().real;
-        } else {
-            throw new IOException(getErrorMessage(errorDescription + " entry is not a number"));
         }
+        throw new IOException(getErrorMessage(errorDescription + " entry is not a number"));
     }
 
     @Override
     protected String getErrorMessage(String message, long offset) {
-        return message + "(offset = " + offset + " in AFM file for predefined font " + fontName + ")";
+        return message + "(offset = " + offset + " in AFM file for predefined font " + fontName + ')';
     }
 }

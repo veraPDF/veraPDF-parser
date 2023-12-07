@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  */
 public class COSFilterLZWDecode extends ASBufferedInFilter {
 
-    private Logger LOGGER = Logger.getLogger(COSFilterLZWDecode.class.getCanonicalName());
+    private static final Logger LOGGER = Logger.getLogger(COSFilterLZWDecode.class.getCanonicalName());
 
     private static final int CLEAR_TABLE_MARKER = 256;
     private static final int EOD = 257;
@@ -61,7 +61,7 @@ public class COSFilterLZWDecode extends ASBufferedInFilter {
     private List<byte[]> lzwTable;
     private byte[] leftoverData;
     private int codeLengthBits = 9;
-    private int earlyChange;
+    private final int earlyChange;
     private long thisWord = -1;
     private long previousWord = -1;
 

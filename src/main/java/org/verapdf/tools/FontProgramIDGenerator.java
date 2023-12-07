@@ -39,43 +39,43 @@ public class FontProgramIDGenerator {
 
 	public static String getCIDFontType2ProgramID(COSKey key, CMap cMap, COSObject cidToGIDMap) {
 		return getBaseFontProgramID("CIDFontType2Program", key, cMap)
-				+ " " + getCOSObjectID(cidToGIDMap);
+				+ ' ' + getCOSObjectID(cidToGIDMap);
 	}
 
 	public static String getCFFFontProgramID(COSKey key, CMap cMap, boolean isSubset) {
 		return getBaseFontProgramID("CFFFontProgram", key, cMap)
-				+ " " + String.valueOf(isSubset);
+				+ ' ' + isSubset;
 	}
 
 	public static String getOpenTypeFontProgramID(COSKey key, boolean isCFF, boolean isSymbolic, COSObject encoding, CMap cMap, boolean isSubset) {
 		return getBaseFontProgramID("OpenTypeFontProgram", key, cMap)
-				+ " " + String.valueOf(isCFF)
-				+ " " + String.valueOf(isSymbolic)
-				+ " " + getCOSObjectID(encoding)
-				+ " " + String.valueOf(isSubset);
+				+ ' ' + isCFF
+				+ ' ' + isSymbolic
+				+ ' ' + getCOSObjectID(encoding)
+				+ ' ' + isSubset;
 	}
 
 	public static String getTrueTypeFontProgramID(COSKey key, boolean isSymbolic, COSObject encoding) {
 		if (key == null) {
 			return null;
 		}
-		return "TrueTypeFontProgram " + key.toString()
-				+ " " + String.valueOf(isSymbolic)
-				+ " " + getCOSObjectID(encoding);
+		return "TrueTypeFontProgram " + key
+				+ ' ' + isSymbolic
+				+ ' ' + getCOSObjectID(encoding);
 	}
 
 	public static String getType1FontProgramID(COSKey key) {
 		if (key == null) {
 			return null;
 		}
-		return "Type1FontProgram " + key.toString();
+		return "Type1FontProgram " + key;
 	}
 
 	private static String getBaseFontProgramID(String type, COSKey key, CMap cMap) {
 		if (key == null) {
 			return null;
 		}
-		return type + " " + key.toString() + " " + getObjectID(cMap);
+		return type + ' ' + key + ' ' + getObjectID(cMap);
 	}
 
 	private static String getCOSObjectID(COSObject cosObject) {

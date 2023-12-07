@@ -52,12 +52,12 @@ class Type1PrivateParser extends SeekableBaseParser {
      */
     private int lenIV;
     private Map<String, Integer> glyphWidths;
-    private double[] fontMatrix;
-    private boolean isDefaultFontMatrix;
+    private final double[] fontMatrix;
+    private final boolean isDefaultFontMatrix;
     private boolean charStringsFound;
     private Map<Integer, CFFNumber> subrWidths;
 
-    private COSKey key;
+    private final COSKey key;
 
     /**
      * {@inheritDoc}
@@ -179,7 +179,7 @@ class Type1PrivateParser extends SeekableBaseParser {
         } catch (IOException e) {
             // There are files with wrong charstring amount specified. Actual
             // amount can be determined from "end" keyword.
-            if (getToken().type == Token.Type.TT_KEYWORD && getToken().getValue().equals("end")) {
+            if (getToken().type == Token.Type.TT_KEYWORD && "end".equals(getToken().getValue())) {
                 LOGGER.log(Level.WARNING, getErrorMessage("Error in parsing private data in Type 1 font: incorrect amount of charstings specified"));
                 return false;
             } else {
@@ -239,7 +239,7 @@ class Type1PrivateParser extends SeekableBaseParser {
     @Override
     protected String getErrorMessage(String message, long offset) {
         if (key != null) {
-            return message + "(offset = " + offset + " in stream " + key + ")";
+            return message + "(offset = " + offset + " in stream " + key + ')';
         }
         return super.getErrorMessage(message, offset);
     }

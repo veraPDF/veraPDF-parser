@@ -32,13 +32,13 @@ import java.util.Map;
  */
 public class TrueTypeCmapSubtable {
 
-    private int platformID;
-    private int encodingID;
-    private long offset;
-    private Map<Integer, Integer> mapping;
+    private final int platformID;
+    private final int encodingID;
+    private final long offset;
+    private final Map<Integer, Integer> mapping;
     private int sampleCode;
 
-    private static List<PlatformEncodingPair> standardEncodingCMaps = new ArrayList<>();
+    private static final List<PlatformEncodingPair> standardEncodingCMaps = new ArrayList<>();
 
     static {
         standardEncodingCMaps.add(new PlatformEncodingPair(3,1));
@@ -95,11 +95,7 @@ public class TrueTypeCmapSubtable {
      * @return glyph ID for this character code.
      */
     public int getGlyph(int code) {
-        if (!mapping.containsKey(code)) {
-            return 0;
-        } else {
-            return mapping.get(code);
-        }
+        return mapping.getOrDefault(code, 0);
     }
 
     int getSampleCharCode() {

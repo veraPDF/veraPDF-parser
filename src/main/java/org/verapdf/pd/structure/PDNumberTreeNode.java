@@ -108,7 +108,7 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
      * null if object can't be found.
      */
     public COSObject getObject(Long key) {
-        HashSet<COSKey> visitedKeys = new HashSet<>();
+        Set<COSKey> visitedKeys = new HashSet<>();
         COSKey objectKey = getObject().getObjectKey();
         if (objectKey != null) {
             visitedKeys.add(objectKey);
@@ -156,6 +156,7 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
         return null;
     }
 
+    @Override
     public NumberTreeIterator iterator() {
         return new NumberTreeIterator(this);
     }

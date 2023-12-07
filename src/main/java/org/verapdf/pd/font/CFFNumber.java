@@ -27,9 +27,9 @@ package org.verapdf.pd.font;
  */
 public class CFFNumber {
 
-    private long integer;
-    private float real;
-    private boolean isInteger;
+    private final long integer;
+    private final float real;
+    private final boolean isInteger;
 
     /**
      * Initializes this number with integer.

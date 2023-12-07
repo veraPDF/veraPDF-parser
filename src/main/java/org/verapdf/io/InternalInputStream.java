@@ -35,21 +35,21 @@ import java.io.*;
  */
 public class InternalInputStream extends SeekableInputStream {
 
-	private final static String READ_ONLY_MODE = "r";
-	private static int DEFAULT_BUFFER_SIZE = 2048;
+	private static final String READ_ONLY_MODE = "r";
+	private static final int DEFAULT_BUFFER_SIZE = 2048;
 
-	private RandomAccessFile stream;
-	private byte[] buffer;
+	private final RandomAccessFile stream;
+	private final byte[] buffer;
 
 	private long bufferFrom;
 	private long bufferTo;
 	private long offset;
 
-	private boolean isTempFile;
-	private IntReference numOfFileUsers;
-	private String filePath;
-	private long fromOffset;
-	private long size;
+	private final boolean isTempFile;
+	private final IntReference numOfFileUsers;
+	private final String filePath;
+	private final long fromOffset;
+	private final long size;
 	private long resetPosition;
 
 	public InternalInputStream(final File file) throws IOException {

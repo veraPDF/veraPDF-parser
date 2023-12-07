@@ -52,7 +52,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private CFFIndex[] localSubrIndexes;
     private float[][] fontMatrices;
 
-    private CMap externalCMap;
+    private final CMap externalCMap;
 
     CFFCIDFontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                       long topDictBeginOffset, long topDictEndOffset, CMap externalCMap,

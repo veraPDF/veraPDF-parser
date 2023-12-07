@@ -37,7 +37,7 @@ import java.util.SortedSet;
  */
 public abstract class XRefReader implements IReader {
 
-	private COSXRefTableReader xref;
+	private final COSXRefTableReader xref;
 
 	//CONSTRUCTORS
 	public XRefReader() {
@@ -53,26 +53,32 @@ public abstract class XRefReader implements IReader {
 	}
 
 	//PUBLIC METHODS
+	@Override
 	public List<COSKey> getKeys() {
 		return this.xref.getKeys();
 	}
 
+	@Override
 	public long getStartXRef() {
 		return this.xref.getStartXRef();
 	}
 
+	@Override
 	public SortedSet<Long> getStartXRefs() {
 		return this.xref.getStartXRefs();
 	}
 
+	@Override
 	public COSTrailer getTrailer() {
 		return this.xref.getTrailer();
 	}
 
+	@Override
 	public COSTrailer getFirstTrailer() {
 		return this.xref.getFirstTrailer();
 	}
 
+	@Override
 	public COSTrailer getLastTrailer() {
 		return this.xref.getLastTrailer();
 	}

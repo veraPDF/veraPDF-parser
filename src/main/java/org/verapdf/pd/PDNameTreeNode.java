@@ -35,7 +35,7 @@ import java.util.*;
  */
 public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 
-	private Set<COSKey> parents = null;
+	private final Set<COSKey> parents;
 
 	private List<PDNameTreeNode> kids = null;
 	private Map<String, COSObject> names = null;
@@ -58,7 +58,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 			throw new IllegalArgumentException("Argument object shall be dictionary or stream type");
 		}
 
-		return new PDNameTreeNode(object, new HashSet<COSKey>());
+		return new PDNameTreeNode(object, new HashSet<>());
 	}
 
 	public List<PDNameTreeNode> getKids() {
@@ -120,7 +120,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 	}
 
 	public COSObject getObject(String key) {
-		HashSet<COSKey> visitedKeys = new HashSet<>();
+		Set<COSKey> visitedKeys = new HashSet<>();
 		COSKey objectKey = getObject().getObjectKey();
 		if (objectKey != null) {
 			visitedKeys.add(objectKey);
@@ -165,6 +165,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 		return null;
 	}
 
+	@Override
 	public NameTreeIterator iterator() {
 		return new NameTreeIterator(this);
 	}

@@ -27,7 +27,7 @@ package org.verapdf.tools;
  */
 public class IntReference {
 
-    private int[] num = new int[1];
+    private final int[] num = new int[1];
 
     /**
      * Default constructor that sets integer to 0.

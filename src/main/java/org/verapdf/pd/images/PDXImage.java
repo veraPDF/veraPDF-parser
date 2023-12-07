@@ -48,7 +48,7 @@ public class PDXImage extends PDXObject {
 
 	private ASAtom colorSpaceName;
 	private PDColorSpace imageCS;
-	private PDResources resources;
+	private final PDResources resources;
 
 	private JPEG2000 jpxStream;
 

@@ -98,7 +98,7 @@ public class CMapParser extends PSParser {
                 }
                 break;
             case COS_NAME:
-                if (getBaseParser().getToken().getValue().equals("usecmap")) {
+                if ("usecmap".equals(getBaseParser().getToken().getValue())) {
                     CMap usedCMap = new PDCMap(lastCOSName).getCMapFile();
                     if (usedCMap != null) {
                         this.cMap.useCMap(usedCMap);

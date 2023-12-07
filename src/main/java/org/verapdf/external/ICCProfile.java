@@ -391,12 +391,12 @@ public class ICCProfile extends PDObject {
 			int prevOffset = currentOffset;
 			currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 			String tag = new String(temp, StandardCharsets.ISO_8859_1);
-			if (tag.equals("desc")) {
+			if ("desc".equals(tag)) {
 				currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 				descOffset = byteArrayToInt(temp);
 				currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 				descLength = byteArrayToInt(temp);
-			} else if (tag.equals("cprt")) {
+			} else if ("cprt".equals(tag)) {
 				currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 				cprtOffset = byteArrayToInt(temp);
 				currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
@@ -516,7 +516,7 @@ public class ICCProfile extends PDObject {
 	public double[] getRange() {
 		COSObject rangeObject = getObject().getKey(ASAtom.RANGE);
 		if (rangeObject != null && rangeObject.getType() == COSObjType.COS_ARRAY) {
-			int size = rangeObject.size().intValue();
+			int size = rangeObject.size();
 			Long estimatedSize = getNumberOfColorants();
 			if (estimatedSize != null && size != estimatedSize.intValue()*2) {
 				LOGGER.log(Level.FINE, "Range array doesn't consist of " + estimatedSize.intValue()*2 + " elements");
@@ -529,7 +529,7 @@ public class ICCProfile extends PDObject {
 					LOGGER.log(Level.FINE, "Range array contains non number value");
 					return null;
 				}
-				res[i] = number.getReal().doubleValue();
+				res[i] = number.getReal();
 			}
 			return res;
 		}

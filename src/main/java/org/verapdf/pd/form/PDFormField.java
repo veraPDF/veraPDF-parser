@@ -36,7 +36,7 @@ import java.util.*;
  */
 public class PDFormField extends PDObject {
 
-	private Set<COSKey> parents = null;
+	private final Set<COSKey> parents;
 
 	protected PDFormField(COSObject obj, Set<COSKey> parents) {
 		super(obj);
@@ -52,7 +52,7 @@ public class PDFormField extends PDObject {
 	}
 
 	public static PDFormField createTypedFormField(COSObject obj) {
-		return createTypedFormField(obj, new HashSet<COSKey>());
+		return createTypedFormField(obj, new HashSet<>());
 	}
 
     private static PDFormField createTypedFormField(COSObject obj, Set<COSKey> parents) {

@@ -48,9 +48,9 @@ public class Reader extends XRefReader {
 
 	private static final Logger LOGGER = Logger.getLogger(Reader.class.getCanonicalName());
 
-	private PDFParser parser;
+	private final PDFParser parser;
 	private COSHeader header;
-	private Map<Long, DecodedObjectStreamParser> objectStreams;
+	private final Map<Long, DecodedObjectStreamParser> objectStreams;
 
 	public Reader(final COSDocument document, final String fileName) throws IOException {
 		super();
@@ -75,11 +75,11 @@ public class Reader extends XRefReader {
 	@Override
 	public COSObject getObject(final COSKey key) throws IOException {
 		if (!super.containsKey(key)) {
-			LOGGER.log(Level.FINE, "Trying to get object " + key.getNumber() + " " +
+			LOGGER.log(Level.FINE, "Trying to get object " + key.getNumber() + ' ' +
 					key.getGeneration() + " that is not present in the document");
 			return null;
 		}
-		long offset = getOffset(key).longValue();
+		long offset = getOffset(key);
 		if (offset == 0) {
 			return new COSObject();
 		} else if (offset > 0) {
@@ -93,13 +93,13 @@ public class Reader extends XRefReader {
 		//TODO : set object key
 		//a negative number to identify a case of object stream from normal offset
 		//see method XrefStreamParser.parseStream and ISO 32000-2 7.5.7 and 7.5.8.3
-		DecodedObjectStreamParser parser = objectStreams.get(Long.valueOf(-offset));
+		DecodedObjectStreamParser parser = objectStreams.get(-offset);
 		if (parser != null) {
 			return parser.getObject(key);
 		}
 		COSKey newKey = new COSKey(- (int)offset, 0);
-		COSObject object = !newKey.equals(key) ? getObject(newKey) : null;
-		if (object == null || !object.getType().equals(COSObjType.COS_STREAM)) {
+		COSObject object = newKey.equals(key) ? null : getObject(newKey);
+		if (object == null || object.getType() != COSObjType.COS_STREAM) {
 			throw new IOException("Object number " + (-offset) + " should" +
 					" be object stream, but in fact it is " +
 					(object == null ? "null" : object.getType()));
@@ -109,7 +109,7 @@ public class Reader extends XRefReader {
 				objectStream.getData(COSStream.FilterFlags.DECODE),
 				objectStream, new COSKey((int) -offset, 0),
 				this.parser.getDocument());
-		objectStreams.put(Long.valueOf(-offset), parser);
+		objectStreams.put(-offset, parser);
 		return parser.getObject(key);
 	}
 
@@ -173,8 +173,8 @@ public class Reader extends XRefReader {
 	private boolean docCanBeDecrypted() {
 		try {
 			COSObject cosEncrypt = this.parser.getEncryption();
-			if (cosEncrypt.isIndirect().booleanValue()) {
-				cosEncrypt = this.parser.getObject(this.getOffset(cosEncrypt.getObjectKey()).longValue());
+			if (cosEncrypt.isIndirect()) {
+				cosEncrypt = this.parser.getObject(this.getOffset(cosEncrypt.getObjectKey()));
 			}
 			PDEncryption encryption = new PDEncryption(cosEncrypt);
 			if (encryption.getFilter() != ASAtom.STANDARD) {

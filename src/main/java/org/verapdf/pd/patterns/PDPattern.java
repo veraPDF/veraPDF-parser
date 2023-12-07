@@ -51,7 +51,7 @@ public class PDPattern extends PDColorSpace {
 
     public static PDPattern createPattern(COSObject underlyingColorSpace, PDResources resources) {
         if (underlyingColorSpace == null || underlyingColorSpace.empty()) {
-            return PDPattern.INSTANCE;
+            return INSTANCE;
         }
         return new PDPattern(COSName.construct(ASAtom.PATTERN), ColorSpaceFactory.getColorSpace(underlyingColorSpace, resources));
     }

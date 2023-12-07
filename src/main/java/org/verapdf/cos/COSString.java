@@ -78,27 +78,33 @@ public class COSString extends COSDirect {
         return new COSObject(new COSString(initValue, isHex, hexCount, containsOnlyHex));
     }
 
+    @Override
     public void accept(final IVisitor visitor) {
         visitor.visitFromString(this);
     }
 
+    @Override
     public Object accept(final ICOSVisitor visitor) {
         return visitor.visitFromString(this);
     }
 
+    @Override
     public COSObjType getType() {
         return COSObjType.COS_STRING;
     }
 
     //! Returns the size of the string
+    @Override
     public Long getInteger() {
         return (long) this.value.length;
     }
 
+    @Override
     public Double getReal() {
         return (double) this.value.length;
     }
 
+    @Override
     public String getString() {
         if (value.length > 2) {
             if ((value[0] & 0xFF) == 0xFE && (value[1] & 0xFF) == 0xFF) {
@@ -116,6 +122,7 @@ public class COSString extends COSDirect {
         return PDFDocEncoding.getStringFromBytes(value);
     }
 
+    @Override
     public boolean setString(final String value) {
         this.value = new byte[value.length()];
         boolean utf16 = false;

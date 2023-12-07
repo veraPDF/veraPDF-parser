@@ -68,6 +68,7 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
      *
      * @return next byte.
      */
+    @Override
     public abstract int peek() throws IOException;
 
     /**
@@ -97,6 +98,7 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
     /**
      * @return true if end of stream is reached.
      */
+    @Override
     public boolean isEOF() throws IOException {
         return this.getOffset() == this.getStreamLength();
     }
@@ -104,6 +106,7 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
     /**
      * Resets reading pointer one byte backwards.
      */
+    @Override
     public void unread() throws IOException {
         this.seek(this.getOffset() - 1);
     }
@@ -113,6 +116,7 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
      *
      * @param count is number of bytes to unread.
      */
+    @Override
     public void unread(final int count) throws IOException {
         this.seek(this.getOffset() - count);
     }
@@ -141,6 +145,7 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
      *
      * @return the byte read.
      */
+    @Override
     public byte readByte() throws IOException {
         int next = this.read();
         if (next < 0) {

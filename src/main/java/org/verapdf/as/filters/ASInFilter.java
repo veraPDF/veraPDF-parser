@@ -86,6 +86,7 @@ public abstract class ASInFilter extends ASInputStream {
 		return this.storedInStream != null ? this.storedInStream.skip(size) : 0;
 	}
 
+	@Override
 	public void closeResource() throws IOException {
 		this.storedInStream.closeResource();
 	}

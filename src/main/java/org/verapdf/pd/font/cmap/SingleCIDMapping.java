@@ -26,8 +26,8 @@ package org.verapdf.pd.font.cmap;
  */
 class SingleCIDMapping implements CIDMappable {
 
-    private int from;
-    private int to;
+    private final int from;
+    private final int to;
 
     SingleCIDMapping(int from, int to) {
         this.from = from;

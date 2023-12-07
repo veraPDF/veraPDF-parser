@@ -147,8 +147,8 @@ public class TaggedPDFHelper {
 	}
 
 	private static final int MAX_NUMBER_OF_ELEMENTS = 1;
-	private static Map<ASAtom, Set<COSKey>> visitedWithNS = new HashMap<>();
-	private static Set<ASAtom> visitedWithoutNS = new HashSet<>();
+	private static final Map<ASAtom, Set<COSKey>> visitedWithNS = new HashMap<>();
+	private static final Set<ASAtom> visitedWithoutNS = new HashSet<>();
 
 	private TaggedPDFHelper() {
 		// disable default constructor

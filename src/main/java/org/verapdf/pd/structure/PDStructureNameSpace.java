@@ -35,7 +35,7 @@ import org.verapdf.tools.StaticResources;
  */
 public class PDStructureNameSpace extends PDObject {
 
-	private PDNameSpaceRoleMapping nsRoleMap;
+	private final PDNameSpaceRoleMapping nsRoleMap;
 
 	private PDStructureNameSpace(COSObject obj) {
 		super(obj);

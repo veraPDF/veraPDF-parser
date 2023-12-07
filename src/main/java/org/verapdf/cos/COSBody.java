@@ -27,7 +27,7 @@ import java.util.*;
  */
 public class COSBody {
 
-	private Map<COSKey, COSObject> table;
+	private final Map<COSKey, COSObject> table;
 
 	public COSBody() {
 		this.table = new HashMap<>();
@@ -50,9 +50,9 @@ public class COSBody {
 		if (obj.isIndirect()) {
 			return obj.getObjectKey();
 		} else {
-			for (COSKey key : this.table.keySet()) {
-				if (this.table.get(key) == obj) {
-                    return key;
+			for (Map.Entry<COSKey, COSObject> entry : this.table.entrySet()) {
+				if (entry.getValue() == obj) {
+                    return entry.getKey();
                 }
 			}
 			return null;

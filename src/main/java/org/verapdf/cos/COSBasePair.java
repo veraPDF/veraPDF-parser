@@ -26,8 +26,8 @@ import java.util.List;
  * @author Sergey Shemyakov
  */
 public class COSBasePair {
-    private COSBase first;
-    private COSBase second;
+    private final COSBase first;
+    private final COSBase second;
 
     private COSBasePair(COSBase first, COSBase second) {
         this.first = first;

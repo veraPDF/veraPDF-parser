@@ -48,13 +48,13 @@ public class PDFParser extends SeekableCOSParser {
     /**
      * Linearization dictionary must be in first 1024 bytes of document
      */
-    protected final int LINEARIZATION_DICTIONARY_LOOKUP_SIZE = 1024;
+    protected static final int LINEARIZATION_DICTIONARY_LOOKUP_SIZE = 1024;
     private static final String HEADER_PATTERN = "%PDF-";
     private static final String PDF_DEFAULT_VERSION = "1.4";
     private static final byte[] STARTXREF = "startxref".getBytes(StandardCharsets.ISO_8859_1);
 
     //%%EOF marker byte representation
-    private static final byte[] EOF_MARKER = new byte[]{37, 37, 69, 79, 70};
+    private static final byte[] EOF_MARKER = {37, 37, 69, 79, 70};
 
     private long offsetShift = 0;
     private boolean isEncrypted;
@@ -95,7 +95,7 @@ public class PDFParser extends SeekableCOSParser {
         if (!header.contains(HEADER_PATTERN)) {
             header = getBaseParser().getLine();
             while (!header.contains(HEADER_PATTERN) && !header.contains(HEADER_PATTERN.substring(1))) {
-                if ((header.length() > 0) && (Character.isDigit(header.charAt(0)))) {
+                if ((!header.isEmpty()) && (Character.isDigit(header.charAt(0)))) {
                     break;
                 }
                 header = getBaseParser().getLine();
@@ -118,7 +118,7 @@ public class PDFParser extends SeekableCOSParser {
 
         if (headerStart > 0) {
             //trim off any leading characters
-            header = header.substring(headerStart, header.length());
+            header = header.substring(headerStart);
         }
 
         // This is used if there is garbage after the header on the same line
@@ -131,13 +131,13 @@ public class PDFParser extends SeekableCOSParser {
                 // trying to parse header version if it has some garbage
                 Integer pos = null;
                 if (header.indexOf(37) > -1) {
-                    pos = Integer.valueOf(header.indexOf(37));
+                    pos = header.indexOf(37);
                 } else if (header.contains("PDF-")) {
-                    pos = Integer.valueOf(header.indexOf("PDF-"));
+                    pos = header.indexOf("PDF-");
                 }
                 if (pos != null) {
-                    int length = Math.min(8, header.substring(pos.intValue()).length());
-                    header = header.substring(pos.intValue(), pos.intValue() + length);
+                    int length = Math.min(8, header.substring(pos).length());
+                    header = header.substring(pos, pos + length);
                 }
             }
         }
@@ -237,7 +237,7 @@ public class PDFParser extends SeekableCOSParser {
     public void getXRefInfo(List<COSXRefInfo> infos) throws IOException {
         calculatePostEOFDataSize();
         document.setFileSize(getSource().getStreamLength());
-        this.getXRefInfo(infos, new HashSet<Long>(), null);
+        this.getXRefInfo(infos, new HashSet<>(), null);
     }
 
     public COSObject getObject(final long offset) throws IOException {
@@ -331,7 +331,7 @@ public class PDFParser extends SeekableCOSParser {
         if (token.type != Token.Type.TT_KEYWORD &&
                 token.keyword != Token.Keyword.KW_ENDOBJ) {
             // TODO : replace with ASException
-            LOGGER.log(Level.WARNING, getErrorMessage("No endobj keyword" + offsetBeforeEndobj));
+            LOGGER.log(Level.WARNING, getErrorMessage("No endobj keyword " + offsetBeforeEndobj));
             this.getSource().seek(offsetBeforeEndobj);
         }
 
@@ -339,9 +339,9 @@ public class PDFParser extends SeekableCOSParser {
             endOfObjectComplyPDFA = false;
         }
 
-        obj.setIsHeaderOfObjectComplyPDFA(Boolean.valueOf(headerOfObjectComplyPDFA));
-        obj.setIsHeaderFormatComplyPDFA(Boolean.valueOf(headerFormatComplyPDFA));
-        obj.setIsEndOfObjectComplyPDFA(Boolean.valueOf(endOfObjectComplyPDFA));
+        obj.setIsHeaderOfObjectComplyPDFA(headerOfObjectComplyPDFA);
+        obj.setIsHeaderFormatComplyPDFA(headerFormatComplyPDFA);
+        obj.setIsEndOfObjectComplyPDFA(endOfObjectComplyPDFA);
 
         return obj;
     }
@@ -585,7 +585,7 @@ public class PDFParser extends SeekableCOSParser {
 		COSXRefInfo section = new COSXRefInfo();
 		info.add(0, section);
 
-		section.setStartXRef(offset.longValue());
+		section.setStartXRef(offset);
         getXRefSectionAndTrailer(section);
 
         COSTrailer trailer = section.getTrailer();

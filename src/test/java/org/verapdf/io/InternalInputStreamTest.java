@@ -39,11 +39,11 @@ import org.verapdf.exceptions.VeraPDFParserException;
 
 public class InternalInputStreamTest {
     @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void substreamOfStreamAtOffsetShouldReportCorrectOffset() throws IOException {
-        byte[] buf = new byte[] { 0 };
+        byte[] buf = { 0 };
         File file = temporaryFolder.newFile();
         Files.write(file.toPath(), new byte[] { 1, 2, 3 });
 
@@ -121,10 +121,8 @@ public class InternalInputStreamTest {
         File temp = temporaryFolder.newFile("test");
         Files.write(temp.toPath(), "abc".getBytes(StandardCharsets.US_ASCII));
 
-        try (
-            InternalInputStream original = new InternalInputStream(temp, true);
-            InternalInputStream copy = (InternalInputStream) original.getStream(0, original.getStreamLength());
-        ) {
+        try (InternalInputStream original = new InternalInputStream(temp, true);
+            InternalInputStream copy = (InternalInputStream) original.getStream(0, original.getStreamLength())) {
             byte firstInOriginal = original.readByte();
             byte secondInOriginal = original.readByte();
             byte firstInCopy = copy.readByte();
@@ -140,9 +138,7 @@ public class InternalInputStreamTest {
         File temp = temporaryFolder.newFile("test");
         Files.write(temp.toPath(), "abc".getBytes(StandardCharsets.US_ASCII));
 
-        try (
-            InternalInputStream a = new InternalInputStream(temp, true);
-        ) {
+        try (InternalInputStream a = new InternalInputStream(temp, true)) {
             byte ba = a.readByte();
             assertEquals('a', ba);
             assertEquals(1, a.getOffset());
@@ -158,9 +154,7 @@ public class InternalInputStreamTest {
         File temp = temporaryFolder.newFile("test");
         Files.write(temp.toPath(), "abc".getBytes(StandardCharsets.US_ASCII));
 
-        try (
-            InternalInputStream a = new InternalInputStream(temp, true);
-        ) {
+        try (InternalInputStream a = new InternalInputStream(temp, true)) {
             assertEquals(0, a.getOffset());
             assertEquals(3, a.getStreamLength());
             byte ba = a.readByte();
@@ -190,7 +184,7 @@ public class InternalInputStreamTest {
     public void shouldBeAbleToReadWhenDoublyNested() throws IOException {
         File temp = temporaryFolder.newFile("test");
         byte[] buf = new byte[10 + 4];
-        byte[] deadbeef = new byte[] { (byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef };
+        byte[] deadbeef = { (byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef };
         for (int i = 0; i < 4; i++) {
             buf[i] = deadbeef[i % deadbeef.length];
         }
@@ -222,7 +216,7 @@ public class InternalInputStreamTest {
         Path temp = Files.createTempFile("test", "bin");
         temp.toFile().deleteOnExit();
         byte[] buf = new byte[10 + 4];
-        byte[] deadbeef = new byte[] { (byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef };
+        byte[] deadbeef = { (byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef };
         for (int i = 0; i < 4; i++) {
             buf[i] = deadbeef[i % deadbeef.length];
         }
@@ -232,9 +226,7 @@ public class InternalInputStreamTest {
         Files.write(temp, buf);
         try (InternalInputStream input = new InternalInputStream(temp.toFile(), true)) {
             assertEquals(4, input.read(buf, 4));
-            try (
-                SeekableInputStream seekable1 = SeekableInputStream.getSeekableStream(input);
-            ) {
+            try (SeekableInputStream seekable1 = SeekableInputStream.getSeekableStream(input)) {
                 assertEquals(0, seekable1.getOffset());
                 assertEquals(10, seekable1.getStreamLength());
                 assertEquals(0, seekable1.peek());

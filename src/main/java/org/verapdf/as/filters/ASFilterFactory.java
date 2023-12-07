@@ -36,7 +36,7 @@ import java.io.IOException;
  */
 public class ASFilterFactory implements IASFilterFactory{
 
-    private ASAtom filterType;
+    private final ASAtom filterType;
 
     public ASFilterFactory(ASAtom filterType) {
         this.filterType = filterType;

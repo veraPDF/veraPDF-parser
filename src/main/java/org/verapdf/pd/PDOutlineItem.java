@@ -66,7 +66,7 @@ public class PDOutlineItem extends PDOutlineDictionary {
 	public double[] getColor() {
 		COSObject arr = getKey(ASAtom.C);
 		if (arr != null && arr.getType() == COSObjType.COS_ARRAY) {
-			if (arr.size().intValue() == 3) {
+			if (arr.size() == 3) {
 				Double redValue = arr.at(0).getReal();
 				Double greenValue = arr.at(1).getReal();
 				Double blueValue = arr.at(2).getReal();

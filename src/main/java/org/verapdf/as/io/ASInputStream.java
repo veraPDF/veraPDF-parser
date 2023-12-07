@@ -36,8 +36,9 @@ public abstract class ASInputStream extends InputStream {
 	protected boolean isClosed = false;
 	protected boolean isSourceClosed = false;
 
-	protected IntReference resourceUsers = new IntReference(1);
+	protected final IntReference resourceUsers = new IntReference(1);
 
+	@Override
 	public abstract int read() throws IOException;
 
 	public abstract int read(byte[] buffer, int size) throws IOException;

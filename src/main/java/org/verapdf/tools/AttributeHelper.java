@@ -13,30 +13,30 @@ public class AttributeHelper {
 	public static final String NONE = "None";
 
 	public static String getListNumbering(org.verapdf.pd.PDObject simplePDObject) {
-		return AttributeHelper.getNameAttributeValue(simplePDObject, ASAtom.LIST_NUMBERING, LIST, NONE);
+		return getNameAttributeValue(simplePDObject, ASAtom.LIST_NUMBERING, LIST, NONE);
 	}
 
 	public static String getNoteType(org.verapdf.pd.PDObject simplePDObject) {
-		return AttributeHelper.getNameAttributeValue(simplePDObject, ASAtom.NOTE_TYPE, TaggedPDFConstants.FENOTE, NONE);
+		return getNameAttributeValue(simplePDObject, ASAtom.NOTE_TYPE, TaggedPDFConstants.FENOTE, NONE);
 	}
 	public static Long getColSpan(org.verapdf.pd.PDObject simplePDObject) {
-		return AttributeHelper.getIntegerAttributeValue(simplePDObject, ASAtom.COL_SPAN, TaggedPDFConstants.TABLE, 1L);
+		return getIntegerAttributeValue(simplePDObject, ASAtom.COL_SPAN, TaggedPDFConstants.TABLE, 1L);
 	}
 
 	public static Long getRowSpan(org.verapdf.pd.PDObject simplePDObject) {
-		return AttributeHelper.getIntegerAttributeValue(simplePDObject, ASAtom.ROW_SPAN, TaggedPDFConstants.TABLE, 1L);
+		return getIntegerAttributeValue(simplePDObject, ASAtom.ROW_SPAN, TaggedPDFConstants.TABLE, 1L);
 	}
 
 	public static String getScope(org.verapdf.pd.PDObject simplePDObject) {
-		return AttributeHelper.getNameAttributeValue(simplePDObject, ASAtom.SCOPE, TaggedPDFConstants.TABLE, null);
+		return getNameAttributeValue(simplePDObject, ASAtom.SCOPE, TaggedPDFConstants.TABLE, null);
 	}
 
 	public static String getRole(org.verapdf.pd.PDObject simplePDObject) {
-		return AttributeHelper.getNameAttributeValue(simplePDObject, ASAtom.ROLE, PRINT_FIELD, null);
+		return getNameAttributeValue(simplePDObject, ASAtom.ROLE, PRINT_FIELD, null);
 	}
 
 	public static COSArray getBBox(org.verapdf.pd.PDObject simplePDObject) {
-		return AttributeHelper.getArrayAttributeValue(simplePDObject, ASAtom.BBOX, LAYOUT, null);
+		return getArrayAttributeValue(simplePDObject, ASAtom.BBOX, LAYOUT, null);
 	}
 
 	public static COSArray getArrayAttributeValue(org.verapdf.pd.PDObject simplePDObject, ASAtom attributeName, String O,

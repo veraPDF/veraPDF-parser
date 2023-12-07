@@ -27,6 +27,7 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,8 +44,8 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected boolean successfullyParsed = false;
 
     protected static final float[] DEFAULT_FONT_MATRIX =
-            {(float) 0.001, 0, 0, (float) 0.001, 0, 0};
-    protected ArrayList<CFFNumber> stack;
+            {0.001f, 0, 0, 0.001f, 0, 0};
+    protected final List<CFFNumber> stack;
     protected CFFIndex globalSubrs;
     protected boolean isSubset;
 

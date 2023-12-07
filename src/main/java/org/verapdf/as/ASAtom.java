@@ -658,13 +658,13 @@ public class ASAtom implements Comparable<ASAtom> {
 
         if (PREDEFINED_PDF_NAMES.containsKey(value)) {
             return PREDEFINED_PDF_NAMES.get(value);
-        } else if (CACHED_PDF_NAMES.containsKey(value)) {
-            return CACHED_PDF_NAMES.get(value);
-        } else {
-            ASAtom result = new ASAtom(value, false);
-            CACHED_PDF_NAMES.put(value, result);
-            return result;
         }
+        if (CACHED_PDF_NAMES.containsKey(value)) {
+            return CACHED_PDF_NAMES.get(value);
+        }
+        ASAtom result = new ASAtom(value, false);
+        CACHED_PDF_NAMES.put(value, result);
+        return result;
     }
 
     /**

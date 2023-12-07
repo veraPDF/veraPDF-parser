@@ -29,8 +29,8 @@ import java.util.logging.Logger;
  * @author Sergey Shemyakov
  */
 class CodeSpace {
-    private byte[] begin;
-    private byte[] end;
+    private final byte[] begin;
+    private final byte[] end;
 
     private static final Logger LOGGER = Logger.getLogger(CodeSpace.class.getCanonicalName());
 
@@ -50,7 +50,7 @@ class CodeSpace {
                 }
                 this.begin = new byte[0];
                 this.end = new byte[0];
-                LOGGER.log(Level.FINE, "In codespace byte " + i + "in begin array is bigger than in end array.");
+                LOGGER.log(Level.FINE, "In codespace byte " + i + " in begin array is bigger than in end array.");
                 return;
             }
             this.begin = begin;

@@ -85,9 +85,9 @@ public class FunctionParser extends SeekableBaseParser {
         FUNCTION_KEYWORDS = Collections.unmodifiableSet(tempSet);
     }
 
-    private List<COSObject> operators = new ArrayList<>();
+    private final List<COSObject> operators = new ArrayList<>();
 
-    private COSKey key;
+    private final COSKey key;
 
     public FunctionParser(InputStream functionStream, COSKey key) throws IOException {
         super(functionStream);
@@ -137,7 +137,7 @@ public class FunctionParser extends SeekableBaseParser {
     @Override
     protected String getErrorMessage(String message, long offset) {
         if (key != null) {
-            return message + "(offset = " + offset + " in stream " + key + ")";
+            return message + "(offset = " + offset + " in stream " + key + ')';
         }
         return super.getErrorMessage(message, offset);
     }

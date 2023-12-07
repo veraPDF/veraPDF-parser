@@ -170,7 +170,7 @@ public class PDEncryption extends PDObject {
     }
 
     private Map<ASAtom, PDCryptFilter> getCryptFilters() {
-        HashMap<ASAtom, PDCryptFilter> res = new HashMap<>();
+        Map<ASAtom, PDCryptFilter> res = new HashMap<>();
         COSObject cf = getKey(ASAtom.CF);
         if (cf == null || cf.empty() || cf.isIndirect() || cf.getType() != COSObjType.COS_DICT) {
             if (cf != null && !cf.empty()) {

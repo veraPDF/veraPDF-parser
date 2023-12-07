@@ -53,10 +53,10 @@ public class Writer implements IVisitor {
 	private static final Logger LOGGER = Logger.getLogger(Writer.class.getCanonicalName());
 
 	protected InternalOutputStream os;
-	private long incrementalOffset;
+	private final long incrementalOffset;
 	protected COSXRefInfo info;
 
-	protected COSDocument document;
+	protected final COSDocument document;
 
 	protected List<COSKey> toWrite;
 	protected List<COSKey> written;
@@ -111,17 +111,18 @@ public class Writer implements IVisitor {
 	private List<COSKey> prepareAddedObjects(List<COSObject> addedObjects) {
 		List<COSKey> res = new ArrayList<>();
 		for (COSObject obj : addedObjects) {
-			if (!obj.isIndirect()) {
-				COSObject indirect = COSIndirect.construct(obj, this.document);
-				res.add(indirect.getObjectKey());
-			} else {
-				res.add(obj.getObjectKey());
-			}
+            if (obj.isIndirect()) {
+                res.add(obj.getObjectKey());
+            } else {
+                COSObject indirect = COSIndirect.construct(obj, this.document);
+                res.add(indirect.getObjectKey());
+            }
 		}
 		addedObjects.clear();
 		return res;
 	}
 
+	@Override
 	public void visitFromBoolean(COSBoolean obj) {
 		try {
 			this.write(String.valueOf(obj.get()));
@@ -130,6 +131,7 @@ public class Writer implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromInteger(COSInteger obj) {
 		try {
 			this.write(obj.toString());
@@ -138,6 +140,7 @@ public class Writer implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromReal(COSReal obj) {
 		try {
 			this.write(obj.toString());
@@ -146,6 +149,7 @@ public class Writer implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromString(COSString obj) {
 		try {
 			this.write(obj.getPrintableString());
@@ -154,6 +158,7 @@ public class Writer implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromName(COSName obj) {
 		try {
 			this.write(obj.toString());
@@ -162,6 +167,7 @@ public class Writer implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromArray(COSArray obj) {
 		try {
 			this.write("[");
@@ -175,6 +181,7 @@ public class Writer implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromDictionary(COSDictionary obj) {
 		try {
 			this.write("<<");
@@ -190,6 +197,7 @@ public class Writer implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromStream(COSStream obj) {
 		long length;
 
@@ -242,7 +250,7 @@ public class Writer implements IVisitor {
 			// That is the case of unfiltered stream
 			return ((SeekableInputStream) stream).getStreamLength();
 		} else {
-			// That is the case of fitered stream. Optimization can be reached
+			// That is the case of filtered stream. Optimization can be reached
 			// if decoded data is stored in memory and not thrown away.
 			stream.reset();
 			byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
@@ -256,6 +264,7 @@ public class Writer implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromNull(COSNull obj) {
 		try {
 			this.write("null");
@@ -264,6 +273,7 @@ public class Writer implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromIndirect(COSIndirect obj) {
 		try {
 			COSKey key = obj.getKey();

@@ -32,10 +32,10 @@ import java.util.*;
 public class COSXRefTableReader {
 
 	private long startXRef;
-	private Map<COSKey, Long> offsets;
+	private final Map<COSKey, Long> offsets;
 	private COSTrailer trailer;
 
-	private SortedSet<Long> startXRefs;
+	private final SortedSet<Long> startXRefs;
 
 	private COSTrailer firstTrailer;
 	private COSTrailer lastTrailer;

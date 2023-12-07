@@ -44,20 +44,20 @@ public class CharStringsWidths {
     private static final float DEFAULT_WIDTH = -1f;
     private static final Logger LOGGER = Logger.getLogger(CharStringsWidths.class.getCanonicalName());
 
-    private boolean isSubset;
+    private final boolean isSubset;
 
-    private int charStringType;
-    private CFFCharStringsHandler charStrings;
-    private float[][] fontMatrices;
-    private boolean[] isDefaultFontMatrices;
+    private final int charStringType;
+    private final CFFCharStringsHandler charStrings;
+    private final float[][] fontMatrices;
+    private final boolean[] isDefaultFontMatrices;
     
-    private CFFIndex globalSubrs;
+    private final CFFIndex globalSubrs;
     
-    private CFFIndex[] localSubrIndexes;
-    private int[] bias;
-    private int[] defaultWidths;
-    private int[] nominalWidths;
-    private int[] fdSelect;
+    private final CFFIndex[] localSubrIndexes;
+    private final int[] bias;
+    private final int[] defaultWidths;
+    private final int[] nominalWidths;
+    private final int[] fdSelect;
 
     private float[] subsetFontWidths;
     private Map<Integer, Float> generalFontWidths;
@@ -131,14 +131,12 @@ public class CharStringsWidths {
             return subsetFontWidths[gid];
         } else if (!isSubset) {
             Float res = generalFontWidths.get(gid);
-            if (res != null) {
-                return res;
-            } else {
+            if (res == null) {
                 CFFNumber width = getWidthFromCharstring(gid);
                 res = getActualWidth(width, gid);
                 this.generalFontWidths.put(gid, res);
-                return res;
             }
+            return res;
         } else {
             LOGGER.log(Level.FINE, "Can't get width of charstring " + gid +
                     " in font subset, got only " + (subsetFontWidths.length - 1) +

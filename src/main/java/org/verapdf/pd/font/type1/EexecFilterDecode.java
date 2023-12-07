@@ -97,8 +97,7 @@ public class EexecFilterDecode extends ASBufferedInFilter {
             }
             r = (encoded + r) * EEXEC_C1 + EEXEC_C2 & 0xffff;
         }
-        bytesToDiscard = (bytesToDiscard - bytesRead) < 0 ? 0 :
-                (bytesToDiscard - bytesRead);
+        bytesToDiscard = Math.max((bytesToDiscard - bytesRead), 0);
         return res;
     }
 }

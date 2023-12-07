@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class COSFilterLZWDecodeTest {
 
-    private String lzwPath = "src/test/resources/org/verapdf/cos/filters/lzw";
+    private final String lzwPath = "src/test/resources/org/verapdf/cos/filters/lzw";
 
     @Test
     public void test() throws IOException {
@@ -42,9 +42,9 @@ public class COSFilterLZWDecodeTest {
         COSFilterLZWDecode lzwDecode = new COSFilterLZWDecode(SeekableInputStream.getSeekableStream(stream), (COSDictionary) COSDictionary.construct().get());
         byte[] buf = new byte[2048];
         int read = lzwDecode.read(buf, 2048);
-        assertEquals(buf[0], 66);
-        assertEquals(read, 102);
-        assertEquals(buf[50], 46);
+        assertEquals(66, buf[0]);
+        assertEquals(102, read);
+        assertEquals(46, buf[50]);
     }
 
 }

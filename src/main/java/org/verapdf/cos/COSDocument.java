@@ -63,7 +63,7 @@ public class COSDocument {
 	private StandardSecurityHandler standardSecurityHandler;
 	private List<COSObject> changedObjects;
 	private List<COSObject> addedObjects;
-	private FileResourceHandler resourceHandler;
+	private final FileResourceHandler resourceHandler;
 	private String fileName;
 
 	private long fileSize;
@@ -149,7 +149,7 @@ public class COSDocument {
 					result.add(newObj);
 				} catch (IOException e) {
 					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
-							" " + key.getGeneration(), e);
+							' ' + key.getGeneration(), e);
 				} catch (StackOverflowError e) {
 					// TODO: double check this StackOverflow catching
 					throw new LoopedException("Loop in getting object from reader", e);
@@ -173,7 +173,7 @@ public class COSDocument {
 					addObjectWithTypeKeyCheck(result, obj, type);
 				} catch (IOException e) {
 					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
-							" " + key.getGeneration(), e);
+							' ' + key.getGeneration(), e);
 				}
 			}
 		}
@@ -204,7 +204,7 @@ public class COSDocument {
 					result.put(key, newObj);
 				} catch (IOException e) {
 					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
-							" " + key.getGeneration(), e);
+							' ' + key.getGeneration(), e);
 				}
 			}
 		}
@@ -235,7 +235,7 @@ public class COSDocument {
 		} catch (IOException e) {
 			//TODO : maybe not runtime, maybe no exception at all
 			throw new VeraPDFParserException("Error while parsing object : " + key.getNumber() +
-			                                 " " + key.getGeneration(), e);
+					' ' + key.getGeneration(), e);
 		}
 	}
 
