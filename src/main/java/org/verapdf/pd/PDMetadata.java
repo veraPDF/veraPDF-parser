@@ -53,7 +53,7 @@ public class PDMetadata extends PDObject {
                     res.add(filters.getName());
                     break;
                 case COS_ARRAY:
-                    for (int i = 0; i < filters.size().intValue(); ++i) {
+                    for (int i = 0; i < filters.size(); ++i) {
                         COSObject elem = filters.at(i);
                         if (elem.getType() == COSObjType.COS_NAME) {
                             res.add(elem.getName());

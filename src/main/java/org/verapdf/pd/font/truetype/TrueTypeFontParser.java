@@ -66,17 +66,17 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
             this.readULong();   // checksum
             long offset = this.readULong();
             long length = this.readULong();   // length
-            if (tabName == TrueTypeFontParser.CMAP) {
+            if (tabName == CMAP) {
                 this.cmapParser = new TrueTypeCmapTable(this.source, offset);
-            } else if (tabName == TrueTypeFontParser.HHEA) {
+            } else if (tabName == HHEA) {
                 this.hheaParser = new TrueTypeHheaTable(this.source, offset);
-            } else if (tabName == TrueTypeFontParser.HMTX) {
+            } else if (tabName == HMTX) {
                 this.hmtxParser = new TrueTypeHmtxTable(this.source, offset);
-            } else if (tabName == TrueTypeFontParser.HEAD) {
+            } else if (tabName == HEAD) {
                 this.headParser = new TrueTypeHeadTable(this.source, offset);
-            } else if (tabName == TrueTypeFontParser.POST) {
+            } else if (tabName == POST) {
                 this.postParser = new TrueTypePostTable(this.source, offset, length);
-            } else if (tabName == TrueTypeFontParser.MAXP) {
+            } else if (tabName == MAXP) {
                 this.maxpParser = new TrueTypeMaxpTable(source, offset);
             }
         }

@@ -97,7 +97,7 @@ public class PDOutputIntent extends PDObject {
 		COSObject obj = getKey(ASAtom.DEST_OUTPUT_PROFILE);
 		if (!obj.empty() && obj.isIndirect()) {
 			COSKey key = obj.getKey();
-			return String.valueOf(key.getNumber() + " " + key.getGeneration());
+			return key.getNumber() + " " + key.getGeneration();
 		}
 		return null;
 	}

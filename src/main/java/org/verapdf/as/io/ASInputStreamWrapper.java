@@ -30,7 +30,7 @@ import java.io.IOException;
  */
 public class ASInputStreamWrapper extends ASInputStream {
 
-    private ASInputStream stream;
+    private final ASInputStream stream;
 
     public ASInputStreamWrapper(ASInputStream stream) {
         stream.incrementResourceUsers();

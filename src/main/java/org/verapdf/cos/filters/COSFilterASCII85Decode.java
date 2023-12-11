@@ -34,7 +34,7 @@ import java.util.Arrays;
  */
 public class COSFilterASCII85Decode extends ASBufferedInFilter {
 
-    private COSFilterASCIIReader reader;
+    private final COSFilterASCIIReader reader;
     private byte[] fourBytes = new byte[4];
     private int fourBytesPointer = 0;
 

@@ -35,13 +35,13 @@ import java.util.Arrays;
  */
 public class ASMemoryInStream extends SeekableInputStream {
 
-    private int bufferSize;
+    private final int bufferSize;
     private int bufferOffset = 0;
     private int currentPosition;
     private byte[] buffer;
-    private boolean copiedBuffer;
+    private final boolean copiedBuffer;
     private int resetPosition = 0;
-    private IntReference numOfBufferUsers;
+    private final IntReference numOfBufferUsers;
 
     /**
      * Constructor from byte array. Buffer is copied while initializing
@@ -262,6 +262,7 @@ public class ASMemoryInStream extends SeekableInputStream {
     /**
      * @return the amount of bytes left in stream.
      */
+    @Override
     public int available() {
         return bufferSize - (int) getCurrentOffset();
     }
@@ -278,9 +279,8 @@ public class ASMemoryInStream extends SeekableInputStream {
         if (startOffset > 0 && startOffset < this.bufferSize &&
                 startOffset + length <= this.bufferSize) {
             return new ASMemoryInStream(this, (int) startOffset, (int) length);
-        } else {
-            throw new IOException();
         }
+        throw new IOException();
     }
 
     @Override

@@ -37,8 +37,8 @@ import java.util.List;
  */
 public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProgram {
 
-    private CMap cMap;
-    private CIDToGIDMapping cidToGID;
+    private final CMap cMap;
+    private final CIDToGIDMapping cidToGID;
 
     /**
      * Constructor from font stream and encoding details.

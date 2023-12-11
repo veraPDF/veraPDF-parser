@@ -37,7 +37,7 @@ public class TaggedPDFRoleMapHelper {
 	 * @param roleMap role map from PDF
 	 */
 	public TaggedPDFRoleMapHelper(Map<ASAtom, ASAtom> roleMap) {
-		this.roleMap = roleMap == null ? Collections.<ASAtom, ASAtom>emptyMap() : new HashMap<>(roleMap);
+		this.roleMap = roleMap == null ? Collections.emptyMap() : new HashMap<>(roleMap);
 	}
 
 	/**

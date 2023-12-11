@@ -34,7 +34,7 @@ public class ASMemoryInStreamTest {
 
     @Test
     public void substreamOfStreamAtStartShouldReportCorrectOffset() throws IOException {
-        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[]{0, 1, 2})) {
             try (ASMemoryInStream copy = new ASMemoryInStream(stream, 0, 3)) {
                 assertEquals(0, copy.getOffset());
             }
@@ -43,7 +43,7 @@ public class ASMemoryInStreamTest {
 
     @Test
     public void substreamOfStreamAtStartShouldReportCorrectLength() throws IOException {
-        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[]{0, 1, 2})) {
             try (ASMemoryInStream copy = new ASMemoryInStream(stream, 0, 3)) {
                 assertEquals(3, copy.getStreamLength());
             }
@@ -52,7 +52,7 @@ public class ASMemoryInStreamTest {
 
     @Test
     public void substreamOfStreamAtOffsetShouldReportCorrectOffset() throws IOException {
-        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[]{0, 1, 2})) {
             try (ASMemoryInStream copy = new ASMemoryInStream(stream, 1, 2)) {
                 assertEquals(0, copy.getOffset());
             }
@@ -61,7 +61,7 @@ public class ASMemoryInStreamTest {
 
     @Test
     public void substreamOfStreamAtOffsetShouldReportCorrectLength() throws IOException {
-        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[]{0, 1, 2})) {
             try (ASMemoryInStream copy = new ASMemoryInStream(stream, 1, 2)) {
                 assertEquals(2, copy.getStreamLength());
             }
@@ -70,7 +70,7 @@ public class ASMemoryInStreamTest {
 
     @Test
     public void shouldSupportMarkAndReset() throws IOException {
-        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[]{0, 1, 2})) {
 
             assertEquals(0, stream.read());
             stream.mark(Integer.MAX_VALUE);
@@ -85,7 +85,7 @@ public class ASMemoryInStreamTest {
 
     @Test
     public void shouldBeAbleToReadAllBytes() throws IOException {
-        byte buf[] = { 0, 1, 2 };
+        byte[] buf = {0, 1, 2};
         try (ASMemoryInStream stream = new ASMemoryInStream(buf)) {
             for (int i = 0; i < buf.length; i++) {
                 byte b = stream.readByte();
@@ -97,14 +97,14 @@ public class ASMemoryInStreamTest {
 
     @Test(expected = IOException.class)
     public void shouldNotBeAbleToUnreadAtStart() throws IOException {
-        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[]{0, 1, 2})) {
             stream.unread();
         }
     }
 
     @Test
     public void shouldBeAbleToUnread() throws IOException {
-        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[] { 0, 1, 2 })) {
+        try (ASMemoryInStream stream = new ASMemoryInStream(new byte[]{0, 1, 2})) {
             assertEquals(0, stream.read());
             assertEquals(1, stream.read());
             stream.unread();
@@ -114,9 +114,7 @@ public class ASMemoryInStreamTest {
 
     @Test
     public void shouldHaveCorrectPositionWhenNested() throws IOException {
-        try (
-            ASMemoryInStream a = new ASMemoryInStream("abc".getBytes(StandardCharsets.US_ASCII));
-        ) {
+        try (ASMemoryInStream a = new ASMemoryInStream("abc".getBytes(StandardCharsets.US_ASCII))) {
             byte ba = a.readByte();
             assertEquals('a', ba);
             assertEquals(1, a.getOffset());
@@ -130,9 +128,7 @@ public class ASMemoryInStreamTest {
 
     @Test
     public void shouldHaveCorrectPositionWhenDoublyNested() throws IOException {
-        try (
-            ASMemoryInStream a = new ASMemoryInStream("abc".getBytes(StandardCharsets.US_ASCII));
-        ) {
+        try (ASMemoryInStream a = new ASMemoryInStream("abc".getBytes(StandardCharsets.US_ASCII))) {
             byte ba = a.readByte();
             assertEquals('a', ba);
             assertEquals(1, a.getOffset());
@@ -158,7 +154,7 @@ public class ASMemoryInStreamTest {
     @Test
     public void shouldBeAbleToReadWhenDoublyNested() throws IOException {
         byte[] buf = new byte[10 + 4];
-        byte[] deadbeef = new byte[] { (byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef };
+        byte[] deadbeef = {(byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef};
         for (int i = 0; i < 4; i++) {
             buf[i] = deadbeef[i % deadbeef.length];
         }
@@ -170,8 +166,7 @@ public class ASMemoryInStreamTest {
             assertEquals(1, inner.getOffset());
             assertEquals(0xad, inner.read());
             assertEquals(2, inner.getOffset());
-            try (ASMemoryInStream outer =
-                (ASMemoryInStream) inner.getStream(2 + inner.getOffset(), inner.getStreamLength() - 4)) {
+            try (ASMemoryInStream outer = (ASMemoryInStream) inner.getStream(2 + inner.getOffset(), inner.getStreamLength() - 4)) {
 
                 assertEquals(10, outer.getStreamLength());
                 for (int i = 0; i < 10; i++) {
@@ -187,7 +182,7 @@ public class ASMemoryInStreamTest {
     public void sholdNotBeAbleToCreateSubstreamPastEnd() throws IOException {
         byte[] buf = new byte[2];
         try (ASMemoryInStream inner = new ASMemoryInStream(buf)) {
-            try (ASMemoryInStream outer = (ASMemoryInStream) new ASMemoryInStream(inner, 1, 2)) {
+            try (ASMemoryInStream outer = new ASMemoryInStream(inner, 1, 2)) {
             }
         }
     }
@@ -196,17 +191,17 @@ public class ASMemoryInStreamTest {
     public void sholdNotBeAbleToCreateSubstreamBeforeStart() throws IOException {
         byte[] buf = new byte[2];
         try (ASMemoryInStream inner = new ASMemoryInStream(buf)) {
-            try (ASMemoryInStream outer = (ASMemoryInStream) new ASMemoryInStream(inner, -1, 2)) {
+            try (ASMemoryInStream outer = new ASMemoryInStream(inner, -1, 2)) {
             }
         }
     }
 
     @Test
     public void shouldBeAbleToCreateSubstreamBeforeStartOfOffsetSubstream() throws IOException {
-        byte[] buf = new byte[] {1, 2, 3};
+        byte[] buf = {1, 2, 3};
         try (ASMemoryInStream grandparent = new ASMemoryInStream(buf)) {
-            try (ASMemoryInStream parent = (ASMemoryInStream) new ASMemoryInStream(grandparent, 1, 2)) {
-                try (ASMemoryInStream child = (ASMemoryInStream) new ASMemoryInStream(parent, -1, 3)) {
+            try (ASMemoryInStream parent = new ASMemoryInStream(grandparent, 1, 2)) {
+                try (ASMemoryInStream child = new ASMemoryInStream(parent, -1, 3)) {
                     assertEquals(1, child.readByte() & 0xff);
                 }
             }

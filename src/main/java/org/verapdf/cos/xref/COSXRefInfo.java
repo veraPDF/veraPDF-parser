@@ -32,7 +32,7 @@ public class COSXRefInfo {
 
 	private long startXRef;
 	private COSXRefSection xref;
-	private COSTrailer trailer;
+	private final COSTrailer trailer;
 
 	/**
 	 * Creates empty COSXrefInfo object.

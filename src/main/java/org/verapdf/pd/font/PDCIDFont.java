@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 public class PDCIDFont extends PDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDCIDFont.class.getCanonicalName());
-    private static final Double DEFAULT_CID_FONT_WIDTH = Double.valueOf(1000d);
+    private static final Double DEFAULT_CID_FONT_WIDTH = 1000d;
 
     protected CMap cMap;
     private CIDWArray widths;
@@ -250,12 +250,10 @@ public class PDCIDFont extends PDFont {
      * @return CID System Info object for this CIDFont.
      */
     public PDCIDSystemInfo getCIDSystemInfo() {
-        if (this.cidSystemInfo != null) {
-            return this.cidSystemInfo;
-        } else {
+        if (this.cidSystemInfo == null) {
             this.cidSystemInfo =
                     new PDCIDSystemInfo(this.dictionary.getKey(ASAtom.CID_SYSTEM_INFO));
-            return this.cidSystemInfo;
         }
+        return this.cidSystemInfo;
     }
 }

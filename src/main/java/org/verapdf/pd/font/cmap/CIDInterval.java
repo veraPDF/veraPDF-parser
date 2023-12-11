@@ -27,9 +27,9 @@ package org.verapdf.pd.font.cmap;
  */
 class CIDInterval implements CIDMappable {
 
-    private int intervalStart;
-    private int intervalEnd;
-    protected int startingCID;
+    private final int intervalStart;
+    private final int intervalEnd;
+    protected final int startingCID;
 
     CIDInterval(int intervalStart, int intervalEnd, int startingCID) {
         this.intervalStart = intervalStart;
@@ -54,6 +54,7 @@ class CIDInterval implements CIDMappable {
      * @param character is code of character.
      * @return CID of given character.
      */
+    @Override
     public int getCID(int character) {
         if (!contains(character)) {
             return -1;

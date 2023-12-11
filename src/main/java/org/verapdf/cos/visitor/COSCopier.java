@@ -30,32 +30,38 @@ import java.util.Map;
  */
 public class COSCopier implements IVisitor {
 
-	private COSObject copy;
+	private final COSObject copy;
 
 	public COSCopier(COSObject copy) {
 		this.copy = copy;
 	}
 
+	@Override
 	public void visitFromBoolean(COSBoolean obj) {
 		this.copy.assign(COSBoolean.construct(obj.get()));
 	}
 
+	@Override
 	public void visitFromInteger(COSInteger obj) {
 		this.copy.assign(COSInteger.construct(obj.get()));
 	}
 
+	@Override
 	public void visitFromReal(COSReal obj) {
 		this.copy.assign(COSReal.construct(obj.get()));
 	}
 
+	@Override
 	public void visitFromString(COSString obj) {
 		this.copy.assign(COSString.construct(obj.get(), obj.isHexadecimal()));
 	}
 
+	@Override
 	public void visitFromName(COSName obj) {
 		this.copy.assign(COSName.construct(obj.get()));
 	}
 
+	@Override
 	public void visitFromArray(COSArray obj) {
 		this.copy.assign(COSArray.construct());
 
@@ -67,6 +73,7 @@ public class COSCopier implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromDictionary(COSDictionary obj) {
 		this.copy.assign(COSDictionary.construct());
 
@@ -78,16 +85,19 @@ public class COSCopier implements IVisitor {
 		}
 	}
 
+	@Override
 	public void visitFromStream(COSStream obj) {
 		visitFromDictionary(obj);
 		this.copy.assign(COSStream.construct((COSDictionary) this.copy.get(), obj.getData(), obj.getFilterFlags()));
 	}
 
+	@Override
 	public void visitFromNull(COSNull obj) {
 		//TODO : make singleton
 		this.copy.assign(COSNull.construct());
 	}
 
+	@Override
 	public void visitFromIndirect(COSIndirect obj) {
 		try {
 			this.copy.set(obj);

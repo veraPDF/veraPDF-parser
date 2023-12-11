@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class FileResourceHandler implements Closeable {
 
-    private List<Closeable> resources;
+    private final List<Closeable> resources;
 
     public FileResourceHandler() {
         this.resources = new ArrayList<>();

@@ -35,7 +35,7 @@ import java.util.Stack;
  */
 public class PSProcedure extends PSObject {
 
-    private COSArray procedure;
+    private final COSArray procedure;
 
     public PSProcedure(COSArray procedure) {
         super(procedure);

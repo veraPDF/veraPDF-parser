@@ -41,10 +41,10 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
     private static final Logger LOGGER = Logger.getLogger(CFFFontProgram.class.getCanonicalName());
     private FontProgram font;
-    private CMap externalCMap;
+    private final CMap externalCMap;
     private boolean isCIDFont = false;
     private boolean isFontParsed = false;
-    private boolean isSubset;
+    private final boolean isSubset;
 
     /**
      * Constructor from stream.
@@ -187,7 +187,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
     @Override
     public List<Integer> getCIDList() {
         if (this.font instanceof CFFCIDFontProgram) {
-            return ((CFFCIDFontProgram) this.font).getCIDList();
+            return this.font.getCIDList();
         } else {
             return Collections.emptyList();
         }

@@ -259,7 +259,7 @@ public class SeekableCOSParser extends COSParser {
 
 	protected String getErrorMessage(String message, long offset) {
 		if (keyOfCurrentObject != null) {
-			return message + "(object key = " + keyOfCurrentObject + ", offset = " + offset + ")";
+			return message + "(object key = " + keyOfCurrentObject + ", offset = " + offset + ')';
 		}
 		return getBaseParser().getErrorMessage(message, offset);
 	}

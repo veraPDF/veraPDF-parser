@@ -28,7 +28,7 @@ import java.util.TreeSet;
  */
 public class ZapfDingbats {
 
-    private static Set<String> glyphNames = new TreeSet<>();
+    private static final Set<String> glyphNames = new TreeSet<>();
 
     static {
         glyphNames.add("a100");

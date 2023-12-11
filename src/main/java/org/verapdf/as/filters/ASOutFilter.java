@@ -20,7 +20,6 @@
  */
 package org.verapdf.as.filters;
 
-import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASOutputStream;
 

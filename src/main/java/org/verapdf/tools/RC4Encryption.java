@@ -27,8 +27,8 @@ package org.verapdf.tools;
  */
 public class RC4Encryption {
 
-    private int[] s = new int[256];
-    private int[] key;
+    private final int[] s = new int[256];
+    private final int[] key;
     private int i;
     private int j;
 

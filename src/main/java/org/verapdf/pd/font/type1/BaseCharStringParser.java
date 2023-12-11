@@ -35,15 +35,15 @@ import java.util.Stack;
  */
 public abstract class BaseCharStringParser {
 
-    private Stack<ASInputStream> streams;
-    protected Stack<CFFNumber> stack;
+    private final Stack<ASInputStream> streams;
+    protected final Stack<CFFNumber> stack;
     private CFFNumber width;
 
-    protected CFFIndex globalSubrs;
-    protected CFFIndex localSubrs;
-    protected int bias;
-    protected int gBias;
-    protected Map<Integer, CFFNumber> subrWidths;
+    protected final CFFIndex globalSubrs;
+    protected final CFFIndex localSubrs;
+    protected final int bias;
+    protected final int gBias;
+    protected final Map<Integer, CFFNumber> subrWidths;
 
     /**
      * Constructor that calls method parse(), so width is extracted right after

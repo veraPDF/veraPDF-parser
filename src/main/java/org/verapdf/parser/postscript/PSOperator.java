@@ -174,7 +174,7 @@ public class PSOperator extends PSObject {
                     operandStack.push(COSDictionary.construct());
                     break;
                 case PSOperatorsConstants.BEGIN:
-                    if (operandStack.size() > 0) {
+                    if (!operandStack.isEmpty()) {
                         operandStack.pop();
                     }
                     break;
@@ -214,7 +214,7 @@ public class PSOperator extends PSObject {
                     }
                     COSObject lastOperand = operandStack.peek();
                     if (lastOperand.getType() == COSObjType.COS_NAME
-                            && lastOperand.getString().equals("Encoding")) {
+                            && "Encoding".equals(lastOperand.getString())) {
                         operandStack.pop();
                         userDict.put(lastOperand.getName(), COSName.construct(ASAtom.STANDARD_ENCODING));
                     }

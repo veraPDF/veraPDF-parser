@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  */
 public class COSFilterRegistry {
 
-	private static Map<ASAtom, IASFilterFactory> registeredFactories;
+	private static final Map<ASAtom, IASFilterFactory> registeredFactories;
 	private static final Logger LOGGER = Logger.getLogger(COSFilterRegistry.class.getCanonicalName());
 
 	static {

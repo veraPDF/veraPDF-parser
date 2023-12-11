@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class OpenTypeCFFTest {
 
-    private String fontFilePath = "src/test/resources/org/verapdf/pd/font/opentype/ShortStack-Regular.otf";
+    private final String fontFilePath = "src/test/resources/org/verapdf/pd/font/opentype/ShortStack-Regular.otf";
 
     @Test
     public void test() throws IOException {

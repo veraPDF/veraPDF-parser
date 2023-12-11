@@ -25,6 +25,7 @@ import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * @author Timur Kamalov
@@ -47,6 +48,7 @@ public class COSName extends COSDirect {
         this.value = ASAtom.getASAtom(value);
     }
 
+    @Override
     public COSObjType getType() {
         return COSObjType.COS_NAME;
     }
@@ -67,19 +69,23 @@ public class COSName extends COSDirect {
         return new COSObject(new COSName(value));
     }
 
+    @Override
     public void accept(final IVisitor visitor) {
         visitor.visitFromName(this);
     }
 
+    @Override
     public Object accept(final ICOSVisitor visitor) {
         return visitor.visitFromName(this);
     }
 
     //! ASAtom data exchange
+    @Override
     public ASAtom getName() {
         return this.value;
     }
 
+    @Override
     public boolean setName(final ASAtom value) {
         set(value);
         return true;
@@ -101,6 +107,7 @@ public class COSName extends COSDirect {
 		/*! It is recommended to use ASAtom instead of the string representation of the PDF Name object
 		    whenever possible. See method GetName().
 		*/
+    @Override
     public String getString() {
         return this.value.getValue();
     }
@@ -109,6 +116,7 @@ public class COSName extends COSDirect {
         return new String(this.getString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
+    @Override
     public boolean setString(final String value) {
         set(value);
         return true;
@@ -125,7 +133,7 @@ public class COSName extends COSDirect {
 
         COSName cosName = (COSName) o;
 
-        return value != null ? value.equals(cosName.value) : cosName.value == null;
+        return Objects.equals(value, cosName.value);
 
     }
 }

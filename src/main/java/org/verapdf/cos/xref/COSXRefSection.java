@@ -31,7 +31,7 @@ import java.util.*;
  */
 public class COSXRefSection {
 
-	private Map<Integer, COSXRefEntry> entries;
+	private final Map<Integer, COSXRefEntry> entries;
 
 	public COSXRefSection() {
 		this.entries = new TreeMap<>();

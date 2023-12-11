@@ -44,16 +44,16 @@ public class OpenTypeFontProgram implements FontProgram {
     private static final long CFF = 1128678944;     // "CFF " read as 4-byte unsigned number
     // See TrueTypeFontParser table logic
 
-    private boolean isCFF;
-    private boolean isSymbolic;
-    private boolean isSubset;
-    private COSObject encoding;
-    private ASInputStream source;
+    private final boolean isCFF;
+    private final boolean isSymbolic;
+    private final boolean isSubset;
+    private final COSObject encoding;
+    private final ASInputStream source;
     private FontProgram font;
     private int numTables;
     private boolean attemptedParsing = false;
     private boolean successfullyParsed = false;
-    private CMap externalCMap;
+    private final CMap externalCMap;
 
     /**
      * Constructor from stream, containing font data, and encoding details.

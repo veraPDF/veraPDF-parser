@@ -34,7 +34,7 @@ public class StringExceptions {
 	public static final String XREF_STM_NOT_SUPPORTED = "xref streams not supported";
 	public static final String INVALID_PDF_OBJECT = "invalid pdf object";
 	public static final String INVALID_PDF_ARRAY = "invalid pdf array";
-	public static final String INVALID_PDF_DICTONARY = "invalid pdf dictonary";
+	public static final String INVALID_PDF_DICTIONARY = "invalid pdf dictionary";
 	public static final String INVALID_PDF_STREAM = "invalid pdf stream";
 
 	public static final String DUPLICATE_FACTORY_NAMES = "internal library error";

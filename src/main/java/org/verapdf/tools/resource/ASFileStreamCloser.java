@@ -30,7 +30,7 @@ import java.io.IOException;
  */
 public class ASFileStreamCloser implements Closeable {
 
-    private Closeable stream;
+    private final Closeable stream;
 
     /**
      * Sets inner stream.

@@ -28,7 +28,7 @@ package org.verapdf.cos.xref;
  */
 public class COSXRefEntry {
 
-	public final static COSXRefEntry FIRST_XREF_ENTRY = new COSXRefEntry(0, 65535, 'f');
+	public static final COSXRefEntry FIRST_XREF_ENTRY = new COSXRefEntry(0, 65535, 'f');
 
 	/**
 	 * Is offset of object in the document.

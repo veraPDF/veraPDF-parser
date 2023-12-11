@@ -116,10 +116,8 @@ public class SeekableBaseParser extends BaseParser {
 		byte c = this.source.readByte();
 		if (isCR(c)) {
 			c = this.source.readByte();
-			if (!isLF(c)) {
-				this.source.unread();
-			}
-		} else if (!isLF(c)) {
+		}
+		if (!isLF(c)) {
 			this.source.unread();
 		}
 	}
@@ -226,12 +224,13 @@ public class SeekableBaseParser extends BaseParser {
 		}
 	}
 
+	@Override
 	protected String getErrorMessage(String message) {
 		return getErrorMessage(message, getSource().getCurrentOffset());
 	}
 
 	protected String getErrorMessage(String message, long offset) {
-		return message + "(offset = " + offset + ")";
+		return message + "(offset = " + offset + ')';
 	}
 
 	@Override

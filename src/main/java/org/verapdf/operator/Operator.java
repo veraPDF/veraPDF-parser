@@ -30,7 +30,7 @@ public class Operator {
 
 	private static final Map<String, Operator> CACHED_OPERATORS = new HashMap<>();
 
-	private String operator;
+	private final String operator;
 
 	protected Operator(final String operator) {
 		this.operator = operator;
@@ -38,7 +38,7 @@ public class Operator {
 
 	public static Operator getOperator(final String operator) {
 		//don't cache image operators due to unique parameters and data
-		if (operator.equals("BI") || operator.equals("ID")) {
+		if ("BI".equals(operator) || "ID".equals(operator)) {
 			return new InlineImageOperator(operator);
 		} else {
 			if (CACHED_OPERATORS.containsKey(operator)) {

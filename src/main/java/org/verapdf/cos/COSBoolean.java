@@ -41,6 +41,7 @@ public class COSBoolean extends COSDirect {
         this.value = initValue;
     }
 
+    @Override
     public COSObjType getType() {
         return COSObjType.COS_BOOLEAN;
     }
@@ -49,18 +50,22 @@ public class COSBoolean extends COSDirect {
         return new COSObject(new COSBoolean(initValue));
     }
 
+    @Override
     public void accept(final IVisitor visitor) {
         visitor.visitFromBoolean(this);
     }
 
+    @Override
     public Object accept(final ICOSVisitor visitor) {
         return visitor.visitFromBoolean(this);
     }
 
+    @Override
     public Boolean getBoolean() {
         return get();
     }
 
+    @Override
     public boolean setBoolean(final boolean value) {
         set(value);
         return true;

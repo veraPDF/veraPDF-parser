@@ -41,7 +41,7 @@ public class CIDToGIDMapping {
 
     private static final Logger LOGGER = Logger.getLogger(CIDToGIDMapping.class.getCanonicalName());
     private int[] mapping;
-    private boolean isIdentity;
+    private final boolean isIdentity;
 
     /**
      * Constructor from COSObject, containing CIDToGID.

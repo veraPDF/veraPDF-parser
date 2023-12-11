@@ -32,7 +32,7 @@ import java.util.Arrays;
 /**
  * Class provides buffered input from input stream.
  * It has two uses. If the ASBufferedInFilter object is used as a buffered
- * stream (e. g. in unseekable parsers) then the buffer holds DECODED bytes read
+ * stream (e.g. in unseekable parsers) then the buffer holds DECODED bytes read
  * from inlaying stream.
  * Before using the ASBufferedInFilter in this make sure to call initialize()
  * method.
@@ -130,6 +130,7 @@ public class ASBufferedInFilter extends ASInFilter implements BaseParserInputStr
         return read(buffer, buffer.length);
     }
 
+    @Override
     public byte readByte() throws IOException {
         if (eod != -1 && pos >= eod) {
             return -1;
@@ -325,6 +326,7 @@ public class ASBufferedInFilter extends ASInFilter implements BaseParserInputStr
         return skipped;
     }
 
+    @Override
     public int peek() throws IOException {
         return peek(0);
     }
@@ -340,10 +342,12 @@ public class ASBufferedInFilter extends ASInFilter implements BaseParserInputStr
         return this.buffer[index] & 0xFF;
     }
 
+    @Override
     public void unread() throws IOException {
         unread(1);
     }
 
+    @Override
     public void unread(int i) throws IOException {
         int index = pos - i;
         if (index > buffer.length || index < 0) {
@@ -353,6 +357,7 @@ public class ASBufferedInFilter extends ASInFilter implements BaseParserInputStr
         this.readCounter -= i;
     }
 
+    @Override
     public boolean isEOF() {
         return eod != -1 && pos >= eod;
     }

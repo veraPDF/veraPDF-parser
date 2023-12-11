@@ -34,7 +34,7 @@ import java.util.zip.Inflater;
  */
 public class COSFilterFlateDecode extends ASBufferedInFilter {
 
-    private Inflater inflater;
+    private final Inflater inflater;
     private int bufferSize;
 
     /**

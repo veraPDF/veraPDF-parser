@@ -37,7 +37,7 @@ public class StandardFontMetrics {
 
     private static final String NOTDEF_STRING = ".notdef";
 
-    private Map<String, Integer> widths;
+    private final Map<String, Integer> widths;
 
     // values
     private String fontName;

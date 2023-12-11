@@ -40,9 +40,9 @@ import java.util.logging.Logger;
 class TrueTypePostTable extends TrueTypeTable {
 
     private static final Logger LOGGER = Logger.getLogger(TrueTypePostTable.class.getCanonicalName());
-    private long length;
+    private final long length;
     private int numGlyphs;
-    private Map<String, Integer> stringToGid;
+    private final Map<String, Integer> stringToGid;
 
     TrueTypePostTable(SeekableInputStream source, long offset, long length) {
         super(source, offset);
@@ -110,7 +110,7 @@ class TrueTypePostTable extends TrueTypeTable {
 
     int getGID(String s) {
         Integer res = this.stringToGid.get(s);
-        return res == null ? 0 : res.intValue();    // gid for .notdef
+        return res == null ? 0 : res;    // gid for .notdef
     }
 
     boolean containsGlyph(String glyphName) {

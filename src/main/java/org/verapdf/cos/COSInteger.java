@@ -34,6 +34,7 @@ public class COSInteger extends COSNumber {
         this.value = value;
     }
 
+    @Override
     public COSObjType getType() {
         return COSObjType.COS_INTEGER;
     }
@@ -42,27 +43,33 @@ public class COSInteger extends COSNumber {
         return new COSObject(new COSInteger(initValue));
     }
 
+    @Override
     public void accept(final IVisitor visitor) {
         visitor.visitFromInteger(this);
     }
 
+    @Override
     public Object accept(final ICOSVisitor visitor) {
         return visitor.visitFromInteger(this);
     }
 
+    @Override
     public Long getInteger() {
         return get();
     }
 
+    @Override
     public boolean setInteger(final long value) {
         set(value);
         return true;
     }
 
+    @Override
     public Double getReal() {
         return (double) get();
     }
 
+    @Override
     public boolean setReal(final double value) {
         set((long) value);
         return true;

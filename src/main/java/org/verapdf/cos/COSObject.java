@@ -25,6 +25,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -32,7 +33,7 @@ import java.util.Set;
  */
 public class COSObject {
 
-	private final static COSObject EMPTY = new COSObject();
+	private static final COSObject EMPTY = new COSObject();
 
 	private COSBase base;
 
@@ -496,7 +497,7 @@ public class COSObject {
 
 		COSObject cosObject = (COSObject) o;
 
-		return base != null ? base.equals(cosObject.base) : cosObject.base == null;
+		return Objects.equals(base, cosObject.base);
 
 	}
 

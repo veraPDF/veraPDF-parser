@@ -67,6 +67,7 @@ public class NotSeekableBaseParser extends BaseParser implements Closeable {
     /**
      * Closes source stream.
      */
+    @Override
     public void close() throws IOException {
         this.source.close();
     }
@@ -96,10 +97,8 @@ public class NotSeekableBaseParser extends BaseParser implements Closeable {
 
         if (space == ASCII_CR) {
             space = this.source.readByte();
-            if (space != ASCII_LF) {
-                this.source.unread();
-            }
-        } else if (space != ASCII_LF) {
+        }
+        if (space != ASCII_LF) {
             this.source.unread();
         }
     }
@@ -153,6 +152,7 @@ public class NotSeekableBaseParser extends BaseParser implements Closeable {
         return res;
     }
 
+    @Override
     protected ASBufferedInFilter getSource() {
         return (ASBufferedInFilter) source;
     }

@@ -59,10 +59,10 @@ public abstract class BaseParser {
         byte ch = this.source.readByte();
         while (!CharTable.isSpace(ch) && !CharTable.isTokenDelimiter(ch)) {
             appendToToken(ch);
-            if (!this.source.isEOF()) {
-                ch = this.source.readByte();
-            } else {
+            if (this.source.isEOF()) {
                 break;
+            } else {
+                ch = this.source.readByte();
             }
         }
         if (CharTable.isSpace(ch) || CharTable.isTokenDelimiter(ch)) {
@@ -135,9 +135,9 @@ public abstract class BaseParser {
             int read = ascii85Decode.read(buf);
 
             this.token.setContainsOnlyHex(false);
-            this.token.setHexCount(Long.valueOf(0));
+            this.token.setHexCount(0L);
             if (read == -1) {
-				LOGGER.log(Level.WARNING, "Invalid ASCII85 string");
+                LOGGER.log(Level.WARNING, "Invalid ASCII85 string");
                 this.token.clearValue();
             } else {
                 this.token.setByteValue(Arrays.copyOf(buf, read));
@@ -290,7 +290,7 @@ public abstract class BaseParser {
                     appendToToken(uc);
                 }
                 this.token.setContainsOnlyHex(containsOnlyHex);
-                this.token.setHexCount(Long.valueOf(hexCount));
+                this.token.setHexCount(hexCount);
                 return;
             } else if (!CharTable.isSpace(ch)) {
                 hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
@@ -311,7 +311,7 @@ public abstract class BaseParser {
         }
 
         this.token.setContainsOnlyHex(containsOnlyHex);
-        this.token.setHexCount(Long.valueOf(hexCount));
+        this.token.setHexCount(hexCount);
     }
 
     protected void readNumber() throws IOException {
@@ -334,7 +334,7 @@ public abstract class BaseParser {
                     appendToToken(ch);
                 } else if (ch == '#' && isPSParser) {
                     if (this.token.type == Token.Type.TT_INTEGER) {
-                        radix = Integer.valueOf(this.token.getValue());
+                        radix = Integer.parseInt(this.token.getValue());
                     }
                     token.clearValue();
                 } else {
@@ -343,11 +343,11 @@ public abstract class BaseParser {
                 }
             }
             if (this.token.type == Token.Type.TT_INTEGER) {
-                long value = Long.valueOf(this.token.getValue(), radix).longValue();
+                long value = Long.valueOf(this.token.getValue(), radix);
                 this.token.integer = value;
                 this.token.real = value;
             } else {
-                double value = Double.valueOf(this.token.getValue()).doubleValue();
+                double value = Double.parseDouble(this.token.getValue());
                 this.token.integer = Math.round(value);
                 this.token.real = value;
             }

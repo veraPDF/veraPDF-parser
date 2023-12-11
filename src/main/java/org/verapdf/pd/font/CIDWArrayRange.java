@@ -27,9 +27,9 @@ package org.verapdf.pd.font;
  * @author Sergey Shemyakov
  */
 public class CIDWArrayRange {
-    private double width;
-    private int beginCID;
-    private int endCID;
+    private final double width;
+    private final int beginCID;
+    private final int endCID;
 
     public CIDWArrayRange(int beginCID, int endCID, double width) {
         this.width = width;

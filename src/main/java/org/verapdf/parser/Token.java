@@ -38,7 +38,7 @@ public class Token {
 	public long integer;
 	public double real;
 
-	private ByteArrayOutputStream token = new ByteArrayOutputStream();
+	private final ByteArrayOutputStream token = new ByteArrayOutputStream();
 
 	//fields specific for pdf/a validation of strings
 	private boolean containsOnlyHex = true;

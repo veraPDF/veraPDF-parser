@@ -48,7 +48,7 @@ public class COSStreamTest {
         byte[] buf = new byte[100];
         int read = cosStream.getData(COSStream.FilterFlags.DECODE).read(buf, 100);
         String message = new String(Arrays.copyOf(buf, read), StandardCharsets.ISO_8859_1);
-        assertEquals(message, SAMPLE_DATA);
+        assertEquals(SAMPLE_DATA, message);
     }
 
 }

@@ -28,7 +28,7 @@ package org.verapdf.tools;
 public class PDFDocEncoding {
 
     private static final int UNKNOWN = '\uFFFD';
-    private static int[] encoding = new int[256];
+    private static final int[] encoding = new int[256];
 
     static {
         for (int i = 0; i < 256; ++i) {
@@ -87,7 +87,7 @@ public class PDFDocEncoding {
      * Applies PDF doc encoding to given byte array.
      *
      * @param bytes to be PDF doc encoded.
-     * @return String that containes PDF doc encoded bytes.
+     * @return String that contains PDF doc encoded bytes.
      */
     public static String getStringFromBytes(byte[] bytes) {
         StringBuilder sb = new StringBuilder();

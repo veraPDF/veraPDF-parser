@@ -48,7 +48,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	private static final int INLINE_IMAGE_BUFFER_SIZE = 8192;
 
 	private final List<Object> tokens = new ArrayList<>();
-	private List<Closeable> imageDataStreams = new ArrayList<>();
+	private final List<Closeable> imageDataStreams = new ArrayList<>();
 
 	private COSDictionary lastInlineImageDict;
 
@@ -74,45 +74,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	}
 
 	public Iterator<Object> getTokensIterator() {
-		return new Iterator<Object>() {
-
-			private Object token;
-
-			private void tryNext() {
-				try {
-					if (token == null) {
-						token = parseNextToken();
-					}
-				} catch (IOException e) {
-					throw new VeraPDFParserException(e);
-				}
-			}
-
-			/** {@inheritDoc} */
-			@Override
-			public boolean hasNext() {
-				tryNext();
-				return token != null;
-			}
-
-			/** {@inheritDoc} */
-			@Override
-			public Object next() {
-				tryNext();
-				Object tmp = token;
-				if (tmp == null) {
-					throw new NoSuchElementException();
-				}
-				token = null;
-				return tmp;
-			}
-
-			/** {@inheritDoc} */
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-		};
+		return new TokensIterator();
 	}
 
 	/**
@@ -164,7 +126,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			case 'n': {
 				// null
 				String nullString = getBaseParser().readUntilDelimiter();
-				if (nullString.equals("null")) {
+				if ("null".equals(nullString)) {
 					result = new COSObject(COSNull.NULL);
 				} else {
 					result = Operator.getOperator(nullString);
@@ -174,10 +136,10 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			case 't':
 			case 'f': {
 				String line = getBaseParser().readUntilDelimiter();
-				if (line.equals("true")) {
+				if ("true".equals(line)) {
 					result = new COSObject(COSBoolean.TRUE);
 					break;
-				} else if (line.equals("false")) {
+				} else if ("false".equals(line)) {
 					result = new COSObject(COSBoolean.FALSE);
 				} else {
 					result = Operator.getOperator(line);
@@ -199,9 +161,9 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			case '-': {
 				Token token = getBaseParser().getToken();
 				getBaseParser().nextToken();
-				if (token.type.equals(Token.Type.TT_REAL)) {
+				if (token.type == Token.Type.TT_REAL) {
 					result = COSReal.construct(token.real);
-				} else if (token.type.equals(Token.Type.TT_INTEGER)) {
+				} else if (token.type == Token.Type.TT_INTEGER) {
 					result = COSInteger.construct(token.integer);
 				}
 				break;
@@ -255,7 +217,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			}
 			default: {
 				String operator = nextOperator();
-				if (operator.length() == 0) {
+				if (operator.isEmpty()) {
 					//stream is corrupted
 					result = null;
 				} else {
@@ -296,7 +258,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	private ASInputStream readInlineImage() throws IOException {
 		getSource().resetReadCounter();
 		Long l = this.lastInlineImageDict == null ? Long.valueOf(0) : PDInlineImage.getInlineImageKey(lastInlineImageDict, ASAtom.LENGTH).getInteger();
-		ArrayList<Byte> image = new ArrayList<>(INLINE_IMAGE_BUFFER_SIZE);
+		List<Byte> image = new ArrayList<>(INLINE_IMAGE_BUFFER_SIZE);
 		byte previousByte = getSource().readByte();
 		byte currentByte = getSource().readByte();
 		boolean imageEndFound = false;
@@ -346,12 +308,52 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		return imageDataStreams;
 	}
 
-	public static byte[] getByteArrayFromArrayList(ArrayList<Byte> list) {
+	public static byte[] getByteArrayFromArrayList(List<Byte> list) {
 		byte[] res = new byte[list.size()];
 		int i = 0;
 		for (Byte b : list) {
 			res[i++] = b;
 		}
 		return res;
+	}
+
+	private class TokensIterator implements Iterator<Object> {
+
+		private Object token;
+
+		private void tryNext() {
+			try {
+				if (token == null) {
+					token = parseNextToken();
+				}
+			} catch (IOException e) {
+				throw new VeraPDFParserException(e);
+			}
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean hasNext() {
+			tryNext();
+			return token != null;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public Object next() {
+			tryNext();
+			Object tmp = token;
+			if (tmp == null) {
+				throw new NoSuchElementException();
+			}
+			token = null;
+			return tmp;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
 	}
 }

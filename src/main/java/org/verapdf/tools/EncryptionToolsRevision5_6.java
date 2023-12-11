@@ -127,8 +127,7 @@ public class EncryptionToolsRevision5_6 {
                 aes.init(Cipher.ENCRYPT_MODE, key, initializingVector);
                 byte[] e = aes.doFinal(k1);
                 int shaType = getReminderByModulo3(Arrays.copyOf(e, 16));
-                k = shaType == 0 ? getSHAHash(256, e) :
-                        shaType == 1 ? getSHAHash(384, e) : getSHAHash(512, e);
+                k = getSHAHash(shaType == 0 ? 256 : shaType == 1 ? 384 : 512, e);
                 if (rounds >= 63 && (e[e.length - 1] & 0xFF) <= rounds - 32) {
                     break;
                 }

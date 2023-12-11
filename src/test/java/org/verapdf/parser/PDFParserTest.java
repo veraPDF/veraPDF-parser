@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author Maxim Plushchov
  */
 public class PDFParserTest {
-    final private String xrefPath = "src/test/resources/org/verapdf/parser/xref";
+    private final String xrefPath = "src/test/resources/org/verapdf/parser/xref";
 
     @Test
     public void testXrefParsing() {

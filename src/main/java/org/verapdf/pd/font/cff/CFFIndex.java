@@ -30,10 +30,10 @@ import java.util.Arrays;
  */
 public class CFFIndex {
 
-    private int count;
-    private int offsetShift;
-    private int[] offsets;
-    private byte[] data;
+    private final int count;
+    private final int offsetShift;
+    private final int[] offsets;
+    private final byte[] data;
 
     CFFIndex(int count, int offsetShift, int[] offsets, byte[] data) {
         this.count = count;

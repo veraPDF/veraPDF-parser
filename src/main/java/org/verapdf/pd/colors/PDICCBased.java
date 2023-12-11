@@ -100,7 +100,7 @@ public class PDICCBased extends PDColorSpace {
 		if (iccProfile != null) {
 			COSKey key = this.iccProfile.getObject().getKey();
 			if (key != null) {
-				return String.valueOf(key.getNumber() + " " + key.getGeneration());
+				return key.getNumber() + " " + key.getGeneration();
 			}
 		}
 		return null;
@@ -132,7 +132,7 @@ public class PDICCBased extends PDColorSpace {
 					break;
 				default:
 					LOGGER.log(Level.FINE, "Unknown amount of components in icc based colorspace (" +
-							this.numberOfComponents + ")");
+							this.numberOfComponents + ')');
 			}
 		}
 		return res;

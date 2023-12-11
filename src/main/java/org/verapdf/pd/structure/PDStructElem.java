@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class PDStructElem extends PDStructTreeNode {
 
-	private Map<ASAtom, ASAtom> rootRoleMap;
+	private final Map<ASAtom, ASAtom> rootRoleMap;
 
 	public PDStructElem(COSObject obj, Map<ASAtom, ASAtom> rootRoleMap) {
 		super(obj);

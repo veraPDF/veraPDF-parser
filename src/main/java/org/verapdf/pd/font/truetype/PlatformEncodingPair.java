@@ -27,8 +27,8 @@ package org.verapdf.pd.font.truetype;
  */
 class PlatformEncodingPair {
 
-    private int platformID;
-    private int encodingID;
+    private final int platformID;
+    private final int encodingID;
 
     PlatformEncodingPair(int platformID, int encodingID) {
         this.platformID = platformID;

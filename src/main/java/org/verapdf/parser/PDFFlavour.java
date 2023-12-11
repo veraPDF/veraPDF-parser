@@ -35,6 +35,6 @@ public enum PDFFlavour {
 		ISO_19005_2,
 		ISO_19005_3,
 		ISO_19005_4,
-		WCAG_2_1;
+		WCAG_2_1
 	}
 }

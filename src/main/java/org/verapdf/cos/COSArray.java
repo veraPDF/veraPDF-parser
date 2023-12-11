@@ -75,6 +75,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
     }
 
     //! Object type
+    @Override
     public COSObjType getType() {
         return COSObjType.COS_ARRAY;
     }
@@ -102,23 +103,28 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         return new COSObject(new COSArray(size));
     }
 
+    @Override
     public void accept(IVisitor visitor) {
         visitor.visitFromArray(this);
     }
 
+    @Override
     public Object accept(final ICOSVisitor visitor) {
         return visitor.visitFromArray(this);
     }
 
+    @Override
     public Integer size() {
         return this.entries.size();
     }
 
     //TODO : cosbase?
+    @Override
     public Iterator<COSObject> iterator() {
         return this.entries.iterator();
     }
 
+    @Override
     public COSObject at(final int i) {
         if (i >= this.entries.size()) {
             return new COSObject();
@@ -127,38 +133,45 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         return _at(i);
     }
 
+    @Override
     public boolean add(final COSObject value) {
         this.entries.add(value);
         return true;
     }
 
+    @Override
     public boolean set(final int i, final COSObject value) {
         this.entries.set(i, value);
         return true;
     }
 
+    @Override
     public boolean insert(final int i, final COSObject value) {
         this.entries.add(i, value);
         return true;
     }
 
+    @Override
     public void remove(final int i) {
         if (entries.size() > i) {
             this.entries.remove(i);
         }
     }
 
+    @Override
     public boolean setArray() {
         this.entries.clear();
         return true;
     }
 
+    @Override
     public boolean setArray(final int size, final COSObject[] value) {
         //TODO : check this
         this.entries.addAll(Arrays.asList(value));
         return true;
     }
 
+    @Override
     public boolean setArray(final int size, final double[] values) {
         this.entries.clear();
         for (double value : values) {
@@ -167,6 +180,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         return true;
     }
 
+    @Override
     public void clearArray() {
         this.entries.clear();
     }
@@ -194,6 +208,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
 
     }
 
+    @Override
     boolean equals(Object obj, List<COSBasePair> checkedObjects) {
         if (this == obj) {
             return true;

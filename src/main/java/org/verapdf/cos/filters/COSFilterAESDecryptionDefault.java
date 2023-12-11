@@ -43,11 +43,11 @@ import java.util.Arrays;
  */
 public class COSFilterAESDecryptionDefault extends ASBufferedInFilter {
 
-    private static final byte[] SALT_BYTES = new byte[]{0x73, 0x41, 0x6C, 0x54};
+    private static final byte[] SALT_BYTES = {0x73, 0x41, 0x6C, 0x54};
 
     private SecretKey key;
     private IvParameterSpec initializingVector;
-    private Cipher aes;
+    private final Cipher aes;
     private boolean isDecryptFinished;
     private int decryptedPointer;
     private byte[] decryptedBytes;

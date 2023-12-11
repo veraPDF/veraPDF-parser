@@ -49,10 +49,10 @@ public class SignatureParser extends SeekableCOSParser {
     private static final byte[] ENDSTREAM_STRING = "endstream".getBytes(StandardCharsets.ISO_8859_1);
 
     private boolean isStream = false;
-    private long[] byteRange = new long[4];
+    private final long[] byteRange = new long[4];
     private int floatingBytesNumber = 0;
     private boolean isStreamEnd = true;
-    private COSDocument document;
+    private final COSDocument document;
 
     /**
      * Constructor.
@@ -107,10 +107,10 @@ public class SignatureParser extends SeekableCOSParser {
         getBaseParser().skipSpaces();
         getBaseParser().skipExpectedCharacter('R');
         if (number.getType() != COSObjType.COS_INTEGER) {
-            throw new IOException(getErrorMessage("expected number but got" + number.getType(), numOffset));
+            throw new IOException(getErrorMessage("expected number but got " + number.getType(), numOffset));
         }
         if (generationNumber.getType() != COSObjType.COS_INTEGER) {
-            throw new IOException(getErrorMessage("expected number but got" + generationNumber.getType(), numOffset));
+            throw new IOException(getErrorMessage("expected number but got " + generationNumber.getType(), numOffset));
         }
     }
 
@@ -167,14 +167,14 @@ public class SignatureParser extends SeekableCOSParser {
         int c = getSource().read();
         if (c == 'R') {  // Indirect reference
             if (number.getType() != COSObjType.COS_INTEGER) {
-                throw new IOException(getErrorMessage("expected number but got" + number.getType(), numOffset1));
+                throw new IOException(getErrorMessage("expected number but got " + number.getType(), numOffset1));
             }
             if (generationNumber.getType() != COSObjType.COS_INTEGER) {
-                throw new IOException(getErrorMessage("expected number but got" + generationNumber.getType(), genOffset));
+                throw new IOException(getErrorMessage("expected number but got " + generationNumber.getType(), genOffset));
             }
             COSKey key = new COSKey(number.getInteger().intValue(),
                     generationNumber.getInteger().intValue());
-            long keyOffset = this.document.getOffset(key).longValue();
+            long keyOffset = this.document.getOffset(key);
             getSource().seek(keyOffset + document.getHeader().getHeaderOffset());
             parseSignatureValue();    // Recursive parsing to get to the contents hex string itself
         }

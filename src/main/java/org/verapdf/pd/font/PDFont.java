@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  */
 public abstract class PDFont extends PDResource {
 
-    private static Map<String, Double> weightNames = new LinkedHashMap<>();
+    private static final Map<String, Double> weightNames = new LinkedHashMap<>();
 
     private static final Logger LOGGER = Logger.getLogger(PDFont.class.getCanonicalName());
 
@@ -233,7 +233,7 @@ public abstract class PDFont extends PDResource {
             if (obj.getType() == COSObjType.COS_INTEGER) {
                 diffIndex = obj.getInteger().intValue();
             } else if (obj.getType() == COSObjType.COS_NAME && diffIndex != -1) {
-                res.put(Integer.valueOf(diffIndex++), obj.getString());
+                res.put(diffIndex++, obj.getString());
             }
         }
         return res;
@@ -364,7 +364,7 @@ public abstract class PDFont extends PDResource {
             return null;
         }
 
-        return Double.valueOf(0);
+        return (double) 0;
     }
 
     /**
@@ -410,9 +410,9 @@ public abstract class PDFont extends PDResource {
         }
         if (this.fontWeight == null) {
             if (fontNameWithoutSubset != null) {
-                for (String weightName : weightNames.keySet()) {
-                    if (fontNameWithoutSubset.contains(weightName)) {
-                        fontWeight = weightNames.get(weightName);
+                for (Map.Entry<String, Double> entry : weightNames.entrySet()) {
+                    if (fontNameWithoutSubset.contains(entry.getKey())) {
+                        fontWeight = entry.getValue();
                         return;
                     }
                 }

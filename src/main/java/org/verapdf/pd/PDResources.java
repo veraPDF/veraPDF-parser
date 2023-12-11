@@ -42,13 +42,13 @@ import java.util.Set;
  */
 public class PDResources extends PDObject {
 
-	private Map<ASAtom, PDColorSpace> colorSpaceMap = new HashMap<>();
-	private Map<ASAtom, PDPattern> patternMap = new HashMap<>();
-	private Map<ASAtom, PDShading> shadingMap = new HashMap<>();
-	private Map<ASAtom, PDXObject> xObjectMap = new HashMap<>();
-	private Map<ASAtom, PDExtGState> extGStateMap = new HashMap<>();
-	private Map<ASAtom, PDFont> fontMap = new HashMap<>();
-	private Map<ASAtom, PDResource> propertiesMap = new HashMap<>();
+	private final Map<ASAtom, PDColorSpace> colorSpaceMap = new HashMap<>();
+	private final Map<ASAtom, PDPattern> patternMap = new HashMap<>();
+	private final Map<ASAtom, PDShading> shadingMap = new HashMap<>();
+	private final Map<ASAtom, PDXObject> xObjectMap = new HashMap<>();
+	private final Map<ASAtom, PDExtGState> extGStateMap = new HashMap<>();
+	private final Map<ASAtom, PDFont> fontMap = new HashMap<>();
+	private final Map<ASAtom, PDResource> propertiesMap = new HashMap<>();
 
 	public PDResources(COSObject resourcesDictionary) {
 		super(resourcesDictionary);
@@ -97,10 +97,9 @@ public class PDResources extends PDObject {
 			PDPattern pattern = (PDPattern) cs;
 			patternMap.put(name, pattern);
 			return pattern;
-		} else {
-			patternMap.put(name, null);
-			return null;
 		}
+		patternMap.put(name, null);
+		return null;
 	}
 
 	public PDShading getShading(ASAtom name) {

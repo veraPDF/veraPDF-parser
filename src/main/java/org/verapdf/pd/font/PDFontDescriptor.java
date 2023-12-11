@@ -53,10 +53,10 @@ public class PDFontDescriptor extends PDObject {
     private static final int ALL_CAP_BIT = 17;
     private static final int SMALL_CAP_BIT = 18;
     private static final int FORCE_BOLD_BIT = 19;
-    private static final Double DEFAULT_LEADING = new Double(0);
-    private static final Double DEFAULT_XHEIGHT = new Double(0);
-    private static final Double DEFAULT_STEM_H = new Double(0);
-    private static final Double DEFAULT_WIDTH = new Double(0);
+    private static final Double DEFAULT_LEADING = 0d;
+    private static final Double DEFAULT_XHEIGHT = 0d;
+    private static final Double DEFAULT_STEM_H = 0d;
+    private static final Double DEFAULT_WIDTH = 0d;
 
     // values
     private String fontName;

@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class CharacterCollections {
 
-	private final static Map<String, CIDSystemInfo[]> map = new HashMap<>();
+	private static final Map<String, CIDSystemInfo[]> map = new HashMap<>();
 
 	static {
 		map.put("GB-EUC-H", new CIDSystemInfo[]{CIDSystemInfo.ADOBE_GB1_0, CIDSystemInfo.ADOBE_GB1_0,

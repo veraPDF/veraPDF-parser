@@ -88,7 +88,8 @@ public class PDCMap extends PDObject {
         }
         if (object.getType() == COSObjType.COS_STREAM) {
             return "CMap " + object.getObjectKey().toString();
-        } else if (object.getType() == COSObjType.COS_NAME) {
+        }
+        if (object.getType() == COSObjType.COS_NAME) {
             return object.getString();
         }
         return "";
