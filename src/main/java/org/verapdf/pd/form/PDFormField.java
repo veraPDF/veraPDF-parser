@@ -109,7 +109,7 @@ public class PDFormField extends PDObject {
 		COSObject currObject = getObject();
 		Set<COSKey> checkedObjects = new HashSet<>();
 		while (currObject != null && !currObject.empty()) {
-			String partial = getStringKey(ASAtom.T);
+			String partial = currObject.getStringKey(ASAtom.T);
 			if (partial != null) {
 				parts.add(partial);
 			}
@@ -129,7 +129,7 @@ public class PDFormField extends PDObject {
 		if (!parts.isEmpty()) {
 			StringBuilder builder = new StringBuilder();
 			for (int i = parts.size() - 1; i > 0; --i) {
-				builder.append(parts.get(i)).append(".");
+				builder.append(parts.get(i)).append('.');
 			}
 			builder.append(parts.get(0));
 			return builder.toString();
@@ -146,29 +146,18 @@ public class PDFormField extends PDObject {
 	}
 
 	public List<PDFormField> getChildFormFields() {
-		if (isNonTerminalField()) {
+		COSObject kids = getKey(ASAtom.KIDS);
+		if (kids != null && kids.getType() == COSObjType.COS_ARRAY) {
 			List<PDFormField> res = new ArrayList<>();
-			for (COSObject elem : (COSArray) getKey(ASAtom.KIDS).getDirectBase()) {
-				res.add(createTypedFormField(elem, this.parents));
+			
+			for (COSObject elem : (COSArray)kids.getDirectBase()) {
+				if (elem != null) {
+					res.add(createTypedFormField(elem, this.parents));
+				}
 			}
 			return Collections.unmodifiableList(res);
 		}
 		return Collections.emptyList();
-	}
-
-	private boolean isNonTerminalField() {
-		COSObject kids = getKey(ASAtom.KIDS);
-		if (kids != null && kids.getType() == COSObjType.COS_ARRAY) {
-			for (COSObject elem : (COSArray) kids.getDirectBase()) {
-				if (elem == null
-						|| !elem.getType().isDictionaryBased()
-						|| ASAtom.ANNOT.equals(elem.getNameKey(ASAtom.TYPE))) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
 	}
 
     private static ASAtom getFieldTypeCOSObject(COSObject field) {
