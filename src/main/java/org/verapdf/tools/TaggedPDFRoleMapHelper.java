@@ -56,7 +56,7 @@ public class TaggedPDFRoleMapHelper {
 			currentStandardTypes = TaggedPDFHelper.getPdf14StandardRoleTypes();
 			isFastStop = true;
 		} else {
-			if (StaticResources.getFlavour() == PDFFlavour.WCAG2_1) {
+			if (StaticResources.getFlavour().getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
 				currentStandardTypes = TaggedPDFHelper.getWcagStandardRoleTypes();
 			} else {
 				currentStandardTypes = TaggedPDFHelper.getPdf17StandardRoleTypes();

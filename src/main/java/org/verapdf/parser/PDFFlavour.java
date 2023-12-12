@@ -15,10 +15,11 @@ public enum PDFFlavour {
 	PDFA_4_E(Specification.ISO_19005_4),
 	PDFUA_1(Specification.ISO_14289_1),
 	PDFUA_2(Specification.ISO_14289_2),
-	WCAG2_1(Specification.WCAG_2_1);
+	WCAG2_1(Specification.WCAG2_1),
+	WCAG2_2(Specification.WCAG2_2);
 
 	private final Specification specification;
-	
+
 	private PDFFlavour(final Specification specification) {
 		this.specification = specification;
 	}
@@ -28,13 +29,31 @@ public enum PDFFlavour {
 	}
 
 	public enum Specification {
-		NO_STANDARD,
-		ISO_14289_1,
-		ISO_14289_2,
-		ISO_19005_1,
-		ISO_19005_2,
-		ISO_19005_3,
-		ISO_19005_4,
-		WCAG_2_1
+		NO_STANDARD(SpecificationFamily.NONE),
+		ISO_14289_1(SpecificationFamily.PDF_UA),
+		ISO_14289_2(SpecificationFamily.PDF_UA),
+		ISO_19005_1(SpecificationFamily.PDF_A),
+		ISO_19005_2(SpecificationFamily.PDF_A),
+		ISO_19005_3(SpecificationFamily.PDF_A),
+		ISO_19005_4(SpecificationFamily.PDF_A),
+		WCAG2_1(SpecificationFamily.WCAG),
+		WCAG2_2(SpecificationFamily.WCAG);
+
+		private final SpecificationFamily family;
+
+		Specification(final SpecificationFamily family) {
+			this.family = family;
+		}
+		
+		public SpecificationFamily getFamily() {
+			return family;
+		}
+	}
+	
+	public enum SpecificationFamily {
+		NONE,
+		PDF_A,
+		PDF_UA,
+		WCAG
 	}
 }
