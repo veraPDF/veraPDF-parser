@@ -134,8 +134,8 @@ public class PDStructElem extends PDStructTreeNode {
 
 	public static StructureType getStructureElementStandardStructureType(PDStructElem pdStructElem) {
 		PDFFlavour flavour = StaticResources.getFlavour();
-		if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_4 || 
-				flavour == PDFFlavour.PDFUA_2 || flavour == PDFFlavour.WCAG2_1) {
+		if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_4 || flavour == PDFFlavour.PDFUA_2 || 
+				flavour.getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
 			StructureType defaultStructureType = pdStructElem.getDefaultStructureType();
 			if (defaultStructureType != null) {
 				return defaultStructureType;
