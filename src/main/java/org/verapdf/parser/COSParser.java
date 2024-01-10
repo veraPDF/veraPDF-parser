@@ -123,14 +123,10 @@ public abstract class COSParser {
             case TT_REAL:
                 return COSReal.construct(token.real);
             case TT_LITSTRING:
-                return COSString.construct(token.getByteValue());
+                return this.decryptCOSString(COSString.construct(token.getByteValue()));
             case TT_HEXSTRING:
-                COSObject res = COSString.construct(token.getByteValue(), true,
-                        token.getHexCount(), token.isContainsOnlyHex());
-                if (this.document == null || !this.document.isEncrypted()) {
-                    return res;
-                }
-                return this.decryptCOSString(res);
+                return this.decryptCOSString(COSString.construct(token.getByteValue(), true,
+                        token.getHexCount(), token.isContainsOnlyHex()));
             case TT_NAME:
                 return COSName.construct(token.getValue());
             case TT_OPENARRAY:
@@ -230,15 +226,8 @@ public abstract class COSParser {
         return dict;
     }
 
-    private COSObject decryptCOSString(COSObject string) {
-        StandardSecurityHandler ssh = this.document.getStandardSecurityHandler();
-        try {
-            ssh.decryptString((COSString) string.getDirectBase(), this.keyOfCurrentObject);
-            return string;
-        } catch (IOException | GeneralSecurityException e) {
-            LOGGER.log(Level.WARNING, getErrorMessage("Can't decrypt string"));
-            return string;
-        }
+    protected COSObject decryptCOSString(COSObject string) {
+        return string;
     }
 
     protected String getErrorMessage(String message) {
