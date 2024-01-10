@@ -29,6 +29,7 @@ import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.cos.xref.COSXRefSection;
 import org.verapdf.exceptions.LoopedException;
 import org.verapdf.io.SeekableInputStream;
+import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -634,5 +635,23 @@ public class PDFParser extends SeekableCOSParser {
 
     public boolean isContainsXRefStream() {
         return containsXRefStream;
+    }
+
+    @Override
+    protected COSObject decryptCOSString(COSObject string) {
+        if (this.document == null || !this.document.isEncrypted()) {
+            return string;
+        }
+        if (getEncryption() != null && Objects.equals(this.keyOfCurrentObject, getEncryption().getObjectKey())) {
+            return string;
+        }
+        StandardSecurityHandler ssh = this.document.getStandardSecurityHandler();
+        try {
+            ssh.decryptString((COSString) string.getDirectBase(), this.keyOfCurrentObject);
+            return string;
+        } catch (IOException | GeneralSecurityException e) {
+            LOGGER.log(Level.WARNING, getErrorMessage("Can't decrypt string"));
+            return string;
+        }
     }
 }
