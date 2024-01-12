@@ -160,4 +160,9 @@ public class PDStructElem extends PDStructTreeNode {
 		return StaticResources.getFlavour() == PDFFlavour.PDFUA_2 && standardStructureType != null &&
 				TaggedPDFConstants.MATH_ML_NAMESPACE.equals(standardStructureType.getNameSpaceURI());
 	}
+
+	public static boolean isPassThroughTag(String structureType) {
+		return TaggedPDFConstants.NON_STRUCT.equals(structureType) || TaggedPDFConstants.DIV.equals(structureType) ||
+				TaggedPDFConstants.PART.equals(structureType);
+	}
 }
