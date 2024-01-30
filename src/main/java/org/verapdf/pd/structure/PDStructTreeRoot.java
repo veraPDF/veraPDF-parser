@@ -24,7 +24,6 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.tools.StaticResources;
-import org.verapdf.tools.TaggedPDFHelper;
 
 import java.util.*;
 
@@ -36,16 +35,6 @@ public class PDStructTreeRoot extends PDStructTreeNode {
 	public PDStructTreeRoot(COSObject obj) {
 		super(obj);
 		StaticResources.setRoleMapHelper(getRoleMap());
-	}
-
-	@Override
-	public List<PDStructElem> getStructChildren() {
-		return TaggedPDFHelper.getStructTreeRootStructChildren(getObject(), getRoleMap());
-	}
-
-	@Override
-	public List<Object> getChildren() {
-		return TaggedPDFHelper.getStructTreeRootChildren(getObject(), getRoleMap());
 	}
 
 	public Map<ASAtom, ASAtom> getRoleMap() {
