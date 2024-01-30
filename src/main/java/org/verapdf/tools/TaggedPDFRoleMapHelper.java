@@ -22,6 +22,7 @@ package org.verapdf.tools;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.parser.PDFFlavour;
+import org.verapdf.pd.structure.StructureType;
 
 import java.util.*;
 
@@ -50,21 +51,30 @@ public class TaggedPDFRoleMapHelper {
 		if (type == null) {
 			return null;
 		}
-		Set<String> currentStandardTypes;
+		Set<String> currentStandardTypes = getCurrentStandardTypes();
 		boolean isFastStop;
 		if (StaticResources.getFlavour().getSpecification() == PDFFlavour.Specification.ISO_19005_1) {
-			currentStandardTypes = TaggedPDFHelper.getPdf14StandardRoleTypes();
 			isFastStop = true;
 		} else {
-			if (StaticResources.getFlavour().getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
-				currentStandardTypes = TaggedPDFHelper.getWcagStandardRoleTypes();
-			} else {
-				currentStandardTypes = TaggedPDFHelper.getPdf17StandardRoleTypes();
-			}
 			isFastStop = false;
 		}
 		return getStandardType(type, currentStandardTypes, isFastStop);
 	}
+	
+	private static Set<String> getCurrentStandardTypes() {
+		if (StaticResources.getFlavour().getSpecification() == PDFFlavour.Specification.ISO_19005_1) {
+			return TaggedPDFHelper.getPdf14StandardRoleTypes();
+		}
+		if (StaticResources.getFlavour().getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
+			return TaggedPDFHelper.getWcagStandardRoleTypes();
+		}
+		return TaggedPDFHelper.getPdf17StandardRoleTypes();
+	}
+
+	public static boolean isStandardType(StructureType type) {
+		return getCurrentStandardTypes().contains(type.getType().getValue());
+	}
+
 
 	private String getStandardType(ASAtom type, Set<String> currentStandardTypes, boolean isFastStop) {
 		Set<ASAtom> visitedTypes = new HashSet<>();
