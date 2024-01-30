@@ -124,7 +124,9 @@ public class PDCMap extends PDObject {
                 String name = this.getObject().getString();
                 String cMapPath = "/font/cmap/" + name;
                 try (ASInputStream cMapStream = loadCMap(cMapPath)) {
-                    this.cMapFile = CMapFactory.getCMap(getCMapID(), cMapStream);
+                    if (cMapStream != null) {
+                        this.cMapFile = CMapFactory.getCMap(getCMapID(), cMapStream);
+                    }
                 } catch (IOException e) {
                     LOGGER.log(Level.FINE, "Can't close stream", e);
                 }
@@ -180,8 +182,13 @@ public class PDCMap extends PDObject {
      * @return COSObject of the referenced cMap.
      */
     public COSObject getUseCMap() {
-        COSObject res = this.getObject().getKey(ASAtom.USE_CMAP);
-        return res == null ? COSObject.getEmpty() : res;
+        if (this.getObject().getType().isDictionaryBased()) {
+            COSObject res = this.getObject().getKey(ASAtom.USE_CMAP);
+            if (res != null) {
+                return res;
+            }
+        }
+        return COSObject.getEmpty();
     }
 
     private COSDictionary getCIDSystemInfo() {
