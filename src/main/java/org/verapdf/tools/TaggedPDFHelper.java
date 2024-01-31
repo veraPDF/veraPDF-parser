@@ -161,7 +161,7 @@ public class TaggedPDFHelper {
 		visitedWithNS.clear();
 		visitedWithoutNS.clear();
 		addVisited(type);
-		StructureType curr = getEquivalent(type);
+		StructureType curr = getEquivalent(type, StaticResources.getRoleMapHelper().getRoleMap());
 		if (curr == null || isVisited(curr)) {
 			return isStandardType(type) ? type : null;
 		}
@@ -170,7 +170,7 @@ public class TaggedPDFHelper {
 				return curr;
 			}
 			addVisited(curr);
-			curr = getEquivalent(curr);
+			curr = getEquivalent(curr, StaticResources.getRoleMapHelper().getRoleMap());
 		}
 		return null;
 	}
@@ -183,7 +183,7 @@ public class TaggedPDFHelper {
 		visitedWithoutNS.clear();
 		addVisited(type);
 		StructureType prev = type;
-		StructureType curr = getEquivalent(prev);
+		StructureType curr = getEquivalent(prev, Collections.emptyMap());
 		while (curr != null) {
 			if (curr.getNameSpaceURI() != null && curr.getNameSpaceURI().equals(prev.getNameSpaceURI())) {
 				return curr.getNameSpaceURI();
@@ -193,12 +193,12 @@ public class TaggedPDFHelper {
 			}
 			addVisited(curr);
 			prev = curr;
-			curr = getEquivalent(prev);
+			curr = getEquivalent(prev, Collections.emptyMap());
 		}
 		return null;
 	}
 	
-	private static StructureType getEquivalent(StructureType type) {
+	private static StructureType getEquivalent(StructureType type, Map<ASAtom, ASAtom> roleMap) {
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {
 			PDNameSpaceRoleMapping nameSpaceMapping = nameSpace.getNameSpaceMapping();
@@ -208,7 +208,7 @@ public class TaggedPDFHelper {
 				return null;
 			}
 		}
-		ASAtom equiv = StaticResources.getRoleMapHelper().getRoleMap().get(type.getType());
+		ASAtom equiv = roleMap.get(type.getType());
 		return equiv == null ? null : StructureType.createStructureType(equiv);
 	}
 
