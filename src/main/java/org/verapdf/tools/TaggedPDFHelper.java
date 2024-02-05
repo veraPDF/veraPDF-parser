@@ -186,7 +186,7 @@ public class TaggedPDFHelper {
 		StructureType curr = getEquivalent(prev, Collections.emptyMap());
 		while (curr != null) {
 			if (curr.getNameSpaceURI() != null && curr.getNameSpaceURI().equals(prev.getNameSpaceURI())) {
-				return curr.getNameSpaceURI();
+				return prev.getNameSpaceURI() + ":" + (prev.getType() != null ? prev.getType().getValue() : null);
 			}
 			if (isVisited(curr) || isStandardType(curr)) {
 				return null;
