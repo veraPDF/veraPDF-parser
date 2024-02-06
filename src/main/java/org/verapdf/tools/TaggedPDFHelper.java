@@ -215,7 +215,7 @@ public class TaggedPDFHelper {
 	public static boolean isStandardType(StructureType type) {
 		String structureType = type.getType().getValue();
 		PDStructureNameSpace nameSpace = type.getNameSpace();
-		if (nameSpace != null) {
+		if (nameSpace != null && nameSpace.getNS() != null) {
 			switch (nameSpace.getNS()) {
 				case TaggedPDFConstants.PDF_NAMESPACE:
 					return PDF_1_7_STANDARD_ROLE_TYPES.contains(structureType);
