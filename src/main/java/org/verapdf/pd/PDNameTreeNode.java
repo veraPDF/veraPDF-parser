@@ -26,7 +26,6 @@ import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.exceptions.LoopedException;
-import org.verapdf.pd.structure.NameTreeIterator;
 
 import java.util.*;
 
@@ -165,14 +164,22 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 		return null;
 	}
 
+	private List<COSObject> getObjects() {
+		List<COSObject> result = new LinkedList<>(getNames().values());
+		for (PDNameTreeNode kid : getKids()) {
+			result.addAll(kid.getObjects());
+		}
+		return result;
+	}
+
 	@Override
-	public NameTreeIterator iterator() {
-		return new NameTreeIterator(this);
+	public Iterator<COSObject> iterator() {
+		return getObjects().iterator();
 	}
 
 	public Long size() {
 		long i = 0;
-		NameTreeIterator iterator = iterator();
+		Iterator<COSObject> iterator = iterator();
 		for (; iterator.hasNext(); i++) {
 			iterator.next();
 		}
