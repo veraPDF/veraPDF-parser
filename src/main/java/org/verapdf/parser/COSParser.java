@@ -3,10 +3,8 @@ package org.verapdf.parser;
 import org.verapdf.as.exceptions.StringExceptions;
 import org.verapdf.cos.*;
 import org.verapdf.parser.postscript.PSObject;
-import org.verapdf.pd.encryption.StandardSecurityHandler;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Level;
