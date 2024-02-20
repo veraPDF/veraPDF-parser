@@ -75,9 +75,10 @@ public class CMapParser extends PSParser {
             getBaseParser().initializeToken();
             //Skipping starting comments
             getBaseParser().skipSpaces(true);
+            COSObject nextObject = nextObject();
             while (getBaseParser().getToken().type != Token.Type.TT_EOF) {
-                COSObject nextObject = nextObject();
                 processObject(nextObject);
+                nextObject = nextObject();
             }
         } finally {
             this.getSource().close();    // We close stream after first reading attempt
