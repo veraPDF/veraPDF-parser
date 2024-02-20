@@ -40,7 +40,7 @@ public class PDStructureNameSpace extends PDObject {
 	private PDStructureNameSpace(COSObject obj) {
 		super(obj);
 		COSObject roleMap = this.getKey(ASAtom.ROLE_MAP_NS);
-		if (obj != null && obj.getType() == COSObjType.COS_DICT) {
+		if (roleMap != null && roleMap.getType() == COSObjType.COS_DICT) {
 			this.nsRoleMap = new PDNameSpaceRoleMapping(roleMap);
 		} else {
 			this.nsRoleMap = null;
