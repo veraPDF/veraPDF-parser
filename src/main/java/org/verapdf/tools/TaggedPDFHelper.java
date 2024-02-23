@@ -188,7 +188,7 @@ public class TaggedPDFHelper {
 			if (curr.getNameSpaceURI() != null && curr.getNameSpaceURI().equals(prev.getNameSpaceURI())) {
 				return prev.getNameSpaceURI() + ":" + (prev.getType() != null ? prev.getType().getValue() : null);
 			}
-			if (isVisited(curr) || isStandardType(curr)) {
+			if (isVisited(curr)) {
 				return null;
 			}
 			addVisited(curr);
