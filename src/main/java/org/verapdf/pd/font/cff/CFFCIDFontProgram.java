@@ -57,13 +57,8 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     CFFCIDFontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                       long topDictBeginOffset, long topDictEndOffset, CMap externalCMap,
                       boolean isSubset) {
-        super(stream);
-        this.definedNames = definedNames;
-        this.globalSubrs = globalSubrs;
-        this.topDictBeginOffset = topDictBeginOffset;
-        this.topDictEndOffset = topDictEndOffset;
+        super(stream, definedNames, globalSubrs, topDictBeginOffset, topDictEndOffset, isSubset);
         this.externalCMap = externalCMap;
-        this.isSubset = isSubset;
     }
 
     /**

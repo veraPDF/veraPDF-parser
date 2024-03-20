@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  *
  * @author Sergey Shemyakov
  */
-abstract class CFFFontBaseParser extends CFFFileBaseParser {
+class CFFFontBaseParser extends CFFFileBaseParser {
 
     private static final Logger LOGGER = Logger.getLogger(CFFFontBaseParser.class.getCanonicalName());
 
@@ -72,11 +72,37 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     //Subrs
     protected long subrsOffset = -1;
 
+    private boolean containsROS = false;
+
     public CFFFontBaseParser(SeekableInputStream source) {
         super(source);
         stack = new ArrayList<>(48);
         this.charStringType = 2;
         this.charSetOffset = 0; // default
+    }
+
+    public CFFFontBaseParser(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
+                        long topDictBeginOffset, long topDictEndOffset, boolean isSubset) {
+        this(stream);
+        this.definedNames = definedNames;
+        this.globalSubrs = globalSubrs;
+        this.topDictBeginOffset = topDictBeginOffset;
+        this.topDictEndOffset = topDictEndOffset;
+        this.isSubset = isSubset;
+    }
+
+    protected boolean containsROS() {
+        try {
+            this.source.seek(topDictBeginOffset);
+            while (this.source.getOffset() < topDictEndOffset) {
+                readTopDictUnit();
+            }     
+            if (containsROS) {
+                return true;
+            }
+        } catch (IOException ignored) {
+        }
+        return false;
     }
 
     protected void readTopDictUnit() throws IOException {
@@ -124,6 +150,9 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                                     this.charStringType = (int)
                                             this.stack.get(this.stack.size() - 1).getInteger();
                                     this.stack.clear();
+                                    break;
+                                case 30:
+                                    this.containsROS = true;
                                     break;
                                 default:
                                     readTopDictTwoByteOps(next);
