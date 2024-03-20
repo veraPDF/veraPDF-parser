@@ -58,15 +58,10 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     CFFType1FontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                         long topDictBeginOffset, long topDictEndOffset,
                         CMap externalCMap, boolean isSubset) {
-        super(stream);
+        super(stream, definedNames, globalSubrs, topDictBeginOffset, topDictEndOffset, isSubset);
         encodingOffset = 0;
         encoding = new int[256];
-        this.definedNames = definedNames;
-        this.globalSubrs = globalSubrs;
-        this.topDictBeginOffset = topDictBeginOffset;
-        this.topDictEndOffset = topDictEndOffset;
         this.externalCMap = externalCMap;
-        this.isSubset = isSubset;
         fontMatrix = new float[6];
         System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,
                 DEFAULT_FONT_MATRIX.length);
