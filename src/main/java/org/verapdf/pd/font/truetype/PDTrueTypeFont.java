@@ -103,8 +103,8 @@ public class PDTrueTypeFont extends PDSimpleFont {
                     this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                     if (fontProgram == null) {
                         try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
-                            this.fontProgram = new OpenTypeFontProgram(fontData, false,
-                                    isSymbolic, encoding, null, isSubset);
+                            this.fontProgram = new OpenTypeFontProgram(fontData, false, false, 
+                                    isSymbolic, encoding, null, isSubset, null);
                             StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                         }
                     }

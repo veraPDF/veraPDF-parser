@@ -162,7 +162,7 @@ public class PDCIDFont extends PDFont {
             this.isFontParsed = true;
 
             if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE2) &&
-                    this.getSubtype() == ASAtom.CID_FONT_TYPE2) {
+                    this.getSubtypeEntryValue() == ASAtom.CID_FONT_TYPE2) {
                 COSStream trueTypeFontFile = fontDescriptor.getFontFile2();
                 COSKey key = trueTypeFontFile.getObjectKey();
                 COSObject cidToGIDMap = this.getCIDToGIDMap();
@@ -170,8 +170,7 @@ public class PDCIDFont extends PDFont {
                 this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                 if (fontProgram == null) {
                     try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
-                        this.fontProgram = new CIDFontType2Program(
-                                fontData, this.cMap, cidToGIDMap);
+                        this.fontProgram = new CIDFontType2Program(fontData, this.cMap, cidToGIDMap);
                         StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                     } catch (IOException e) {
                         LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
@@ -193,17 +192,18 @@ public class PDCIDFont extends PDFont {
                             }
                         }
                     } else if (ASAtom.OPEN_TYPE == subtype.getName()) {
-                        ASAtom fontName = ASAtom.getASAtom(this.getName());
-                        boolean isCFF = fontName != ASAtom.TRUE_TYPE && fontName != ASAtom.CID_FONT_TYPE2;
+                        boolean isCFF = this.getSubtypeEntryValue() != ASAtom.TRUE_TYPE && this.getSubtypeEntryValue() != ASAtom.CID_FONT_TYPE2;
+                        boolean isCIDFontType2 = this.getSubtypeEntryValue() == ASAtom.CID_FONT_TYPE2;
                         boolean isSymbolic = this.isSymbolic();
                         COSObject encoding = this.getEncoding();
                         String fontProgramID = FontProgramIDGenerator.getOpenTypeFontProgramID(key, isCFF, isSymbolic, encoding, this.cMap, isSubset);
                         this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                         if (fontProgram == null) {
+                            COSObject cidToGIDMap = this.getCIDToGIDMap();
                             try (ASInputStream fontData = fontFile.getData(COSStream.FilterFlags.DECODE)) {
                                 this.fontProgram = new OpenTypeFontProgram(
-                                        fontData, isCFF, isSymbolic, encoding,
-                                        this.cMap, isSubset);
+                                        fontData, isCFF, isCIDFontType2, isSymbolic, encoding,
+                                        this.cMap, isSubset, cidToGIDMap);
                                 StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                             }
                         }
