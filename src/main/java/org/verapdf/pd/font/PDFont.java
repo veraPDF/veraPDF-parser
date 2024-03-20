@@ -116,6 +116,10 @@ public abstract class PDFont extends PDResource {
     public ASAtom getSubtype() {
         return this.subtype;
     }
+    
+    public ASAtom getSubtypeEntryValue() {
+        return this.subtype;
+    }
 
     /**
      * @return true if the font flags in the font descriptor dictionary mark

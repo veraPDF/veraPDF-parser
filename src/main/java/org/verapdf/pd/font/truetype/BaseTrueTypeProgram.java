@@ -84,7 +84,7 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
      * this True Type font.
      */
     public int getNrOfCMaps() {
-        if(this.parser.getCmapParser() != null) {
+        if (this.parser.getCmapParser() != null) {
             return this.parser.getCmapParser().getCmapInfos().length;
         } else {
             return 0;
