@@ -149,9 +149,8 @@ public class PDFormField extends PDObject {
 		COSObject kids = getKey(ASAtom.KIDS);
 		if (kids != null && kids.getType() == COSObjType.COS_ARRAY) {
 			List<PDFormField> res = new ArrayList<>();
-			
 			for (COSObject elem : (COSArray)kids.getDirectBase()) {
-				if (elem != null) {
+				if (isField(elem)) {
 					res.add(createTypedFormField(elem, this.parents));
 				}
 			}
@@ -182,6 +181,10 @@ public class PDFormField extends PDObject {
 
 	public Long getStructParent() {
 		return getIntegerKey(ASAtom.STRUCT_PARENT);
+	}
+	
+	public static boolean isField(COSObject obj) {
+		return obj != null && !obj.empty() && obj.knownKey(ASAtom.T);
 	}
 
 }
