@@ -56,9 +56,8 @@ public abstract class PDAbstractAdditionalActions extends PDObject {
             return Collections.emptyList();
         }
         List<PDAction> actions = new ArrayList<>(actionNames.length);
-        PDAction action;
         for (ASAtom name : actionNames) {
-            action = getAction(name);
+            PDAction action = getAction(name);
             if (name != null) {
                 actions.add(action);
             }

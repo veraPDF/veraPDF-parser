@@ -160,9 +160,9 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         if (nextObject.getType() == COSObjType.COS_NAME &&
                 nextObject.getString().equals(Type1StringConstants.EEXEC_STRING)) {
             this.skipSpacesExceptNullByte();
-            Type1PrivateParser parser = null;
             try (ASInputStream eexecEncoded = this.getSource().getStreamUntilToken(
                     CLEAR_TO_MARK_BYTES)) {
+                Type1PrivateParser parser = null;
                 try (ASInputStream eexecDecoded = new EexecFilterDecode(
                         eexecEncoded, false)) {
                     parser = new Type1PrivateParser(
@@ -218,9 +218,8 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     }
 
     protected void skipSpacesExceptNullByte() throws IOException {
-        byte ch;
         while (!this.getSource().isEOF()) {
-            ch = this.getSource().readByte();
+            byte ch = this.getSource().readByte();
             if (CharTable.isSpace(ch) && ch != 0) {
                 continue;
             }

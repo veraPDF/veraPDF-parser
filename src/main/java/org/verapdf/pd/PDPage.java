@@ -286,10 +286,10 @@ public class PDPage extends PDPageTreeNode {
     public List<PDAnnotation> getAnnotations() {
         COSObject annots = getKey(ASAtom.ANNOTS);
         if (!annots.empty() && annots.getType() == COSObjType.COS_ARRAY) {
-            List<PDAnnotation> res = new ArrayList<>();
             if (annots.isIndirect()) {
                 annots = annots.getDirect();
             }
+            List<PDAnnotation> res = new ArrayList<>();
             for (COSObject annot : (COSArray) annots.getDirectBase()) {
                 if (annot != null && annot.getType() == COSObjType.COS_DICT) {
                     if (ASAtom.WIDGET.equals(annot.getNameKey(ASAtom.SUBTYPE))) {

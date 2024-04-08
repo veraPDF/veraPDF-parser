@@ -162,9 +162,9 @@ public abstract class PDFont extends PDResource {
      * @return encoding object for given COSObject.
      */
     private static Encoding getEncodingMappingFromCOSObject(COSObject e) {
-        Encoding encodingObj;
         COSBase cosEncoding = e.getDirectBase();
         if (cosEncoding != null) {
+            Encoding encodingObj;
             if (cosEncoding.getType() == COSObjType.COS_NAME) {
                 encodingObj = new Encoding(cosEncoding.getName());
                 return encodingObj;

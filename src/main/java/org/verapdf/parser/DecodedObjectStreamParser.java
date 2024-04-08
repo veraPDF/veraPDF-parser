@@ -66,15 +66,13 @@ public class DecodedObjectStreamParser extends SeekableCOSParser {
         int n = (int) ((COSInteger) this.objectStream.getKey(ASAtom.N).getDirectBase()).get();
         long first = ((COSInteger) this.objectStream.getKey(ASAtom.FIRST).getDirectBase()).get();
         for (int i = 0; i < n; ++i) {
-            Long objNum;
-            Long objOffset;
             getBaseParser().skipSpaces(false);
             getBaseParser().readNumber();
-            objNum = getBaseParser().getToken().integer;
+            long objNum = getBaseParser().getToken().integer;
             getBaseParser().skipSpaces(false);
             getBaseParser().readNumber();
-            objOffset = getBaseParser().getToken().integer;
-            internalOffsets.put(objNum.intValue(), objOffset + first);
+            long objOffset = getBaseParser().getToken().integer;
+            internalOffsets.put((int) objNum, objOffset + first);
         }
     }
 

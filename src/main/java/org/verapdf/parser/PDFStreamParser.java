@@ -85,7 +85,6 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	 * @throws IOException If an io error occurs while parsing the stream.
 	 */
 	public Object parseNextToken() throws IOException {
-		Object result = null;
 
 		getBaseParser().skipSpaces(true);
 		int nextByte = getSource().peek();
@@ -95,6 +94,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 
 		int c = nextByte;
 
+		Object result = null;
 		switch (c) {
 			case '(':
                 getBaseParser().nextToken();

@@ -223,16 +223,16 @@ public class SeekableCOSParser extends COSParser {
 	private void checkEndstreamSpacings(COSObject stream, long streamStartOffset, Long expectedLength) throws IOException {
 		getBaseParser().skipSpaces();
 
-		byte eolCount = 0;
 		long approximateLength = getSource().getOffset() - streamStartOffset;
 		long expected = expectedLength == null ? 0 : expectedLength;
-		long diff = approximateLength - expected;
 
 		getSource().unread(2);
 		int firstSymbol = getSource().readByte();
 		int secondSymbol = getSource().readByte();
+		byte eolCount = 0;
 		if (secondSymbol == 10) {
 			if (firstSymbol == 13) {
+				long diff = approximateLength - expected;
 				eolCount = (byte) (diff > 1 ? 2 : 1);
 			} else {
 				eolCount = 1;

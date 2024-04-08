@@ -289,13 +289,13 @@ public class CMapParser extends PSParser {
     }
 
     private static long getBfrangeEndFromBytes(byte[] endRange, byte[] beginRange) {
-        long res = 0;
         int length = Math.max(beginRange.length, endRange.length);
         byte[] correctBeginRange = new byte[length];
-        byte[] correctEndRange = new byte[length];
         System.arraycopy(beginRange, 0, correctBeginRange, length - beginRange.length, beginRange.length);
+        byte[] correctEndRange = new byte[length];
         System.arraycopy(endRange, 0, correctEndRange, length - endRange.length, endRange.length);
         int i = 0;
+        long res = 0;
         for (; i < length - 1; ++i) {
             // getting first hex digits of begin range string.
             // see PDF 32000 2008, 9.10.3: these digits should be the same as

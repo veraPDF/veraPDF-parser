@@ -164,10 +164,10 @@ public class StandardSecurityHandler {
             filter = new COSFilterAESDecryptionDefault(stream, stringKey,
                     this.encryptionKey, false, method);
         }
-        byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
-        byte[] res = new byte[0];
         filter.reset();
+        byte[] buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
         int read = filter.read(buf, buf.length);
+        byte[] res = new byte[0];
         while (read != -1) {
             res = ASBufferedInFilter.concatenate(res, res.length, buf, read);
             read = filter.read(buf, buf.length);

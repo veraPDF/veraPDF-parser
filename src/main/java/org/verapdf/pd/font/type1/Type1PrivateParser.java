@@ -90,9 +90,8 @@ class Type1PrivateParser extends SeekableBaseParser {
     @Override
     protected void readName() throws IOException {
         this.clearToken();
-        byte ch;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (CharTable.isTokenDelimiter(ch)) {
                 this.source.unread();
                 break;

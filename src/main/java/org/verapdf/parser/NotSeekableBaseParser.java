@@ -106,9 +106,8 @@ public class NotSeekableBaseParser extends BaseParser implements Closeable {
     @Override
     protected void skipComment() throws IOException {
         // skips all characters till EOL == { CR, LF, CRLF }
-        byte ch;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (isLF(ch)) {
                 return; // EOL == LF
             }

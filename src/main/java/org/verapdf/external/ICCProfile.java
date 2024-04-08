@@ -376,17 +376,16 @@ public class ICCProfile extends PDObject {
 			return;
 		}
 
-		int descOffset = 0;
-		int descLength = 0;
-		int cprtOffset = 0;
-		int cprtLength = 0;
-
 		byte[] temp = new byte[REQUIRED_LENGTH];
 		currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);
 		if (currentOffset != HEADER_LENGTH + REQUIRED_LENGTH) {
 				return;
 		}
 		int tagsNumberRemained = byteArrayToInt(temp);
+		int descOffset = 0;
+		int descLength = 0;
+		int cprtOffset = 0;
+		int cprtLength = 0;
 		while (tagsNumberRemained-- > 0) {
 			int prevOffset = currentOffset;
 			currentOffset += Math.max(data.read(temp, REQUIRED_LENGTH), 0);

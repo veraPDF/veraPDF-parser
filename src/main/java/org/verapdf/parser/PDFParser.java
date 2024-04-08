@@ -248,14 +248,11 @@ public class PDFParser extends SeekableCOSParser {
 
         final Token token = getBaseParser().getToken();
 
-        boolean headerOfObjectComplyPDFA = true;
-        boolean headerFormatComplyPDFA = true;
-        boolean endOfObjectComplyPDFA = true;
-
         //Check that if offset doesn't point to obj key there is eol character before obj key
         //pdf/a-1b spec, clause 6.1.8
         getBaseParser().skipSpaces(false);
         getSource().seek(getSource().getOffset() - 1);
+        boolean headerOfObjectComplyPDFA = true;
         if (!getBaseParser().isNextByteEOL()) {
             headerOfObjectComplyPDFA = false;
         }
@@ -267,6 +264,7 @@ public class PDFParser extends SeekableCOSParser {
         }
         long number = token.integer;
 
+        boolean headerFormatComplyPDFA = true;
         if (!CharTable.isSpace(getSource().read()) || CharTable.isSpace(getSource().peek())) {
             //check correct spacing (6.1.8 clause)
             headerFormatComplyPDFA = false;
@@ -319,6 +317,7 @@ public class PDFParser extends SeekableCOSParser {
         if (this.getSource().getOffset() != beforeSkip) {
             this.getSource().unread();
         }
+        boolean endOfObjectComplyPDFA = true;
         if (!getBaseParser().isNextByteEOL()) {
             endOfObjectComplyPDFA = false;
         }
@@ -476,9 +475,8 @@ public class PDFParser extends SeekableCOSParser {
             int number = (int) getBaseParser().getToken().integer;
             getBaseParser().nextToken();
             int count = (int) getBaseParser().getToken().integer;
-            COSXRefEntry xref;
             for (int i = 0; i < count; ++i) {
-                xref = new COSXRefEntry();
+                COSXRefEntry xref = new COSXRefEntry();
                 getBaseParser().nextToken();
                 xref.offset = getBaseParser().getToken().integer;
                 getBaseParser().nextToken();

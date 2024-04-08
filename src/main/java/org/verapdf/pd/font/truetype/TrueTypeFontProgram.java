@@ -222,14 +222,14 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
 
     private int getGIDFrom30(int code) {
         TrueTypeCmapSubtable cmap30 = this.parser.getCmapTable(3, 0);
-        int gid;
         if (cmap30 != null) {
             int sampleCode = cmap30.getSampleCharCode();
             int highByteMask = sampleCode & 0x0000FF00;
 
             if (highByteMask == 0x00000000 || highByteMask == 0x0000F000 ||
                     highByteMask == 0x0000F100 || highByteMask == 0x0000F200) { // should we check this at all?
-                gid = cmap30.getGlyph(highByteMask + code);     // we suppose that code is in fact 1-byte value
+                // we suppose that code is in fact 1-byte value
+                int gid = cmap30.getGlyph(highByteMask + code);
                 return gid;
             }
         }

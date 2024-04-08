@@ -147,9 +147,8 @@ public abstract class BaseParser {
 
     private void readToken() throws IOException {
         this.token.clearValue();
-        byte ch;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (CharTable.isTokenDelimiter(ch)) {
                 this.source.unread();
                 break;
@@ -273,9 +272,7 @@ public abstract class BaseParser {
 
     private void readHexString() throws IOException {
         this.token.clearValue();
-        byte ch;
         int uc = 0;
-        int hex;
 
         //these are required for pdf/a validation
         boolean containsOnlyHex = true;
@@ -283,7 +280,7 @@ public abstract class BaseParser {
 
         boolean odd = false;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (ch == '>') {
                 if (odd) {
                     uc <<= 4;
@@ -293,7 +290,7 @@ public abstract class BaseParser {
                 this.token.setHexCount(hexCount);
                 return;
             } else if (!CharTable.isSpace(ch)) {
-                hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
+                int hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
                 hexCount++;
                 if (hex < 16 && hex > -1) { // skip all non-Hex characters
                     if (odd) {
@@ -316,13 +313,12 @@ public abstract class BaseParser {
 
     protected void readNumber() throws IOException {
         try {
-            int radix = 10;
             initializeToken();
             this.token.clearValue();
             this.token.type = Token.Type.TT_INTEGER;
-            byte ch;
+            int radix = 10;
             while (!this.source.isEOF()) {
-                ch = this.source.readByte();
+                byte ch = this.source.readByte();
                 if (CharTable.isTokenDelimiter(ch)) {
                     this.source.unread();
                     break;
@@ -455,9 +451,8 @@ public abstract class BaseParser {
 
     protected void readName() throws IOException {
         this.token.clearValue();
-        byte ch;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (CharTable.isTokenDelimiter(ch)) {
                 this.source.unread();
                 break;
@@ -465,13 +460,10 @@ public abstract class BaseParser {
 
             // if ch == # (0x23)
             if (ch == '#' && !isPSParser) {
-                byte ch1;
-                byte ch2;
-                byte dc;
-                ch1 = this.source.readByte();
+                byte ch1 = this.source.readByte();
                 if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.ER) {
-                    dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
-                    ch2 = this.source.readByte();
+                    byte dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
+                    byte ch2 = this.source.readByte();
                     if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.ER) {
                         dc = (byte) ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
                         appendToToken(dc);

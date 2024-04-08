@@ -143,7 +143,6 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
             // find kid with mapping for given key
             List<PDNumberTreeNode> kids = getKids();
             if (kids != null) {
-                COSObject res;
                 for (PDNumberTreeNode kid : kids) {
                     COSKey kidObjectKey = kid.getObject().getObjectKey();
                     if (kidObjectKey != null) {
@@ -153,7 +152,7 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
                             visitedKeys.add(kidObjectKey);
                         }
                     }
-                    res = kid.getObject(key, visitedKeys);
+                    COSObject res = kid.getObject(key, visitedKeys);
                     if (res != null) {
                         return res;
                     }

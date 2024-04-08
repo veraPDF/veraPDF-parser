@@ -87,9 +87,8 @@ public class COSXRefSection {
 
 		Iterator<Map.Entry<Integer, COSXRefEntry>> iterator = this.entries.entrySet().iterator();
 		COSXRefRange segment = new COSXRefRange(iterator.next().getKey());
-		int nextSegment;
 		while(iterator.hasNext()) {
-			nextSegment = iterator.next().getKey();
+			int nextSegment = iterator.next().getKey();
 			if (nextSegment == segment.next()) {
 				segment.count++;
 			} else {

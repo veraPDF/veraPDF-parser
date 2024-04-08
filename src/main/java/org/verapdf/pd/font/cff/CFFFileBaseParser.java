@@ -100,10 +100,9 @@ class CFFFileBaseParser {
 
     private float readReal() throws IOException {
         StringBuilder builder = new StringBuilder();
-        int buf;
         parsing:
         while (true) {
-            buf = readCard8();
+            int buf = readCard8();
             int[] hexs = new int[2];
             hexs[0] = buf >> 4;
             hexs[1] = buf & 0x0F;

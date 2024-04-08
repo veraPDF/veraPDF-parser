@@ -126,12 +126,11 @@ class XrefStreamParser {
         byte[] field0 = new byte[field0Size.intValue()];
         byte[] field1 = new byte[field1Size.intValue()];
         byte[] field2 = new byte[field2Size.intValue()];
-        byte[] buffer;
         byte[] remainedBytes = new byte[0];
         int objIdIndex = 0;
 
         while (true) {
-            buffer = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
+            byte[] buffer = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
             long read = xrefInputStream.read(buffer, ASBufferedInFilter.BF_BUFFER_SIZE);
             if (read == -1) {
                 break;
@@ -139,10 +138,8 @@ class XrefStreamParser {
             buffer = ASBufferedInFilter.concatenate(remainedBytes, remainedBytes.length,
                     buffer, (int) read);
 
-            int pointer = 0;
-            COSXRefEntry xref;
-            for (; objIdIndex < objIDs.size(); ++objIdIndex) {
-                if(pointer + field0.length + field1.length + field2.length >
+            for (int pointer = 0; objIdIndex < objIDs.size(); ++objIdIndex) {
+                if (pointer + field0.length + field1.length + field2.length >
                         buffer.length) {
                     remainedBytes = Arrays.copyOfRange(buffer, pointer, buffer.length);
                     break;
@@ -158,6 +155,7 @@ class XrefStreamParser {
                 if (field0.length > 0) {
                     type = (int) numberFromBytes(field0);
                 }
+                COSXRefEntry xref;
                 switch (type) {
                     case 0:
                         break;

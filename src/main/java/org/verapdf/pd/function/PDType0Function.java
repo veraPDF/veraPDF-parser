@@ -168,7 +168,6 @@ public class PDType0Function extends PDFunction {
                 return null;
             }
             List<COSObject> operands = getValuesInIntervals(ops, getDomain());
-            List<COSObject> result = new ArrayList<>();
             for (int i = 0; i < operands.size(); ++i) {
                 operands.set(i, interpolate(operands.get(i), domain.at(2 * i), domain.at(2 * i + 1), encode.at(2 * i), encode.at(2 * i + 1)));
             }
@@ -177,6 +176,7 @@ public class PDType0Function extends PDFunction {
             List<COSObject> interpolationResult = getOrder().intValue() == 1 ?
                     multiLinearInterpolation(doubleOperands) :
                     multiCubicInterpolation(doubleOperands);
+            List<COSObject> result = new ArrayList<>();
             for (int i = 0; i < outputDimension; ++i) {
                 result.add(interpolate(interpolationResult.get(i), COSReal.construct(0),
                         COSReal.construct(Math.pow(2, getBitsPerSample()) - 1), decode.at(2 * i), decode.at(2 * i + 1)));

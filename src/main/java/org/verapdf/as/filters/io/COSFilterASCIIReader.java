@@ -85,11 +85,11 @@ public class COSFilterASCIIReader {
     }
 
     private byte[] getNextASCIIHexBytes() throws IOException {
-        byte[] twoBytes = new byte[2];
         byte b;
         do {
             b = readByte();
         } while (isWS(b) && b != -1);
+        byte[] twoBytes = new byte[2];
         if (b == -1 || b == ASCII_HEX_EOD) {
             isEOD = true;
             return null;

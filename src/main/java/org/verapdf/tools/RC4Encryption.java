@@ -104,8 +104,7 @@ public class RC4Encryption {
     }
 
     private void swapSElements(int i, int j) {
-        int tmp;
-        tmp = s[i];
+        int tmp = s[i];
         s[i] = s[j];
         s[j] = tmp;
     }

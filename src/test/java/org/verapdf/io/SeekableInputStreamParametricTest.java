@@ -261,7 +261,6 @@ public class SeekableInputStreamParametricTest {
     @Test
     public void shouldReportCorrectPositionAfterSmallRead() throws IOException {
         try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
-            byte[] buf = new byte[SMALL_INPUT_SIZE - 1];
 
             assertEquals(0, seekable.getOffset());
 
@@ -269,6 +268,7 @@ public class SeekableInputStreamParametricTest {
             assertEquals(0, read);
             assertEquals(1, seekable.getOffset());
 
+            byte[] buf = new byte[SMALL_INPUT_SIZE - 1];
             int numRead = seekable.read(buf);
             assertEquals(buf.length, numRead);
             assertEquals(buf.length + 1, seekable.getOffset());
@@ -281,7 +281,6 @@ public class SeekableInputStreamParametricTest {
             return;
         }
         try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input)) {
-            byte[] buf = new byte[LARGE_INPUT_SIZE - 1];
 
             assertEquals(0, seekable.getOffset());
 
@@ -289,6 +288,7 @@ public class SeekableInputStreamParametricTest {
             assertEquals(0, read);
             assertEquals(1, seekable.getOffset());
 
+            byte[] buf = new byte[LARGE_INPUT_SIZE - 1];
             int numRead = seekable.read(buf);
             if (numRead >= buf.length) {
                 assertEquals(buf.length, numRead);
