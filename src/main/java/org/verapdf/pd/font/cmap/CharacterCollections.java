@@ -139,9 +139,9 @@ public class CharacterCollections {
 		CIDSystemInfo[] cidSystemInfos = map.get(cmapName);
 		if (cidSystemInfos != null) {
 			PDFFlavour flavour = StaticResources.getFlavour();
-			if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_1) {
+			if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.PDF_REFERENCE_1_4)) {
 				return cidSystemInfos[0];
-			} else if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_4) {
+			} else if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 				return cidSystemInfos[2];
 			} else {
 				return cidSystemInfos[1];

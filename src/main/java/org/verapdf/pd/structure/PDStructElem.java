@@ -127,14 +127,13 @@ public class PDStructElem extends PDStructTreeNode {
 
 	public static StructureType getStructureTypeStandardStructureType(StructureType type) {
 		PDFFlavour flavour = StaticResources.getFlavour();
-		if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_4 || flavour == PDFFlavour.PDFUA_2 ||
-				flavour.getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
+		if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 			StructureType defaultStructureType = PDStructElem.getDefaultStructureType(type);
 			if (defaultStructureType != null) {
 				return defaultStructureType;
 			}
 		}
-		if (flavour.getSpecification() != PDFFlavour.Specification.ISO_19005_4 && flavour != PDFFlavour.PDFUA_2) {
+		if (!PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0) || PDFFlavour.isFlavourFamily(flavour, PDFFlavour.SpecificationFamily.WCAG)) {
 			if (type != null) {
 				return StructureType.createStructureType(ASAtom.getASAtom(
 						StaticResources.getRoleMapHelper().getStandardType(type.getType())));
@@ -156,11 +155,10 @@ public class PDStructElem extends PDStructTreeNode {
 	public static boolean isStandardStructureType(StructureType type) {
 		PDFFlavour flavour = StaticResources.getFlavour();
 		boolean isStandard = false;
-		if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_4 || flavour == PDFFlavour.PDFUA_2 ||
-				flavour.getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
+		if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 			isStandard = TaggedPDFHelper.isStandardType(type);
 		}
-		if (flavour.getSpecification() != PDFFlavour.Specification.ISO_19005_4 && flavour != PDFFlavour.PDFUA_2) {
+		if (!PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0) || PDFFlavour.isFlavourFamily(flavour, PDFFlavour.SpecificationFamily.WCAG)) {
 			if (type != null) {
 				isStandard |= TaggedPDFRoleMapHelper.isStandardType(type);
 			}
@@ -169,7 +167,7 @@ public class PDStructElem extends PDStructTreeNode {
 	}
 
 	public static boolean isMathStandardType(StructureType standardStructureType) {
-		return StaticResources.getFlavour() == PDFFlavour.PDFUA_2 && standardStructureType != null &&
+		return PDFFlavour.isPDFUA2RelatedFlavour(StaticResources.getFlavour()) && standardStructureType != null &&
 				TaggedPDFConstants.MATH_ML_NAMESPACE.equals(standardStructureType.getNameSpaceURI());
 	}
 
