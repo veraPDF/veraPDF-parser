@@ -22,8 +22,9 @@ package org.verapdf.tools.resource;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Class that handles resource closing.
@@ -32,10 +33,10 @@ import java.util.List;
  */
 public class FileResourceHandler implements Closeable {
 
-    private final List<Closeable> resources;
+    private final Set<Closeable> resources;
 
     public FileResourceHandler() {
-        this.resources = new ArrayList<>();
+        this.resources = new HashSet<>();
     }
 
     /**
@@ -46,7 +47,7 @@ public class FileResourceHandler implements Closeable {
     public void addResource(ASFileStreamCloser obj) {
         if (obj != null) {
             Closeable resource = obj.getStream();
-            if (resource != null && !resources.contains(resource)) {
+            if (resource != null) {
                 resources.add(obj);
             }
         }
@@ -58,7 +59,7 @@ public class FileResourceHandler implements Closeable {
      * @param res is a closeable object to be stored.
      */
     public void addResource(Closeable res) {
-        if (res != null && !resources.contains(res)) {
+        if (res != null) {
             resources.add(res);
         }
     }
