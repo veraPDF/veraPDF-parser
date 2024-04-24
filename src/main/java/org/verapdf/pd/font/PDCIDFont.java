@@ -179,10 +179,11 @@ public class PDCIDFont extends PDFont {
             } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
                 COSStream fontFile = fontDescriptor.getFontFile3();
                 COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).getDirectBase();
+                ASAtom subtypeValue = subtype != null ? subtype.getName() : null;
                 COSKey key = fontFile.getObjectKey();
                 try {
                     boolean isSubset = this.isSubset();
-                    if (ASAtom.CID_FONT_TYPE0C == subtype.getName()) {
+                    if (ASAtom.CID_FONT_TYPE0C == subtypeValue) {
                         String fontProgramID = FontProgramIDGenerator.getCFFFontProgramID(key, this.cMap, isSubset);
                         this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                         if (fontProgram == null) {
@@ -191,7 +192,7 @@ public class PDCIDFont extends PDFont {
                                 StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                             }
                         }
-                    } else if (ASAtom.OPEN_TYPE == subtype.getName()) {
+                    } else if (ASAtom.OPEN_TYPE == subtypeValue) {
                         boolean isCFF = this.getSubtypeEntryValue() != ASAtom.TRUE_TYPE && this.getSubtypeEntryValue() != ASAtom.CID_FONT_TYPE2;
                         boolean isCIDFontType2 = this.getSubtypeEntryValue() == ASAtom.CID_FONT_TYPE2;
                         boolean isSymbolic = this.isSymbolic();
@@ -222,26 +223,30 @@ public class PDCIDFont extends PDFont {
 
     @Override
     public float getWidthFromProgram(int code) {
-        int cid = this.cMap.toCID(code);
         FontProgram font = getFontProgram();
         CFFType1FontProgram cffType1 = CFFType1FontProgram.getCFFType1(font);
-        if (cid != 0 && cffType1 != null) {
+        if (cffType1 != null) {
+            int cid = this.cMap.toCID(code);
             // In this case we ignore internal notations of names from CFF
             // Type 1 font and use external CMap
-            return cffType1.getWidthFromGID(cid);
+            if (cid != 0) {
+                return cffType1.getWidthFromGID(cid);
+            }
         }
         return font.getWidth(code);
     }
 
     @Override
     public boolean glyphIsPresent(int code) {
-        int cid = this.cMap.toCID(code);
         FontProgram font = getFontProgram();
         CFFType1FontProgram cffType1 = CFFType1FontProgram.getCFFType1(font);
-        if (cid != 0 && cffType1 != null) {
+        if (cffType1 != null) {
+            int cid = this.cMap.toCID(code);
             // In this case we ignore internal notations of names from CFF
             // Type 1 font and use external CMap
-            return cffType1.containsGID(cid);
+            if (cid != 0) {
+                return cffType1.containsGID(cid);
+            }
         }
         return font.containsCode(code);
     }
