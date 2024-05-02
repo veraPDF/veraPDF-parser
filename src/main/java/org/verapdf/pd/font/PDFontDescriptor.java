@@ -21,10 +21,7 @@
 package org.verapdf.pd.font;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSBase;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
 
@@ -91,10 +88,10 @@ public class PDFontDescriptor extends PDObject {
      * @param obj is descriptor COSObject.
      */
     public PDFontDescriptor(COSObject obj) {
-        super(obj);
+        super(obj != null ? obj : COSDictionary.construct());
         flags = getFlags();
         fontName = (getFontName() == null ? "" : getFontName().getValue());
-        if (flags == null) {
+        if (flags == null && obj != null) {
             LOGGER.log(Level.FINE, "Font descriptor for font " +
                     fontName + " doesn't contain flags.");
         }
@@ -567,7 +564,7 @@ public class PDFontDescriptor extends PDObject {
      * @return font descriptor with fields set in accordance with sfm.
      */
     public static PDFontDescriptor getDescriptorFromMetrics(StandardFontMetrics sfm) {
-        PDFontDescriptor res = new PDFontDescriptor(new COSObject());
+        PDFontDescriptor res = new PDFontDescriptor(null);
         boolean isSymbolic = "FontSpecific".equals(sfm.getEncodingScheme());
         res.fontName = sfm.getFontName();
         res.setFontName(ASAtom.getASAtom(sfm.getFontName()));
