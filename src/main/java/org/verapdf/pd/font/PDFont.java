@@ -75,7 +75,7 @@ public abstract class PDFont extends PDResource {
         if (fd != null && fd.getType() == COSObjType.COS_DICT) {
             fontDescriptor = new PDFontDescriptor(fd);
         } else {
-            fontDescriptor = new PDFontDescriptor(COSDictionary.construct());
+            fontDescriptor = new PDFontDescriptor(null);
         }
         this.fontName = this.dictionary.getNameKeyStringValue(ASAtom.BASE_FONT);
         this.fontNameWithoutSubset = fontName != null ? (fontName.matches("^[A-Z]{6}+.+") ? fontName.substring(7) : fontName) : null;
