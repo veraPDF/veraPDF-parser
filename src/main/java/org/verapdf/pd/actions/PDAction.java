@@ -25,6 +25,7 @@ import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSNumber;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.pd.PDDestination;
 import org.verapdf.pd.PDObject;
 
 import java.util.ArrayList;
@@ -93,7 +94,15 @@ public class PDAction extends PDObject {
 	}
 
 	public boolean containsStructureDestination() {
-		return getObject().knownKey(ASAtom.SD);
+		if (getObject().knownKey(ASAtom.SD)) {
+			return true;
+		}
+		if (getObject().knownKey(ASAtom.D)) {
+			COSObject d = getDestination();
+			if (d.getType() == COSObjType.COS_NAME || d.getType() == COSObjType.COS_STRING) {
+				return new PDDestination(d).getIsStructDestination();
+			}
+		}
+		return false;
 	}
-
 }
