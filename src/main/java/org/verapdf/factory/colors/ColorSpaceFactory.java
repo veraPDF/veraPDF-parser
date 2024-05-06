@@ -111,7 +111,7 @@ public class ColorSpaceFactory {
                     }
                 }
             }
-            LOGGER.log(Level.FINE, "Unknown ColorSpace name");
+            LOGGER.log(Level.FINE, "Unknown ColorSpace name " + name);
             return null;
         }
     }

@@ -139,9 +139,11 @@ public class Type1FontProgram extends PSParser implements FontProgram {
                 getBaseParser().initializeToken();
 
                 getBaseParser().skipSpaces(true);
-
+                
+                COSObject nextObject = nextObject();
                 while (getBaseParser().getToken().type != Token.Type.TT_EOF) {
-                    processObject(nextObject());
+                    processObject(nextObject);
+                    nextObject = nextObject();
                 }
                 initializeEncoding();
                 if (glyphWidths == null) {
