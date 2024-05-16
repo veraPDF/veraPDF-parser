@@ -29,12 +29,12 @@
     <parent>
       <artifactId>verapdf-parent</artifactId>
       <groupId>org.verapdf</groupId>
-      <version>1.26.1</version>
+      <version>1.26.2</version>
     </parent>
 
     <groupId>org.verapdf</groupId>
     <artifactId>parser</artifactId>
-    <version>1.26.0-RC1</version>
+    <version>1.26.0</version>
 
     <name>veraPDF Parser</name>
     <description>veraPDF tools for parsing, modifying and creating PDF documents.</description>
