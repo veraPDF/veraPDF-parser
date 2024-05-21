@@ -33,11 +33,11 @@ import java.io.IOException;
  */
 public class COSFilterASCIIHexDecode extends ASBufferedInFilter {
 
-    private final static byte WS = 17;
-    public final static byte ER = 127;
-    private COSFilterASCIIReader reader;
+    private static final byte WS = 17;
+    public static final byte ER = 127;
+    private final COSFilterASCIIReader reader;
 
-    private final static byte[] LO_HEX_TABLE = {
+    private static final byte[] LO_HEX_TABLE = {
             WS, ER, ER, ER, ER, ER, ER, ER, ER, WS, WS, ER, WS, WS, ER, ER,    // 0  - 15
             ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER,    // 16 - 31
             WS, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER, ER,    // 32 - 47

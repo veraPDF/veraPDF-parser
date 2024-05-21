@@ -3,9 +3,9 @@
 %%IncludeResource: ProcSet (CIDInit)
 %%BeginResource: CMap (Adobe-KR-UCS2)
 %%Title: (Adobe-KR-UCS2 Adobe KR 9)
-%%Version: 1.001
+%%Version: 2.000
 %%Copyright: -----------------------------------------------------------
-%%Copyright: Copyright 1990-2019 Adobe. All rights reserved.
+%%Copyright: Copyright 1990-2020 Adobe. All rights reserved.
 %%Copyright:
 %%Copyright: Redistribution and use in source and binary forms, with or
 %%Copyright: without modification, are permitted provided that the
@@ -53,7 +53,7 @@ begincmap
 end def
 
 /CMapName /Adobe-KR-UCS2 def
-/CMapVersion 1.001 def
+/CMapVersion 2.000 def
 /CMapType 2 def
 
 /WMode 0 def
@@ -8303,6 +8303,7 @@ endbfchar
 endbfchar
 
 49 beginbfchar
+<57bd> <d881df29>
 <57be> <537fdb40dd09>
 <57bf> <5795db40dd02>
 <57c0> <57cedb40dd05>
@@ -8321,7 +8322,6 @@ endbfchar
 <57cd> <8acbdb40dd05>
 <57ce> <927cdb40dd04>
 <57cf> <9f9cdb40dd07>
-<57bd> <fffd>
 <57d0> <00a1>
 <57d4> <00aa>
 <57d5> <00af>

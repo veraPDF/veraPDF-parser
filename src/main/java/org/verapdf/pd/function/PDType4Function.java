@@ -54,7 +54,7 @@ public class PDType4Function extends PDFunction {
 
     private void parseStream() throws IOException {
         try (ASInputStream functionStream = getObject().getData(COSStream.FilterFlags.DECODE)) {
-            this.parser = new FunctionParser(functionStream);
+            this.parser = new FunctionParser(functionStream, getObject().getKey());
             this.parser.parse();
         } finally {
             if (this.parser != null) {

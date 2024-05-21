@@ -22,6 +22,7 @@ package org.verapdf.io;
 
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.tools.IntReference;
 
 import java.io.*;
@@ -34,21 +35,22 @@ import java.io.*;
  */
 public class InternalInputStream extends SeekableInputStream {
 
-	private final static String READ_ONLY_MODE = "r";
-	private static int DEFAULT_BUFFER_SIZE = 2048;
+	private static final String READ_ONLY_MODE = "r";
+	private static final int DEFAULT_BUFFER_SIZE = 2048;
 
-	private RandomAccessFile stream;
-	private byte[] buffer;
+	private final RandomAccessFile stream;
+	private final byte[] buffer;
 
 	private long bufferFrom;
 	private long bufferTo;
 	private long offset;
 
-	private boolean isTempFile;
-	private IntReference numOfFileUsers;
-	private String filePath;
-	private long fromOffset;
-	private long size;
+	private final boolean isTempFile;
+	private final IntReference numOfFileUsers;
+	private final String filePath;
+	private final long fromOffset;
+	private final long size;
+	private long resetPosition;
 
 	public InternalInputStream(final File file) throws IOException {
 		this(file, false);
@@ -107,9 +109,9 @@ public class InternalInputStream extends SeekableInputStream {
 	 *                       beginning of stream.
 	 * @param stream is data left in stream.
      */
-	public static InternalInputStream createConcatenated(byte[] alreadyRead,
-	                                                     final InputStream stream) throws IOException {
-		File temp = createTempFile(alreadyRead, stream);
+	public static InternalInputStream createConcatenated(byte[] alreadyRead, final InputStream stream,
+														 Integer maxStreamSize) throws IOException {
+		File temp = createTempFile(alreadyRead, stream, maxStreamSize);
 		return new InternalInputStream(temp, true);
 	}
 
@@ -166,18 +168,31 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	@Override
+	public boolean markSupported() {
+		return true;
+	}
+
+	@Override
+	public synchronized void mark(int readlimit) {
+		resetPosition = offset;
+	}
+
+	@Override
 	public void reset() throws IOException {
 		checkClosed("Reset");
-		this.seek(0);
+		this.seek(resetPosition);
 	}
 
 	@Override
 	public void seek(long offset) throws IOException {
 		checkClosed("Seeking");
+		if (offset < 0) {
+			throw new IOException("Can't seek for offset " + offset + " in InternalInputStream");
+		}
 		if (offset > this.getStreamLength()) {
 			throw new IllegalArgumentException("Destination offset is greater than stream length");
 		}
-		this.offset = offset < 0 ? 0 : offset;
+		this.offset = offset;
 	}
 
 	@Override
@@ -197,11 +212,21 @@ public class InternalInputStream extends SeekableInputStream {
 	}
 
 	@Override
-	public ASInputStream getStream(long startOffset, long length) throws IOException {
-		return new InternalInputStream(this.stream, startOffset, length, numOfFileUsers, filePath, isTempFile);
+	public long getCurrentOffset() {
+		return fromOffset + offset;
 	}
 
 	@Override
+	public ASInputStream getStream(long startOffset, long length) throws IOException {
+		return new InternalInputStream(this.stream, fromOffset + startOffset, length, numOfFileUsers, filePath, isTempFile);
+	}
+
+    @Override
+    public SeekableInputStream getSeekableStream(long startOffset, long length) throws IOException {
+        return new InternalInputStream(this.stream, startOffset + fromOffset, length, numOfFileUsers, filePath, isTempFile);
+    }
+
+    @Override
 	public void closeResource() throws IOException {
 		if (!isSourceClosed) {
 			isSourceClosed = true;
@@ -240,7 +265,7 @@ public class InternalInputStream extends SeekableInputStream {
 			return -1;
 		}
 
-		long realOffset = fromOffset + offset;
+		long realOffset = getCurrentOffset();
 		if (this.stream.getFilePointer() != realOffset) {
 			this.stream.seek(realOffset);
 		}
@@ -254,20 +279,27 @@ public class InternalInputStream extends SeekableInputStream {
 		return size;
 	}
 
-	private static File createTempFile(byte[] alreadyRead, InputStream input) throws IOException {
+	private static File createTempFile(byte[] alreadyRead, InputStream input, Integer maxStreamSize) throws IOException {
+		if (maxStreamSize != null && alreadyRead.length > maxStreamSize) {
+			throw new VeraPDFParserException("Maximum allowed stream size exceeded");
+		}
 		File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
 		try (FileOutputStream output = new FileOutputStream(tmpFile)) {
 			output.write(alreadyRead);
+			int totalRead = alreadyRead.length;
 
 			//copy stream content
 			byte[] buffer = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
 			int n;
 			while ((n = input.read(buffer, 0, ASBufferedInFilter.BF_BUFFER_SIZE)) != -1) {
+				totalRead += n;
+				if (maxStreamSize != null && totalRead > maxStreamSize) {
+					throw new VeraPDFParserException("Maximum allowed stream size exceeded");
+				}
 				output.write(buffer, 0, n);
 			}
-
 			return tmpFile;
-		} catch (IOException e) {
+		} catch (IOException | VeraPDFParserException e) {
 			if (!tmpFile.delete()) {
 				tmpFile.deleteOnExit();
 			}

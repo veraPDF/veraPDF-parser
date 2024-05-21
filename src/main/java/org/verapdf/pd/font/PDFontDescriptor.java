@@ -21,10 +21,7 @@
 package org.verapdf.pd.font;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSBase;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSStream;
+import org.verapdf.cos.*;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
 
@@ -53,10 +50,10 @@ public class PDFontDescriptor extends PDObject {
     private static final int ALL_CAP_BIT = 17;
     private static final int SMALL_CAP_BIT = 18;
     private static final int FORCE_BOLD_BIT = 19;
-    private static final Double DEFAULT_LEADING = new Double(0);
-    private static final Double DEFAULT_XHEIGHT = new Double(0);
-    private static final Double DEFAULT_STEM_H = new Double(0);
-    private static final Double DEFAULT_WIDTH = new Double(0);
+    private static final Double DEFAULT_LEADING = 0d;
+    private static final Double DEFAULT_XHEIGHT = 0d;
+    private static final Double DEFAULT_STEM_H = 0d;
+    private static final Double DEFAULT_WIDTH = 0d;
 
     // values
     private String fontName;
@@ -91,10 +88,10 @@ public class PDFontDescriptor extends PDObject {
      * @param obj is descriptor COSObject.
      */
     public PDFontDescriptor(COSObject obj) {
-        super(obj);
+        super(obj != null ? obj : COSDictionary.construct());
         flags = getFlags();
         fontName = (getFontName() == null ? "" : getFontName().getValue());
-        if (flags == null) {
+        if (flags == null && obj != null) {
             LOGGER.log(Level.FINE, "Font descriptor for font " +
                     fontName + " doesn't contain flags.");
         }
@@ -567,7 +564,7 @@ public class PDFontDescriptor extends PDObject {
      * @return font descriptor with fields set in accordance with sfm.
      */
     public static PDFontDescriptor getDescriptorFromMetrics(StandardFontMetrics sfm) {
-        PDFontDescriptor res = new PDFontDescriptor(new COSObject());
+        PDFontDescriptor res = new PDFontDescriptor(null);
         boolean isSymbolic = "FontSpecific".equals(sfm.getEncodingScheme());
         res.fontName = sfm.getFontName();
         res.setFontName(ASAtom.getASAtom(sfm.getFontName()));

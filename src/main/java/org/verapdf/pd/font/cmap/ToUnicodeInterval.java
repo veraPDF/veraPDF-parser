@@ -33,9 +33,9 @@ public class ToUnicodeInterval {
 
     private static final Logger LOGGER = Logger.getLogger(ToUnicodeInterval.class.getCanonicalName());
 
-    private long intervalBegin;
-    private long intervalEnd;
-    private byte[] startingValue;
+    private final long intervalBegin;
+    private final long intervalEnd;
+    private final byte[] startingValue;
 
     /**
      * @param intervalBegin is the first code of mapping interval.
@@ -87,7 +87,7 @@ public class ToUnicodeInterval {
     private static String getFFFEFromUnicode(byte[] unicode) {
         for (int i = 0; i < unicode.length - 1; ++i) {
             if (unicode[i] == (byte) 0xFF && unicode[i+1] == (byte) 0xFE) {
-                char[] c = new char[] {0xFFFE};
+                char[] c = {0xFFFE};
                 return new String(c);
             }
         }
@@ -97,7 +97,7 @@ public class ToUnicodeInterval {
     private static String getFEFFFromUnicode(byte[] unicode) {
         for (int i = 0; i < unicode.length - 1; ++i) {
             if (unicode[i] == (byte) 0xFE && unicode[i+1] == (byte) 0xFF) {
-                char[] c = new char[] {0xFFFE};
+                char[] c = {0xFFFE};
                 return new String(c);
             }
         }

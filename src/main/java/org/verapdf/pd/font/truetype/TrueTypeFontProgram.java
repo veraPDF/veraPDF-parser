@@ -45,7 +45,7 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
     private static final Logger LOGGER = Logger.getLogger(TrueTypeFontProgram.class.getCanonicalName());
 
     private COSObject encoding;
-    private boolean isSymbolic;
+    private final boolean isSymbolic;
 
     /**
      * Constructor from stream containing font data, and encoding details.

@@ -52,6 +52,8 @@ public class TaggedPDFHelper {
 		tempSet.add(TaggedPDFConstants.PART);
 		tempSet.add(TaggedPDFConstants.DIV);
 		tempSet.add(TaggedPDFConstants.CAPTION);
+		tempSet.add(TaggedPDFConstants.SECT);
+		tempSet.add(TaggedPDFConstants.NON_STRUCT);
 
 		// Standard structure types for paragraphlike elements PDF 1.4, 1.7 and 2.0
 		tempSet.add(TaggedPDFConstants.H);
@@ -84,12 +86,10 @@ public class TaggedPDFHelper {
 
 		// Standard structure types for grouping elements PDF 1.7 and 1.4
 		pdf_1_7.add(TaggedPDFConstants.ART);
-		pdf_1_7.add(TaggedPDFConstants.SECT);
 		pdf_1_7.add(TaggedPDFConstants.BLOCK_QUOTE);
 		pdf_1_7.add(TaggedPDFConstants.TOC);
 		pdf_1_7.add(TaggedPDFConstants.TOCI);
 		pdf_1_7.add(TaggedPDFConstants.INDEX);
-		pdf_1_7.add(TaggedPDFConstants.NON_STRUCT);
 		pdf_1_7.add(TaggedPDFConstants.PRIVATE);
 
 		// Standard structure types for inline-level structure elements PDF 1.7 and 1.4
@@ -147,18 +147,21 @@ public class TaggedPDFHelper {
 	}
 
 	private static final int MAX_NUMBER_OF_ELEMENTS = 1;
-	private static Map<ASAtom, Set<COSKey>> visitedWithNS = new HashMap<>();
-	private static Set<ASAtom> visitedWithoutNS = new HashSet<>();
+	private static final Map<ASAtom, Set<COSKey>> visitedWithNS = new HashMap<>();
+	private static final Set<ASAtom> visitedWithoutNS = new HashSet<>();
 
 	private TaggedPDFHelper() {
 		// disable default constructor
 	}
 
-	public static StructureType getDefaultStructureType(StructureType type, Map<ASAtom, ASAtom> rootRoleMap) {
+	public static StructureType getDefaultStructureType(StructureType type) {
+		if (type == null) {
+			return null;
+		}
 		visitedWithNS.clear();
 		visitedWithoutNS.clear();
 		addVisited(type);
-		StructureType curr = getEquivalent(type, rootRoleMap);
+		StructureType curr = getEquivalent(type, StaticResources.getRoleMapHelper().getRoleMap());
 		if (curr == null || isVisited(curr)) {
 			return isStandardType(type) ? type : null;
 		}
@@ -167,12 +170,35 @@ public class TaggedPDFHelper {
 				return curr;
 			}
 			addVisited(curr);
-			curr = getEquivalent(curr, rootRoleMap);
+			curr = getEquivalent(curr, StaticResources.getRoleMapHelper().getRoleMap());
 		}
 		return null;
 	}
 
-	private static StructureType getEquivalent(StructureType type, Map<ASAtom, ASAtom> rootRoleMap) {
+	public static String getRoleMapToSameNamespaceTag(StructureType type) {
+		if (type == null) {
+			return null;
+		}
+		visitedWithNS.clear();
+		visitedWithoutNS.clear();
+		addVisited(type);
+		StructureType prev = type;
+		StructureType curr = getEquivalent(prev, Collections.emptyMap());
+		while (curr != null) {
+			if (curr.getNameSpaceURI() != null && curr.getNameSpaceURI().equals(prev.getNameSpaceURI())) {
+				return prev.getNameSpaceURI() + ":" + (prev.getType() != null ? prev.getType().getValue() : null);
+			}
+			if (isVisited(curr)) {
+				return null;
+			}
+			addVisited(curr);
+			prev = curr;
+			curr = getEquivalent(prev, Collections.emptyMap());
+		}
+		return null;
+	}
+	
+	private static StructureType getEquivalent(StructureType type, Map<ASAtom, ASAtom> roleMap) {
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {
 			PDNameSpaceRoleMapping nameSpaceMapping = nameSpace.getNameSpaceMapping();
@@ -182,14 +208,14 @@ public class TaggedPDFHelper {
 				return null;
 			}
 		}
-		ASAtom equiv = rootRoleMap.get(type.getType());
+		ASAtom equiv = roleMap.get(type.getType());
 		return equiv == null ? null : StructureType.createStructureType(equiv);
 	}
 
 	public static boolean isStandardType(StructureType type) {
 		String structureType = type.getType().getValue();
 		PDStructureNameSpace nameSpace = type.getNameSpace();
-		if (nameSpace != null) {
+		if (nameSpace != null && nameSpace.getNS() != null) {
 			switch (nameSpace.getNS()) {
 				case TaggedPDFConstants.PDF_NAMESPACE:
 					return PDF_1_7_STANDARD_ROLE_TYPES.contains(structureType);
@@ -215,7 +241,6 @@ public class TaggedPDFHelper {
 		ASAtom structType = type.getType();
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {
-			COSKey key = nameSpace.getObject().getObjectKey();
 			Set<COSKey> nameSpaces;
 			if (visitedWithNS.containsKey(structType)) {
 				nameSpaces = visitedWithNS.get(structType);
@@ -223,6 +248,7 @@ public class TaggedPDFHelper {
 				nameSpaces = new HashSet<>();
 				visitedWithNS.put(structType, nameSpaces);
 			}
+			COSKey key = nameSpace.getObject().getObjectKey();
 			nameSpaces.add(key);
 		} else {
 			visitedWithoutNS.add(structType);
@@ -245,23 +271,15 @@ public class TaggedPDFHelper {
 		}
 	}
 
-	public static List<PDStructElem> getStructTreeRootStructChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
-		return getStructChildren(parent, roleMap, false);
+	public static List<PDStructElem> getStructNodeStructChildren(COSObject parent) {
+		return getStructChildren(parent, true);
 	}
 
-	public static List<Object> getStructTreeRootChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
-		return getChildren(parent, roleMap, false);
+	public static List<Object> getStructNodeChildren(COSObject parent) {
+		return getChildren(parent, true);
 	}
 
-	public static List<PDStructElem> getStructElemStructChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
-		return getStructChildren(parent, roleMap, true);
-	}
-
-	public static List<Object> getStructElemChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap) {
-		return getChildren(parent, roleMap, true);
-	}
-
-	private static List<Object> getChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+	private static List<Object> getChildren(COSObject parent, boolean checkType) {
 		if (parent == null || parent.getType() != COSObjType.COS_DICT) {
 			LOGGER.log(Level.FINE, "Parent element for struct elements is null or not a COSDictionary");
 			return Collections.emptyList();
@@ -271,7 +289,7 @@ public class TaggedPDFHelper {
 		if (children != null) {
 			if (isStructElem(children, checkType)) {
 				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
-				list.add(new PDStructElem(children, roleMap));
+				list.add(new PDStructElem(children));
 				return Collections.unmodifiableList(list);
 			} else if (isMCR(children)) {
 				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
@@ -282,7 +300,7 @@ public class TaggedPDFHelper {
 				list.add(children);
 				return Collections.unmodifiableList(list);
 			} else if (children.getType() == COSObjType.COS_ARRAY) {
-				return getChildrenFromArray(children, roleMap, checkType);
+				return getChildrenFromArray(children, checkType);
 			} else if (isOBJR(children)) {
 				List<Object> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
 				list.add(new PDOBJRDictionary(children));
@@ -298,7 +316,7 @@ public class TaggedPDFHelper {
 	 * @param parent parent dictionary
 	 * @return list of structure elements
 	 */
-	private static List<PDStructElem> getStructChildren(COSObject parent, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+	private static List<PDStructElem> getStructChildren(COSObject parent, boolean checkType) {
 		if (parent == null || parent.getType() != COSObjType.COS_DICT) {
 			LOGGER.log(Level.FINE, "Parent element for struct elements is null or not a COSDictionary");
 			return Collections.emptyList();
@@ -308,10 +326,10 @@ public class TaggedPDFHelper {
 		if (children != null) {
 			if (isStructElem(children, checkType)) {
 				List<PDStructElem> list = new ArrayList<>(MAX_NUMBER_OF_ELEMENTS);
-				list.add(new PDStructElem(children, roleMap));
+				list.add(new PDStructElem(children));
 				return Collections.unmodifiableList(list);
 			} else if (children.getType() == COSObjType.COS_ARRAY) {
-				return getStructChildrenFromArray(children, roleMap, checkType);
+				return getStructChildrenFromArray(children, checkType);
 			}
 		}
 		return Collections.emptyList();
@@ -323,13 +341,13 @@ public class TaggedPDFHelper {
 	 * @param children array of children structure elements
 	 * @return list of structure elements
 	 */
-	private static List<PDStructElem> getStructChildrenFromArray(COSObject children, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+	private static List<PDStructElem> getStructChildrenFromArray(COSObject children, boolean checkType) {
 		if (children.size() > 0) {
 			List<PDStructElem> list = new ArrayList<>();
 			for (int i = 0; i < children.size(); ++i) {
 				COSObject elem = children.at(i);
 				if (isStructElem(elem, checkType)) {
-					list.add(new PDStructElem(elem, roleMap));
+					list.add(new PDStructElem(elem));
 				}
 			}
 			return Collections.unmodifiableList(list);
@@ -337,13 +355,13 @@ public class TaggedPDFHelper {
 		return Collections.emptyList();
 	}
 
-	private static List<Object> getChildrenFromArray(COSObject children, Map<ASAtom, ASAtom> roleMap, boolean checkType) {
+	private static List<Object> getChildrenFromArray(COSObject children, boolean checkType) {
 		if (children.size() > 0) {
 			List<Object> list = new ArrayList<>();
 			for (int i = 0; i < children.size(); ++i) {
 				COSObject elem = children.at(i);
 				if (isStructElem(elem, checkType)) {
-					list.add(new PDStructElem(elem, roleMap));
+					list.add(new PDStructElem(elem));
 				} else if (isMCR(elem)) {
 					list.add(new PDMCRDictionary(elem));
 				} else if (elem.getType() == COSObjType.COS_INTEGER) {

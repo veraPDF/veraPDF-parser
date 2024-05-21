@@ -61,5 +61,13 @@ public interface IReader extends Closeable {
 
 	long getLastTrailerOffset();
 
+	COSObject getLinearizationDictionary();
+
+	COSObject getLastXrefStream();
+
+	boolean isContainsXRefStream();
+
+	List<COSObject> getObjectStreamsList();
+
 	int getGreatestKeyNumberFromXref();
 }

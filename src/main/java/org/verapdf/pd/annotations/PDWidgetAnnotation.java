@@ -36,6 +36,7 @@ public class PDWidgetAnnotation extends PDAnnotation {
 		super(obj);
 	}
 
+	@Override
 	public PDAnnotationAdditionalActions getAdditionalActions() {
 		COSObject aa = getKey(ASAtom.AA);
 		if (aa != null && aa.getType() == COSObjType.COS_DICT) {

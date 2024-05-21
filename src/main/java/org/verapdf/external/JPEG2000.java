@@ -38,14 +38,15 @@ public class JPEG2000 {
 
     private static final Logger LOGGER = Logger.getLogger(JPEG2000.class.getCanonicalName());
 
-    private static final Long DEFAULT_NR_COLOR_CHANNELS = Long.valueOf(0);
-    private static final Long DEFAULT_NR_COLOR_SPACE_SPECS = Long.valueOf(0);
-    private static final Long DEFAULT_NR_COLOR_SPACES_WITH_APPROX_FIELD = Long.valueOf(0);
-    private static final Long DEFAULT_COLR_METHOD = Long.valueOf(0);
+    private static final Long DEFAULT_NR_COLOR_CHANNELS = 0L;
+    private static final Long DEFAULT_NR_COLOR_SPACE_SPECS = 0L;
+    private static final Long DEFAULT_NR_COLOR_SPACES_WITH_APPROX_FIELD = 0L;
+    private static final Long DEFAULT_COLR_METHOD = 0L;
     private static final Long DEFAULT_COLR_ENUM_CS = null;
-    private static final Long DEFAULT_BIT_DEPTH = Long.valueOf(0);
+    private static final Long DEFAULT_BIT_DEPTH = 0L;
     private static final Boolean DEFAULT_BPCC_BOX_PRESENT = Boolean.FALSE;
     private static final PDColorSpace DEFAULT_COLOR_SPACE = null;
+    private static final double[] ILLUMINANT_D50 = {0.9642, 1.0000, 0.8251};
     private static final byte[] sign = {0x00, 0x00, 0x00, 0x0C, 0x6A, 0x50, 0x20, 0x20, 0x0D, 0x0A, -0x79, 0x0A};
 
     private static final byte[] header = {0x6A, 0x70, 0x32, 0x68};
@@ -148,14 +149,14 @@ public class JPEG2000 {
                     break;
                 }
                 long ncColorChannels = convertArrayToLong(nc);
-                builder.nrColorChannels(Long.valueOf(ncColorChannels));
+                builder.nrColorChannels(ncColorChannels);
                 byte[] bpc = new byte[1];
                 if (stream.read(bpc, bpc.length) != 1) {
                     LOGGER.log(Level.FINE, "Can not read bitDepth");
                     break;
                 }
                 long bitDepth = bpc[0] + 1;
-                builder.bitDepth(Long.valueOf(bitDepth));
+                builder.bitDepth(bitDepth);
                 skipBytes(stream, 3);
             } else if (matches(tbox, bpcc)) {
                 builder.bpccBoxPresent(Boolean.TRUE);
@@ -166,7 +167,7 @@ public class JPEG2000 {
                     break;
                 }
                 if (nrColorSpaceSpecs == null) {
-                    nrColorSpaceSpecs = Long.valueOf(1L);
+                    nrColorSpaceSpecs = 1L;
                 } else {
                     ++nrColorSpaceSpecs;
                 }
@@ -177,7 +178,7 @@ public class JPEG2000 {
                 }
                 long methValue = convertArrayToLong(meth);
                 if (firstColrMethod == null) {
-                    firstColrMethod = Long.valueOf(methValue);
+                    firstColrMethod = methValue;
                 }
                 skipBytes(stream, 1);
                 byte[] approx = new byte[1];
@@ -188,12 +189,12 @@ public class JPEG2000 {
                 long approxValue = convertArrayToLong(approx);
                 if (approxValue == 1) {
                     if (nrColorSpacesWithApproxField == null) {
-                        nrColorSpacesWithApproxField = Long.valueOf(1L);
+                        nrColorSpacesWithApproxField = 1L;
                     } else {
                         ++nrColorSpacesWithApproxField;
                     }
                     if (colrMethod == null) {
-                        colrMethod = Long.valueOf(methValue);
+                        colrMethod = methValue;
                     }
                 }
                 long read = 3;
@@ -210,13 +211,13 @@ public class JPEG2000 {
                     read += 4;
                     long enumCSValue = convertArrayToLong(enumCS);
                     if (firstColrEnumCS == null) {
-                        firstColrEnumCS = Long.valueOf(enumCSValue);
-                        firstColorSpace = createColorSpaceFromEnumValue(firstColrEnumCS.longValue());
-                        doesFirstContainsColorSpace = Boolean.valueOf(firstColorSpace != null);
+                        firstColrEnumCS = enumCSValue;
+                        firstColorSpace = createColorSpaceFromEnumValue(firstColrEnumCS);
+                        doesFirstContainsColorSpace = firstColorSpace != null;
                     }
                     if (approxValue == 1 && colrEnumCS == null) {
-                        colrEnumCS = Long.valueOf(enumCSValue);
-                        colorSpace = createColorSpaceFromEnumValue(colrEnumCS.longValue());
+                        colrEnumCS = enumCSValue;
+                        colorSpace = createColorSpaceFromEnumValue(colrEnumCS);
                     }
                 } else if (methValue == 2) {
                     int profileLength = (int) (leftInBox - read);
@@ -228,7 +229,7 @@ public class JPEG2000 {
                     read += profileLength;
                     if (doesFirstContainsColorSpace == null) {
                         firstColorSpace = createColorSpaceFromProfile(profile);
-                        doesFirstContainsColorSpace = Boolean.valueOf(firstColorSpace != null);
+                        doesFirstContainsColorSpace = firstColorSpace != null;
                     }
                     if (approxValue == 1 && colorSpace == null) {
                         colorSpace = createColorSpaceFromProfile(profile);
@@ -284,7 +285,8 @@ public class JPEG2000 {
             case 12:
                 return PDDeviceCMYK.INSTANCE;
             case 14:
-                return new PDLab();
+                return new PDLab(ILLUMINANT_D50);
+                //todo parsing EP field
             case 17:
                 return new PDICCBased(1);
             case 16:

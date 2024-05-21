@@ -26,6 +26,8 @@ import org.verapdf.pd.font.cmap.CMap;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Instance of this class represent a Type1 font from FontSet of
@@ -35,11 +37,15 @@ import java.util.*;
  */
 public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgram {
 
+    private static final Logger LOGGER = Logger.getLogger(CFFType1FontProgram.class.getCanonicalName());
+
+    private static final String DUPLICATED_GLYPH_NAME_MESSAGE = "CFF Type1 FontProgram contains duplicated glyph name %s";
+    
     private static final String NOTDEF_STRING = ".notdef";
 
-    private CMap externalCMap;  // in case if font is embedded into Type0 font
+    private final CMap externalCMap;  // in case if font is embedded into Type0 font
     private long encodingOffset;
-    private int[] encoding;     // array with mapping code -> gid
+    private final int[] encoding;     // array with mapping code -> gid
     private boolean isStandardEncoding = false;
     private boolean isExpertEncoding = false;
     private Map<String, Integer> charSet;   // mappings glyphName -> gid
@@ -52,15 +58,10 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     CFFType1FontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                         long topDictBeginOffset, long topDictEndOffset,
                         CMap externalCMap, boolean isSubset) {
-        super(stream);
+        super(stream, definedNames, globalSubrs, topDictBeginOffset, topDictEndOffset, isSubset);
         encodingOffset = 0;
         encoding = new int[256];
-        this.definedNames = definedNames;
-        this.globalSubrs = globalSubrs;
-        this.topDictBeginOffset = topDictBeginOffset;
-        this.topDictEndOffset = topDictEndOffset;
         this.externalCMap = externalCMap;
-        this.isSubset = isSubset;
         fontMatrix = new float[6];
         System.arraycopy(DEFAULT_FONT_MATRIX, 0, this.fontMatrix, 0,
                 DEFAULT_FONT_MATRIX.length);
@@ -181,8 +182,12 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
                 case 0:
                     for (int i = 1; i < nGlyphs; ++i) {
                         int sid = this.readCard16();
-                        this.charSet.put(this.getStringBySID(sid), i);
-                        this.inverseCharSet.put(i, this.getStringBySID(sid));
+                        String stringBySID = this.getStringBySID(sid);
+                        if (charSet.containsKey(stringBySID)) {
+                            LOGGER.log(Level.WARNING, String.format(DUPLICATED_GLYPH_NAME_MESSAGE, stringBySID));
+                        }
+                        this.charSet.put(stringBySID, i);
+                        this.inverseCharSet.put(i, stringBySID);
                     }
                     break;
                 case 1:
@@ -198,10 +203,12 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
                                 nLeft = this.readCard16();
                             }
                             for (int i = 0; i <= nLeft; ++i) {
-                                this.charSet.put(this.getStringBySID(first + i),
-                                        charSetPointer);
-                                this.inverseCharSet.put(charSetPointer++,
-                                        this.getStringBySID(first + i));
+                                String stringBySID = this.getStringBySID(first + i);
+                                if (charSet.containsKey(stringBySID)) {
+                                    LOGGER.log(Level.WARNING, String.format(DUPLICATED_GLYPH_NAME_MESSAGE, stringBySID));
+                                }
+                                this.charSet.put(stringBySID, charSetPointer);
+                                this.inverseCharSet.put(charSetPointer++, stringBySID);
                             }
                         }
                     } catch (ArrayIndexOutOfBoundsException e) {
@@ -282,7 +289,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
 
     @Override
     public boolean containsGlyph(String glyphName) {
-        return this.charSet.keySet().contains(glyphName);
+        return this.charSet.containsKey(glyphName);
     }
 
     /**
@@ -302,7 +309,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
      */
     @Override
     public boolean containsCode(int code) {
-        return this.charSet.keySet().contains(this.getGlyphName(code));
+        return this.charSet.containsKey(this.getGlyphName(code));
     }
 
     @Override
@@ -325,10 +332,8 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
                 this.encodingStrings[i] =
                         glyphName == null ? NOTDEF_STRING : glyphName;
             }
-            return this.encodingStrings;
-        } else {
-            return this.encodingStrings;
         }
+        return this.encodingStrings;
     }
 
     /**

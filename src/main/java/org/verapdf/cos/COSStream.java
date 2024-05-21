@@ -29,6 +29,7 @@ import org.verapdf.cos.visitor.IVisitor;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.InternalOutputStream;
 import org.verapdf.io.SeekableInputStream;
+import org.verapdf.tools.TypeConverter;
 
 import java.io.File;
 import java.io.IOException;
@@ -142,6 +143,15 @@ public class COSStream extends COSDictionary {
 		return getData(FilterFlags.RAW_DATA);
 	}
 
+	public COSString getStringFromTextStream() {
+		try {
+			return (COSString)COSString.construct(TypeConverter.inputStreamToByteArray(getData())).get();
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Exception during creation string from stream (object key = " + getKey() + ')');
+			return new COSString();
+		}
+	}
+
 	@Override
 	public ASInputStream getData(final FilterFlags filterFlags) {
 		try {
@@ -186,7 +196,7 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public Boolean isStreamKeywordCRLFCompliant() {
-		return Boolean.valueOf(streamKeywordCRLFCompliant);
+		return streamKeywordCRLFCompliant;
 	}
 
 	@Override
@@ -197,7 +207,7 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public Boolean isEndstreamKeywordCRLFCompliant() {
-		return Boolean.valueOf(endstreamKeywordCRLFCompliant);
+		return endstreamKeywordCRLFCompliant;
 	}
 
 	@Override
@@ -208,7 +218,7 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public Long getRealStreamSize() {
-		return Long.valueOf(realStreamSize);
+		return realStreamSize;
 	}
 
 	@Override
@@ -244,7 +254,7 @@ public class COSStream extends COSDictionary {
 	}
 
 	public long getLength() {
-		return getIntegerKey(ASAtom.LENGTH).longValue();
+		return getIntegerKey(ASAtom.LENGTH);
 	}
 
     public void setLength(final long length) {
@@ -254,7 +264,7 @@ public class COSStream extends COSDictionary {
 	public void setIndirectLength(final long length) {
 		COSObject obj = getKey(ASAtom.LENGTH);
 		obj.setInteger(length);
-		if (obj.isIndirect().booleanValue()) {
+		if (obj.isIndirect()) {
 			obj = COSIndirect.construct(obj);
 			setKey(ASAtom.LENGTH, obj);
 		}
@@ -269,19 +279,20 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(this == obj) {
+		if (this == obj) {
 			return true;
 		}
-		if(obj == null) {
+		if (obj == null) {
 			return false;
 		}
-		if(obj instanceof COSObject) {
+		if (obj instanceof COSObject) {
 			return this.equals(((COSObject) obj).get());
 		}
 		List<COSBasePair> checkedObjects = new LinkedList<>();
 		return this.equals(obj, checkedObjects);
 	}
 
+	@Override
 	boolean equals(Object obj, List<COSBasePair> checkedObjects) {
 		if (this == obj) {
 			return true;
@@ -289,7 +300,7 @@ public class COSStream extends COSDictionary {
 		if (obj == null) {
 			return false;
 		}
-		if(obj instanceof COSObject) {
+		if (obj instanceof COSObject) {
 			return this.equals(((COSObject) obj).get());
 		}
 		if (COSBasePair.listContainsPair(checkedObjects, this, (COSBase) obj)) {
@@ -301,33 +312,33 @@ public class COSStream extends COSDictionary {
 		}
 		COSStream that = (COSStream) obj;
 
-		for(Map.Entry<ASAtom, COSObject> entry : this.getEntrySet()) {
-			if(entry.getKey() == ASAtom.FILTER ||
+		for (Map.Entry<ASAtom, COSObject> entry : this.getEntrySet()) {
+			if (entry.getKey() == ASAtom.FILTER ||
 					entry.getKey() == ASAtom.DECODE_PARMS ||
 					entry.getKey() == ASAtom.LENGTH) {
 				continue;
 			}
 			COSBase cosBase = that.getKey(entry.getKey()).get();
-			if(!entry.getValue().get().equals(cosBase, checkedObjects)) {
+			if (!entry.getValue().get().equals(cosBase, checkedObjects)) {
 				return false;
 			}
 		}
 
-		for(Map.Entry<ASAtom, COSObject> entry : that.getEntrySet()) {
-			if(entry.getKey() == ASAtom.FILTER ||
-					entry.getKey() == ASAtom.DECODE_PARMS ||
+		for (Map.Entry<ASAtom, COSObject> entry : that.getEntrySet()) {
+			if (entry.getKey() == ASAtom.FILTER || entry.getKey() == ASAtom.DECODE_PARMS ||
 					entry.getKey() == ASAtom.LENGTH) {
 				continue;
 			}
 			COSBase cosBase = this.getKey(entry.getKey()).get();
-			if(!entry.getValue().get().equals(cosBase, checkedObjects)) {
+			if (!entry.getValue().get().equals(cosBase, checkedObjects)) {
 				return false;
 			}
 		}
 
 		try {
-			if (stream != null ? !equalsStreams(stream, that.stream) :
-					that.stream != null) return false;
+			if (stream != null ? !equalsStreams(stream, that.stream) : that.stream != null) {
+				return false;
+			}
 		} catch (IOException e) {
 			LOGGER.log(Level.FINE, "Exception during comparing streams", e);
 			return false;
@@ -355,7 +366,7 @@ public class COSStream extends COSDictionary {
 
 	@Override
 	public String toString() {
-		return STREAM + "(" + SIZE + " = " + realStreamSize + ")";
+		return STREAM + '(' + SIZE + " = " + realStreamSize + ')';
 	}
 
 }

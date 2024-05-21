@@ -35,10 +35,10 @@ import java.util.Map;
  *
  * @author Sergey Shemyakov
  */
-public class DecodedObjectStreamParser extends COSParser {
+public class DecodedObjectStreamParser extends SeekableCOSParser {
 
-    private COSStream objectStream;
-    private Map<Integer, Long> internalOffsets;
+    private final COSStream objectStream;
+    private final Map<Integer, Long> internalOffsets;
 
     /**
      * Constructor from decoded object stream data and COSStream.
@@ -54,11 +54,11 @@ public class DecodedObjectStreamParser extends COSParser {
         super(doc, inputStream);
         this.objectStream = objectStream;
         this.internalOffsets = new HashMap<>();
+        keyOfCurrentObject = streamKey;
         try {
             calculateInternalOffsets();
         } catch (IOException e) {
-            throw new IOException("Object stream " + streamKey.getNumber() + " "
-                    + streamKey.getGeneration() + " has invalid N value", e);
+            throw new IOException(getErrorMessage("Object stream has invalid N value"), e);
         }
     }
 
@@ -68,12 +68,12 @@ public class DecodedObjectStreamParser extends COSParser {
         for (int i = 0; i < n; ++i) {
             Long objNum;
             Long objOffset;
-            skipSpaces(false);
-            readNumber();
-            objNum = getToken().integer;
-            skipSpaces(false);
-            readNumber();
-            objOffset = getToken().integer;
+            getBaseParser().skipSpaces(false);
+            getBaseParser().readNumber();
+            objNum = getBaseParser().getToken().integer;
+            getBaseParser().skipSpaces(false);
+            getBaseParser().readNumber();
+            objOffset = getBaseParser().getToken().integer;
             internalOffsets.put(objNum.intValue(), objOffset + first);
         }
     }
@@ -108,7 +108,7 @@ public class DecodedObjectStreamParser extends COSParser {
         if (!this.internalOffsets.containsKey(objNum)) {
             return new COSObject();
         }
-        this.source.seek(internalOffsets.get(objNum));
+        this.getSource().seek(internalOffsets.get(objNum));
         this.flag = true;
         this.objects.clear();   // In case if some COSInteger was read before.
         this.integers.clear();

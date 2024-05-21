@@ -26,7 +26,6 @@ import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.exceptions.LoopedException;
-import org.verapdf.pd.structure.NameTreeIterator;
 
 import java.util.*;
 
@@ -35,7 +34,7 @@ import java.util.*;
  */
 public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 
-	private Set<COSKey> parents = null;
+	private final Set<COSKey> parents;
 
 	private List<PDNameTreeNode> kids = null;
 	private Map<String, COSObject> names = null;
@@ -58,7 +57,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 			throw new IllegalArgumentException("Argument object shall be dictionary or stream type");
 		}
 
-		return new PDNameTreeNode(object, new HashSet<COSKey>());
+		return new PDNameTreeNode(object, new HashSet<>());
 	}
 
 	public List<PDNameTreeNode> getKids() {
@@ -120,7 +119,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 	}
 
 	public COSObject getObject(String key) {
-		HashSet<COSKey> visitedKeys = new HashSet<>();
+		Set<COSKey> visitedKeys = new HashSet<>();
 		COSKey objectKey = getObject().getObjectKey();
 		if (objectKey != null) {
 			visitedKeys.add(objectKey);
@@ -165,16 +164,38 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 		return null;
 	}
 
-	public NameTreeIterator iterator() {
-		return new NameTreeIterator(this);
+	private List<COSObject> getObjects() {
+		List<COSObject> result = new LinkedList<>(getNames().values());
+		for (PDNameTreeNode kid : getKids()) {
+			result.addAll(kid.getObjects());
+		}
+		return result;
+	}
+
+	@Override
+	public Iterator<COSObject> iterator() {
+		return getObjects().iterator();
 	}
 
 	public Long size() {
 		long i = 0;
-		NameTreeIterator iterator = iterator();
+		Iterator<COSObject> iterator = iterator();
 		for (; iterator.hasNext(); i++) {
 			iterator.next();
 		}
 		return i;
+	}
+	
+	public boolean containsKey(String key) {
+		return getObject(key) != null;
+	}
+	
+	public boolean containsValue(COSObject value) {
+		for (COSObject object : this) {
+			if (object != null && object.equals(value)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

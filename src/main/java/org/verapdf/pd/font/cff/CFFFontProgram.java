@@ -41,10 +41,10 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
 
     private static final Logger LOGGER = Logger.getLogger(CFFFontProgram.class.getCanonicalName());
     private FontProgram font;
-    private CMap externalCMap;
+    private final CMap externalCMap;
     private boolean isCIDFont = false;
     private boolean isFontParsed = false;
-    private boolean isSubset;
+    private final boolean isSubset;
 
     /**
      * Constructor from stream.
@@ -76,7 +76,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             }
             this.definedNames = this.readIndex();
             CFFIndex globalSubrs = this.readIndex();
-            if (isCIDFont(top.get(0))) {
+            if (isCIDFont(top, globalSubrs, topOffset)) {
                 font = new CFFCIDFontProgram(this.source, this.definedNames, globalSubrs,
                         topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
                         topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
@@ -91,9 +91,10 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         }
     }
 
-    private boolean isCIDFont(byte[] topDict) {
+    private boolean isCIDFont(CFFIndex top, CFFIndex globalSubrs, long topOffset) {
         try {
             byte rosOffset;
+            byte[] topDict = top.get(0);
             int supplementFirstByte = topDict[4] & 0xFF;    // checking if first operator is really ROS
             if (supplementFirstByte < 247 && supplementFirstByte > 31) {
                 rosOffset = 5;
@@ -104,25 +105,25 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
             } else if (supplementFirstByte == 29) {
                 rosOffset = 9;
             } else {
-                return isContainsROS(topDict);
+                return containsROS(top, globalSubrs, topOffset);
             }
             if (topDict[rosOffset] == 12 && topDict[rosOffset + 1] == 30) {
                 isCIDFont = true;
                 return true;
             }
-            return isContainsROS(topDict);
+            return containsROS(top, globalSubrs, topOffset);
         } catch (ArrayIndexOutOfBoundsException ex) {
-            return isContainsROS(topDict);
+            return containsROS(top, globalSubrs, topOffset);
         }
     }
 
-    private boolean isContainsROS(byte[] topDict) {
-        for (int rosOffset = 0; rosOffset < topDict.length - 2; rosOffset++) {
-            if (topDict[rosOffset] == 12 && topDict[rosOffset + 1] == 30) {
-                LOGGER.log(Level.WARNING, "The Top DICT does not begin with ROS operator");
-                isCIDFont = true;
-                return true;
-            }
+    private boolean containsROS(CFFIndex top, CFFIndex globalSubrs, long topOffset) {
+        if (new CFFFontBaseParser(this.source, this.definedNames, globalSubrs,
+                topOffset + top.getOffset(0) - 1 + top.getOffsetShift(),
+                topOffset + top.getOffset(1) - 1 + top.getOffsetShift(),
+                this.isSubset).containsROS()) {
+            LOGGER.log(Level.WARNING, "The Top DICT does not begin with ROS operator");
+            return true;
         }
         return false;
     }
@@ -187,7 +188,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
     @Override
     public List<Integer> getCIDList() {
         if (this.font instanceof CFFCIDFontProgram) {
-            return ((CFFCIDFontProgram) this.font).getCIDList();
+            return this.font.getCIDList();
         } else {
             return Collections.emptyList();
         }

@@ -44,20 +44,20 @@ public class CharStringsWidths {
     private static final float DEFAULT_WIDTH = -1f;
     private static final Logger LOGGER = Logger.getLogger(CharStringsWidths.class.getCanonicalName());
 
-    private boolean isSubset;
+    private final boolean isSubset;
 
-    private int charStringType;
-    private CFFCharStringsHandler charStrings;
-    private float[][] fontMatrices;
-    private boolean[] isDefaultFontMatrices;
+    private final int charStringType;
+    private final CFFCharStringsHandler charStrings;
+    private final float[][] fontMatrices;
+    private final boolean[] isDefaultFontMatrices;
     
-    private CFFIndex globalSubrs;
+    private final CFFIndex globalSubrs;
     
-    private CFFIndex[] localSubrIndexes;
-    private int[] bias;
-    private int[] defaultWidths;
-    private int[] nominalWidths;
-    private int[] fdSelect;
+    private final CFFIndex[] localSubrIndexes;
+    private final int[] bias;
+    private final int[] defaultWidths;
+    private final int[] nominalWidths;
+    private final int[] fdSelect;
 
     private float[] subsetFontWidths;
     private Map<Integer, Float> generalFontWidths;
@@ -131,14 +131,12 @@ public class CharStringsWidths {
             return subsetFontWidths[gid];
         } else if (!isSubset) {
             Float res = generalFontWidths.get(gid);
-            if (res != null) {
-                return res;
-            } else {
+            if (res == null) {
                 CFFNumber width = getWidthFromCharstring(gid);
                 res = getActualWidth(width, gid);
                 this.generalFontWidths.put(gid, res);
-                return res;
             }
+            return res;
         } else {
             LOGGER.log(Level.FINE, "Can't get width of charstring " + gid +
                     " in font subset, got only " + (subsetFontWidths.length - 1) +
@@ -168,24 +166,28 @@ public class CharStringsWidths {
             } else {
                 throw new IOException("Can't process CharString of type " + this.charStringType);
             }
-        } catch (IOException e) {
-            return new CFFNumber(-1f);
+        } catch (IOException | ArrayIndexOutOfBoundsException e) {
+            return new CFFNumber(DEFAULT_WIDTH);
         }
     }
 
     private float getActualWidth(CFFNumber charStringWidth, int gid) {
-        float res;
-        if (charStringWidth == null) {
-            res = getDefaultWidth(gid);
-        } else {
-            res = charStringWidth.isInteger() ? charStringWidth.getInteger() :
-                    charStringWidth.getReal();
-            res += getNominalWidth(gid);
+        try {
+            float res;
+            if (charStringWidth == null) {
+                res = getDefaultWidth(gid);
+            } else {
+                res = charStringWidth.isInteger() ? charStringWidth.getInteger() :
+                        charStringWidth.getReal();
+                res += getNominalWidth(gid);
+            }
+            if (!isDefaultFontMatrix(gid)) {
+                res *= (getFontMatrix(gid)[0] * 1000);
+            }
+            return res;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return DEFAULT_WIDTH;
         }
-        if (!isDefaultFontMatrix(gid)) {
-            res *= (getFontMatrix(gid)[0] * 1000);
-        }
-        return res;
     }
 
     private int getDefaultWidth(int gid) {

@@ -134,6 +134,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom CID_TO_GID_MAP = new ASAtom("CIDToGIDMap");
     public static final ASAtom CID_SET = new ASAtom("CIDSet");
     public static final ASAtom CID_SYSTEM_INFO = new ASAtom("CIDSystemInfo");
+    public static final ASAtom CLASS_MAP = new ASAtom("ClassMap");
     public static final ASAtom CLR_F = new ASAtom("ClrF");
     public static final ASAtom CLR_FF = new ASAtom("ClrFf");
     public static final ASAtom CMAP = new ASAtom("CMap");
@@ -273,6 +274,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom FORM = new ASAtom("Form");
     public static final ASAtom FORMTYPE = new ASAtom("FormType");
     public static final ASAtom FRM = new ASAtom("FRM");
+    public static final ASAtom FS = new ASAtom("FS");
     public static final ASAtom FT = new ASAtom("FT");
     public static final ASAtom FUNCTION = new ASAtom("Function");
     public static final ASAtom FUNCTION_TYPE = new ASAtom("FunctionType");
@@ -347,6 +349,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom LENGTH2 = new ASAtom("Length2");
     public static final ASAtom LIGHTEN = new ASAtom("Lighten");
     public static final ASAtom LIMITS = new ASAtom("Limits");
+    public static final ASAtom LIST_NUMBERING = new ASAtom("ListNumbering");
     public static final ASAtom LJ = new ASAtom("LJ");
     public static final ASAtom LL = new ASAtom("LL");
     public static final ASAtom LLE = new ASAtom("LLE");
@@ -390,6 +393,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom NON_EFONT_NO_WARN = new ASAtom("NonEFontNoWarn");
     public static final ASAtom NON_FULL_SCREEN_PAGE_MODE = new ASAtom("NonFullScreenPageMode");
     public static final ASAtom NONE = new ASAtom("None");
+    public static final ASAtom NOTE_TYPE = new ASAtom("NoteType");
     public static final ASAtom NORMAL = new ASAtom("Normal");
     public static final ASAtom NS = new ASAtom("NS");
     public static final ASAtom NUMS = new ASAtom("Nums");
@@ -654,13 +658,13 @@ public class ASAtom implements Comparable<ASAtom> {
 
         if (PREDEFINED_PDF_NAMES.containsKey(value)) {
             return PREDEFINED_PDF_NAMES.get(value);
-        } else if (CACHED_PDF_NAMES.containsKey(value)) {
-            return CACHED_PDF_NAMES.get(value);
-        } else {
-            ASAtom result = new ASAtom(value, false);
-            CACHED_PDF_NAMES.put(value, result);
-            return result;
         }
+        if (CACHED_PDF_NAMES.containsKey(value)) {
+            return CACHED_PDF_NAMES.get(value);
+        }
+        ASAtom result = new ASAtom(value, false);
+        CACHED_PDF_NAMES.put(value, result);
+        return result;
     }
 
     /**

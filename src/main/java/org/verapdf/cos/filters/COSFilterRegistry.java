@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  */
 public class COSFilterRegistry {
 
-	private static Map<ASAtom, IASFilterFactory> registeredFactories;
+	private static final Map<ASAtom, IASFilterFactory> registeredFactories;
 	private static final Logger LOGGER = Logger.getLogger(COSFilterRegistry.class.getCanonicalName());
 
 	static {
@@ -69,7 +69,7 @@ public class COSFilterRegistry {
 
 	private static void registerFactory(final ASAtom filterName, final IASFilterFactory factory) throws VeraPDFParserException {
 		if (registeredFactories.containsKey(filterName)) {
-			throw new VeraPDFParserException("COSFilterRegistry::RegisterFactory(...)" + StringExceptions.DUPLICATE_FACTORY_NAMES);
+			throw new VeraPDFParserException(StringExceptions.DUPLICATE_FACTORY_NAMES);
 		}
 		registeredFactories.put(filterName, factory);
 	}

@@ -37,7 +37,7 @@ public class AccessPermissions {
     private static final int ASSEMBLE_DOCUMENT_BIT = 11;
     private static final int DEGRADED_PRINT_BIT = 12;
 
-    private int bits;
+    private final int bits;
 
     private AccessPermissions(int bits) {
         this.bits = bits;

@@ -33,11 +33,11 @@ import java.util.*;
  */
 public class PDPageTreeBranch extends PDPageTreeNode {
 
-	private final int PD_TREE_MAX_CHILD = 11;
+	private static final int PD_TREE_MAX_CHILD = 11;
 
 	private int leafCount;
 	private boolean isTerminal;
-	private List<PDPageTreeNode> children;
+	private final List<PDPageTreeNode> children;
 
 	public PDPageTreeBranch() {
 		this.isTerminal = true;
@@ -78,6 +78,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		rightChild.setParent(this);
 	}
 
+	@Override
 	public int getLeafCount() {
 		return leafCount;
 	}
@@ -94,6 +95,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return children.indexOf(node);
 	}
 
+	@Override
 	public PDPage findTerminalPDPage(int index) {
 		if (isTerminal) {
 			index = Math.min(index, leafCount);
@@ -112,6 +114,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return this.children.get(lastIndex).findTerminalPDPage(index);
 	}
 
+	@Override
 	public PDPageTreeBranch findTerminal(int index) {
 		if (isTerminal) {
 			return this;
@@ -135,6 +138,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return insertNode(leaf, insertAt);
 	}
 
+	@Override
 	protected void updateFromObject() {
 		clear();
 
@@ -155,7 +159,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 					isTerminal = false;
 				} else {
 					//TODO : ASException
-					throw new VeraPDFParserException("PDPageTreeBranch::UpdateFromObject()" + StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
+					throw new VeraPDFParserException(StringExceptions.UNKNOWN_TYPE_PAGE_TREE_NODE);
 				}
 
 				kid_i.setParent(this);
@@ -184,15 +188,7 @@ public class PDPageTreeBranch extends PDPageTreeNode {
 		return Collections.unmodifiableSet(res);
 	}
 
-//	PDPageTreeNode parent = getParent();
-//	Set<COSKey> res = parent != null ? new HashSet<>(parent.parentKeys) : new HashSet<>();
-//	COSKey objectKey = this.getObject().getObjectKey();
-//		if (res.contains(objectKey)) {
-//		throw new LoopedException("Page tree loop found");
-//	}
-//		res.add(objectKey);
-//		return Collections.unmodifiableSet(res);
-
+	@Override
 	protected void updateToObject() {
 		COSObject branch = getObject();
 		COSObject kids = COSArray.construct();

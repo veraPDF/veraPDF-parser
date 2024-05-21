@@ -23,6 +23,7 @@ package org.verapdf.as.filters.io;
 import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.parser.BaseParserInputStream;
 import org.verapdf.parser.NotSeekableBaseParser;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ import java.util.Arrays;
 /**
  * Class provides buffered input from input stream.
  * It has two uses. If the ASBufferedInFilter object is used as a buffered
- * stream (e. g. in unseekable parsers) then the buffer holds DECODED bytes read
+ * stream (e.g. in unseekable parsers) then the buffer holds DECODED bytes read
  * from inlaying stream.
  * Before using the ASBufferedInFilter in this make sure to call initialize()
  * method.
@@ -41,7 +42,7 @@ import java.util.Arrays;
  *
  * @author Sergey Shemyakov
  */
-public class ASBufferedInFilter extends ASInFilter {
+public class ASBufferedInFilter extends ASInFilter implements BaseParserInputStream {
 
     public static final int START_BUFFER_SIZE = 10240;
     public static final int BF_BUFFER_SIZE = 2048;
@@ -129,6 +130,7 @@ public class ASBufferedInFilter extends ASInFilter {
         return read(buffer, buffer.length);
     }
 
+    @Override
     public byte readByte() throws IOException {
         if (eod != -1 && pos >= eod) {
             return -1;
@@ -208,7 +210,7 @@ public class ASBufferedInFilter extends ASInFilter {
     }
 
     /**
-     * @return index of the end of of valid unread data in buffer.
+     * @return index of the end of valid unread data in buffer.
      */
     public int getBufferEnd() {
         return bufferEnd;
@@ -324,11 +326,12 @@ public class ASBufferedInFilter extends ASInFilter {
         return skipped;
     }
 
-    public byte peek() throws IOException {
+    @Override
+    public int peek() throws IOException {
         return peek(0);
     }
 
-    public byte peek(int i) throws IOException {
+    public int peek(int i) throws IOException {
         int index = pos + i;
         if (index > buffer.length || index < 0) {
             throw new IOException("Can't peek at index " + index + " in buffer in ASBufferingInputStream.");
@@ -336,13 +339,15 @@ public class ASBufferedInFilter extends ASInFilter {
         if (eod != -1 && index >= eod) {
             return -1;
         }
-        return this.buffer[index];
+        return this.buffer[index] & 0xFF;
     }
 
+    @Override
     public void unread() throws IOException {
         unread(1);
     }
 
+    @Override
     public void unread(int i) throws IOException {
         int index = pos - i;
         if (index > buffer.length || index < 0) {
@@ -352,6 +357,7 @@ public class ASBufferedInFilter extends ASInFilter {
         this.readCounter -= i;
     }
 
+    @Override
     public boolean isEOF() {
         return eod != -1 && pos >= eod;
     }
@@ -368,7 +374,7 @@ public class ASBufferedInFilter extends ASInFilter {
         int read = getInputStream().read(buffer, offset, len);
         this.bufferEnd = read;
         if (read < len) {
-            // TODO: in fact, read may be less then len even if eof is not reached.
+            // TODO: in fact, read may be less than len even if eof is not reached.
             // Fix problem for this case.
             eod = offset + (read == -1 ? 0 : read);
         }

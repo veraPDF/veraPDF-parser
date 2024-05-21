@@ -191,7 +191,7 @@ public class PDAnnotation extends PDObject {
 	private boolean getFlagValue(int index) {
 		Long flag = getIntegerKey(ASAtom.F);
 		if (flag != null) {
-			long f = flag.longValue();
+			long f = flag;
 			int bitFlag = 1 << index;
 			return (f & bitFlag) == bitFlag;
 		}

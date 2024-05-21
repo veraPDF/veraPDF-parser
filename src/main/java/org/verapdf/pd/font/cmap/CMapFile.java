@@ -39,7 +39,7 @@ public class CMapFile {
     private static final Logger LOGGER = Logger.getLogger(CMapFile.class.getCanonicalName());
 
     private CMap cMap;
-    private COSStream parentStream;
+    private final COSStream parentStream;
 
     /**
      * Constructor from COSStream containing CMap.
@@ -73,9 +73,9 @@ public class CMapFile {
         if (cMap == null) {
             parseCMapFile();
         }
-        List<CIDMappable> cidMapings = this.cMap.getCidMappings();
+        List<CIDMappable> cidMappings = this.cMap.getCidMappings();
         int res = 0;
-        for (CIDMappable cidMappable : cidMapings) {
+        for (CIDMappable cidMappable : cidMappings) {
             if (cidMappable.getMaxCID() > res) {
                 res = cidMappable.getMaxCID();
             }

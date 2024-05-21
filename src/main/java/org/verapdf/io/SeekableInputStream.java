@@ -23,6 +23,8 @@ package org.verapdf.io;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.exceptions.VeraPDFParserException;
+import org.verapdf.parser.BaseParserInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +36,7 @@ import java.io.InputStream;
  *
  * @author Sergey Shemyakov
  */
-public abstract class SeekableInputStream extends ASInputStream {
+public abstract class SeekableInputStream extends ASInputStream implements BaseParserInputStream {
 
     private static final int MAX_BUFFER_SIZE = 10240;
 
@@ -52,6 +54,8 @@ public abstract class SeekableInputStream extends ASInputStream {
      */
     public abstract long getOffset() throws IOException;
 
+    public abstract long getCurrentOffset();
+
     /**
      * Gets total length of stream.
      *
@@ -64,6 +68,7 @@ public abstract class SeekableInputStream extends ASInputStream {
      *
      * @return next byte.
      */
+    @Override
     public abstract int peek() throws IOException;
 
     /**
@@ -74,6 +79,8 @@ public abstract class SeekableInputStream extends ASInputStream {
      * @param length      is length of substream.
      */
     public abstract ASInputStream getStream(long startOffset, long length) throws IOException;
+
+    public abstract SeekableInputStream getSeekableStream(long startOffset, long length) throws IOException;
 
     /**
      * {@inheritDoc}
@@ -91,6 +98,7 @@ public abstract class SeekableInputStream extends ASInputStream {
     /**
      * @return true if end of stream is reached.
      */
+    @Override
     public boolean isEOF() throws IOException {
         return this.getOffset() == this.getStreamLength();
     }
@@ -98,6 +106,7 @@ public abstract class SeekableInputStream extends ASInputStream {
     /**
      * Resets reading pointer one byte backwards.
      */
+    @Override
     public void unread() throws IOException {
         this.seek(this.getOffset() - 1);
     }
@@ -107,6 +116,7 @@ public abstract class SeekableInputStream extends ASInputStream {
      *
      * @param count is number of bytes to unread.
      */
+    @Override
     public void unread(final int count) throws IOException {
         this.seek(this.getOffset() - count);
     }
@@ -135,6 +145,7 @@ public abstract class SeekableInputStream extends ASInputStream {
      *
      * @return the byte read.
      */
+    @Override
     public byte readByte() throws IOException {
         int next = this.read();
         if (next < 0) {
@@ -151,10 +162,23 @@ public abstract class SeekableInputStream extends ASInputStream {
      * @return SeekableStream that contains data of passed stream.
      */
     public static SeekableInputStream getSeekableStream(InputStream stream) throws IOException {
+        if (stream instanceof SeekableInputStream) {
+            SeekableInputStream seekableStream = (SeekableInputStream) stream;
+            long offset = seekableStream.getOffset();
+            long remaining = seekableStream.getStreamLength() - offset;
+            SeekableInputStream result = seekableStream.getSeekableStream(offset, remaining);
+            seekableStream.seekFromEnd(0);
+            return result;
+        }
+        return getSeekableStream(stream, null);
+    }
+
+    public static SeekableInputStream getSeekableStream(InputStream stream, Integer maxStreamSize) throws IOException {
         int totalRead = 0;
         byte[] buffer = new byte[0];
         byte[] temp = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
-        while (MAX_BUFFER_SIZE < 0 || totalRead < MAX_BUFFER_SIZE) {
+        int maximumSize = maxStreamSize == null ? MAX_BUFFER_SIZE : Math.min(MAX_BUFFER_SIZE, maxStreamSize + 1);
+        while (totalRead < maximumSize) {
             int read = stream.read(temp);
             if (read == -1) {
                 return new ASMemoryInStream(buffer, buffer.length, false);
@@ -162,6 +186,10 @@ public abstract class SeekableInputStream extends ASInputStream {
             buffer = ASBufferedInFilter.concatenate(buffer, buffer.length, temp, read);
             totalRead += read;
         }
-        return InternalInputStream.createConcatenated(buffer, stream);
+        if (maxStreamSize != null && totalRead > maxStreamSize) {
+            throw new VeraPDFParserException("Maximum allowed stream size exceeded");
+        }
+        return InternalInputStream.createConcatenated(buffer, stream, maxStreamSize);
     }
+
 }

@@ -57,6 +57,6 @@ public class PDDeviceRGB extends PDColorSpace {
             rgb[i] = (float) value[i];
         }
         rgb = colorSpaceRGB.toRGB(rgb);
-        return new double[]{(double) rgb[0], (double) rgb[1], (double) rgb[2]};
+        return new double[]{rgb[0], rgb[1], rgb[2]};
     }
 }

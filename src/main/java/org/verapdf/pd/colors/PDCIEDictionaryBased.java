@@ -33,9 +33,9 @@ import java.awt.color.ColorSpace;
  */
 public abstract class PDCIEDictionaryBased extends PDColorSpace {
 
-    private static final double[] DEFAULT_BLACK_POINT = new double[]{0, 0, 0};
+    private static final double[] DEFAULT_BLACK_POINT = {0, 0, 0};
 
-    protected COSObject dictionary;
+    protected final COSObject dictionary;
 
     protected double wpX = 1;
     protected double wpY = 1;
@@ -54,7 +54,7 @@ public abstract class PDCIEDictionaryBased extends PDColorSpace {
         fillWhitepointCache(getWhitePoint());
     }
 
-    private void fillWhitepointCache(double[] whitepoint) {
+    protected void fillWhitepointCache(double[] whitepoint) {
         if (whitepoint == null || whitepoint.length < 3) {
             return;
         }
@@ -66,7 +66,7 @@ public abstract class PDCIEDictionaryBased extends PDColorSpace {
     protected double[] convXYZtoRGB(double x, double y, double z) {
         float[] rgb = ColorSpace.getInstance(ColorSpace.CS_CIEXYZ)
                 .toRGB(new float[]{(float) Math.max(0, x), (float) Math.max(0, y), (float) Math.max(0, z)});
-        return new double[]{(double) rgb[0], (double) rgb[1], (double) rgb[2]};
+        return new double[]{rgb[0], rgb[1], rgb[2]};
     }
 
     public double[] getWhitePoint() {

@@ -117,8 +117,8 @@ public class AdobeGlyphList {
      * Unicode of diacritic symbol.
      */
     public static class AGLUnicode {
-        private int symbolCode;
-        private int[] diacriticCodes;
+        private final int symbolCode;
+        private final int[] diacriticCodes;
 
         AGLUnicode(int symbolCode, int... diacriticCode) {
             this.symbolCode = symbolCode;

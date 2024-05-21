@@ -43,11 +43,11 @@ public class CMap {
     private boolean usesNonPredefinedCMap;
     int shortestCodeSpaceLength;
 
-    private List<CIDMappable> cidMappings;
+    private final List<CIDMappable> cidMappings;
     private List<CodeSpace> codeSpaces;
-    private List<CIDMappable> notDefMappings;
-    private Map<Integer, String> toUnicode;
-    private List<ToUnicodeInterval> unicodeIntervals;
+    private final List<CIDMappable> notDefMappings;
+    private final Map<Integer, String> toUnicode;
+    private final List<ToUnicodeInterval> unicodeIntervals;
 
     public CMap() {
         this.cidMappings = new LinkedList<>();
@@ -104,7 +104,7 @@ public class CMap {
     }
 
     /**
-     * Reads character code from input stream and returnes it's CID. This uses
+     * Reads character code from input stream and returns it's CID. This uses
      * codespace information from CMap. Details are described in PDF32000 in
      * 9.7.6.2 "CMap Mapping".
      *
@@ -249,7 +249,7 @@ public class CMap {
     }
 
     void addUnicodeMapping(int code, String toUnicodeMap) {
-        this.toUnicode.put(Integer.valueOf(code), toUnicodeMap);
+        this.toUnicode.put(code, toUnicodeMap);
     }
 
     /**
@@ -259,7 +259,7 @@ public class CMap {
      * @return Unicode sequence obtained from this CMap.
      */
     public String getUnicode(int code) {
-        String res = this.toUnicode.get(Integer.valueOf(code));
+        String res = this.toUnicode.get(code);
         if(res == null) {
             for(ToUnicodeInterval interval : this.unicodeIntervals) {
                 if(interval.containsCode(code)) {

@@ -20,10 +20,7 @@
  */
 package org.verapdf.parser;
 
-import org.verapdf.cos.COSInteger;
-import org.verapdf.cos.COSName;
-import org.verapdf.cos.COSObject;
-import org.verapdf.cos.COSReal;
+import org.verapdf.cos.*;
 import org.verapdf.parser.postscript.PSOperator;
 import org.verapdf.pd.function.PSOperatorsConstants;
 
@@ -33,7 +30,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FunctionParser extends BaseParser {
+public class FunctionParser extends SeekableBaseParser {
 
     private static final Logger LOGGER = Logger.getLogger(FunctionParser.class.getCanonicalName());
 
@@ -88,10 +85,13 @@ public class FunctionParser extends BaseParser {
         FUNCTION_KEYWORDS = Collections.unmodifiableSet(tempSet);
     }
 
-    private List<COSObject> operators = new ArrayList<>();
+    private final List<COSObject> operators = new ArrayList<>();
 
-    public FunctionParser(InputStream functionStream) throws IOException {
+    private final COSKey key;
+
+    public FunctionParser(InputStream functionStream, COSKey key) throws IOException {
         super(functionStream);
+        this.key = key;
     }
 
     public void parse() throws IOException {
@@ -113,7 +113,7 @@ public class FunctionParser extends BaseParser {
                 break;
             case TT_KEYWORD:
                 if (!FUNCTION_KEYWORDS.contains(this.getToken().getValue())) {
-                    LOGGER.log(Level.WARNING, "Invalid keyword in Function");
+                    LOGGER.log(Level.WARNING, getErrorMessage("Invalid keyword in Function"));
                 } else {
                     operators.add(new PSOperator(COSName.construct(this.getToken().getValue())));
                 }
@@ -125,12 +125,20 @@ public class FunctionParser extends BaseParser {
                 operators.add(COSReal.construct(this.getToken().real));
                 break;
             default:
-                LOGGER.log(Level.WARNING, "Invalid object type in Function");
+                LOGGER.log(Level.WARNING, getErrorMessage("Invalid object type in Function"));
                 break;
         }
     }
 
     public List<COSObject> getOperators() {
         return Collections.unmodifiableList(operators);
+    }
+
+    @Override
+    protected String getErrorMessage(String message, long offset) {
+        if (key != null) {
+            return message + "(offset = " + offset + " in stream " + key + ')';
+        }
+        return super.getErrorMessage(message, offset);
     }
 }

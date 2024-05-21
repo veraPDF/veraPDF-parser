@@ -28,10 +28,10 @@ import org.verapdf.as.io.ASOutputStream;
  */
 public class ASBufferingOutFilter extends ASOutFilter {
 
-    private int bufferCapacity;
+    private final int bufferCapacity;
     protected byte [] internalBuffer;
     private int bufferWriter;
-    private int bufferEnd;
+    private final int bufferEnd;
 
     public ASBufferingOutFilter(ASOutputStream stream) {
         this(stream, ASBufferedInFilter.BF_BUFFER_SIZE);

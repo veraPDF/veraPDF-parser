@@ -84,7 +84,7 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
      * this True Type font.
      */
     public int getNrOfCMaps() {
-        if(this.parser.getCmapParser() != null) {
+        if (this.parser.getCmapParser() != null) {
             return this.parser.getCmapParser().getCmapInfos().length;
         } else {
             return 0;
@@ -117,7 +117,7 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
             if (gid < this.parser.getMaxpParser().getNumGlyphs()) {
                 return widths[widths.length - 1];   // case of monospaced fonts
             } else {
-                return widths[0];
+                return widths.length > 0 ? widths[0] : 0;
             }
         }
     }

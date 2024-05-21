@@ -40,13 +40,13 @@ public class PDPage extends PDPageTreeNode {
     private static final Logger LOGGER = Logger.getLogger(PDPage.class.getCanonicalName());
 
     //! Predefined page sizes
-    public static double PAGE_SIZE_A3[] = {0, 0, 842, 1190};
-    public static double PAGE_SIZE_A4[] = {0, 0, 595, 842};
-    public static double PAGE_SIZE_A5[] = {0, 0, 420, 595};
-    public static double PAGE_SIZE_B4[] = {0, 0, 709, 1001};
-    public static double PAGE_SIZE_B5[] = {0, 0, 499, 709};
-    public static double PAGE_SIZE_LETTER[] = {0, 0, 612, 1008};
-    public static double PAGE_SIZE_LEGAL[] = {0, 0, 612, 792};
+    public static final double[] PAGE_SIZE_A3 = {0, 0, 842, 1190};
+    public static final double[] PAGE_SIZE_A4 = {0, 0, 595, 842};
+    public static final double[] PAGE_SIZE_A5 = {0, 0, 420, 595};
+    public static final double[] PAGE_SIZE_B4 = {0, 0, 709, 1001};
+    public static final double[] PAGE_SIZE_B5 = {0, 0, 499, 709};
+    public static final double[] PAGE_SIZE_LETTER = {0, 0, 612, 1008};
+    public static final double[] PAGE_SIZE_LEGAL = {0, 0, 612, 792};
 
     private PDResources resources;
 
@@ -55,7 +55,7 @@ public class PDPage extends PDPageTreeNode {
     int pageNumber;
     int pagesTotal;
 
-    public PDPage(final double bbox[], final COSDocument document) {
+    public PDPage(final double[] bbox, final COSDocument document) {
         super();
 
         this.pageNumber = 0;
@@ -163,7 +163,7 @@ public class PDPage extends PDPageTreeNode {
         for (int i = 0; i < array.size(); ++i) {
             COSObject obj = array.at(i);
             if (obj.getType().isNumber()) {
-                res[i] = obj.getReal().doubleValue();
+                res[i] = obj.getReal();
             } else {
                 res[i] = 0;
             }
@@ -327,13 +327,13 @@ public class PDPage extends PDPageTreeNode {
                 if (object.getType() == COSObjType.COS_INTEGER) {
                     return object.getInteger();
                 } else {
-                    return Long.valueOf(0);
+                    return 0L;
                 }
             } else {
                 current = current.getKey(ASAtom.PARENT);
             }
         }
-        return Long.valueOf(0);
+        return 0L;
     }
 
     public Double getScaling() {

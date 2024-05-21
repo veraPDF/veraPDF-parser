@@ -40,8 +40,8 @@ import java.util.List;
  */
 class XrefStreamParser {
 
-    private COSXRefInfo section;
-    private COSStream xrefCOSStream;
+    private final COSXRefInfo section;
+    private final COSStream xrefCOSStream;
 
     /**
      * Constructor.

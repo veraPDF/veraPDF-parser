@@ -27,6 +27,7 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 
 /**
@@ -34,7 +35,7 @@ import java.util.TreeMap;
  */
 public class PageLabels {
 
-	private final TreeMap<Integer, PageLabelDictionary> labelsMap;
+	private final NavigableMap<Integer, PageLabelDictionary> labelsMap;
 
 	public PageLabels(COSDictionary numbTree) {
 		if (numbTree == null) {
@@ -82,7 +83,7 @@ public class PageLabels {
 
 	private static class PageLabelDictionary {
 
-		private final static TreeMap<Integer, String> MAP = new TreeMap<>();
+		private static final TreeMap<Integer, String> MAP = new TreeMap<>();
 
 		static {
 			MAP.put(1000, "M");

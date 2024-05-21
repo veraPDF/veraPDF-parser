@@ -27,6 +27,7 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +36,7 @@ import java.util.logging.Logger;
  *
  * @author Sergey Shemyakov
  */
-abstract class CFFFontBaseParser extends CFFFileBaseParser {
+class CFFFontBaseParser extends CFFFileBaseParser {
 
     private static final Logger LOGGER = Logger.getLogger(CFFFontBaseParser.class.getCanonicalName());
 
@@ -43,8 +44,8 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     protected boolean successfullyParsed = false;
 
     protected static final float[] DEFAULT_FONT_MATRIX =
-            {(float) 0.001, 0, 0, (float) 0.001, 0, 0};
-    protected ArrayList<CFFNumber> stack;
+            {0.001f, 0, 0, 0.001f, 0, 0};
+    protected final List<CFFNumber> stack;
     protected CFFIndex globalSubrs;
     protected boolean isSubset;
 
@@ -71,6 +72,8 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     //Subrs
     protected long subrsOffset = -1;
 
+    private boolean containsROS = false;
+
     public CFFFontBaseParser(SeekableInputStream source) {
         super(source);
         stack = new ArrayList<>(48);
@@ -78,9 +81,33 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
         this.charSetOffset = 0; // default
     }
 
+    public CFFFontBaseParser(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
+                        long topDictBeginOffset, long topDictEndOffset, boolean isSubset) {
+        this(stream);
+        this.definedNames = definedNames;
+        this.globalSubrs = globalSubrs;
+        this.topDictBeginOffset = topDictBeginOffset;
+        this.topDictEndOffset = topDictEndOffset;
+        this.isSubset = isSubset;
+    }
+
+    protected boolean containsROS() {
+        try {
+            this.source.seek(topDictBeginOffset);
+            while (this.source.getOffset() < topDictEndOffset) {
+                readTopDictUnit();
+            }     
+            if (containsROS) {
+                return true;
+            }
+        } catch (IOException ignored) {
+        }
+        return false;
+    }
+
     protected void readTopDictUnit() throws IOException {
         try {
-            int next = this.source.peek() & 0xFF;
+            int next = this.source.peek();
             if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
                 this.stack.add(readNumber());
             } else {
@@ -124,6 +151,9 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
                                             this.stack.get(this.stack.size() - 1).getInteger();
                                     this.stack.clear();
                                     break;
+                                case 30:
+                                    this.containsROS = true;
+                                    break;
                                 default:
                                     readTopDictTwoByteOps(next);
                             }
@@ -152,7 +182,7 @@ abstract class CFFFontBaseParser extends CFFFileBaseParser {
     }
 
     protected void readPrivateDictUnit() throws IOException {
-        int next = this.source.peek() & 0xFF;
+        int next = this.source.peek();
         if ((next > 27 && next < 31) || (next > 31 && next < 255)) {
             this.stack.add(readNumber());
         } else {

@@ -51,14 +51,14 @@ public class PDNavigationNode extends PDObject {
 	}
 
 	public PDNavigationNode getNext() {
-		return getNavidationNode(ASAtom.NEXT);
+		return getNavigationNode(ASAtom.NEXT);
 	}
 
 	public PDNavigationNode getPrev() {
-		return getNavidationNode(ASAtom.PREV);
+		return getNavigationNode(ASAtom.PREV);
 	}
 
-	private PDNavigationNode getNavidationNode(ASAtom key) {
+	private PDNavigationNode getNavigationNode(ASAtom key) {
 		COSObject object = getKey(key);
 		if (object != null && object.getType() == COSObjType.COS_DICT) {
 			return new PDNavigationNode(object);

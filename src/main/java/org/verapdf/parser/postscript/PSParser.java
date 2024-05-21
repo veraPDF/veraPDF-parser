@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
+import org.verapdf.parser.NotSeekableBaseParser;
 import org.verapdf.parser.NotSeekableCOSParser;
 import org.verapdf.pd.function.PSOperatorsConstants;
 
@@ -39,13 +40,15 @@ import java.util.Stack;
  */
 public class PSParser extends NotSeekableCOSParser {
 
-    protected Map<ASAtom, COSObject> userDict = new HashMap<>();
-    protected Stack<COSObject> operandStack = new Stack<>();
+    protected final Map<ASAtom, COSObject> userDict = new HashMap<>();
+    protected final Stack<COSObject> operandStack = new Stack<>();
 
     public PSParser(ASInputStream fileStream) throws IOException {
         super(fileStream, true);
-        userDict = new HashMap<>();
-        operandStack = new Stack<>();
+    }
+
+    public PSParser(NotSeekableBaseParser baseParser) {
+        super(baseParser);
     }
 
     public COSObject getObjectFromUserDict(ASAtom key) {

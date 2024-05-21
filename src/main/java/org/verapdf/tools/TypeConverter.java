@@ -23,6 +23,9 @@ package org.verapdf.tools;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -137,7 +140,7 @@ public class TypeConverter {
 			}
 
 			TimeZone zone;
-			if (!sign.equals("Z")) {
+			if (!"Z".equals(sign)) {
 				zone = TimeZone.getTimeZone(String.format(
 						"GMT%s%d:%02d", sign, timeZoneHours, timeZoneMins));
 			} else if (timeZoneHours == 0 && timeZoneMins == 0) {
@@ -199,7 +202,7 @@ public class TypeConverter {
 		}
 
 		if (array != null && array.getType() == COSObjType.COS_ARRAY) {
-			int size = array.size().intValue();
+			int size = array.size();
 
 			if (checkSize && size != estimatedSize) {
 				LOGGER.log(Level.FINE, arrayName + " array doesn't consist of " + estimatedSize + " elements");
@@ -212,10 +215,23 @@ public class TypeConverter {
 					LOGGER.log(Level.FINE, arrayName + " array contains non number value");
 					return null;
 				}
-				res[i] = number.getReal().doubleValue();
+				res[i] = number.getReal();
 			}
 			return res;
 		}
 		return null;
+	}
+
+	public static byte[] inputStreamToByteArray(InputStream is) throws IOException {
+		if (is == null) {
+			return new byte[0];
+		}
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] bytes = new byte[1024];
+		int length;
+		while ((length = is.read(bytes)) != -1) {
+			baos.write(bytes, 0, length);
+		}
+		return baos.toByteArray();
 	}
 }

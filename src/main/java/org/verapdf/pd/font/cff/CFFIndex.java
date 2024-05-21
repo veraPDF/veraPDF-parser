@@ -30,10 +30,10 @@ import java.util.Arrays;
  */
 public class CFFIndex {
 
-    private int count;
-    private int offsetShift;
-    private int[] offsets;
-    private byte[] data;
+    private final int count;
+    private final int offsetShift;
+    private final int[] offsets;
+    private final byte[] data;
 
     CFFIndex(int count, int offsetShift, int[] offsets, byte[] data) {
         this.count = count;
@@ -47,7 +47,7 @@ public class CFFIndex {
     }
 
     byte[] get(int n) {
-        if (n >= count) {
+        if (n < 0 || n >= count || offsets[n] <= 0 || offsets[n + 1] <= 0) {
             throw new ArrayIndexOutOfBoundsException("Can't get object with number "
                     + n + " from INDEX with " + count + " elements.");
         }

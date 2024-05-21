@@ -50,7 +50,7 @@ public class PDType0Font extends PDCIDFont {
 
     private PDCMap pdcMap;
     private PDCMap ucsCMap;
-    private COSDictionary type0FontDict;
+    private final COSDictionary type0FontDict;
 
     /**
      * Constructs PD Type 0 font from font dictionary.
@@ -84,7 +84,7 @@ public class PDType0Font extends PDCIDFont {
         if (dict != null) {
             COSArray array =
                     (COSArray) dict.getKey(ASAtom.DESCENDANT_FONTS).getDirectBase();
-            if (array != null) {
+            if (array != null && array.size() > 0 && array.at(0) != null && array.at(0).getType() == COSObjType.COS_DICT) {
                 return (COSDictionary) array.at(0).getDirectBase();
             }
         }
@@ -148,7 +148,7 @@ public class PDType0Font extends PDCIDFont {
         if (pdcMap != null && pdcMap.getCMapFile() != null) {
             String registry = pdcMap.getRegistry();
             String ordering = pdcMap.getOrdering();
-            String ucsName = registry + "-" + ordering + "-" + UCS2;
+            String ucsName = registry + '-' + ordering + '-' + UCS2;
             PDCMap pdUCSCMap = new PDCMap(COSName.construct(ucsName));
             CMap ucsCMap = pdUCSCMap.getCMapFile();
             if (ucsCMap != null) {
@@ -170,7 +170,7 @@ public class PDType0Font extends PDCIDFont {
                 String ordering = cidSystemInfo.getOrdering();
                 if (JAPAN_1.equals(ordering) || CNS_1.equals(ordering) || GB_1.equals(ordering) ||
                         KOREA_1.equals(ordering) || KR_9.equals(ordering)) {
-                    String ucsName = "Adobe-" + ordering + "-" + UCS2;
+                    String ucsName = "Adobe-" + ordering + '-' + UCS2;
                     this.ucsCMap = new PDCMap(COSName.construct(ucsName));
                 }
             }
@@ -183,7 +183,7 @@ public class PDType0Font extends PDCIDFont {
      * @param descendant is descendant CID font for this Type 0 font.
      */
     public void setFontProgramFromDescendant(PDCIDFont descendant) {
-        this.fontProgram = descendant.fontProgram;
+        this.fontProgram = descendant != null ? descendant.fontProgram : null;
         this.isFontParsed = true;
     }
 

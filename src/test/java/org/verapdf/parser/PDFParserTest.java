@@ -31,14 +31,14 @@ import java.io.IOException;
  * @author Maxim Plushchov
  */
 public class PDFParserTest {
-    final private String xrefPath = "src/test/resources/org/verapdf/parser/xref";
+    private final String xrefPath = "src/test/resources/org/verapdf/parser/xref";
 
     @Test
     public void testXrefParsing() {
         try {
             PDFParser pdfParser = new PDFParser(xrefPath);
             COSXRefSection section = new COSXRefSection();
-            pdfParser.initializeToken();
+            pdfParser.getBaseParser().initializeToken();
             pdfParser.parseXrefTable(section);
             Assert.assertEquals(COSXRefEntry.FIRST_XREF_ENTRY, section.getEntry(0));
         } catch (IOException ex) {

@@ -38,7 +38,7 @@ class CFFCharStringsHandler {
 
     private static final int MAX_BUFFER_SIZE = 10240;
 
-    private int amount;
+    private final int amount;
     private CFFIndex memoryInCharStirngs;
     private SeekableInputStream fontStream;
     private long[] charStringsOffsets;
@@ -73,7 +73,7 @@ class CFFCharStringsHandler {
             }
         } else {
             LOGGER.log(Level.FINE, "Cannot obtain charstring " + num + ", " +
-                    "total " + amount + "charstrings ");
+                    "total " + amount + " charstrings ");
             return new byte[]{};
         }
     }

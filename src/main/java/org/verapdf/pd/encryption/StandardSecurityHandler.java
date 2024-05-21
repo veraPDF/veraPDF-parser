@@ -48,13 +48,13 @@ public class StandardSecurityHandler {
 
     private static final Logger LOGGER = Logger.getLogger(StandardSecurityHandler.class.getCanonicalName());
 
-    private PDEncryption pdEncryption;
-    private COSObject id;
+    private final PDEncryption pdEncryption;
+    private final COSObject id;
     private Boolean isPasswordCorrect;
     private byte[] encryptionKey;
-    private boolean isRC4Decryption;
+    private final boolean isRC4Decryption;
     private ASAtom method;
-    private COSDocument document;
+    private final COSDocument document;
 
     /**
      * Constructor.

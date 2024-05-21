@@ -28,6 +28,7 @@ import org.verapdf.cos.*;
 import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.operator.InlineImageOperator;
 import org.verapdf.operator.Operator;
+import org.verapdf.pd.images.PDInlineImage;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -47,13 +48,13 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	private static final int INLINE_IMAGE_BUFFER_SIZE = 8192;
 
 	private final List<Object> tokens = new ArrayList<>();
-	private List<Closeable> imageDataStreams = new ArrayList<>();
+	private final List<Closeable> imageDataStreams = new ArrayList<>();
 
 	private COSDictionary lastInlineImageDict;
 
 	public PDFStreamParser(ASInputStream stream) throws IOException {
 		super(stream);
-		initializeToken();
+		getBaseParser().initializeToken();
 	}
 
 	public void parseTokens() throws IOException {
@@ -73,45 +74,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	}
 
 	public Iterator<Object> getTokensIterator() {
-		return new Iterator<Object>() {
-
-			private Object token;
-
-			private void tryNext() {
-				try {
-					if (token == null) {
-						token = parseNextToken();
-					}
-				} catch (IOException e) {
-					throw new VeraPDFParserException(e);
-				}
-			}
-
-			/** {@inheritDoc} */
-			@Override
-			public boolean hasNext() {
-				tryNext();
-				return token != null;
-			}
-
-			/** {@inheritDoc} */
-			@Override
-			public Object next() {
-				tryNext();
-				Object tmp = token;
-				if (tmp == null) {
-					throw new NoSuchElementException();
-				}
-				token = null;
-				return tmp;
-			}
-
-			/** {@inheritDoc} */
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-		};
+		return new TokensIterator();
 	}
 
 	/**
@@ -124,30 +87,30 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	public Object parseNextToken() throws IOException {
 		Object result = null;
 
-		skipSpaces(true);
-		byte nextByte = source.peek();
+		getBaseParser().skipSpaces(true);
+		int nextByte = getSource().peek();
 		if (nextByte == -1) {
 			return null;
 		}
 
-		byte c = nextByte;
+		int c = nextByte;
 
 		switch (c) {
 			case '(':
-                nextToken();
-                result = COSString.construct(getToken().getByteValue());
+                getBaseParser().nextToken();
+                result = COSString.construct(getBaseParser().getToken().getByteValue());
                 break;
             case '<': {
 				//check brackets
-				source.readByte();
-				c = source.peek();
-				source.unread();
+				getSource().readByte();
+				c = getSource().peek();
+				getSource().unread();
 
 				if (c == '<') {
 					result = getDictionary();
 				} else {
-					nextToken();
-					Token token = getToken();
+					getBaseParser().nextToken();
+					Token token = getBaseParser().getToken();
 					result = COSString.construct(token.getByteValue(), true, token.getHexCount(), token.isContainsOnlyHex());
 				}
 				break;
@@ -162,8 +125,8 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 				break;
 			case 'n': {
 				// null
-				String nullString = readUntilDelimiter();
-				if (nullString.equals("null")) {
+				String nullString = getBaseParser().readUntilDelimiter();
+				if ("null".equals(nullString)) {
 					result = new COSObject(COSNull.NULL);
 				} else {
 					result = Operator.getOperator(nullString);
@@ -172,11 +135,11 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			}
 			case 't':
 			case 'f': {
-				String line = readUntilDelimiter();
-				if (line.equals("true")) {
+				String line = getBaseParser().readUntilDelimiter();
+				if ("true".equals(line)) {
 					result = new COSObject(COSBoolean.TRUE);
 					break;
-				} else if (line.equals("false")) {
+				} else if ("false".equals(line)) {
 					result = new COSObject(COSBoolean.FALSE);
 				} else {
 					result = Operator.getOperator(line);
@@ -194,20 +157,21 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			case '7':
 			case '8':
 			case '9':
+			case '+':
 			case '-': {
-				Token token = getToken();
-				nextToken();
-				if (token.type.equals(Token.Type.TT_REAL)) {
+				Token token = getBaseParser().getToken();
+				getBaseParser().nextToken();
+				if (token.type == Token.Type.TT_REAL) {
 					result = COSReal.construct(token.real);
-				} else if (token.type.equals(Token.Type.TT_INTEGER)) {
+				} else if (token.type == Token.Type.TT_INTEGER) {
 					result = COSInteger.construct(token.integer);
 				}
 				break;
 			}
 			// BI operator
 			case 'B': {
-				Token token = getToken();
-				nextToken();
+				Token token = getBaseParser().getToken();
+				getBaseParser().nextToken();
 				result = Operator.getOperator(token.getValue());
 				if (result instanceof InlineImageOperator) {
 					InlineImageOperator imageOperator = (InlineImageOperator) result;
@@ -238,12 +202,12 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			// ID operator
 			case 'I': {
 				//looking for an ID operator
-				if (source.readByte() != 'I' && source.readByte() != 'D') {
+				if (getSource().readByte() != 'I' || getSource().readByte() != 'D') {
 					//TODO : change
 					throw new IOException("Corrupted inline image operator");
 				}
-				if (CharTable.isSpace(source.peek())) {
-					source.readByte();
+				if (CharTable.isSpace(getSource().peek())) {
+					getSource().readByte();
 				}
 				ASInputStream imageDataStream = readInlineImage();
 				result = Operator.getOperator("ID");
@@ -253,7 +217,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 			}
 			default: {
 				String operator = nextOperator();
-				if (operator.length() == 0) {
+				if (operator.isEmpty()) {
 					//stream is corrupted
 					result = null;
 				} else {
@@ -265,25 +229,25 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	}
 
 	protected String nextOperator() throws IOException {
-		skipSpaces();
+		getBaseParser().skipSpaces();
 
 		//maximum possible length of an operator is 3 and we'll leave some space for invalid cases
 		StringBuilder buffer = new StringBuilder(5);
-		byte nextByte = source.peek();
-		while (!source.isEOF() &&
+		int nextByte = getSource().peek();
+		while (!getSource().isEOF() &&
 				!CharTable.isSpace(nextByte) && nextByte != ']' &&
 				nextByte != '[' && nextByte != '<' &&
 				nextByte != '(' && nextByte != '/' &&
 				(nextByte < '0' || nextByte > '9'))	{
-			byte currentByte = source.readByte();
+			byte currentByte = getSource().readByte();
 			buffer.append((char) currentByte);
 
-			if (!source.isEOF()) {
+			if (!getSource().isEOF()) {
 				// d0 and d1 operators
-				nextByte = source.peek();
+				nextByte = getSource().peek();
 				if (currentByte == 'd' && (nextByte == '0' || nextByte == '1')) {
-					buffer.append((char) source.readByte());
-					nextByte = source.peek();
+					buffer.append((char) getSource().readByte());
+					nextByte = getSource().peek();
 				}
 			}
 		}
@@ -292,42 +256,104 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	}
 
 	private ASInputStream readInlineImage() throws IOException {
-		source.resetReadCounter();
-		ArrayList<Byte> image = new ArrayList<>(INLINE_IMAGE_BUFFER_SIZE);
-		byte previousByte = source.readByte();
-		byte currentByte = source.readByte();
-		image.add(previousByte);
-		image.add(currentByte);
-		Long l = this.lastInlineImageDict == null ? new Long(0) : lastInlineImageDict.getIntegerKey(ASAtom.L);
-		if (l == null) {
-			l = lastInlineImageDict.getIntegerKey(ASAtom.LENGTH);
-		}
-		while (!(this.source.isEOF())) {
-			if (previousByte == 'E' && currentByte == 'I' && isSourceAfterImage(l) && CharTable.isSpace(source.peek())) {
-			    break;
+		getSource().resetReadCounter();
+		Long l = this.lastInlineImageDict == null ? Long.valueOf(0) : PDInlineImage.getInlineImageKey(lastInlineImageDict, ASAtom.LENGTH).getInteger();
+		List<Byte> image = new ArrayList<>(INLINE_IMAGE_BUFFER_SIZE);
+		byte previousByte = getSource().readByte();
+		byte currentByte = getSource().readByte();
+		boolean imageEndFound = false;
+		while (!(this.getSource().isEOF())) {
+			if (previousByte == 'E' && currentByte == 'I' && isSourceAfterImage(l) && CharTable.isSpace(getSource().peek())) {
+				if (checkInlineImage()) {
+					imageEndFound = true;
+					break;
+				} else {
+					LOGGER.log(Level.WARNING, "Inline image content contains EI inside");
+				}
             }
+			image.add(previousByte);
 			previousByte = currentByte;
-			currentByte = source.readByte();
-			image.add(currentByte);
+			currentByte = getSource().readByte();
+		}
+		if (previousByte == 'E' && currentByte == 'I') {
+			imageEndFound = true;
+		}
+		if (!imageEndFound) {
+			LOGGER.log(Level.WARNING, "End of inline image not found");
 		}
 		return new ASMemoryInStream(getByteArrayFromArrayList(image),
-				source.getReadCounter(), false);
+				getSource().getReadCounter(), false);
+	}
+
+	private boolean checkInlineImage() throws IOException {
+		int readCounter = getSource().getReadCounter();
+		try {
+			Object token = parseNextToken();
+			if (token instanceof Operator && !Operators.operators.contains(((Operator)token).getOperator())) {
+				return false;
+			}
+		} catch (IOException e) {
+			return false;
+		} finally {
+			getSource().unread(getSource().getReadCounter() - readCounter);
+		}
+		return true;
 	}
 
 	private boolean isSourceAfterImage(Long length) {
-		 return length == null || source.getReadCounter() >= length;
+		 return length == null || getSource().getReadCounter() >= length;
 	}
 
 	public List<Closeable> getImageDataStreams() {
 		return imageDataStreams;
 	}
 
-	public static byte[] getByteArrayFromArrayList(ArrayList<Byte> list) {
+	public static byte[] getByteArrayFromArrayList(List<Byte> list) {
 		byte[] res = new byte[list.size()];
 		int i = 0;
 		for (Byte b : list) {
 			res[i++] = b;
 		}
 		return res;
+	}
+
+	private class TokensIterator implements Iterator<Object> {
+
+		private Object token;
+
+		private void tryNext() {
+			try {
+				if (token == null) {
+					token = parseNextToken();
+				}
+			} catch (IOException e) {
+				throw new VeraPDFParserException(e);
+			}
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean hasNext() {
+			tryNext();
+			return token != null;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public Object next() {
+			tryNext();
+			Object tmp = token;
+			if (tmp == null) {
+				throw new NoSuchElementException();
+			}
+			token = null;
+			return tmp;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
 	}
 }

@@ -100,6 +100,14 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
         return Collections.emptyMap();
     }
 
+    private List<COSObject> getObjects() {
+        List<COSObject> result = new LinkedList<>(getNums().values());
+        for (PDNumberTreeNode kid : getKids()) {
+            result.addAll(kid.getObjects());
+        }
+        return result;
+    }
+
     /**
      * Gets object with given key from this node and it's kids recursively.
      *
@@ -108,7 +116,7 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
      * null if object can't be found.
      */
     public COSObject getObject(Long key) {
-        HashSet<COSKey> visitedKeys = new HashSet<>();
+        Set<COSKey> visitedKeys = new HashSet<>();
         COSKey objectKey = getObject().getObjectKey();
         if (objectKey != null) {
             visitedKeys.add(objectKey);
@@ -156,13 +164,14 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
         return null;
     }
 
-    public NumberTreeIterator iterator() {
-        return new NumberTreeIterator(this);
+    @Override
+    public Iterator<COSObject> iterator() {
+        return getObjects().iterator();
     }
 
     public Long size() {
         long i = 0;
-        NumberTreeIterator iterator = iterator();
+        Iterator<COSObject> iterator = iterator();
         for (; iterator.hasNext(); i++) {
             iterator.next();
         }

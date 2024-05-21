@@ -24,7 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.*;
-import org.verapdf.parser.COSParser;
+import org.verapdf.parser.SeekableCOSParser;
 import org.verapdf.pd.font.Encoding;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDFontDescriptor;
@@ -97,7 +97,7 @@ public class PDType1Font extends PDSimpleFont {
                 ASMemoryInStream stream =
                         new ASMemoryInStream(descriptorCharSetString.getBytes(StandardCharsets.ISO_8859_1));
                 Set<String> descriptorCharSet = new TreeSet<>();
-                COSParser parser = new COSParser(stream);
+                SeekableCOSParser parser = new SeekableCOSParser(stream);
                 COSObject glyphName = parser.nextObject();
                 while (!glyphName.empty()) {
                     if (glyphName.getType() == COSObjType.COS_NAME) {
@@ -148,7 +148,7 @@ public class PDType1Font extends PDSimpleFont {
                         this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                         if (fontProgram == null) {
                             try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
-                                this.fontProgram = new Type1FontProgram(fontData);
+                                this.fontProgram = new Type1FontProgram(fontData, key);
                                 StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                             }
                         }
@@ -171,8 +171,8 @@ public class PDType1Font extends PDSimpleFont {
                             this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                             if (fontProgram == null) {
                                 try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
-                                    this.fontProgram = new OpenTypeFontProgram(fontData, true, isSymbolic,
-                                            encoding, null, isSubset);
+                                    this.fontProgram = new OpenTypeFontProgram(fontData, true, false, isSymbolic,
+                                            encoding, null, isSubset, null);
                                     StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                                 }
                             }
@@ -227,14 +227,20 @@ public class PDType1Font extends PDSimpleFont {
         }
         if (fontMetrics != null) {
             Encoding enc = this.getEncodingMapping();
-            if (Encoding.empty().equals(enc)) {
-                enc = new Encoding(fontMetrics.getEncodingScheme());
-            }
             return (double) fontMetrics.getWidth(enc.getName(code));
         }
         // should not get here
         LOGGER.log(Level.FINE, "Can't get standard metrics");
         return null;
+    }
+
+    @Override
+    protected Encoding calculateEncodingMapping() {
+        Encoding encoding = super.calculateEncodingMapping();
+        if (fontMetrics != null && encoding.getSize() == 0) {
+            encoding = new Encoding(fontMetrics.getEncodingScheme(), getDifferences());
+        }
+        return encoding;
     }
 
     @Override
@@ -303,7 +309,7 @@ public class PDType1Font extends PDSimpleFont {
             }
             return null;
         }
-        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code" + code + " in font " + this.getName());
+        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code " + code + " in font " + this.getName());
         return null;
     }
 

@@ -27,6 +27,7 @@ import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cff.CFFFontProgram;
 import org.verapdf.pd.font.cmap.CMap;
+import org.verapdf.pd.font.truetype.CIDFontType2Program;
 import org.verapdf.pd.font.truetype.TrueTypeFontProgram;
 import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.resource.ASFileStreamCloser;
@@ -44,16 +45,18 @@ public class OpenTypeFontProgram implements FontProgram {
     private static final long CFF = 1128678944;     // "CFF " read as 4-byte unsigned number
     // See TrueTypeFontParser table logic
 
-    private boolean isCFF;
-    private boolean isSymbolic;
-    private boolean isSubset;
-    private COSObject encoding;
-    private ASInputStream source;
+    private final boolean isCFF;
+    private final boolean isCIDFontType2;
+    private final boolean isSymbolic;
+    private final boolean isSubset;
+    private final COSObject encoding;
+    private final ASInputStream source;
     private FontProgram font;
     private int numTables;
     private boolean attemptedParsing = false;
     private boolean successfullyParsed = false;
-    private CMap externalCMap;
+    private final CMap externalCMap;
+    private final COSObject cidToGIDMap;
 
     /**
      * Constructor from stream, containing font data, and encoding details.
@@ -62,14 +65,16 @@ public class OpenTypeFontProgram implements FontProgram {
      * @param isSymbolic is true if font is marked as symbolic.
      * @param encoding   is value of /Encoding in font dictionary.
      */
-    public OpenTypeFontProgram(ASInputStream source, boolean isCFF, boolean isSymbolic,
-                               COSObject encoding, CMap externalCMap, boolean isSubset) {
+    public OpenTypeFontProgram(ASInputStream source, boolean isCFF, boolean isCIDFontType2, boolean isSymbolic,
+                               COSObject encoding, CMap externalCMap, boolean isSubset, COSObject cidToGIDMap) {
         this.source = source;
         this.isCFF = isCFF;
+        this.isCIDFontType2 = isCIDFontType2;
         this.isSymbolic = isSymbolic;
         this.encoding = encoding;
         this.externalCMap = externalCMap;
         this.isSubset = isSubset;
+        this.cidToGIDMap = cidToGIDMap;
     }
 
     /**
@@ -134,14 +139,17 @@ public class OpenTypeFontProgram implements FontProgram {
     public void parseFont() throws IOException {
         if (!attemptedParsing) {
             attemptedParsing = true;
-            if (!isCFF) {
-                this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
+            if (isCIDFontType2) {
+                this.font = new CIDFontType2Program(source, externalCMap, cidToGIDMap);
                 this.font.parseFont();
-            } else {
+            } else if (isCFF) {
                 try (ASInputStream cffTable = getCFFTable()) {
                     this.font = new CFFFontProgram(cffTable, externalCMap, isSubset);
                     this.font.parseFont();
                 }
+            } else {
+                this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
+                this.font.parseFont();
             }
             StaticResources.cacheFontProgram(null, this.font);
             this.successfullyParsed = true;

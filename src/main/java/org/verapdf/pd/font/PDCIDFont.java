@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 public class PDCIDFont extends PDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDCIDFont.class.getCanonicalName());
-    private static final Double DEFAULT_CID_FONT_WIDTH = Double.valueOf(1000d);
+    private static final Double DEFAULT_CID_FONT_WIDTH = 1000d;
 
     protected CMap cMap;
     private CIDWArray widths;
@@ -162,7 +162,7 @@ public class PDCIDFont extends PDFont {
             this.isFontParsed = true;
 
             if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE2) &&
-                    this.getSubtype() == ASAtom.CID_FONT_TYPE2) {
+                    this.getSubtypeEntryValue() == ASAtom.CID_FONT_TYPE2) {
                 COSStream trueTypeFontFile = fontDescriptor.getFontFile2();
                 COSKey key = trueTypeFontFile.getObjectKey();
                 COSObject cidToGIDMap = this.getCIDToGIDMap();
@@ -170,8 +170,7 @@ public class PDCIDFont extends PDFont {
                 this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                 if (fontProgram == null) {
                     try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
-                        this.fontProgram = new CIDFontType2Program(
-                                fontData, this.cMap, cidToGIDMap);
+                        this.fontProgram = new CIDFontType2Program(fontData, this.cMap, cidToGIDMap);
                         StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                     } catch (IOException e) {
                         LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
@@ -180,10 +179,11 @@ public class PDCIDFont extends PDFont {
             } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
                 COSStream fontFile = fontDescriptor.getFontFile3();
                 COSName subtype = (COSName) fontFile.getKey(ASAtom.SUBTYPE).getDirectBase();
+                ASAtom subtypeValue = subtype != null ? subtype.getName() : null;
                 COSKey key = fontFile.getObjectKey();
                 try {
                     boolean isSubset = this.isSubset();
-                    if (ASAtom.CID_FONT_TYPE0C == subtype.getName()) {
+                    if (ASAtom.CID_FONT_TYPE0C == subtypeValue) {
                         String fontProgramID = FontProgramIDGenerator.getCFFFontProgramID(key, this.cMap, isSubset);
                         this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                         if (fontProgram == null) {
@@ -192,18 +192,19 @@ public class PDCIDFont extends PDFont {
                                 StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                             }
                         }
-                    } else if (ASAtom.OPEN_TYPE == subtype.getName()) {
-                        ASAtom fontName = ASAtom.getASAtom(this.getName());
-                        boolean isCFF = fontName != ASAtom.TRUE_TYPE && fontName != ASAtom.CID_FONT_TYPE2;
+                    } else if (ASAtom.OPEN_TYPE == subtypeValue) {
+                        boolean isCFF = this.getSubtypeEntryValue() != ASAtom.TRUE_TYPE && this.getSubtypeEntryValue() != ASAtom.CID_FONT_TYPE2;
+                        boolean isCIDFontType2 = this.getSubtypeEntryValue() == ASAtom.CID_FONT_TYPE2;
                         boolean isSymbolic = this.isSymbolic();
                         COSObject encoding = this.getEncoding();
                         String fontProgramID = FontProgramIDGenerator.getOpenTypeFontProgramID(key, isCFF, isSymbolic, encoding, this.cMap, isSubset);
                         this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                         if (fontProgram == null) {
+                            COSObject cidToGIDMap = this.getCIDToGIDMap();
                             try (ASInputStream fontData = fontFile.getData(COSStream.FilterFlags.DECODE)) {
                                 this.fontProgram = new OpenTypeFontProgram(
-                                        fontData, isCFF, isSymbolic, encoding,
-                                        this.cMap, isSubset);
+                                        fontData, isCFF, isCIDFontType2, isSymbolic, encoding,
+                                        this.cMap, isSubset, cidToGIDMap);
                                 StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                             }
                         }
@@ -222,26 +223,30 @@ public class PDCIDFont extends PDFont {
 
     @Override
     public float getWidthFromProgram(int code) {
-        int cid = this.cMap.toCID(code);
         FontProgram font = getFontProgram();
         CFFType1FontProgram cffType1 = CFFType1FontProgram.getCFFType1(font);
-        if (cid != 0 && cffType1 != null) {
+        if (cffType1 != null) {
+            int cid = this.cMap.toCID(code);
             // In this case we ignore internal notations of names from CFF
             // Type 1 font and use external CMap
-            return cffType1.getWidthFromGID(cid);
+            if (cid != 0) {
+                return cffType1.getWidthFromGID(cid);
+            }
         }
         return font.getWidth(code);
     }
 
     @Override
     public boolean glyphIsPresent(int code) {
-        int cid = this.cMap.toCID(code);
         FontProgram font = getFontProgram();
         CFFType1FontProgram cffType1 = CFFType1FontProgram.getCFFType1(font);
-        if (cid != 0 && cffType1 != null) {
+        if (cffType1 != null) {
+            int cid = this.cMap.toCID(code);
             // In this case we ignore internal notations of names from CFF
             // Type 1 font and use external CMap
-            return cffType1.containsGID(cid);
+            if (cid != 0) {
+                return cffType1.containsGID(cid);
+            }
         }
         return font.containsCode(code);
     }
@@ -250,12 +255,10 @@ public class PDCIDFont extends PDFont {
      * @return CID System Info object for this CIDFont.
      */
     public PDCIDSystemInfo getCIDSystemInfo() {
-        if (this.cidSystemInfo != null) {
-            return this.cidSystemInfo;
-        } else {
+        if (this.cidSystemInfo == null) {
             this.cidSystemInfo =
                     new PDCIDSystemInfo(this.dictionary.getKey(ASAtom.CID_SYSTEM_INFO));
-            return this.cidSystemInfo;
         }
+        return this.cidSystemInfo;
     }
 }

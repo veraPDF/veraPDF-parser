@@ -52,18 +52,13 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private CFFIndex[] localSubrIndexes;
     private float[][] fontMatrices;
 
-    private CMap externalCMap;
+    private final CMap externalCMap;
 
     CFFCIDFontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                       long topDictBeginOffset, long topDictEndOffset, CMap externalCMap,
                       boolean isSubset) {
-        super(stream);
-        this.definedNames = definedNames;
-        this.globalSubrs = globalSubrs;
-        this.topDictBeginOffset = topDictBeginOffset;
-        this.topDictEndOffset = topDictEndOffset;
+        super(stream, definedNames, globalSubrs, topDictBeginOffset, topDictEndOffset, isSubset);
         this.externalCMap = externalCMap;
-        this.isSubset = isSubset;
     }
 
     /**
@@ -367,6 +362,7 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
         }
     }
 
+    @Override
     public List<Integer> getCIDList() {
         if (charSet != null) {
             List<Integer> res = new ArrayList<>(this.charSet.size());

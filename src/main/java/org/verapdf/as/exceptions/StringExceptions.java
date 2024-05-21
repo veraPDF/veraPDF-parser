@@ -30,11 +30,11 @@ public class StringExceptions {
 	//PDFAPI
 	public static final String CAN_NOT_LOCATE_XREF_TABLE = "can not locate xref table";
 	public static final String START_XREF_VALIDATION = "startxref validation failed";
-	public static final String ENCRYPTED_PDF_NOT_SUPPORTED = "encrypted pdf is not supported";
+	public static final String ENCRYPTED_PDF = "encrypted PDF with unknown or wrong password";
 	public static final String XREF_STM_NOT_SUPPORTED = "xref streams not supported";
 	public static final String INVALID_PDF_OBJECT = "invalid pdf object";
 	public static final String INVALID_PDF_ARRAY = "invalid pdf array";
-	public static final String INVALID_PDF_DICTONARY = "invalid pdf dictonary";
+	public static final String INVALID_PDF_DICTIONARY = "invalid pdf dictionary";
 	public static final String INVALID_PDF_STREAM = "invalid pdf stream";
 
 	public static final String DUPLICATE_FACTORY_NAMES = "internal library error";

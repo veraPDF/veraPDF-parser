@@ -39,7 +39,7 @@ public class COSFilters extends PDObject {
 
 	private static final Logger LOGGER = Logger.getLogger(COSFilters.class.getCanonicalName());
 
-	private List<ASAtom> entries;
+	private final List<ASAtom> entries;
 
 	public COSFilters() {
 		super();
@@ -55,10 +55,10 @@ public class COSFilters extends PDObject {
 										COSObject decodeParams) throws IOException {
 		List<COSDictionary> decodeParameters = null;
 		if(!decodeParams.empty()) {
-			if(decodeParams.getType().equals(COSObjType.COS_DICT)) {
+			if(decodeParams.getType() == COSObjType.COS_DICT) {
 				decodeParameters = new ArrayList<>(1);
 				decodeParameters.add((COSDictionary) decodeParams.getDirectBase());
-			} else if (decodeParams.getType().equals(COSObjType.COS_ARRAY)) {
+			} else if (decodeParams.getType() == COSObjType.COS_ARRAY) {
 				decodeParameters = new ArrayList<>(decodeParams.size());
 				for(int i = 0; i < decodeParams.size(); ++i) {
 					COSObjType paramsType = decodeParams.at(i).getType();
@@ -108,6 +108,7 @@ public class COSFilters extends PDObject {
 		return entries;
 	}
 
+	@Override
 	protected void updateToObject() {
 		COSObject filters = getObject();
 
@@ -118,9 +119,10 @@ public class COSFilters extends PDObject {
 		}
 	}
 
+	@Override
 	protected void updateFromObject() {
 		COSObject filters = getObject();
-		if(filters.getType().equals(COSObjType.COS_ARRAY)) {
+		if(filters.getType() == COSObjType.COS_ARRAY) {
 			int size = filters.size();
 
 			this.entries.clear();
@@ -128,7 +130,7 @@ public class COSFilters extends PDObject {
 			for (int i = 0; i < size; i++) {
 				this.entries.add(filters.at(i).getName());
 			}
-		} else if (filters.getType().equals(COSObjType.COS_NAME)) {
+		} else if (filters.getType() == COSObjType.COS_NAME) {
 			this.entries.clear();
 			this.entries.add(filters.getName());
 		}

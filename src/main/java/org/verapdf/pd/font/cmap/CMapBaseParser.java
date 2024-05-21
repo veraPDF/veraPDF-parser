@@ -18,10 +18,27 @@
  * If a copy of the MPL was not distributed with this file, you can obtain one at
  * http://mozilla.org/MPL/2.0/.
  */
-package org.verapdf.cos.filters;
+package org.verapdf.pd.font.cmap;
+
+import org.verapdf.as.io.ASInputStream;
+import org.verapdf.parser.BaseParser;
+import org.verapdf.parser.NotSeekableBaseParser;
+
+import java.io.IOException;
 
 /**
+ * This class parses CMap files and constructs CMap objects.
+ *
  * @author Sergey Shemyakov
  */
-public class COSFilterASCII85Encode {
+public class CMapBaseParser extends NotSeekableBaseParser {
+
+    public CMapBaseParser(ASInputStream stream) throws IOException {
+        super(stream, true);
+    }
+
+    @Override
+    protected boolean isEndOfComment(byte ch) {
+        return BaseParser.isCR(ch) || BaseParser.isFF(ch);
+    }
 }

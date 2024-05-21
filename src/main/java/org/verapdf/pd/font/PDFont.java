@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  */
 public abstract class PDFont extends PDResource {
 
-    private static Map<String, Double> weightNames = new LinkedHashMap<>();
+    private static final Map<String, Double> weightNames = new LinkedHashMap<>();
 
     private static final Logger LOGGER = Logger.getLogger(PDFont.class.getCanonicalName());
 
@@ -75,7 +75,7 @@ public abstract class PDFont extends PDResource {
         if (fd != null && fd.getType() == COSObjType.COS_DICT) {
             fontDescriptor = new PDFontDescriptor(fd);
         } else {
-            fontDescriptor = new PDFontDescriptor(COSDictionary.construct());
+            fontDescriptor = new PDFontDescriptor(null);
         }
         this.fontName = this.dictionary.getNameKeyStringValue(ASAtom.BASE_FONT);
         this.fontNameWithoutSubset = fontName != null ? (fontName.matches("^[A-Z]{6}+.+") ? fontName.substring(7) : fontName) : null;
@@ -116,6 +116,10 @@ public abstract class PDFont extends PDResource {
     public ASAtom getSubtype() {
         return this.subtype;
     }
+    
+    public ASAtom getSubtypeEntryValue() {
+        return this.subtype;
+    }
 
     /**
      * @return true if the font flags in the font descriptor dictionary mark
@@ -132,9 +136,13 @@ public abstract class PDFont extends PDResource {
      */
     public Encoding getEncodingMapping() {
         if (this.encoding == null) {
-            this.encoding = getEncodingMappingFromCOSObject(this.getEncoding());
+            this.encoding = calculateEncodingMapping();
         }
         return this.encoding;
+    }
+    
+    protected Encoding calculateEncodingMapping() {
+        return getEncodingMappingFromCOSObject(this.getEncoding());
     }
 
     public Double getFontWeight() {
@@ -229,7 +237,7 @@ public abstract class PDFont extends PDResource {
             if (obj.getType() == COSObjType.COS_INTEGER) {
                 diffIndex = obj.getInteger().intValue();
             } else if (obj.getType() == COSObjType.COS_NAME && diffIndex != -1) {
-                res.put(Integer.valueOf(diffIndex++), obj.getString());
+                res.put(diffIndex++, obj.getString());
             }
         }
         return res;
@@ -360,7 +368,7 @@ public abstract class PDFont extends PDResource {
             return null;
         }
 
-        return Double.valueOf(0);
+        return (double) 0;
     }
 
     /**
@@ -406,9 +414,9 @@ public abstract class PDFont extends PDResource {
         }
         if (this.fontWeight == null) {
             if (fontNameWithoutSubset != null) {
-                for (String weightName : weightNames.keySet()) {
-                    if (fontNameWithoutSubset.contains(weightName)) {
-                        fontWeight = weightNames.get(weightName);
+                for (Map.Entry<String, Double> entry : weightNames.entrySet()) {
+                    if (fontNameWithoutSubset.contains(entry.getKey())) {
+                        fontWeight = entry.getValue();
                         return;
                     }
                 }

@@ -22,19 +22,24 @@ package org.verapdf.pd.structure;
 
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDObject;
+import org.verapdf.tools.TaggedPDFHelper;
 
 import java.util.List;
 
 /**
  * @author Maksim Bezrukov
  */
-public abstract class PDStructTreeNode extends PDObject {
+public class PDStructTreeNode extends PDObject {
 
 	protected PDStructTreeNode(COSObject obj) {
 		super(obj);
 	}
 
-	public abstract List<PDStructElem> getStructChildren();
+	public List<PDStructElem> getStructChildren() {
+		return TaggedPDFHelper.getStructNodeStructChildren(getObject());
+	}
 
-	public abstract List<Object> getChildren();
+	public List<Object> getChildren() {
+		return TaggedPDFHelper.getStructNodeChildren(getObject());
+	}
 }

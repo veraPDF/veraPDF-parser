@@ -22,6 +22,7 @@ package org.verapdf.tools;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.parser.PDFFlavour;
+import org.verapdf.pd.structure.StructureType;
 
 import java.util.*;
 
@@ -30,14 +31,14 @@ import java.util.*;
  */
 public class TaggedPDFRoleMapHelper {
 
-	private Map<ASAtom, ASAtom> roleMap;
+	private final Map<ASAtom, ASAtom> roleMap;
 
 	/**
 	 * Creates new TaggedPDFRoleMapHelper
 	 * @param roleMap role map from PDF
 	 */
 	public TaggedPDFRoleMapHelper(Map<ASAtom, ASAtom> roleMap) {
-		this.roleMap = roleMap == null ? Collections.<ASAtom, ASAtom>emptyMap() : new HashMap<>(roleMap);
+		this.roleMap = roleMap == null ? Collections.emptyMap() : new HashMap<>(roleMap);
 	}
 
 	/**
@@ -50,21 +51,30 @@ public class TaggedPDFRoleMapHelper {
 		if (type == null) {
 			return null;
 		}
-		Set<String> currentStandardTypes;
+		Set<String> currentStandardTypes = getCurrentStandardTypes();
 		boolean isFastStop;
-		if (StaticResources.getFlavour() == PDFFlavour.PDFA_1_A || StaticResources.getFlavour() == PDFFlavour.PDFA_1_B) {
-			currentStandardTypes = TaggedPDFHelper.getPdf14StandardRoleTypes();
+		if (StaticResources.getFlavour().getSpecification() == PDFFlavour.Specification.ISO_19005_1) {
 			isFastStop = true;
 		} else {
-			if (StaticResources.getFlavour() == PDFFlavour.WCAG2_1) {
-				currentStandardTypes = TaggedPDFHelper.getWcagStandardRoleTypes();
-			} else {
-				currentStandardTypes = TaggedPDFHelper.getPdf17StandardRoleTypes();
-			}
 			isFastStop = false;
 		}
 		return getStandardType(type, currentStandardTypes, isFastStop);
 	}
+	
+	private static Set<String> getCurrentStandardTypes() {
+		if (StaticResources.getFlavour().getSpecification() == PDFFlavour.Specification.ISO_19005_1) {
+			return TaggedPDFHelper.getPdf14StandardRoleTypes();
+		}
+		if (StaticResources.getFlavour().getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
+			return TaggedPDFHelper.getWcagStandardRoleTypes();
+		}
+		return TaggedPDFHelper.getPdf17StandardRoleTypes();
+	}
+
+	public static boolean isStandardType(StructureType type) {
+		return getCurrentStandardTypes().contains(type.getType().getValue());
+	}
+
 
 	private String getStandardType(ASAtom type, Set<String> currentStandardTypes, boolean isFastStop) {
 		Set<ASAtom> visitedTypes = new HashSet<>();
@@ -100,5 +110,9 @@ public class TaggedPDFRoleMapHelper {
 			res = roleMap.get(res);
 		}
 		return false;
+	}
+
+	public Map<ASAtom, ASAtom> getRoleMap() {
+		return roleMap;
 	}
 }

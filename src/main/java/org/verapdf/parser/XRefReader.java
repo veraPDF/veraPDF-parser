@@ -21,11 +21,14 @@
 package org.verapdf.parser;
 
 import org.verapdf.cos.COSKey;
+import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSTrailer;
 import org.verapdf.cos.xref.COSXRefInfo;
 import org.verapdf.io.COSXRefTableReader;
 import org.verapdf.io.IReader;
 
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
 
@@ -34,7 +37,7 @@ import java.util.SortedSet;
  */
 public abstract class XRefReader implements IReader {
 
-	private COSXRefTableReader xref;
+	private final COSXRefTableReader xref;
 
 	//CONSTRUCTORS
 	public XRefReader() {
@@ -50,26 +53,32 @@ public abstract class XRefReader implements IReader {
 	}
 
 	//PUBLIC METHODS
+	@Override
 	public List<COSKey> getKeys() {
 		return this.xref.getKeys();
 	}
 
+	@Override
 	public long getStartXRef() {
 		return this.xref.getStartXRef();
 	}
 
+	@Override
 	public SortedSet<Long> getStartXRefs() {
 		return this.xref.getStartXRefs();
 	}
 
+	@Override
 	public COSTrailer getTrailer() {
 		return this.xref.getTrailer();
 	}
 
+	@Override
 	public COSTrailer getFirstTrailer() {
 		return this.xref.getFirstTrailer();
 	}
 
+	@Override
 	public COSTrailer getLastTrailer() {
 		return this.xref.getLastTrailer();
 	}
@@ -77,6 +86,25 @@ public abstract class XRefReader implements IReader {
 	//PROTECTED METHODS
 	protected void setXRefInfo(final List<COSXRefInfo> infos) {
 		this.xref.set(infos);
+	}
+
+	@Override
+	public List<COSObject> getObjectStreamsList() {
+		List<COSObject> objectStreams = new LinkedList<>();
+		for (COSKey key : this.xref.getKeys()) {
+			long offset = this.xref.getOffset(key);
+			if (offset < 0) {
+				COSKey newKey = new COSKey(- (int)offset, 0);
+				try {
+					COSObject object = !newKey.equals(key) ? getObject(newKey) : null;
+					if (object != null) {
+						objectStreams.add(object);
+					}
+				} catch (IOException ignored) {
+				}
+			}
+		}
+		return objectStreams;
 	}
 
 	protected void setXRefInfo(final COSXRefInfo info) {

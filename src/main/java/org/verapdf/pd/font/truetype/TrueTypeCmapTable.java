@@ -107,7 +107,7 @@ class TrueTypeCmapTable extends TrueTypeTable {
                 if (startCode[i] != 65535 && endCode[i] != 65535) {
                     for (int j = 0; j <= endCode[i] - startCode[i]; ++j) {
                         long glyphOffset = idRangeOffsetBegin +
-                                ((idRangeOffset[i] / 2) + j + (i - segCount)) * 2;
+                                ((idRangeOffset[i] / 2) + j + (i - segCount)) * 2L;
                         this.source.seek(glyphOffset);
                         int glyphCode = this.readUShort();
                         if (glyphCode != 0) {

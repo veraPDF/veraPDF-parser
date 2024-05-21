@@ -47,7 +47,7 @@ public class PDDocument {
     private static final Logger LOGGER = Logger.getLogger(PDDocument.class.getCanonicalName());
 	public static final String PDF_HEADER_DEFAULT = "%PDF-1.4";
 
-	private PDCatalog catalog;
+	private final PDCatalog catalog;
 	private COSDocument document;
 
 	public PDDocument() throws IOException {
