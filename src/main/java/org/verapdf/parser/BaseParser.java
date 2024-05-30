@@ -348,7 +348,7 @@ public abstract class BaseParser {
                 this.token.real = value;
             }
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.FINE, getErrorMessage(""), e);
+            LOGGER.log(Level.FINE, getErrorMessage(e.getMessage()));
             this.token.integer = Math.round(Double.MAX_VALUE);
             this.token.real = Double.MAX_VALUE;
         }
