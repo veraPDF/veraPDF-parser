@@ -53,7 +53,7 @@ public class TaggedPDFRoleMapHelper {
 		}
 		Set<String> currentStandardTypes = getCurrentStandardTypes();
 		boolean isFastStop;
-		if (StaticResources.getFlavour().getSpecification() == PDFFlavour.Specification.ISO_19005_1) {
+		if (PDFFlavour.isFlavourPart(StaticResources.getFlavour(), PDFFlavour.Specification.ISO_19005_1)) {
 			isFastStop = true;
 		} else {
 			isFastStop = false;
@@ -62,10 +62,10 @@ public class TaggedPDFRoleMapHelper {
 	}
 	
 	private static Set<String> getCurrentStandardTypes() {
-		if (StaticResources.getFlavour().getSpecification() == PDFFlavour.Specification.ISO_19005_1) {
+		if (PDFFlavour.isFlavourPart(StaticResources.getFlavour(), PDFFlavour.Specification.ISO_19005_1)) {
 			return TaggedPDFHelper.getPdf14StandardRoleTypes();
 		}
-		if (StaticResources.getFlavour().getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
+		if (PDFFlavour.isFlavourFamily(StaticResources.getFlavour(), PDFFlavour.SpecificationFamily.WCAG)) {
 			return TaggedPDFHelper.getWcagStandardRoleTypes();
 		}
 		return TaggedPDFHelper.getPdf17StandardRoleTypes();
