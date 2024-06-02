@@ -184,18 +184,56 @@ public class TaggedPDFHelper {
 		addVisited(type);
 		StructureType prev = type;
 		StructureType curr = getEquivalent(prev, Collections.emptyMap());
+		Map<String, ASAtom> processedTypes = new HashMap<>();
 		while (curr != null) {
-			if (curr.getNameSpaceURI() != null && curr.getNameSpaceURI().equals(prev.getNameSpaceURI())) {
-				return prev.getNameSpaceURI() + ":" + (prev.getType() != null ? prev.getType().getValue() : null);
+			if (curr.getNameSpaceURI() != null && processedTypes.containsKey(curr.getNameSpaceURI())) {
+				ASAtom processedType = processedTypes.get(curr.getNameSpaceURI());
+				if (curr.getType() != null && !Objects.equals(curr.getType(), processedType)) {
+					return curr.getNameSpaceURI() + ":" + (processedType != null ? processedType.getValue() : null);
+				}
+				return null;
 			}
 			if (isVisited(curr)) {
 				return null;
+			}
+			if (curr.getNameSpaceURI() != null) {
+				processedTypes.put(curr.getNameSpaceURI(), curr.getType());
 			}
 			addVisited(curr);
 			prev = curr;
 			curr = getEquivalent(prev, Collections.emptyMap());
 		}
 		return null;
+	}
+
+	public static Boolean isCircularMappingExist(StructureType type) {
+		if (type == null) {
+			return null;
+		}
+		visitedWithNS.clear();
+		visitedWithoutNS.clear();
+		addVisited(type);
+		StructureType prev = type;
+		StructureType curr = getEquivalent(prev, Collections.emptyMap());
+		Map<String, ASAtom> processedTypes = new HashMap<>();
+		while (curr != null) {
+			if (curr.getNameSpaceURI() != null && processedTypes.containsKey(curr.getNameSpaceURI())) {
+				ASAtom processedType = processedTypes.get(curr.getNameSpaceURI());
+				if (curr.getType() != null && Objects.equals(curr.getType(), processedType)) {
+					return true;
+				}
+			}
+			if (isVisited(curr)) {
+				return false;
+			}
+			if (curr.getNameSpaceURI() != null) {
+				processedTypes.put(curr.getNameSpaceURI(), curr.getType());
+			}
+			addVisited(curr);
+			prev = curr;
+			curr = getEquivalent(prev, Collections.emptyMap());
+		}
+		return false;
 	}
 	
 	private static StructureType getEquivalent(StructureType type, Map<ASAtom, ASAtom> roleMap) {
