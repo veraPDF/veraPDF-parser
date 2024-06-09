@@ -176,4 +176,17 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
         }
         return i;
     }
+
+    public boolean containsKey(Long key) {
+        return getObject(key) != null;
+    }
+
+    public boolean containsValue(COSObject value) {
+        for (COSObject object : this) {
+            if (object != null && object.equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
