@@ -32,6 +32,8 @@ import org.verapdf.tools.TaggedPDFConstants;
 import org.verapdf.tools.TaggedPDFHelper;
 import org.verapdf.tools.TaggedPDFRoleMapHelper;
 
+import java.util.List;
+
 /**
  * @author Maksim Bezrukov
  */
@@ -126,7 +128,7 @@ public class PDStructElem extends PDStructTreeNode {
 	}
 
 	public static StructureType getStructureTypeStandardStructureType(StructureType type) {
-		PDFFlavour flavour = StaticResources.getFlavour();
+		List<PDFFlavour> flavour = StaticResources.getFlavour();
 		if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 			StructureType defaultStructureType = PDStructElem.getDefaultStructureType(type);
 			if (defaultStructureType != null) {
@@ -153,7 +155,7 @@ public class PDStructElem extends PDStructTreeNode {
 	}
 
 	public static boolean isStandardStructureType(StructureType type) {
-		PDFFlavour flavour = StaticResources.getFlavour();
+		List<PDFFlavour> flavour = StaticResources.getFlavour();
 		boolean isStandard = false;
 		if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 			isStandard = TaggedPDFHelper.isStandardType(type);

@@ -1,5 +1,7 @@
 package org.verapdf.parser;
 
+import java.util.List;
+
 public enum PDFFlavour {
 	NO_FLAVOUR(Specification.NO_STANDARD),
 	PDFA_1_A(Specification.ISO_19005_1),
@@ -73,9 +75,27 @@ public enum PDFFlavour {
 		ISO_32000_1_7,
 		ISO_32000_2_0
 	}
+
+	public static boolean isFlavourPDFSpecification(List<PDFFlavour> flavours, PDFSpecification pdfSpecification) {
+		for (PDFFlavour flavour : flavours) {
+			if (isFlavourPDFSpecification(flavour, pdfSpecification)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	public static boolean isFlavourPDFSpecification(PDFFlavour flavour, PDFSpecification pdfSpecification) {
 		return flavour != null && flavour.getSpecification().getPdfSpecification() == pdfSpecification;
+	}
+
+	public static boolean isFlavourFamily(List<PDFFlavour> flavours, SpecificationFamily specificationFamily) {
+		for (PDFFlavour flavour : flavours) {
+			if (isFlavourFamily(flavour, specificationFamily)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean isFlavourFamily(PDFFlavour flavour, SpecificationFamily specificationFamily) {
@@ -86,8 +106,26 @@ public enum PDFFlavour {
 		return currentFlavour != null && currentFlavour == flavour;
 	}
 
+	public static boolean isFlavourPart(List<PDFFlavour> flavours, Specification specificationPart) {
+		for (PDFFlavour flavour : flavours) {
+			if (isFlavourPart(flavour, specificationPart)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static boolean isFlavourPart(PDFFlavour flavour, Specification specificationPart) {
 		return flavour != null && flavour.getSpecification() == specificationPart;
+	}
+
+	public static boolean isPDFUA2RelatedFlavour(List<PDFFlavour> flavours) {
+		for (PDFFlavour flavour : flavours) {
+			if (isPDFUA2RelatedFlavour(flavour)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean isPDFUA2RelatedFlavour(PDFFlavour flavour) {
