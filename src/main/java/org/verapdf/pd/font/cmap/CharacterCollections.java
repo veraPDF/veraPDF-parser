@@ -4,6 +4,7 @@ import org.verapdf.parser.PDFFlavour;
 import org.verapdf.tools.StaticResources;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CharacterCollections {
@@ -138,7 +139,7 @@ public class CharacterCollections {
 	public static CIDSystemInfo getCIDSystemInfo(String cmapName) {
 		CIDSystemInfo[] cidSystemInfos = map.get(cmapName);
 		if (cidSystemInfos != null) {
-			PDFFlavour flavour = StaticResources.getFlavour();
+			List<PDFFlavour> flavour = StaticResources.getFlavour();
 			if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.PDF_REFERENCE_1_4)) {
 				return cidSystemInfos[0];
 			} else if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
