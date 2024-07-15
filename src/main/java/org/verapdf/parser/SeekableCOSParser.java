@@ -105,7 +105,7 @@ public class SeekableCOSParser extends COSParser {
 		long streamStartOffset = getSource().getOffset();
 
 		COSObject length = dict.getKey(ASAtom.LENGTH);
-		if (this.keyOfCurrentObject != null && length.isIndirect() && this.keyOfCurrentObject.equals(length.getKey())) {
+		if (this.keyOfCurrentObject != null && Boolean.TRUE.equals(length.isIndirect()) && this.keyOfCurrentObject.equals(length.getKey())) {
 			throw new VeraPDFParserException(getErrorMessage("Object has stream length value" +
 					" which references to its own object key"));
 		}
