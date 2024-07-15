@@ -186,6 +186,9 @@ public class TaggedPDFHelper {
 		StructureType curr = getEquivalent(prev, Collections.emptyMap());
 		Map<String, ASAtom> processedTypes = new HashMap<>();
 		while (curr != null) {
+			if (prev.getNameSpaceURI() != null) {
+				processedTypes.put(prev.getNameSpaceURI(), prev.getType());
+			}
 			if (curr.getNameSpaceURI() != null && processedTypes.containsKey(curr.getNameSpaceURI())) {
 				ASAtom processedType = processedTypes.get(curr.getNameSpaceURI());
 				if (curr.getType() != null && !Objects.equals(curr.getType(), processedType)) {
@@ -195,9 +198,6 @@ public class TaggedPDFHelper {
 			}
 			if (isVisited(curr)) {
 				return null;
-			}
-			if (curr.getNameSpaceURI() != null) {
-				processedTypes.put(curr.getNameSpaceURI(), curr.getType());
 			}
 			addVisited(curr);
 			prev = curr;
@@ -217,6 +217,9 @@ public class TaggedPDFHelper {
 		StructureType curr = getEquivalent(prev, Collections.emptyMap());
 		Map<String, ASAtom> processedTypes = new HashMap<>();
 		while (curr != null) {
+			if (prev.getNameSpaceURI() != null) {
+				processedTypes.put(prev.getNameSpaceURI(), prev.getType());
+			}
 			if (curr.getNameSpaceURI() != null && processedTypes.containsKey(curr.getNameSpaceURI())) {
 				ASAtom processedType = processedTypes.get(curr.getNameSpaceURI());
 				if (curr.getType() != null && Objects.equals(curr.getType(), processedType)) {
@@ -225,9 +228,6 @@ public class TaggedPDFHelper {
 			}
 			if (isVisited(curr)) {
 				return false;
-			}
-			if (curr.getNameSpaceURI() != null) {
-				processedTypes.put(curr.getNameSpaceURI(), curr.getType());
 			}
 			addVisited(curr);
 			prev = curr;
