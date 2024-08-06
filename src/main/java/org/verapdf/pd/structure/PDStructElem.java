@@ -137,7 +137,7 @@ public class PDStructElem extends PDStructTreeNode {
 		}
 		if (!PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0) || PDFFlavour.isFlavourFamily(flavour, PDFFlavour.SpecificationFamily.WCAG)) {
 			if (type != null) {
-				return new StructureType(ASAtom.getASAtom(
+				return StructureType.createStructureType(ASAtom.getASAtom(
 						StaticResources.getRoleMapHelper().getStandardType(type.getType())), type.getNameSpace());
 			}
 		}
