@@ -32,7 +32,7 @@ public class StructureType {
 	private final ASAtom type;
 	private final PDStructureNameSpace nameSpace;
 
-	private StructureType(ASAtom type, PDStructureNameSpace nameSpace) {
+	public StructureType(ASAtom type, PDStructureNameSpace nameSpace) {
 		this.type = type;
 		this.nameSpace = nameSpace;
 	}
