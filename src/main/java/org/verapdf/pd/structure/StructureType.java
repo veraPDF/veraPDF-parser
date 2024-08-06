@@ -32,7 +32,7 @@ public class StructureType {
 	private final ASAtom type;
 	private final PDStructureNameSpace nameSpace;
 
-	public StructureType(ASAtom type, PDStructureNameSpace nameSpace) {
+	private StructureType(ASAtom type, PDStructureNameSpace nameSpace) {
 		this.type = type;
 		this.nameSpace = nameSpace;
 	}
@@ -58,6 +58,13 @@ public class StructureType {
 			} else {
 				return new StructureType(type.getName(), null);
 			}
+		}
+		return null;
+	}
+
+	public static StructureType createStructureType(ASAtom type, PDStructureNameSpace nameSpace) {
+		if (type != null) {
+			return new StructureType(type, nameSpace);
 		}
 		return null;
 	}
