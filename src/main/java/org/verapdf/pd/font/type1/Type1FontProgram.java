@@ -341,7 +341,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     public String getWeight() {
         COSObject weight = this.getObjectFromUserDict(ASAtom.getASAtom(
                 Type1StringConstants.WEIGHT));
-        if (weight.getType() == COSObjType.COS_STRING) {
+        if (weight != null && weight.getType() == COSObjType.COS_STRING) {
             return weight.getString();
         }
         return null;
@@ -351,7 +351,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     public Double getAscent() {
         COSObject ascent = this.getObjectFromUserDict(ASAtom.getASAtom(
                 Type1StringConstants.ASCENT));
-        if (ascent.getType().isNumber()) {
+        if (ascent != null && ascent.getType().isNumber()) {
             return ascent.getReal();
         }
         return null;
@@ -361,7 +361,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     public Double getDescent() {
         COSObject descent = this.getObjectFromUserDict(ASAtom.getASAtom(
                 Type1StringConstants.DESCENT));
-        if (descent.getType().isNumber()) {
+        if (descent != null && descent.getType().isNumber()) {
             return descent.getReal();
         }
         return null;
