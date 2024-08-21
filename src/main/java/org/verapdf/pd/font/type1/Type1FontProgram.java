@@ -339,16 +339,31 @@ public class Type1FontProgram extends PSParser implements FontProgram {
 
     @Override
     public String getWeight() {
+        COSObject weight = this.getObjectFromUserDict(ASAtom.getASAtom(
+                Type1StringConstants.WEIGHT));
+        if (weight.getType() == COSObjType.COS_STRING) {
+            return weight.getString();
+        }
         return null;
     }
 
     @Override
     public Double getAscent() {
+        COSObject ascent = this.getObjectFromUserDict(ASAtom.getASAtom(
+                Type1StringConstants.ASCENT));
+        if (ascent.getType().isNumber()) {
+            return ascent.getReal();
+        }
         return null;
     }
 
     @Override
     public Double getDescent() {
+        COSObject descent = this.getObjectFromUserDict(ASAtom.getASAtom(
+                Type1StringConstants.DESCENT));
+        if (descent.getType().isNumber()) {
+            return descent.getReal();
+        }
         return null;
     }
 

@@ -39,4 +39,7 @@ public class Type1StringConstants {
     static final String SUBRS = "Subrs";
     static final String STANDARD_ENCODING_STRING = "StandardEncoding";
     static final String NOACCESS = "noaccess";
+    static final String WEIGHT = "Weight";
+    static final String ASCENT = "Ascent";
+    static final String DESCENT = "Descent";
 }
