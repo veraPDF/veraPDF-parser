@@ -239,6 +239,12 @@ public abstract class COSDirect extends COSBase {
     }
 
     @Override
+    public String getNameKeyUnicodeValue(final ASAtom key) {
+        LOGGER.log(Level.FINE, String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        return null;
+    }
+
+    @Override
     public boolean setNameKey(final ASAtom key, final ASAtom value) {
         return false;
     }

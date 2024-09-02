@@ -302,6 +302,11 @@ public class COSIndirect extends COSBase {
     }
 
     @Override
+    public String getNameKeyUnicodeValue(final ASAtom key) {
+        return getDirect().getNameKeyUnicodeValue(key);
+    }
+
+    @Override
     public boolean setNameKey(final ASAtom key, final ASAtom value) {
         getDirect().setNameKey(key, value);
         return true;

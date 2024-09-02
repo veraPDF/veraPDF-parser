@@ -236,6 +236,12 @@ public class COSDictionary extends COSDirect {
     }
 
     @Override
+    public final String getNameKeyUnicodeValue(final ASAtom key) {
+        ASAtom value = getNameKey(key);
+        return value != null ? ((COSName)COSName.fromValue(value)).getUnicodeValue() : null;
+    }
+
+    @Override
     public boolean setNameKey(final ASAtom key, final ASAtom value) {
         COSObject obj = new COSObject();
         obj.setName(value);

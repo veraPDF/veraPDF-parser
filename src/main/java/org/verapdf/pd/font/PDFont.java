@@ -77,7 +77,7 @@ public abstract class PDFont extends PDResource {
         } else {
             fontDescriptor = new PDFontDescriptor(null);
         }
-        this.fontName = this.dictionary.getNameKeyStringValue(ASAtom.BASE_FONT);
+        this.fontName = this.dictionary.getNameKeyUnicodeValue(ASAtom.BASE_FONT);
         this.fontNameWithoutSubset = fontName != null ? (fontName.matches("^[A-Z]{6}+.+") ? fontName.substring(7) : fontName) : null;
         if (!(this instanceof PDType3Font)) {
             this.boundingBox = fontDescriptor.getFontBoundingBox();
