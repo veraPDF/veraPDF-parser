@@ -92,7 +92,7 @@ public class COSFilterRegistry {
 		if (filterFactory != null) {
 			return filterFactory.getInFilter(inputStream, decodeParams);
 		}
-		LOGGER.log(Level.SEVERE, "Unknown decode filter");
+		LOGGER.log(Level.SEVERE, "Unknown decode filter " + filterName);
 		return new ASInFilter(inputStream) {
 			@Override
 			public int read() {
