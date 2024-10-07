@@ -437,7 +437,8 @@ public class COSIndirect extends COSBase {
 
     @Override
     public COSBase getDirectBase() {
-        return this.document != null ? this.document.getObject(key).get() : this.child.get();
+        COSObject direct = getDirect();
+        return direct != null ? direct.getDirectBase() : null;
     }
 
     @Override
