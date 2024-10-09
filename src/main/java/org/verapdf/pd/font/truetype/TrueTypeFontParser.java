@@ -21,6 +21,7 @@
 package org.verapdf.pd.font.truetype;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSKey;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -49,9 +50,11 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
     private TrueTypeCmapTable cmapParser;
     private TrueTypePostTable postParser;
     private TrueTypeMaxpTable maxpParser;
+    private COSKey key;
 
-    TrueTypeFontParser(ASInputStream source) throws IOException {
+    TrueTypeFontParser(ASInputStream source, COSKey key) throws IOException {
         super(source);
+        this.key = key;
     }
 
     void readHeader() throws IOException {
@@ -86,27 +89,27 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         if (headParser != null) {
             this.headParser.readTable();
         } else {
-            LOGGER.log(Level.FINE, "True type font doesn't contain head table. Default value for unitsPerEm used.");
+            LOGGER.log(Level.FINE, getErrorMessage("True type font doesn't contain head table. Default value for unitsPerEm used."));
             this.headParser = new TrueTypeHeadTable();
         }
 
         if (hheaParser != null) {
             this.hheaParser.readTable();
         } else {
-            throw new IOException("True type font doesn't contain hhea table.");
+            throw new IOException(getErrorMessage("True type font doesn't contain hhea table."));
         }
 
         if (hmtxParser != null) {
             this.hmtxParser.setNumberOfHMetrics(hheaParser.getNumberOfHMetrics());
             this.hmtxParser.readTable();
         } else {
-            throw new IOException("True type font doesn't contain hmtx table.");
+            throw new IOException(getErrorMessage("True type font doesn't contain hmtx table."));
         }
 
         if (cmapParser != null) {
             this.cmapParser.readTable();
         } else {
-            LOGGER.log(Level.FINE, "True type font doesn't contain cmap table.");
+            LOGGER.log(Level.FINE, getErrorMessage("True type font doesn't contain cmap table."));
         }
 
         if (this.maxpParser != null) {
@@ -114,14 +117,14 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
         } else {
             this.maxpParser = new TrueTypeMaxpTable(
                     this.hmtxParser.getLongHorMetrics().length);
-            LOGGER.log(Level.FINE, "True type font doesn't contain maxp table. Default value for numGlyphs used.");
+            LOGGER.log(Level.FINE, getErrorMessage("True type font doesn't contain maxp table. Default value for numGlyphs used."));
         }
 
         if (this.postParser != null) {
             this.postParser.setNumGlyphs(maxpParser.getNumGlyphs());
             this.postParser.readTable();
         } else {
-            LOGGER.log(Level.FINE, "True type font doesn't contain post table.");
+            LOGGER.log(Level.FINE, getErrorMessage("True type font doesn't contain post table."));
         }
     }
 
@@ -159,5 +162,12 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
 
     TrueTypeHheaTable getHheaParser() {
         return hheaParser;
+    }
+
+    protected String getErrorMessage(String message) {
+        if (key != null) {
+            return message + "(object key = " + key + ')';
+        }
+        return message;
     }
 }

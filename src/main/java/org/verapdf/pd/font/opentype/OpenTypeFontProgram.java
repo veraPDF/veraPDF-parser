@@ -22,6 +22,7 @@ package org.verapdf.pd.font.opentype;
 
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObject;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.FontProgram;
@@ -57,6 +58,7 @@ public class OpenTypeFontProgram implements FontProgram {
     private boolean successfullyParsed = false;
     private final CMap externalCMap;
     private final COSObject cidToGIDMap;
+    private final COSKey key;
 
     /**
      * Constructor from stream, containing font data, and encoding details.
@@ -66,7 +68,7 @@ public class OpenTypeFontProgram implements FontProgram {
      * @param encoding   is value of /Encoding in font dictionary.
      */
     public OpenTypeFontProgram(ASInputStream source, boolean isCFF, boolean isCIDFontType2, boolean isSymbolic,
-                               COSObject encoding, CMap externalCMap, boolean isSubset, COSObject cidToGIDMap) {
+                               COSObject encoding, CMap externalCMap, boolean isSubset, COSObject cidToGIDMap, COSKey key) {
         this.source = source;
         this.isCFF = isCFF;
         this.isCIDFontType2 = isCIDFontType2;
@@ -75,6 +77,7 @@ public class OpenTypeFontProgram implements FontProgram {
         this.externalCMap = externalCMap;
         this.isSubset = isSubset;
         this.cidToGIDMap = cidToGIDMap;
+        this.key = key;
     }
 
     /**
@@ -140,7 +143,7 @@ public class OpenTypeFontProgram implements FontProgram {
         if (!attemptedParsing) {
             attemptedParsing = true;
             if (isCIDFontType2) {
-                this.font = new CIDFontType2Program(source, externalCMap, cidToGIDMap);
+                this.font = new CIDFontType2Program(source, externalCMap, cidToGIDMap, key);
                 this.font.parseFont();
             } else if (isCFF) {
                 try (ASInputStream cffTable = getCFFTable()) {
@@ -148,7 +151,7 @@ public class OpenTypeFontProgram implements FontProgram {
                     this.font.parseFont();
                 }
             } else {
-                this.font = new TrueTypeFontProgram(source, isSymbolic, encoding);
+                this.font = new TrueTypeFontProgram(source, isSymbolic, encoding, key);
                 this.font.parseFont();
             }
             StaticResources.cacheFontProgram(null, this.font);

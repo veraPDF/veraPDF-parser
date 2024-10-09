@@ -170,7 +170,7 @@ public class PDCIDFont extends PDFont {
                 this.fontProgram = StaticResources.getCachedFont(fontProgramID);
                 if (fontProgram == null) {
                     try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
-                        this.fontProgram = new CIDFontType2Program(fontData, this.cMap, cidToGIDMap);
+                        this.fontProgram = new CIDFontType2Program(fontData, this.cMap, cidToGIDMap, key);
                         StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                     } catch (IOException e) {
                         LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
@@ -204,7 +204,7 @@ public class PDCIDFont extends PDFont {
                             try (ASInputStream fontData = fontFile.getData(COSStream.FilterFlags.DECODE)) {
                                 this.fontProgram = new OpenTypeFontProgram(
                                         fontData, isCFF, isCIDFontType2, isSymbolic, encoding,
-                                        this.cMap, isSubset, cidToGIDMap);
+                                        this.cMap, isSubset, cidToGIDMap, key);
                                 StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                             }
                         }
