@@ -301,13 +301,13 @@ public class COSDictionary extends COSDirect {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) {
+        if (this == obj) {
             return true;
         }
-        if(obj == null) {
+        if (obj == null) {
             return false;
         }
-        if(obj instanceof COSObject) {
+        if (obj instanceof COSObject) {
             return this.equals(((COSObject) obj).get());
         }
         List<COSBasePair> checkedObjects = new LinkedList<>();
@@ -322,7 +322,7 @@ public class COSDictionary extends COSDirect {
         if (obj == null) {
             return false;
         }
-        if(obj instanceof COSObject) {
+        if (obj instanceof COSObject) {
             return this.equals(((COSObject) obj).get());
         }
         if (COSBasePair.listContainsPair(checkedObjects, this, (COSBase) obj)) {

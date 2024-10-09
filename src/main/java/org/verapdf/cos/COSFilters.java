@@ -54,13 +54,13 @@ public class COSFilters extends PDObject {
 	public ASInputStream getInputStream(ASInputStream inputStream,
 										COSObject decodeParams) throws IOException {
 		List<COSDictionary> decodeParameters = null;
-		if(!decodeParams.empty()) {
-			if(decodeParams.getType() == COSObjType.COS_DICT) {
+		if (!decodeParams.empty()) {
+			if (decodeParams.getType() == COSObjType.COS_DICT) {
 				decodeParameters = new ArrayList<>(1);
 				decodeParameters.add((COSDictionary) decodeParams.getDirectBase());
 			} else if (decodeParams.getType() == COSObjType.COS_ARRAY) {
 				decodeParameters = new ArrayList<>(decodeParams.size());
-				for(int i = 0; i < decodeParams.size(); ++i) {
+				for (int i = 0; i < decodeParams.size(); ++i) {
 					COSObjType paramsType = decodeParams.at(i).getType();
 					if (decodeParams.at(i).empty() || paramsType == COSObjType.COS_NULL) {
 						decodeParameters.add((COSDictionary) COSDictionary.construct().get());
@@ -74,7 +74,7 @@ public class COSFilters extends PDObject {
 		}
 		if (decodeParameters == null) {
 			decodeParameters = new ArrayList<>(entries.size());
-			for(int i = 0; i < entries.size(); ++i) {
+			for (int i = 0; i < entries.size(); ++i) {
 				decodeParameters.add((COSDictionary) COSDictionary.construct().get());
 			}
 		}
@@ -122,7 +122,7 @@ public class COSFilters extends PDObject {
 	@Override
 	protected void updateFromObject() {
 		COSObject filters = getObject();
-		if(filters.getType() == COSObjType.COS_ARRAY) {
+		if (filters.getType() == COSObjType.COS_ARRAY) {
 			int size = filters.size();
 
 			this.entries.clear();

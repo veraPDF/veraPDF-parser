@@ -36,7 +36,7 @@ class SingleCIDMapping implements CIDMappable {
 
     @Override
     public int getCID(int character) {
-        if(character != from) {
+        if (character != from) {
             return -1;
         }
         return to;

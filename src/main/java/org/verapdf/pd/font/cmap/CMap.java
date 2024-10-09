@@ -260,9 +260,9 @@ public class CMap {
      */
     public String getUnicode(int code) {
         String res = this.toUnicode.get(code);
-        if(res == null) {
-            for(ToUnicodeInterval interval : this.unicodeIntervals) {
-                if(interval.containsCode(code)) {
+        if (res == null) {
+            for (ToUnicodeInterval interval : this.unicodeIntervals) {
+                if (interval.containsCode(code)) {
                     return interval.toUnicode(code);
                 }
             }

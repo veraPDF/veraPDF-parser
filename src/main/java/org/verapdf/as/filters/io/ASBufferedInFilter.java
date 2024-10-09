@@ -237,7 +237,7 @@ public class ASBufferedInFilter extends ASInFilter implements BaseParserInputStr
      */
     public int bufferPopArray(byte[] buffer, int read) throws IOException {
         int actualRead = Math.min(read, bufferSize());
-        if(actualRead == -1) {
+        if (actualRead == -1) {
             return -1;
         }
         if (buffer.length < actualRead) {

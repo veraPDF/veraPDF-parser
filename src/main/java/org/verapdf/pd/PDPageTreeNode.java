@@ -61,7 +61,7 @@ public class PDPageTreeNode extends PDObject {
 	}
 
 	public PDPage findTerminalPDPage(int index) {
-		if(parent == null) {
+		if (parent == null) {
 			return null;
 		}
 

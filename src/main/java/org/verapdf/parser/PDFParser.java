@@ -520,7 +520,7 @@ public class PDFParser extends SeekableCOSParser {
             isLastBytesCorrect = false;
         }
 
-        if (!isLastBytesCorrect){
+        if (!isLastBytesCorrect) {
             this.getSource().unread();
             LOGGER.log(Level.WARNING, getErrorMessage("Incorrect end of line in cross-reference table"));
         }

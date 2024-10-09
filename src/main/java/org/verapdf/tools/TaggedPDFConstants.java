@@ -96,7 +96,7 @@ public final class TaggedPDFConstants {
     public static final String STRONG = "Strong";
     public static final String ARTIFACT = "Artifact";
 
-    private TaggedPDFConstants(){
+    private TaggedPDFConstants() {
         //disable default constructor
     }
 }

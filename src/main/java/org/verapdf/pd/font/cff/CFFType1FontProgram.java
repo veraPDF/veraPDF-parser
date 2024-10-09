@@ -263,10 +263,10 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
      */
     @Override
     public float getWidth(int charCode) {
-        if(externalCMap != null) {
+        if (externalCMap != null) {
             int gid = this.externalCMap.toCID(charCode);
             float res = this.widths.getWidth(gid);
-            if(res != -1.) {
+            if (res != -1.) {
                 return res;
             } else {
                 return this.widths.getWidth(0);
@@ -327,7 +327,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     public String[] getEncoding() {
         if (this.encodingStrings == null) {
             this.encodingStrings = new String[256];
-            for(int i = 0; i < 256; ++i) {
+            for (int i = 0; i < 256; ++i) {
                 String glyphName = inverseCharSet.get(encoding[i]);
                 this.encodingStrings[i] =
                         glyphName == null ? NOTDEF_STRING : glyphName;

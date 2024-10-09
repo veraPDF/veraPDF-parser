@@ -53,7 +53,7 @@ public class PDDeviceRGB extends PDColorSpace {
     @Override
     public double[] toRGB(double[] value) {
         float[] rgb = new float[value.length];
-        for (int i = 0; i < value.length; ++i){
+        for (int i = 0; i < value.length; ++i) {
             rgb[i] = (float) value[i];
         }
         rgb = colorSpaceRGB.toRGB(rgb);

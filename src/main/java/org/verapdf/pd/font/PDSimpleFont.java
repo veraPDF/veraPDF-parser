@@ -57,7 +57,7 @@ public abstract class PDSimpleFont extends PDFont {
     public String toUnicode(int code) {
 
         String unicodeString = super.toUnicode(code);
-        if(unicodeString != null) {
+        if (unicodeString != null) {
             return unicodeString;
         }
 

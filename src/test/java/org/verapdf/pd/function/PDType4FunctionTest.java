@@ -43,7 +43,7 @@ public class PDType4FunctionTest {
         func.setOperators(operators);
         List<COSObject> actualResult = func.getResult(operands);
         Assertions.assertEquals(result.size(), actualResult.size());
-        for (int i = 0; i < result.size(); ++i){
+        for (int i = 0; i < result.size(); ++i) {
             Assertions.assertEquals(result.get(i).getReal(), actualResult.get(i).getReal(), EPSILON);
         }
     }

@@ -292,7 +292,7 @@ public class PDType1Font extends PDSimpleFont {
      */
     public String toUnicodePDFA1(int code) {
         String unicodeString = super.cMapToUnicode(code);
-        if(unicodeString != null) {
+        if (unicodeString != null) {
             return unicodeString;
         }
         Encoding fontEncoding = this.getEncodingMapping();

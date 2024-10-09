@@ -73,7 +73,7 @@ public class COSFilterRC4DecryptionDefault extends ASBufferedInFilter {
      */
     @Override
     public int read(byte[] buffer, int off, int size) throws IOException {
-        if(this.bufferSize() == 0) {
+        if (this.bufferSize() == 0) {
             int bytesFed = this.feedBuffer(getBufferCapacity());
             if (bytesFed == -1) {
                 return -1;

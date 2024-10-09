@@ -41,7 +41,7 @@ public class PDCryptFilter extends PDObject{
      */
     public ASAtom getMethod() {
         COSObject obj = getKey(ASAtom.CFM);
-        if(obj != null && obj.getType() == COSObjType.COS_NAME) {
+        if (obj != null && obj.getType() == COSObjType.COS_NAME) {
             return obj.getName();
         }
         return ASAtom.NONE;

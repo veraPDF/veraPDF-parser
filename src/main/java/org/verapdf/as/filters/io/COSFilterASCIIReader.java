@@ -57,7 +57,7 @@ public class COSFilterASCIIReader {
         this.isASCIIHex = isASCIIHex;
         this.buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
         bufPointer = 0;
-        if(buf[0] == '<' && buf[1] == '~') {    //Skipping leading <~
+        if (buf[0] == '<' && buf[1] == '~') {    //Skipping leading <~
             bufPointer += 2;
         }
         isEOD = false;
@@ -186,7 +186,7 @@ public class COSFilterASCIIReader {
     }
 
     private void processCaseOfZ(byte[] fiveBytes, int i) {  
-        for(int j = i; j < 5; ++j) {
+        for (int j = i; j < 5; ++j) {
             fiveBytes[j] = EXCLAM_MARK;
         }
         ascii85ZeroRemains = i;

@@ -68,7 +68,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         this.entries = new ArrayList<>(size);
     }
 
-    public COSArray(List<COSObject> values){
+    public COSArray(List<COSObject> values) {
         super();
         this.entries = new ArrayList<>();
         this.entries.addAll(values);
@@ -197,7 +197,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         if (obj == null) {
             return false;
         }
-        if(obj instanceof COSObject) {
+        if (obj instanceof COSObject) {
             return this.equals(((COSObject) obj).get());
         }
         if (getClass() != obj.getClass()) {
@@ -216,7 +216,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         if (obj == null) {
             return false;
         }
-        if(obj instanceof COSObject) {
+        if (obj instanceof COSObject) {
             return this.equals(((COSObject) obj).get());
         }
         if (COSBasePair.listContainsPair(checkedObjects, this, (COSBase) obj)) {
@@ -250,7 +250,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
                 }
             }
         } catch (Exception any) {
-            for(ASInputStream stream : streams) {
+            for (ASInputStream stream : streams) {
                 try {
                     stream.close();
                 } catch (IOException e) {

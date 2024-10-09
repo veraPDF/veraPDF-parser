@@ -37,7 +37,7 @@ class NotDefInterval extends CIDInterval {
      */
     @Override
     public int getCID(int character) {
-        if(!contains(character)) {
+        if (!contains(character)) {
             return -1;
         }
         return startingCID;

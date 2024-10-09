@@ -43,7 +43,7 @@ public class PDOptionalContentProperties extends PDObject {
 			int size = ocgsArray.size();
 			String[] groups = new String[size];
 
-			for(int i = 0; i < size; ++i) {
+			for (int i = 0; i < size; ++i) {
 				COSObject obj = ocgs.at(i);
 				if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
 					COSDictionary ocgDict = (COSDictionary) obj.getDirectBase();

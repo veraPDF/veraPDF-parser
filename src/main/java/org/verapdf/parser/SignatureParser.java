@@ -84,7 +84,7 @@ public class SignatureParser extends SeekableCOSParser {
             if (c == '>') {
                 done = true;
             } else {
-                if(parseSignatureNameValuePair()) {
+                if (parseSignatureNameValuePair()) {
                     done = true;
                 }
             }

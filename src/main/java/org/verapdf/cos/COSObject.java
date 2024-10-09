@@ -112,7 +112,7 @@ public class COSObject {
 	}
 
 	public void setBoolean(final boolean value) {
-		if(this.base == null || !this.base.setBoolean(value)) {
+		if (this.base == null || !this.base.setBoolean(value)) {
 			this.base = new COSBoolean(value);
 		}
 	}
