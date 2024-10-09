@@ -60,6 +60,14 @@ public abstract class PDXObject extends PDResource {
 		return null;
 	}
 
+	public PDXImage getMask() {
+		COSObject mask = getKey(ASAtom.MASK);
+		if (mask != null && mask.getType() == COSObjType.COS_STREAM) {
+			return new PDXImage(mask, null);
+		}
+		return null;
+	}
+
 	public static PDXObject getTypedPDXObject(COSObject object, PDResources resources) {
 		if (object != null && !object.empty()) {
 			ASAtom type = object.getNameKey(ASAtom.SUBTYPE);
