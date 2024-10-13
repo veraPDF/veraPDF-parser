@@ -24,8 +24,10 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
+import org.verapdf.exceptions.LoopedException;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -430,9 +432,26 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
+    private COSObject getChildObject() {
+        return this.document != null ? this.document.getObject(key) : this.child;
+    }
+
     @Override
     public COSObject getDirect() {
-        return this.document != null ? this.document.getObject(key) : this.child;
+        COSObject object = getChildObject();
+        if (object.isIndirect()) {
+            Set<COSKey> keys = new HashSet<>();
+            keys.add(getObjectKey());
+            while (object.isIndirect()) {
+                COSKey key = object.getObjectKey();
+                if (keys.contains(key)) {
+                    throw new LoopedException("Loop in indirect references starting from indirect object " + getObjectKey());
+                }
+                keys.add(key);
+                object = ((COSIndirect)object.get()).getChildObject();
+            }
+        }
+        return object;
     }
 
     @Override

@@ -300,13 +300,10 @@ public class PDFParser extends SeekableCOSParser {
 
         COSObject obj = nextObject();
 
-        if (obj.getType() == COSObjType.COS_STREAM) {
+        if (!obj.isIndirect() && obj.getType() == COSObjType.COS_STREAM && this.document.isEncrypted()) {
             try {
-                if (this.document.isEncrypted()) {
-                    this.document.getStandardSecurityHandler().decryptStream(
-                            (COSStream) obj.getDirectBase(), new COSKey((int) number,
-                                    (int) generation));
-                }
+                this.document.getStandardSecurityHandler().decryptStream((COSStream) obj.getDirectBase(), 
+                        new COSKey((int) number, (int) generation));
             } catch (GeneralSecurityException e) {
                 throw new IOException(getErrorMessage("Stream cannot be decrypted"), e);
             }
