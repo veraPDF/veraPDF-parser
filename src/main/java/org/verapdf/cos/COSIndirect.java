@@ -439,10 +439,10 @@ public class COSIndirect extends COSBase {
     @Override
     public COSObject getDirect() {
         COSObject object = getChildObject();
-        if (object.isIndirect()) {
+        if (Boolean.TRUE.equals(object.isIndirect())) {
             Set<COSKey> keys = new HashSet<>();
             keys.add(getObjectKey());
-            while (object.isIndirect()) {
+            while (Boolean.TRUE.equals(object.isIndirect())) {
                 COSKey key = object.getObjectKey();
                 if (keys.contains(key)) {
                     throw new LoopedException("Loop in indirect references starting from indirect object " + getObjectKey());
