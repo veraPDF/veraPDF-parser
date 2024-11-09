@@ -129,7 +129,8 @@ public class CharStringsWidths {
     public float getWidth(int gid) {
         if (isSubset && gid >= 0 && gid < subsetFontWidths.length) {
             return subsetFontWidths[gid];
-        } else if (!isSubset) {
+        }
+        if (!isSubset) {
             Float res = generalFontWidths.get(gid);
             if (res == null) {
                 CFFNumber width = getWidthFromCharstring(gid);
@@ -137,12 +138,11 @@ public class CharStringsWidths {
                 this.generalFontWidths.put(gid, res);
             }
             return res;
-        } else {
-            LOGGER.log(Level.FINE, "Can't get width of charstring " + gid +
-                    " in font subset, got only " + (subsetFontWidths.length - 1) +
-                    " charstrings.");
-            return DEFAULT_WIDTH;
         }
+        LOGGER.log(Level.FINE, "Can't get width of charstring " + gid +
+                " in font subset, got only " + (subsetFontWidths.length - 1) +
+                " charstrings.");
+        return DEFAULT_WIDTH;
     }
 
     /**

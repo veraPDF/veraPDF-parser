@@ -46,7 +46,7 @@ public class CMapParser extends PSParser {
     private final CMap cMap;
 
     private static final String WMODE_STRING = "WMode";
-    private static final String REGISTRY_SRTRING = "Registry";
+    private static final String REGISTRY_STRING = "Registry";
     private static final String ORDERING_STRING = "Ordering";
     private static final String CMAP_NAME_STRING = "CMapName";
     private static final String SUPPLEMENT_STRING = "Supplement";
@@ -339,7 +339,7 @@ public class CMapParser extends PSParser {
 
     private void setValuesFromUserDict(CMap cMap) {
         cMap.setName(getStringFromUserDict(CMAP_NAME_STRING));
-        cMap.setRegistry(getStringFromUserDict(REGISTRY_SRTRING));
+        cMap.setRegistry(getStringFromUserDict(REGISTRY_STRING));
         cMap.setOrdering(getStringFromUserDict(ORDERING_STRING));
         cMap.setwMode((int) getLongFromUserDict(WMODE_STRING));
         cMap.setSupplement((int) getLongFromUserDict(SUPPLEMENT_STRING));
