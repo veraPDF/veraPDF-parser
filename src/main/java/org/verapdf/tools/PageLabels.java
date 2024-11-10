@@ -21,10 +21,10 @@
 package org.verapdf.tools;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
 import org.verapdf.cos.COSDictionary;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.pd.structure.PDNumberTreeNode;
 
 import java.util.Map;
 import java.util.NavigableMap;
@@ -37,39 +37,25 @@ public class PageLabels {
 
 	private final NavigableMap<Integer, PageLabelDictionary> labelsMap;
 
-	public PageLabels(COSDictionary numbTree) {
-		if (numbTree == null) {
+	public PageLabels(PDNumberTreeNode numberTree) {
+		if (numberTree == null) {
 			throw new IllegalArgumentException("Number tree base element can not be null");
 		}
 		labelsMap = new TreeMap<>();
-		parseTree(numbTree);
+		parseTree(numberTree);
 	}
 
-	private void parseTree(COSDictionary numbTree) {
-		COSObject nums = numbTree.getKey(ASAtom.NUMS);
-		if (nums != null && !nums.empty() && nums.getType() == COSObjType.COS_ARRAY) {
-			addLabelsFromArray((COSArray) nums.getDirectBase());
-		}
-
-		COSObject kids = numbTree.getKey(ASAtom.KIDS);
-		if (kids != null && !kids.empty() && kids.getType() == COSObjType.COS_ARRAY) {
-			for (COSObject kid : (COSArray) kids.getDirectBase()) {
-				if (kid != null && !kid.empty() && kid.getType() == COSObjType.COS_DICT) {
-					parseTree((COSDictionary) kid.getDirectBase());
-				}
-			}
-		}
-	}
-
-	private void addLabelsFromArray(COSArray nums) {
-		for (int i = 0; i < nums.size(); i += 2) {
-			COSObject cosKey = nums.at(i);
-			Long key = cosKey == null ? null : cosKey.getInteger();
-			COSObject cosValue = nums.at(i + 1);
+	private void parseTree(PDNumberTreeNode numberTree) {
+		for (Map.Entry<Long, COSObject> entry : numberTree.getNums().entrySet()) {
+			Long key = entry.getKey();
+			COSObject cosValue = entry.getValue();
 			if (key != null && cosValue != null && !cosValue.empty() && cosValue.getType() == COSObjType.COS_DICT) {
 				PageLabelDictionary pageLabelDictionary = new PageLabelDictionary((COSDictionary) cosValue.getDirectBase(), key.intValue());
 				this.labelsMap.put(key.intValue(), pageLabelDictionary);
 			}
+		}
+		for (PDNumberTreeNode kid : numberTree.getKids()) {
+			parseTree(kid);
 		}
 	}
 

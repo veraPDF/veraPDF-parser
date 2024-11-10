@@ -31,6 +31,8 @@ import java.util.*;
  * @author Maksim Bezrukov
  */
 public class PDStructTreeRoot extends PDStructTreeNode {
+	
+	private PDNumberTreeNode parentTree;
 
 	public PDStructTreeRoot(COSObject obj) {
 		super(obj);
@@ -58,10 +60,12 @@ public class PDStructTreeRoot extends PDStructTreeNode {
 	}
 
 	public PDNumberTreeNode getParentTree() {
-		COSObject parentTree = getKey(ASAtom.PARENT_TREE);
-		if (parentTree != null && parentTree.getType().isDictionaryBased()) {
-			return new PDNumberTreeNode(parentTree);
+		if (parentTree == null) {
+			COSObject parentTreeObject = getKey(ASAtom.PARENT_TREE);
+			if (parentTreeObject != null && parentTreeObject.getType().isDictionaryBased()) {
+				parentTree = new PDNumberTreeNode(parentTreeObject);
+			}
 		}
-		return null;
+		return parentTree;
 	}
 }

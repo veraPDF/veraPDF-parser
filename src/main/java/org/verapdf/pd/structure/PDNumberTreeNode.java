@@ -37,20 +37,46 @@ import java.util.*;
  */
 public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
 
+    private final Set<COSKey> parents;
+
+    private long[] limitsArray = null;
+    private List<PDNumberTreeNode> kids = null;
+    private Map<Long, COSObject> nums = null;
+
     /**
      * Constructor from number tree node dictionary.
      *
      * @param obj is a number tree node dictionary.
      */
     public PDNumberTreeNode(COSObject obj) {
-        super(obj);
+        this(obj, new HashSet<>());
     }
+
+    private PDNumberTreeNode(COSObject obj, Set<COSKey> parents) {
+        super(obj);
+        COSKey objectKey = obj.getObjectKey();
+        this.parents = new HashSet<>(parents);
+        if (objectKey != null) {
+            if (parents.contains(objectKey)) {
+                throw new LoopedException("Loop inside number tree");
+            }
+            this.parents.add(objectKey);
+        }
+    }
+
 
     /**
      * @return array of two numbers representing limits of this node or null if
      * proper limits array is not present.
      */
     public long[] getLimitsArray() {
+        if (limitsArray == null) {
+            limitsArray = parseLimitsArray();
+        }
+        return limitsArray;
+    }
+
+    public long[] parseLimitsArray() {
         COSObject limits = this.getKey(ASAtom.LIMITS);
         if (limits != null && !limits.empty() && limits.getType() == COSObjType.COS_ARRAY
                 && limits.size() >= 2 && limits.at(0).getType() == COSObjType.COS_INTEGER
@@ -60,19 +86,26 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
             res[1] = limits.at(1).getInteger();
             return res;
         }
-        return null;
+        return new long[0];
+    }
+
+    public List<PDNumberTreeNode> getKids() {
+        if (this.kids == null) {
+            this.kids = parseKids();
+        }
+        return Collections.unmodifiableList(this.kids);
     }
 
     /**
      * @return the list of number tree nodes that are kids of this node or null
      * if no kids are present.
      */
-    public List<PDNumberTreeNode> getKids() {
+    public List<PDNumberTreeNode> parseKids() {
         COSObject kids = this.getKey(ASAtom.KIDS);
         if (kids != null && !kids.empty() && kids.getType() == COSObjType.COS_ARRAY) {
             List<PDNumberTreeNode> res = new ArrayList<>(kids.size());
             for (COSObject obj : (COSArray) kids.get()) {
-                res.add(new PDNumberTreeNode(obj));
+                res.add(new PDNumberTreeNode(obj, parents));
             }
             return Collections.unmodifiableList(res);
         }
@@ -84,7 +117,7 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
      * null if nums are not present.
      * TODO: test method
      */
-    public Map<Long, COSObject> getNums() {
+    public Map<Long, COSObject> parseNums() {
         COSObject nums = this.getKey(ASAtom.NUMS);
         if (nums != null && !nums.empty() && nums.getType() == COSObjType.COS_ARRAY) {
             Map<Long, COSObject> res = new HashMap<>();
@@ -99,6 +132,14 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
         }
         return Collections.emptyMap();
     }
+
+    public Map<Long, COSObject> getNums() {
+        if (this.nums == null) {
+            this.nums = parseNums();
+        }
+        return Collections.unmodifiableMap(this.nums);
+    }
+
 
     private List<COSObject> getObjects() {
         List<COSObject> result = new LinkedList<>(getNums().values());
@@ -126,7 +167,7 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
 
     private COSObject getObject(Long key, Set<COSKey> visitedKeys) {
         long[] limits = this.getLimitsArray();
-        if (limits != null) {
+        if (limits.length == 2) {
             if (key < limits[0] || key > limits[1]) {
                 // integer not in the limits
                 return null;
@@ -144,14 +185,6 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
             List<PDNumberTreeNode> kids = getKids();
             if (kids != null) {
                 for (PDNumberTreeNode kid : kids) {
-                    COSKey kidObjectKey = kid.getObject().getObjectKey();
-                    if (kidObjectKey != null) {
-                        if (visitedKeys.contains(kidObjectKey)) {
-                            throw new LoopedException("Loop inside number tree");
-                        } else {
-                            visitedKeys.add(kidObjectKey);
-                        }
-                    }
                     COSObject res = kid.getObject(key, visitedKeys);
                     if (res != null) {
                         return res;

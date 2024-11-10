@@ -28,21 +28,34 @@ import org.verapdf.cos.COSObject;
  * @author Maksim Bezrukov
  */
 public class PDNamesDictionary extends PDObject {
+	
+	private PDNameTreeNode embeddedFiles;
+	private PDNameTreeNode javaScript;
+	private PDNameTreeNode dests;
 
 	public PDNamesDictionary(COSObject obj) {
 		super(obj);
 	}
 
 	public PDNameTreeNode getEmbeddedFiles() {
-		return getNameTreeByName(ASAtom.EMBEDDED_FILES);
+		if (embeddedFiles == null) {
+			embeddedFiles = getNameTreeByName(ASAtom.EMBEDDED_FILES);
+		}
+		return embeddedFiles;
 	}
 
 	public PDNameTreeNode getJavaScript() {
-		return getNameTreeByName(ASAtom.JAVA_SCRIPT);
+		if (javaScript == null) {
+			javaScript = getNameTreeByName(ASAtom.JAVA_SCRIPT);
+		}
+		return javaScript;
 	}
 
 	public PDNameTreeNode getDests() {
-		return getNameTreeByName(ASAtom.DESTS);
+		if (dests == null) {
+			dests = getNameTreeByName(ASAtom.DESTS);
+		}
+		return dests;
 	}
 
 	private PDNameTreeNode getNameTreeByName(ASAtom name) {
