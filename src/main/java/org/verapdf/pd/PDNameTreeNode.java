@@ -36,6 +36,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 
 	private final Set<COSKey> parents;
 
+	private String[] limitsArray = null;
 	private List<PDNameTreeNode> kids = null;
 	private Map<String, COSObject> names = null;
 
@@ -46,9 +47,8 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 		if (objectKey != null) {
 			if (parents.contains(objectKey)) {
 				throw new LoopedException("Loop in name tree");
-			} else {
-				this.parents.add(objectKey);
 			}
+			this.parents.add(objectKey);
 		}
 	}
 
@@ -106,6 +106,13 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 	}
 
 	public String[] getLimitsArray() {
+		if (limitsArray == null) {
+			limitsArray = parseLimitsArray();
+		}
+		return limitsArray;
+	}
+
+	public String[] parseLimitsArray() {
 		COSObject limits = this.getKey(ASAtom.LIMITS);
 		if (limits != null && !limits.empty() && limits.getType() == COSObjType.COS_ARRAY
 				&& limits.size() >= 2 && limits.at(0).getType() == COSObjType.COS_STRING
@@ -115,21 +122,12 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 			res[1] = limits.at(1).getString();
 			return res;
 		}
-		return null;
+		return new String[0];
 	}
 
 	public COSObject getObject(String key) {
-		Set<COSKey> visitedKeys = new HashSet<>();
-		COSKey objectKey = getObject().getObjectKey();
-		if (objectKey != null) {
-			visitedKeys.add(objectKey);
-		}
-		return getObject(key, visitedKeys);
-	}
-
-	private COSObject getObject(String key, Set<COSKey> visitedKeys) {
 		String[] limits = this.getLimitsArray();
-		if (limits != null && (key.compareTo(limits[0]) < 0 || key.compareTo(limits[1]) > 0)) {
+		if (limits.length == 2 && (key.compareTo(limits[0]) < 0 || key.compareTo(limits[1]) > 0)) {
 			// string not in the limits
 			return null;
 		}
@@ -145,15 +143,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 			List<PDNameTreeNode> kids = getKids();
 			if (kids != null) {
 				for (PDNameTreeNode kid : kids) {
-					COSKey kidObjectKey = kid.getObject().getObjectKey();
-					if (kidObjectKey != null) {
-						if (visitedKeys.contains(kidObjectKey)) {
-							throw new LoopedException("Loop inside name tree");
-						} else {
-							visitedKeys.add(kidObjectKey);
-						}
-					}
-					COSObject res = kid.getObject(key, visitedKeys);
+					COSObject res = kid.getObject(key);
 					if (res != null) {
 						return res;
 					}
