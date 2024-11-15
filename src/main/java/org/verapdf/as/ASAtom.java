@@ -22,6 +22,7 @@ package org.verapdf.as;
 
 import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -34,8 +35,8 @@ import java.util.Objects;
  */
 public class ASAtom implements Comparable<ASAtom> {
 
-    private static final Map<String, ASAtom> PREDEFINED_PDF_NAMES = new HashMap<>();
-    private static final Map<String, ASAtom> CACHED_PDF_NAMES = new HashMap<>();
+    private static final Map<String, ASAtom> PREDEFINED_PDF_NAMES = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<String, ASAtom> CACHED_PDF_NAMES = Collections.synchronizedMap(new HashMap<>());
 
     // 3
     public static final ASAtom key3D = new ASAtom("3D");
