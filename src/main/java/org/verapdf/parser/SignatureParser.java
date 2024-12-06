@@ -268,7 +268,7 @@ public class SignatureParser extends SeekableCOSParser {
         long pointer = this.getSource().getOffset();
         this.getSource().unread(2);
         int byteBeforeEOF = this.getSource().peek();
-        while (!BaseParser.isLF(byteBeforeEOF)) {
+        while (!BaseParser.isLF(byteBeforeEOF) && !BaseParser.isCR(byteBeforeEOF)) {
             this.getSource().unread();
             byteBeforeEOF = this.getSource().peek();
             if (byteBeforeEOF != CharTable.ASCII_SPACE) {
