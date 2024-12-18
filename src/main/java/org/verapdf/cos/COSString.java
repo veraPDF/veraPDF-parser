@@ -106,7 +106,7 @@ public class COSString extends COSDirect {
 
     @Override
     public String getString() {
-        if (value.length > 2) {
+        if (value.length >= 2) {
             if ((value[0] & 0xFF) == 0xFE && (value[1] & 0xFF) == 0xFF) {
                 return new String(value, 2, value.length - 2, StandardCharsets.UTF_16BE);
             }
@@ -114,7 +114,7 @@ public class COSString extends COSDirect {
                 LOGGER.log(Level.WARNING, "String object uses encoding UTF16-LE not supported by PDF");
             }
         }
-        if (value.length > 3) {
+        if (value.length >= 3) {
             if ((value[0] & 0xFF) == 0xEF && (value[1] & 0xFF) == 0xBB && (value[2] & 0xFF) == 0xBF) {
                 return new String(value, 3, value.length - 3, StandardCharsets.UTF_8);
             }
