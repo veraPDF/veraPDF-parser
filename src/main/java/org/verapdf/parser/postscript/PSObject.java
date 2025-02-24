@@ -71,7 +71,7 @@ public abstract class PSObject extends COSObject {
         if (type == COSObjType.COS_NAME && isExecutable) {
             return new PSOperator((COSName) obj.get());
         } else if (type == COSObjType.COS_ARRAY && isExecutable) {
-            return new PSProcedure((COSArray) obj.get());
+            return new PSProcedure((COSArray) obj.getDirectBase());
         } else if (type.isNumber() || type == COSObjType.COS_STRING ||
                 type == COSObjType.COS_BOOLEAN || type == COSObjType.COS_DICT ||
                 type == COSObjType.COS_NAME || type == COSObjType.COS_ARRAY) {
