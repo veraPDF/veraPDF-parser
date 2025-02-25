@@ -104,7 +104,7 @@ public class PDNumberTreeNode extends PDObject implements Iterable<COSObject> {
         COSObject kids = this.getKey(ASAtom.KIDS);
         if (kids != null && !kids.empty() && kids.getType() == COSObjType.COS_ARRAY) {
             List<PDNumberTreeNode> res = new ArrayList<>(kids.size());
-            for (COSObject obj : (COSArray) kids.get()) {
+            for (COSObject obj : (COSArray) kids.getDirectBase()) {
                 res.add(new PDNumberTreeNode(obj, parents));
             }
             return Collections.unmodifiableList(res);

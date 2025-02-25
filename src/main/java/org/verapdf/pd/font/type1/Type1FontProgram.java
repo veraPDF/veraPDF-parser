@@ -281,7 +281,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         if (fontMatrixObject != null && fontMatrixObject.getType() == COSObjType.COS_ARRAY) {
             double[] res = new double[6];
             int pointer = 0;
-            for (COSObject obj : ((COSArray) fontMatrixObject.get())) {
+            for (COSObject obj : ((COSArray) fontMatrixObject.getDirectBase())) {
                 if (obj.getType().isNumber()) {
                     res[pointer++] = obj.getReal();
                 }
@@ -297,7 +297,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         if (encoding != null) {
             if (encoding.getType() == COSObjType.COS_ARRAY) {
                 int pointer = 0;
-                for (COSObject obj : ((COSArray) encoding.get())) {
+                for (COSObject obj : ((COSArray) encoding.getDirectBase())) {
                     if (pointer < 256) {
                         String glyphName = obj.getString();
                         this.encoding[pointer++] = glyphName == null ? "" : glyphName;
