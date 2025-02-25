@@ -300,9 +300,6 @@ public class PDPage extends PDPageTreeNode {
                 }
             }
             return Collections.unmodifiableList(res);
-        } else if (annots.empty()) {
-            annots = COSArray.construct();
-            this.setKey(ASAtom.ANNOTS, annots);
         }
         return Collections.emptyList();
     }
