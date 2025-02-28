@@ -88,11 +88,9 @@ public class EexecFilterDecode extends ASBufferedInFilter {
         int res = bytesRead - bytesToDiscard;
         if (bytesRead < 0) {
             return -1;
-        }
-        else if (size == 0) {
+        } else if (size == 0) {
             return 0;
-        }
-        else if (bytesRead == 0) {
+        } else if (bytesRead == 0) {
             return -1;
         }
         for (int i = 0; i < bytesRead; ++i) {
