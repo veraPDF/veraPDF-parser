@@ -133,6 +133,9 @@ public class InternalInputStream extends SeekableInputStream {
 		if (buffer.length < size) {
 			throw new IllegalArgumentException("Destination buffer size is less than size to be read");
 		}
+		if (size == 0) {
+			return 0;
+		}
 
 		int curPos = 0;
 		int left = size;

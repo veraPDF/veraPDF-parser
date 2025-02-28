@@ -59,6 +59,9 @@ public class COSFilterASCII85Decode extends ASBufferedInFilter {
      */
     @Override
     public int read(byte[] buffer, int size) throws IOException {
+        if (size == 0) {
+            return 0;
+        }
         int pointer = 0;
         while (pointer < size) {
             if (fourBytesPointer > 0) {

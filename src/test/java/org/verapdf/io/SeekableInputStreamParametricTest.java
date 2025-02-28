@@ -400,4 +400,11 @@ public class SeekableInputStreamParametricTest {
     public void shouldThrowExceptionsAboutExceedingMaxSizeWhenExeedingMaxSize() {
         assertThrows(VeraPDFParserException.class, () -> SeekableInputStream.getSeekableStream(input, size - 1));
     }
+
+    @Test
+    public void shouldBeAbleToReadZeroBytes() throws IOException {
+        try (SeekableInputStream seekable = SeekableInputStream.getSeekableStream(input, size)) {
+            assertEquals(0, seekable.read(new byte[] {}, 0));
+        }
+    }
 }
