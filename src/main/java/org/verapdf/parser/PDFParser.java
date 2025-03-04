@@ -576,13 +576,21 @@ public class PDFParser extends SeekableCOSParser {
         }
 
         //we will skip eol marker in any case
-        getSource().seek(Math.max(0, offset - 1));
+        getSource().seek(Math.max(0, offset));
 
 		COSXRefInfo section = new COSXRefInfo();
 		info.add(0, section);
 
 		section.setStartXRef(offset);
-        getXRefSectionAndTrailer(section);
+
+        try {
+            getXRefSectionAndTrailer(section);
+        }
+        catch (IOException e) {
+            getSource().seek(Math.max(0, offset - 1));
+            getXRefSectionAndTrailer(section);
+            LOGGER.log(Level.WARNING, getErrorMessage("Startxref value is 1 byte less than the actual cross-reference table start offset"));
+        }
 
         COSTrailer trailer = section.getTrailer();
 
