@@ -575,7 +575,6 @@ public class PDFParser extends SeekableCOSParser {
             offset += offsetShift;
         }
 
-        //we will skip eol marker in any case
         getSource().seek(Math.max(0, offset));
 
 		COSXRefInfo section = new COSXRefInfo();
