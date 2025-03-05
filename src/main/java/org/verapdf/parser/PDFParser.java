@@ -555,6 +555,26 @@ public class PDFParser extends SeekableCOSParser {
         }
     }
 
+    private long findActualXrefOffset(long offset) throws IOException{
+        long currentOffset = Math.max(0, offset);
+        if (currentOffset == 0) {
+            return 0;
+        }
+
+        long endSearchOffset = Math.max(0, offset - 1);
+        for (; currentOffset >= endSearchOffset; currentOffset = Math.max(0, currentOffset - 1)) {
+            getSource().seek(currentOffset);
+            getBaseParser().nextToken();
+            if ((getBaseParser().getToken().type == Token.Type.TT_KEYWORD &&
+                    getBaseParser().getToken().keyword == Token.Keyword.KW_XREF) ||
+                    (getBaseParser().getToken().type == Token.Type.TT_INTEGER)) {
+                getSource().unread(getBaseParser().getToken().getSize());
+                return currentOffset;
+            }
+        }
+        throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+    }
+
 	private void getXRefInfo(final List<COSXRefInfo> info, Set<Long> processedOffsets, Long offset) throws IOException {
         if (offset == null) {
 			offset = findLastXRef();
@@ -575,22 +595,18 @@ public class PDFParser extends SeekableCOSParser {
             offset += offsetShift;
         }
 
-        getSource().seek(Math.max(0, offset));
+        COSXRefInfo section = new COSXRefInfo();
+        info.add(0, section);
 
-		COSXRefInfo section = new COSXRefInfo();
-		info.add(0, section);
-
-		section.setStartXRef(offset);
-
-        try {
-            getXRefSectionAndTrailer(section);
-        }
-        catch (IOException e) {
-            getSource().seek(Math.max(0, offset - 1));
-            getXRefSectionAndTrailer(section);
-            LOGGER.log(Level.WARNING, getErrorMessage("Startxref value is 1 byte less than the actual cross-reference table start offset"));
+        long actualOffset = findActualXrefOffset(offset);
+        if (offset != actualOffset) {
+	        LOGGER.log(Level.WARNING, getErrorMessage("Actual startxref offset" + actualOffset +
+                    " is different from the specified offset " + offset));
         }
 
+        section.setStartXRef(actualOffset);
+
+        getXRefSectionAndTrailer(section);
         COSTrailer trailer = section.getTrailer();
 
         offset = trailer.getXRefStm();
