@@ -431,7 +431,6 @@ public class PDFParser extends SeekableCOSParser {
             isLastTrailer = true;
             this.lastTrailerOffset = this.getSource().getOffset();
         }
-        getBaseParser().nextToken();
         if (this.getBaseParser().getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
             parseXrefTable(section.getXRefSection());
             getTrailer(section.getTrailer());
@@ -560,7 +559,6 @@ public class PDFParser extends SeekableCOSParser {
             if ((getBaseParser().getToken().type == Token.Type.TT_KEYWORD &&
                     getBaseParser().getToken().keyword == Token.Keyword.KW_XREF) ||
                     (getBaseParser().getToken().type == Token.Type.TT_INTEGER)) {
-                getSource().unread(getBaseParser().getToken().getSize());
                 return currentOffset;
             }
         }
