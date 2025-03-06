@@ -600,7 +600,7 @@ public class PDFParser extends SeekableCOSParser {
 
         long actualOffset = findActualXrefOffset(offset);
         if (offset != actualOffset) {
-	        LOGGER.log(Level.WARNING, getErrorMessage("Actual startxref offset" + actualOffset +
+	        LOGGER.log(Level.WARNING, getErrorMessage("Actual startxref offset " + actualOffset +
                     " is different from the specified offset " + offset));
         }
 
