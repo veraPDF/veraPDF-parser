@@ -557,12 +557,9 @@ public class PDFParser extends SeekableCOSParser {
 
     private long findActualXrefOffset(long offset) throws IOException{
         long currentOffset = Math.max(0, offset);
-        if (currentOffset == 0) {
-            return 0;
-        }
 
         long endSearchOffset = Math.max(0, offset - 1);
-        for (; currentOffset >= endSearchOffset; currentOffset = Math.max(0, currentOffset - 1)) {
+        for (; currentOffset >= endSearchOffset; currentOffset--) {
             getSource().seek(currentOffset);
             getBaseParser().nextToken();
             if ((getBaseParser().getToken().type == Token.Type.TT_KEYWORD &&
