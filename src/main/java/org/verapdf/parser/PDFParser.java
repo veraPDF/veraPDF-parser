@@ -429,7 +429,7 @@ public class PDFParser extends SeekableCOSParser {
         boolean isLastTrailer = false;
         if (this.lastTrailerOffset == 0) {
             isLastTrailer = true;
-            this.lastTrailerOffset = this.getSource().getOffset();
+            this.lastTrailerOffset = section.getStartXRef();
         }
         if (this.getBaseParser().getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
             parseXrefTable(section.getXRefSection());
