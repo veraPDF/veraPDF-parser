@@ -571,7 +571,8 @@ public class PDFParser extends SeekableCOSParser {
             }
         }
 
-        while (offset != null) {
+        boolean shouldStopIteration = false;
+        while (!shouldStopIteration) {
             if (processedOffsets.contains(offset)) {
                 throw new LoopedException(getErrorMessage("XRef loop"));
             }
@@ -604,6 +605,9 @@ public class PDFParser extends SeekableCOSParser {
             }
 
             offset = trailer.getPrev();
+            if (offset == null) {
+                shouldStopIteration = true;
+            }
         }
 	}
 
