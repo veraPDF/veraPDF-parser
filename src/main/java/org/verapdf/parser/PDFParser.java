@@ -574,7 +574,7 @@ public class PDFParser extends SeekableCOSParser {
         List<Long> prevOffsets = new ArrayList<>();
         while (offset != null || !prevOffsets.isEmpty()) {
             if (offset == null) {
-                offset = prevOffsets.removeLast();
+                offset = prevOffsets.remove(prevOffsets.size() - 1);
             }
 
             if (processedOffsets.contains(offset)) {
