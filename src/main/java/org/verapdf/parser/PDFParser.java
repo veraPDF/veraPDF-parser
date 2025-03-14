@@ -563,49 +563,48 @@ public class PDFParser extends SeekableCOSParser {
         throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
     }
 
-	private void getXRefInfo(final List<COSXRefInfo> info, Set<Long> processedOffsets, Long offset) throws IOException {
+    private void getXRefInfo(final List<COSXRefInfo> info, Set<Long> processedOffsets, Long offset) throws IOException {
         if (offset == null) {
-			offset = findLastXRef();
-			if (offset == null) {
-				throw new IOException(StringExceptions.START_XREF_VALIDATION);
-			}
-		}
-
-        if (processedOffsets.contains(offset)) {
-            throw new LoopedException(getErrorMessage("XRef loop"));
-        }
-        processedOffsets.add(offset);
-
-		clear();
-
-        //for files with junk before header
-        if (offsetShift > 0) {
-            offset += offsetShift;
+            offset = findLastXRef();
+            if (offset == null) {
+                throw new IOException(StringExceptions.START_XREF_VALIDATION);
+            }
         }
 
-        COSXRefInfo section = new COSXRefInfo();
-        info.add(0, section);
+        while (offset != null) {
+            if (processedOffsets.contains(offset)) {
+                throw new LoopedException(getErrorMessage("XRef loop"));
+            }
+            processedOffsets.add(offset);
 
-        long actualOffset = findActualXrefOffset(offset);
-        if (offset != actualOffset) {
-	        LOGGER.log(Level.WARNING, "Actual startxref offset " + actualOffset +
-                    " is different from the specified offset " + offset);
+            clear();
+
+            //for files with junk before header
+            if (offsetShift > 0) {
+                offset += offsetShift;
+            }
+
+            COSXRefInfo section = new COSXRefInfo();
+            info.add(0, section);
+
+            long actualOffset = findActualXrefOffset(offset);
+            if (offset != actualOffset) {
+                LOGGER.log(Level.WARNING, "Actual startxref offset " + actualOffset +
+                        " is different from the specified offset " + offset);
+            }
+
+            section.setStartXRef(actualOffset);
+
+            getXRefSectionAndTrailer(section);
+            COSTrailer trailer = section.getTrailer();
+
+            offset = trailer.getXRefStm();
+            if (offset != null) {
+                continue;
+            }
+
+            offset = trailer.getPrev();
         }
-
-        section.setStartXRef(actualOffset);
-
-        getXRefSectionAndTrailer(section);
-        COSTrailer trailer = section.getTrailer();
-
-        offset = trailer.getXRefStm();
-        if (offset != null) {
-            getXRefInfo(info, processedOffsets, offset);
-        }
-
-        offset = trailer.getPrev();
-		if (offset != null) {
-            getXRefInfo(info, processedOffsets, offset);
-		}
 	}
 
 	private void getTrailer(final COSTrailer trailer) throws IOException {
