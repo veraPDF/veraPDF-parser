@@ -571,8 +571,12 @@ public class PDFParser extends SeekableCOSParser {
             }
         }
 
-        boolean shouldStopIteration = false;
-        while (!shouldStopIteration) {
+        List<Long> prevOffsets = new ArrayList<>();
+        while (offset != null || !prevOffsets.isEmpty()) {
+            if (offset == null) {
+                offset = prevOffsets.removeLast();
+            }
+
             if (processedOffsets.contains(offset)) {
                 throw new LoopedException(getErrorMessage("XRef loop"));
             }
@@ -599,15 +603,12 @@ public class PDFParser extends SeekableCOSParser {
             getXRefSectionAndTrailer(section);
             COSTrailer trailer = section.getTrailer();
 
-            offset = trailer.getXRefStm();
-            if (offset != null) {
-                continue;
+            Long prevOffset = trailer.getPrev();
+            if (prevOffset != null) {
+                prevOffsets.add(prevOffset);
             }
 
-            offset = trailer.getPrev();
-            if (offset == null) {
-                shouldStopIteration = true;
-            }
+            offset = trailer.getXRefStm();
         }
 	}
 
