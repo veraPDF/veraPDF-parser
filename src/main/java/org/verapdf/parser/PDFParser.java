@@ -578,6 +578,9 @@ public class PDFParser extends SeekableCOSParser {
                 if (processedOffsets.contains(offset)) {
                     throw new LoopedException(getErrorMessage("XRef loop"));
                 }
+            } else if (processedOffsets.contains(offset)) {
+                offset = null;
+                continue;
             }
             processedOffsets.add(offset);
 
