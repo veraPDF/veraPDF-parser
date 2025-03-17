@@ -575,10 +575,9 @@ public class PDFParser extends SeekableCOSParser {
         while (offset != null || !prevOffsets.isEmpty()) {
             if (offset == null) {
                 offset = prevOffsets.remove(prevOffsets.size() - 1);
-            }
-
-            if (processedOffsets.contains(offset)) {
-                throw new LoopedException(getErrorMessage("XRef loop"));
+                if (processedOffsets.contains(offset)) {
+                    throw new LoopedException(getErrorMessage("XRef loop"));
+                }
             }
             processedOffsets.add(offset);
 
