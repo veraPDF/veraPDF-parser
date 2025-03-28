@@ -300,7 +300,8 @@ public class PDFParser extends SeekableCOSParser {
 
         COSObject obj = nextObject();
 
-        if (!obj.isIndirect() && obj.getType() == COSObjType.COS_STREAM && this.document.isEncrypted()) {
+        if (Boolean.FALSE.equals(obj.isIndirect()) && obj.getType() == COSObjType.COS_STREAM
+                && this.document.isEncrypted()) {
             try {
                 this.document.getStandardSecurityHandler().decryptStream((COSStream) obj.getDirectBase(), 
                         new COSKey((int) number, (int) generation));
