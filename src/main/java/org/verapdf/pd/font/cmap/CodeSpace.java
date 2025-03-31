@@ -20,6 +20,8 @@
  */
 package org.verapdf.pd.font.cmap;
 
+import org.verapdf.exceptions.VeraPDFParserException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,6 +94,12 @@ class CodeSpace {
      * @return true if there is a match.
      */
     public boolean isPartialMatch(byte toBeMatched, int position) {
+        if (position < 0) {
+            throw new VeraPDFParserException("Position is " + position + ". Must be non-negative");
+        } else if (position >= this.getLength()) {
+            throw new VeraPDFParserException("Checking position " + position
+                                                + " while there are only " + this.getLength() + " positions to check");
+        }
         int beginNum = begin[position] & 0xFF;
         int endNum = end[position] & 0xFF;
         int charNum = toBeMatched & 0xFF;
