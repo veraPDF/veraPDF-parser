@@ -20,6 +20,8 @@
  */
 package org.verapdf.pd.font.cmap;
 
+import org.verapdf.exceptions.VeraPDFParserException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -130,18 +132,22 @@ public class CMap {
                 }
             }
             int shortestMatchingCodeSpaceLength = Integer.MAX_VALUE;
-            for (CodeSpace codeSpace : codeSpaces) { // Looking for partial matches on bytes 0, ..., i
-                boolean partialMatch = true;
-                for (int j = 0; j <= i; ++j) {
-                    if (!codeSpace.isPartialMatch(charCode[j], j)) {
-                        partialMatch = false;
-                        break;
+            try {
+                for (CodeSpace codeSpace : codeSpaces) { // Looking for partial matches on bytes 0, ..., i
+                    boolean partialMatch = true;
+                    for (int j = 0; j <= i; ++j) {
+                        if (!codeSpace.isPartialMatch(charCode[j], j)) {
+                            partialMatch = false;
+                            break;
+                        }
+                    }
+                    if (partialMatch && shortestMatchingCodeSpaceLength >
+                            codeSpace.getLength()) {
+                        shortestMatchingCodeSpaceLength = codeSpace.getLength();    // Remembering length of shortest partially matching codespace
                     }
                 }
-                if (partialMatch && shortestMatchingCodeSpaceLength >
-                        codeSpace.getLength()) {
-                    shortestMatchingCodeSpaceLength = codeSpace.getLength();    // Remembering length of shortest partially matching codespace
-                }
+            } catch (VeraPDFParserException e) {
+                LOGGER.log(Level.WARNING, "CMap " + this.name + " has invalid codespace range.", e);
             }
             if (shortestMatchingCodeSpaceLength == Integer.MAX_VALUE && !codeSpaces.isEmpty()) {
                 byte[] tmp = new byte[previousShortestMatchingCodeSpaceLength - i - 1];
