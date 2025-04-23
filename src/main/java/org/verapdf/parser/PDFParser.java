@@ -50,6 +50,8 @@ public class PDFParser extends SeekableCOSParser {
      * Linearization dictionary must be in first 1024 bytes of document
      */
     protected static final int LINEARIZATION_DICTIONARY_LOOKUP_SIZE = 1024;
+    protected static final int STARTXREF_KEYWORD_LOOKUP_SIZE = 1024;
+
     private static final String HEADER_PATTERN = "%PDF-";
     private static final String PDF_DEFAULT_VERSION = "1.4";
     private static final byte[] STARTXREF = "startxref".getBytes(StandardCharsets.ISO_8859_1);
@@ -353,7 +355,7 @@ public class PDFParser extends SeekableCOSParser {
     private Long findLastXRef() throws IOException {
         getSource().seekFromEnd(STARTXREF.length);
         byte[] buf = new byte[STARTXREF.length];
-        while (getSource().getStreamLength() - getSource().getOffset() < 1024) {
+        while (getSource().getStreamLength() - getSource().getOffset() < STARTXREF_KEYWORD_LOOKUP_SIZE) {
             getSource().read(buf);
             if (Arrays.equals(buf, STARTXREF)) {
                 getBaseParser().nextToken();
@@ -364,7 +366,7 @@ public class PDFParser extends SeekableCOSParser {
             }
             getSource().seekFromCurrentPosition(-STARTXREF.length - 1);
         }
-        return null;
+        throw new IOException("Document doesn't contain startxref keyword in the last "+ STARTXREF_KEYWORD_LOOKUP_SIZE + " bytes");
     }
 
     private void calculatePostEOFDataSize() throws IOException {
