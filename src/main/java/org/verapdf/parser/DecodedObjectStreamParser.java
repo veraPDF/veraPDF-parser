@@ -57,8 +57,8 @@ public class DecodedObjectStreamParser extends SeekableCOSParser {
         keyOfCurrentObject = streamKey;
         try {
             calculateInternalOffsets();
-        } catch (IOException e) {
-            throw new IOException(getErrorMessage("Object stream has invalid N value"), e);
+        } catch (Exception e) {
+            throw new IOException(getErrorMessage("Object stream has invalid N or First entry"), e);
         }
     }
 
