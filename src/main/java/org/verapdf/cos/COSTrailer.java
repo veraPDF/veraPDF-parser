@@ -21,6 +21,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.pd.PDObject;
 
 /**
@@ -34,7 +35,14 @@ public class COSTrailer extends PDObject {
 	}
 
 	public Long getSize() {
-		return getObject().getIntegerKey(ASAtom.SIZE);
+		COSObject size = getObject().getKey(ASAtom.SIZE);
+		if (size != null) {
+			if (Boolean.TRUE.equals(size.isIndirect())) {
+				throw new VeraPDFParserException("Entry Size in trailer is indirect");
+			}
+			return size.getInteger();
+		}
+		return null;
 	}
 
 	public void setSize(final Long size) {
@@ -48,7 +56,14 @@ public class COSTrailer extends PDObject {
 	}
 
 	public Long getPrev() {
-		return getObject().getIntegerKey(ASAtom.PREV);
+		COSObject prev = getObject().getKey(ASAtom.PREV);
+		if (prev != null) {
+			if (Boolean.TRUE.equals(prev.isIndirect())) {
+				throw new VeraPDFParserException("Entry Prev in trailer is indirect");
+			}
+			return prev.getInteger();
+		}
+		return null;
 	}
 
 	public void setPrev(final Long prev) {
