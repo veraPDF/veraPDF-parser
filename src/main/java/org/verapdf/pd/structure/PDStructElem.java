@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -31,6 +31,8 @@ import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.TaggedPDFConstants;
 import org.verapdf.tools.TaggedPDFHelper;
 import org.verapdf.tools.TaggedPDFRoleMapHelper;
+
+import java.util.List;
 
 /**
  * @author Maksim Bezrukov
@@ -126,18 +128,17 @@ public class PDStructElem extends PDStructTreeNode {
 	}
 
 	public static StructureType getStructureTypeStandardStructureType(StructureType type) {
-		PDFFlavour flavour = StaticResources.getFlavour();
-		if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_4 || flavour == PDFFlavour.PDFUA_2 ||
-				flavour.getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
+		List<PDFFlavour> flavour = StaticResources.getFlavour();
+		if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 			StructureType defaultStructureType = PDStructElem.getDefaultStructureType(type);
 			if (defaultStructureType != null) {
 				return defaultStructureType;
 			}
 		}
-		if (flavour.getSpecification() != PDFFlavour.Specification.ISO_19005_4 && flavour != PDFFlavour.PDFUA_2) {
+		if (!PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0) || PDFFlavour.isFlavourFamily(flavour, PDFFlavour.SpecificationFamily.WCAG)) {
 			if (type != null) {
 				return StructureType.createStructureType(ASAtom.getASAtom(
-						StaticResources.getRoleMapHelper().getStandardType(type.getType())));
+						StaticResources.getRoleMapHelper().getStandardType(type.getType())), type.getNameSpace());
 			}
 		}
 		return null;
@@ -154,13 +155,12 @@ public class PDStructElem extends PDStructTreeNode {
 	}
 
 	public static boolean isStandardStructureType(StructureType type) {
-		PDFFlavour flavour = StaticResources.getFlavour();
+		List<PDFFlavour> flavour = StaticResources.getFlavour();
 		boolean isStandard = false;
-		if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_4 || flavour == PDFFlavour.PDFUA_2 ||
-				flavour.getSpecification().getFamily() == PDFFlavour.SpecificationFamily.WCAG) {
+		if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 			isStandard = TaggedPDFHelper.isStandardType(type);
 		}
-		if (flavour.getSpecification() != PDFFlavour.Specification.ISO_19005_4 && flavour != PDFFlavour.PDFUA_2) {
+		if (!PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0) || PDFFlavour.isFlavourFamily(flavour, PDFFlavour.SpecificationFamily.WCAG)) {
 			if (type != null) {
 				isStandard |= TaggedPDFRoleMapHelper.isStandardType(type);
 			}
@@ -169,7 +169,7 @@ public class PDStructElem extends PDStructTreeNode {
 	}
 
 	public static boolean isMathStandardType(StructureType standardStructureType) {
-		return StaticResources.getFlavour() == PDFFlavour.PDFUA_2 && standardStructureType != null &&
+		return PDFFlavour.isPDFUA2RelatedFlavour(StaticResources.getFlavour()) && standardStructureType != null &&
 				TaggedPDFConstants.MATH_ML_NAMESPACE.equals(standardStructureType.getNameSpaceURI());
 	}
 

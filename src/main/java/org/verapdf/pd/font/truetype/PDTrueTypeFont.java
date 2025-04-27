@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -89,7 +89,7 @@ public class PDTrueTypeFont extends PDSimpleFont {
                     if (fontProgram == null) {
                         try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
                             this.fontProgram = new TrueTypeFontProgram(fontData, isSymbolic,
-                                    encoding);
+                                    encoding, key);
                             StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                         }
                     }
@@ -104,7 +104,7 @@ public class PDTrueTypeFont extends PDSimpleFont {
                     if (fontProgram == null) {
                         try (ASInputStream fontData = trueTypeFontFile.getData(COSStream.FilterFlags.DECODE)) {
                             this.fontProgram = new OpenTypeFontProgram(fontData, false, false, 
-                                    isSymbolic, encoding, null, isSubset, null);
+                                    isSymbolic, encoding, null, isSubset, null, key);
                             StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                         }
                     }

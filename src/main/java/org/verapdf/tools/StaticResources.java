@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -31,6 +31,8 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,7 +47,7 @@ public class StaticResources {
 
 	private static final Logger LOGGER = Logger.getLogger(StaticResources.class.getCanonicalName());
 
-	private static final ThreadLocal<PDFFlavour> flavour = new ThreadLocal<>();
+	private static final ThreadLocal<List<PDFFlavour>> flavour = new ThreadLocal<>();
 	private static final ThreadLocal<PDDocument> document = new ThreadLocal<>();
 
 	private static final ThreadLocal<TaggedPDFRoleMapHelper> roleMapHelper = new ThreadLocal<>();
@@ -149,7 +151,7 @@ public class StaticResources {
 		StaticResources.cMapCache.set(new HashMap<>());
 		StaticResources.structureNameSpaceCache.set(new HashMap<>());
 		StaticResources.cachedFonts.set(new HashMap<>());
-		StaticResources.flavour.set(null);
+		StaticResources.flavour.set(new LinkedList<>());
 		StaticResources.document.set(null);
 		StaticResources.setPassword(null);
 		StaticResources.roleMapHelper.set(null);
@@ -185,11 +187,11 @@ public class StaticResources {
 		StaticResources.cachedFonts.set(cachedFonts);
 	}
 
-	public static PDFFlavour getFlavour() {
+	public static List<PDFFlavour> getFlavour() {
 		return flavour.get();
 	}
 
-	public static void setFlavour(PDFFlavour flavour) {
+	public static void setFlavour(List<PDFFlavour> flavour) {
 		StaticResources.flavour.set(flavour);
 	}
 

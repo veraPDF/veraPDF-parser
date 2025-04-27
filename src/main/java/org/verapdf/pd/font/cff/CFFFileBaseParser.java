@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -84,7 +84,7 @@ class CFFFileBaseParser {
             throw new IOException("Wrong index data offset");
         }
         byte[] data = new byte[offset[count] - 1];
-        if (source.read(data, data.length) != data.length) {
+        if (data.length != 0 && source.read(data, data.length) != data.length) {
             throw new IOException("End of stream is reached");
         }
         int offsetShift = 3 + offSize * (count + 1);
@@ -100,10 +100,9 @@ class CFFFileBaseParser {
 
     private float readReal() throws IOException {
         StringBuilder builder = new StringBuilder();
-        int buf;
         parsing:
         while (true) {
-            buf = readCard8();
+            int buf = readCard8();
             int[] hexs = new int[2];
             hexs[0] = buf >> 4;
             hexs[1] = buf & 0x0F;

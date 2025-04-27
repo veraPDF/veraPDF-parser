@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -19,6 +19,8 @@
  * http://mozilla.org/MPL/2.0/.
  */
 package org.verapdf.pd.font.cmap;
+
+import org.verapdf.exceptions.VeraPDFParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -130,18 +132,22 @@ public class CMap {
                 }
             }
             int shortestMatchingCodeSpaceLength = Integer.MAX_VALUE;
-            for (CodeSpace codeSpace : codeSpaces) { // Looking for partial matches on bytes 0, ..., i
-                boolean partialMatch = true;
-                for (int j = 0; j <= i; ++j) {
-                    if (!codeSpace.isPartialMatch(charCode[j], j)) {
-                        partialMatch = false;
-                        break;
+            try {
+                for (CodeSpace codeSpace : codeSpaces) { // Looking for partial matches on bytes 0, ..., i
+                    boolean partialMatch = true;
+                    for (int j = 0; j <= i; ++j) {
+                        if (!codeSpace.isPartialMatch(charCode[j], j)) {
+                            partialMatch = false;
+                            break;
+                        }
+                    }
+                    if (partialMatch && shortestMatchingCodeSpaceLength >
+                            codeSpace.getLength()) {
+                        shortestMatchingCodeSpaceLength = codeSpace.getLength();    // Remembering length of shortest partially matching codespace
                     }
                 }
-                if (partialMatch && shortestMatchingCodeSpaceLength >
-                        codeSpace.getLength()) {
-                    shortestMatchingCodeSpaceLength = codeSpace.getLength();    // Remembering length of shortest partially matching codespace
-                }
+            } catch (VeraPDFParserException e) {
+                LOGGER.log(Level.WARNING, "CMap " + this.name + " has invalid codespace range.", e);
             }
             if (shortestMatchingCodeSpaceLength == Integer.MAX_VALUE && !codeSpaces.isEmpty()) {
                 byte[] tmp = new byte[previousShortestMatchingCodeSpaceLength - i - 1];
@@ -260,9 +266,9 @@ public class CMap {
      */
     public String getUnicode(int code) {
         String res = this.toUnicode.get(code);
-        if(res == null) {
-            for(ToUnicodeInterval interval : this.unicodeIntervals) {
-                if(interval.containsCode(code)) {
+        if (res == null) {
+            for (ToUnicodeInterval interval : this.unicodeIntervals) {
+                if (interval.containsCode(code)) {
                     return interval.toUnicode(code);
                 }
             }

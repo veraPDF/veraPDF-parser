@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -69,7 +69,7 @@ public class PDAnnotation extends PDObject {
 		return getStringKey(ASAtom.TU);
 	}
 
-	public COSObject getParent(){
+	public COSObject getParent() {
 		COSObject res = getKey(ASAtom.PARENT);
 		if (res != null && res.getType() == COSObjType.COS_DICT) {
 			return res;
@@ -108,7 +108,7 @@ public class PDAnnotation extends PDObject {
 		return TypeConverter.getRealArray(getKey(ASAtom.RECT), 4, "Rect");
 	}
 
-	public COSObject getCOSC(){
+	public COSObject getCOSC() {
 		COSObject res = getKey(ASAtom.C);
 		if (res != null && res.getType() == COSObjType.COS_ARRAY) {
 			return res;
@@ -116,7 +116,7 @@ public class PDAnnotation extends PDObject {
 		return null;
 	}
 
-	public COSObject getCOSIC(){
+	public COSObject getCOSIC() {
 		COSObject res = getKey(ASAtom.IC);
 		if (res != null && res.getType() == COSObjType.COS_ARRAY) {
 			return res;

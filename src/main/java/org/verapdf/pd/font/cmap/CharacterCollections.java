@@ -1,9 +1,30 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.pd.font.cmap;
 
 import org.verapdf.parser.PDFFlavour;
 import org.verapdf.tools.StaticResources;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CharacterCollections {
@@ -138,10 +159,10 @@ public class CharacterCollections {
 	public static CIDSystemInfo getCIDSystemInfo(String cmapName) {
 		CIDSystemInfo[] cidSystemInfos = map.get(cmapName);
 		if (cidSystemInfos != null) {
-			PDFFlavour flavour = StaticResources.getFlavour();
-			if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_1) {
+			List<PDFFlavour> flavour = StaticResources.getFlavour();
+			if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.PDF_REFERENCE_1_4)) {
 				return cidSystemInfos[0];
-			} else if (flavour.getSpecification() == PDFFlavour.Specification.ISO_19005_4) {
+			} else if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 				return cidSystemInfos[2];
 			} else {
 				return cidSystemInfos[1];

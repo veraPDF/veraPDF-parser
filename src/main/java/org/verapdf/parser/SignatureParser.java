@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -84,7 +84,7 @@ public class SignatureParser extends SeekableCOSParser {
             if (c == '>') {
                 done = true;
             } else {
-                if(parseSignatureNameValuePair()) {
+                if (parseSignatureNameValuePair()) {
                     done = true;
                 }
             }
@@ -268,7 +268,7 @@ public class SignatureParser extends SeekableCOSParser {
         long pointer = this.getSource().getOffset();
         this.getSource().unread(2);
         int byteBeforeEOF = this.getSource().peek();
-        while (!BaseParser.isLF(byteBeforeEOF)) {
+        while (!BaseParser.isLF(byteBeforeEOF) && !BaseParser.isCR(byteBeforeEOF)) {
             this.getSource().unread();
             byteBeforeEOF = this.getSource().peek();
             if (byteBeforeEOF != CharTable.ASCII_SPACE) {

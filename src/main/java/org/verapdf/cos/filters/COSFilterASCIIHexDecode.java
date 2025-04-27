@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -77,13 +77,12 @@ public class COSFilterASCIIHexDecode extends ASBufferedInFilter {
     @Override
     public int read(byte[] buffer, int size) throws IOException {
         int pointer = 0;
-        byte res;
         for (int i = 0; i < size; ++i) {
             byte[] twoBytes = reader.getNextBytes();
             if (twoBytes == null) {
                 return pointer == 0 ? -1 : pointer;
             }
-            res = (byte) (decodeLoHex(twoBytes[0]) << 4);
+            byte res = (byte) (decodeLoHex(twoBytes[0]) << 4);
             res += decodeLoHex(twoBytes[1]);
             buffer[pointer++] = res;
         }

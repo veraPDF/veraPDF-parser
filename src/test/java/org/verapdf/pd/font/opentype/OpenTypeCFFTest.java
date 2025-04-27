@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ public class OpenTypeCFFTest {
         COSObject encoding = COSName.construct(ASAtom.WIN_ANSI_ENCODING);
         ASInputStream stream = new InternalInputStream(fontFilePath, 2);
         OpenTypeFontProgram font = new OpenTypeFontProgram(stream, true, false, false,
-                encoding, null, true, null);
+                encoding, null, true, null, null);
         font.parseFont();
         assertTrue(font.getFont() instanceof CFFFontProgram);
         assertFalse(((CFFFontProgram) font.getFont()).isCIDFont());

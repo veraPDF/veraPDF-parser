@@ -2,7 +2,7 @@ veraPDF-parser
 ==============
 *Greenfield PDF parser developed for veraPDF*
 
-[![Build Status](https://jenkins.openpreservation.org/job/veraPDF/job/1.26/job/parser/badge/icon)](https://jenkins.openpreservation.org/job/veraPDF/job/1.26/job/parser/ "OPF Jenkins")
+[![Build Status](https://jenkins.openpreservation.org/job/veraPDF/job/1.28/job/parser/badge/icon)](https://jenkins.openpreservation.org/job/veraPDF/job/1.28/job/parser/ "OPF Jenkins")
 [![Maven Central](https://img.shields.io/maven-central/v/org.verapdf/parser.svg)](https://repo1.maven.org/maven2/org/verapdf/parser/ "Maven central")
 [![CodeCov Coverage](https://img.shields.io/codecov/c/github/veraPDF/veraPDF-parser.svg)](https://codecov.io/gh/veraPDF/veraPDF-parser/ "CodeCov coverage")
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/6285400847ba461d8d5e331ffca08bff)](https://app.codacy.com/gh/veraPDF/veraPDF-parser/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade "Codacy coverage")
@@ -29,7 +29,7 @@ Quick Start
 
 In order to build the parser you'll need:
 
- * Java 8 - 21, which can be downloaded [from Oracle](https://www.oracle.com/technetwork/java/javase/downloads/index.html), or for Linux users [OpenJDK](http://openjdk.java.net/install/index.html).
+ * Java 8, 11, 17 or 21, which can be downloaded [from Oracle](https://www.oracle.com/technetwork/java/javase/downloads/index.html), or for Linux users [OpenJDK](http://openjdk.java.net/install/index.html).
  * [Maven v3+](https://maven.apache.org/)
 
 ### Building the veraPDF Parser

@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -139,9 +139,11 @@ public class Type1FontProgram extends PSParser implements FontProgram {
                 getBaseParser().initializeToken();
 
                 getBaseParser().skipSpaces(true);
-
+                
+                COSObject nextObject = nextObject();
                 while (getBaseParser().getToken().type != Token.Type.TT_EOF) {
-                    processObject(nextObject());
+                    processObject(nextObject);
+                    nextObject = nextObject();
                 }
                 initializeEncoding();
                 if (glyphWidths == null) {
@@ -160,9 +162,9 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         if (nextObject.getType() == COSObjType.COS_NAME &&
                 nextObject.getString().equals(Type1StringConstants.EEXEC_STRING)) {
             this.skipSpacesExceptNullByte();
-            Type1PrivateParser parser = null;
             try (ASInputStream eexecEncoded = this.getSource().getStreamUntilToken(
                     CLEAR_TO_MARK_BYTES)) {
+                Type1PrivateParser parser = null;
                 try (ASInputStream eexecDecoded = new EexecFilterDecode(
                         eexecEncoded, false)) {
                     parser = new Type1PrivateParser(
@@ -218,9 +220,8 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     }
 
     protected void skipSpacesExceptNullByte() throws IOException {
-        byte ch;
         while (!this.getSource().isEOF()) {
-            ch = this.getSource().readByte();
+            byte ch = this.getSource().readByte();
             if (CharTable.isSpace(ch) && ch != 0) {
                 continue;
             }
@@ -280,7 +281,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         if (fontMatrixObject != null && fontMatrixObject.getType() == COSObjType.COS_ARRAY) {
             double[] res = new double[6];
             int pointer = 0;
-            for (COSObject obj : ((COSArray) fontMatrixObject.get())) {
+            for (COSObject obj : ((COSArray) fontMatrixObject.getDirectBase())) {
                 if (obj.getType().isNumber()) {
                     res[pointer++] = obj.getReal();
                 }
@@ -296,7 +297,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         if (encoding != null) {
             if (encoding.getType() == COSObjType.COS_ARRAY) {
                 int pointer = 0;
-                for (COSObject obj : ((COSArray) encoding.get())) {
+                for (COSObject obj : ((COSArray) encoding.getDirectBase())) {
                     if (pointer < 256) {
                         String glyphName = obj.getString();
                         this.encoding[pointer++] = glyphName == null ? "" : glyphName;
@@ -338,16 +339,31 @@ public class Type1FontProgram extends PSParser implements FontProgram {
 
     @Override
     public String getWeight() {
+        COSObject weight = this.getObjectFromUserDict(ASAtom.getASAtom(
+                Type1StringConstants.WEIGHT));
+        if (weight != null && weight.getType() == COSObjType.COS_STRING) {
+            return weight.getString();
+        }
         return null;
     }
 
     @Override
     public Double getAscent() {
+        COSObject ascent = this.getObjectFromUserDict(ASAtom.getASAtom(
+                Type1StringConstants.ASCENT));
+        if (ascent != null && ascent.getType().isNumber()) {
+            return ascent.getReal();
+        }
         return null;
     }
 
     @Override
     public Double getDescent() {
+        COSObject descent = this.getObjectFromUserDict(ASAtom.getASAtom(
+                Type1StringConstants.DESCENT));
+        if (descent != null && descent.getType().isNumber()) {
+            return descent.getReal();
+        }
         return null;
     }
 

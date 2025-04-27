@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -94,9 +94,8 @@ public class COSFilterLZWDecode extends ASBufferedInFilter {
     public int read(byte[] buffer, int size) throws IOException {
         int position = 0;
         int actualSize = Math.min(buffer.length, size);
-        byte[] nextChunk;
         while (true) {
-            nextChunk = getNextChunk();
+            byte[] nextChunk = getNextChunk();
             if (nextChunk == null) {
                 return position == 0 ? -1 : position;
             }

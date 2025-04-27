@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ class CFFCharStringsHandler {
         } else {
             this.fontStream = fontStream;
             this.charStringsOffsets = new long[charStrings.size() + 1];
-            for(int i = 0; i < charStrings.size() + 1; ++i) {
+            for (int i = 0; i < charStrings.size() + 1; ++i) {
                 this.charStringsOffsets[i] = charStringsOffset +
                         charStrings.getOffsetShift() + charStrings.getOffset(i) - 1;
             }
@@ -59,7 +59,7 @@ class CFFCharStringsHandler {
     }
 
     byte[] getCharString(int num) throws IOException {
-        if(num >= 0 && num < this.amount) {
+        if (num >= 0 && num < this.amount) {
             if (memoryInCharStirngs != null) {
                 return memoryInCharStirngs.get(num);
             } else {

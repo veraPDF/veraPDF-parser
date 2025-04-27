@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -96,7 +96,7 @@ public final class TaggedPDFConstants {
     public static final String STRONG = "Strong";
     public static final String ARTIFACT = "Artifact";
 
-    private TaggedPDFConstants(){
+    private TaggedPDFConstants() {
         //disable default constructor
     }
 }

@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -184,9 +184,17 @@ public class TaggedPDFHelper {
 		addVisited(type);
 		StructureType prev = type;
 		StructureType curr = getEquivalent(prev, Collections.emptyMap());
+		Map<String, ASAtom> processedTypes = new HashMap<>();
 		while (curr != null) {
-			if (curr.getNameSpaceURI() != null && curr.getNameSpaceURI().equals(prev.getNameSpaceURI())) {
-				return prev.getNameSpaceURI() + ":" + (prev.getType() != null ? prev.getType().getValue() : null);
+			if (prev.getNameSpaceURI() != null) {
+				processedTypes.put(prev.getNameSpaceURI(), prev.getType());
+			}
+			if (curr.getNameSpaceURI() != null && processedTypes.containsKey(curr.getNameSpaceURI())) {
+				ASAtom processedType = processedTypes.get(curr.getNameSpaceURI());
+				if (curr.getType() != null && !Objects.equals(curr.getType(), processedType)) {
+					return curr.getNameSpaceURI() + ":" + (processedType != null ? processedType.getValue() : null);
+				}
+				return null;
 			}
 			if (isVisited(curr)) {
 				return null;
@@ -196,6 +204,36 @@ public class TaggedPDFHelper {
 			curr = getEquivalent(prev, Collections.emptyMap());
 		}
 		return null;
+	}
+
+	public static Boolean isCircularMappingExist(StructureType type) {
+		if (type == null) {
+			return null;
+		}
+		visitedWithNS.clear();
+		visitedWithoutNS.clear();
+		addVisited(type);
+		StructureType prev = type;
+		StructureType curr = getEquivalent(prev, Collections.emptyMap());
+		Map<String, ASAtom> processedTypes = new HashMap<>();
+		while (curr != null) {
+			if (prev.getNameSpaceURI() != null) {
+				processedTypes.put(prev.getNameSpaceURI(), prev.getType());
+			}
+			if (curr.getNameSpaceURI() != null && processedTypes.containsKey(curr.getNameSpaceURI())) {
+				ASAtom processedType = processedTypes.get(curr.getNameSpaceURI());
+				if (curr.getType() != null && Objects.equals(curr.getType(), processedType)) {
+					return true;
+				}
+			}
+			if (isVisited(curr)) {
+				return false;
+			}
+			addVisited(curr);
+			prev = curr;
+			curr = getEquivalent(prev, Collections.emptyMap());
+		}
+		return false;
 	}
 	
 	private static StructureType getEquivalent(StructureType type, Map<ASAtom, ASAtom> roleMap) {

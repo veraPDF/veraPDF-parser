@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -39,4 +39,7 @@ public class Type1StringConstants {
     static final String SUBRS = "Subrs";
     static final String STANDARD_ENCODING_STRING = "StandardEncoding";
     static final String NOACCESS = "noaccess";
+    static final String WEIGHT = "Weight";
+    static final String ASCENT = "Ascent";
+    static final String DESCENT = "Descent";
 }

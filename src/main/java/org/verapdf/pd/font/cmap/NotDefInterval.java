@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ class NotDefInterval extends CIDInterval {
      */
     @Override
     public int getCID(int character) {
-        if(!contains(character)) {
+        if (!contains(character)) {
             return -1;
         }
         return startingCID;

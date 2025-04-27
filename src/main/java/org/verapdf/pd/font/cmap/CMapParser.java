@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ public class CMapParser extends PSParser {
     private final CMap cMap;
 
     private static final String WMODE_STRING = "WMode";
-    private static final String REGISTRY_SRTRING = "Registry";
+    private static final String REGISTRY_STRING = "Registry";
     private static final String ORDERING_STRING = "Ordering";
     private static final String CMAP_NAME_STRING = "CMapName";
     private static final String SUPPLEMENT_STRING = "Supplement";
@@ -289,13 +289,13 @@ public class CMapParser extends PSParser {
     }
 
     private static long getBfrangeEndFromBytes(byte[] endRange, byte[] beginRange) {
-        long res = 0;
         int length = Math.max(beginRange.length, endRange.length);
         byte[] correctBeginRange = new byte[length];
-        byte[] correctEndRange = new byte[length];
         System.arraycopy(beginRange, 0, correctBeginRange, length - beginRange.length, beginRange.length);
+        byte[] correctEndRange = new byte[length];
         System.arraycopy(endRange, 0, correctEndRange, length - endRange.length, endRange.length);
         int i = 0;
+        long res = 0;
         for (; i < length - 1; ++i) {
             // getting first hex digits of begin range string.
             // see PDF 32000 2008, 9.10.3: these digits should be the same as
@@ -339,7 +339,7 @@ public class CMapParser extends PSParser {
 
     private void setValuesFromUserDict(CMap cMap) {
         cMap.setName(getStringFromUserDict(CMAP_NAME_STRING));
-        cMap.setRegistry(getStringFromUserDict(REGISTRY_SRTRING));
+        cMap.setRegistry(getStringFromUserDict(REGISTRY_STRING));
         cMap.setOrdering(getStringFromUserDict(ORDERING_STRING));
         cMap.setwMode((int) getLongFromUserDict(WMODE_STRING));
         cMap.setSupplement((int) getLongFromUserDict(SUPPLEMENT_STRING));

@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 package org.verapdf.pd.font.truetype;
 
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.font.CIDToGIDMapping;
 import org.verapdf.pd.font.FontProgram;
@@ -48,8 +49,8 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
      * @param cidToGID
      * @throws IOException
      */
-    public CIDFontType2Program(ASInputStream stream, CMap cMap, COSObject cidToGID) throws IOException {
-        super(stream);
+    public CIDFontType2Program(ASInputStream stream, CMap cMap, COSObject cidToGID, COSKey key) throws IOException {
+        super(stream, key);
         this.cMap = cMap;
         this.cidToGID = new CIDToGIDMapping(cidToGID);
     }

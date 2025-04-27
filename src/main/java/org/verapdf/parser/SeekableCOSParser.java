@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -105,7 +105,7 @@ public class SeekableCOSParser extends COSParser {
 		long streamStartOffset = getSource().getOffset();
 
 		COSObject length = dict.getKey(ASAtom.LENGTH);
-		if (this.keyOfCurrentObject != null && length.isIndirect() && this.keyOfCurrentObject.equals(length.getKey())) {
+		if (this.keyOfCurrentObject != null && Boolean.TRUE.equals(length.isIndirect()) && this.keyOfCurrentObject.equals(length.getKey())) {
 			throw new VeraPDFParserException(getErrorMessage("Object has stream length value" +
 					" which references to its own object key"));
 		}
@@ -223,16 +223,16 @@ public class SeekableCOSParser extends COSParser {
 	private void checkEndstreamSpacings(COSObject stream, long streamStartOffset, Long expectedLength) throws IOException {
 		getBaseParser().skipSpaces();
 
-		byte eolCount = 0;
 		long approximateLength = getSource().getOffset() - streamStartOffset;
 		long expected = expectedLength == null ? 0 : expectedLength;
-		long diff = approximateLength - expected;
 
 		getSource().unread(2);
 		int firstSymbol = getSource().readByte();
 		int secondSymbol = getSource().readByte();
+		byte eolCount = 0;
 		if (secondSymbol == 10) {
 			if (firstSymbol == 13) {
+				long diff = approximateLength - expected;
 				eolCount = (byte) (diff > 1 ? 2 : 1);
 			} else {
 				eolCount = 1;

@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -73,7 +73,7 @@ public class COSFilterRC4DecryptionDefault extends ASBufferedInFilter {
      */
     @Override
     public int read(byte[] buffer, int off, int size) throws IOException {
-        if(this.bufferSize() == 0) {
+        if (this.bufferSize() == 0) {
             int bytesFed = this.feedBuffer(getBufferCapacity());
             if (bytesFed == -1) {
                 return -1;

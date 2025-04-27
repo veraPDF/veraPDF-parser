@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -242,8 +242,11 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
             if (code < CFFPredefined.EXPERT_ENCODING.length) {
                 return CFFPredefined.STANDARD_STRINGS[CFFPredefined.EXPERT_ENCODING[code]];
             }
-        } else if (code < encoding.length && encoding[code] + 1 < inverseCharSet.size()) {
-            return inverseCharSet.get(encoding[code] + 1);
+        } else {
+            Integer gid = getGIDFromCharCode(code);
+            if (gid != null && gid < inverseCharSet.size()) {
+                return inverseCharSet.get(gid);
+            }
         }
         return NOTDEF_STRING;
     }
@@ -263,20 +266,32 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
      */
     @Override
     public float getWidth(int charCode) {
-        if(externalCMap != null) {
+        if (externalCMap != null) {
             int gid = this.externalCMap.toCID(charCode);
-            float res = this.widths.getWidth(gid);
-            if(res != -1.) {
+            float res = getWidthFromGID(gid);
+            if (res != -1.) {
                 return res;
-            } else {
-                return this.widths.getWidth(0);
             }
+            return getWidthFromGID(0);
         }
         try {
+            if (!isStandardEncoding && !isExpertEncoding) {
+                Integer gid = getGIDFromCharCode(charCode);
+                if (gid != null) {
+                    return getWidthByGID(gid);
+                }
+            }
             return this.getWidth(getGlyphName(charCode));
         } catch (ArrayIndexOutOfBoundsException e) {
             return -1;
         }
+    }
+    
+    private Integer getGIDFromCharCode(int charCode) {
+        if (charCode >= 0 && charCode < encoding.length) {
+            return encoding[charCode] + 1;
+        }
+        return null;
     }
 
     public float getWidthFromGID(int gid) {
@@ -297,11 +312,15 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
      */
     @Override
     public float getWidth(String charName) {
-        Integer index = this.charSet.get(charName);
-        if (index == null || index >= this.widths.getWidthsAmount() || index < 0) {
-            return this.widths.getWidth(0);
+        Integer gid = this.charSet.get(charName);
+        return getWidthByGID(gid);
+    }
+    
+    private float getWidthByGID(Integer gid) {
+        if (gid == null || gid < 0 || gid >= this.widths.getWidthsAmount()) {
+            return getWidthFromGID(0);
         }
-        return this.widths.getWidth(index);
+        return getWidthFromGID(gid);
     }
 
     /**
@@ -327,7 +346,7 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
     public String[] getEncoding() {
         if (this.encodingStrings == null) {
             this.encodingStrings = new String[256];
-            for(int i = 0; i < 256; ++i) {
+            for (int i = 0; i < 256; ++i) {
                 String glyphName = inverseCharSet.get(encoding[i]);
                 this.encodingStrings[i] =
                         glyphName == null ? NOTDEF_STRING : glyphName;

@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -90,9 +90,8 @@ class Type1PrivateParser extends SeekableBaseParser {
     @Override
     protected void readName() throws IOException {
         this.clearToken();
-        byte ch;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (CharTable.isTokenDelimiter(ch)) {
                 this.source.unread();
                 break;

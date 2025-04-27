@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ package org.verapdf.pd.font.truetype;
 
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
+import org.verapdf.cos.COSKey;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
@@ -40,6 +41,7 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
     protected String[] encodingMappingArray;
     private boolean attemptedParsing = false;
     private boolean successfullyParsed = false;
+    private COSKey key;
 
     /**
      * Constructor from stream containing font data, and encoding details.
@@ -47,9 +49,10 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
      * @param stream     is stream containing font data.
      * @throws IOException if creation of @{link SeekableStream} fails.
      */
-    public BaseTrueTypeProgram(ASInputStream stream)
+    public BaseTrueTypeProgram(ASInputStream stream, COSKey key)
             throws IOException {
-        this.parser = new TrueTypeFontParser(stream);
+        this.parser = new TrueTypeFontParser(stream, key);
+        this.key = key;
     }
 
     /**
@@ -160,5 +163,12 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
             return 1000d / this.parser.getHeadParser().getUnitsPerEm() * parser.getHheaParser().getDescender();
         }
         return null;
+    }
+
+    protected String getErrorMessage(String message) {
+        if (key != null) {
+            return message + "(object key = " + key + ')';
+        }
+        return message;
     }
 }

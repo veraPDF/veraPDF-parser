@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -56,9 +56,8 @@ public abstract class PDAbstractAdditionalActions extends PDObject {
             return Collections.emptyList();
         }
         List<PDAction> actions = new ArrayList<>(actionNames.length);
-        PDAction action;
         for (ASAtom name : actionNames) {
-            action = getAction(name);
+            PDAction action = getAction(name);
             if (name != null) {
                 actions.add(action);
             }

@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -103,6 +103,7 @@ public abstract class COSBase {
 	public abstract boolean setStringKey(final ASAtom key, final String value);
 	public abstract ASAtom getNameKey(final ASAtom key);
 	public abstract String getNameKeyStringValue(final ASAtom key);
+	public abstract String getNameKeyUnicodeValue(final ASAtom key);
 	public abstract boolean setNameKey(final ASAtom key, final ASAtom value);
 	public abstract boolean setArrayKey(final ASAtom key);
 	public abstract boolean setArrayKey(final ASAtom key, final COSObject array);

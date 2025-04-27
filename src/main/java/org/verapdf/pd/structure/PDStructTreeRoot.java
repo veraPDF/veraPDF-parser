@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -31,6 +31,8 @@ import java.util.*;
  * @author Maksim Bezrukov
  */
 public class PDStructTreeRoot extends PDStructTreeNode {
+	
+	private PDNumberTreeNode parentTree;
 
 	public PDStructTreeRoot(COSObject obj) {
 		super(obj);
@@ -58,10 +60,12 @@ public class PDStructTreeRoot extends PDStructTreeNode {
 	}
 
 	public PDNumberTreeNode getParentTree() {
-		COSObject parentTree = getKey(ASAtom.PARENT_TREE);
-		if (parentTree != null && parentTree.getType().isDictionaryBased()) {
-			return new PDNumberTreeNode(parentTree);
+		if (parentTree == null) {
+			COSObject parentTreeObject = getKey(ASAtom.PARENT_TREE);
+			if (parentTreeObject != null && parentTreeObject.getType().isDictionaryBased()) {
+				parentTree = new PDNumberTreeNode(parentTreeObject);
+			}
 		}
-		return null;
+		return parentTree;
 	}
 }

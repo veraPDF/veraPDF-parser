@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -106,9 +106,8 @@ public class NotSeekableBaseParser extends BaseParser implements Closeable {
     @Override
     protected void skipComment() throws IOException {
         // skips all characters till EOL == { CR, LF, CRLF }
-        byte ch;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (isLF(ch)) {
                 return; // EOL == LF
             }

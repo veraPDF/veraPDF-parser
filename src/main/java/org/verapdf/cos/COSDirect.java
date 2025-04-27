@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -234,6 +234,12 @@ public abstract class COSDirect extends COSBase {
 
     @Override
     public String getNameKeyStringValue(final ASAtom key) {
+        LOGGER.log(Level.FINE, String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
+        return null;
+    }
+
+    @Override
+    public String getNameKeyUnicodeValue(final ASAtom key) {
         LOGGER.log(Level.FINE, String.format(INVALID_TYPE_MESSAGE, COS_DICTIONARY_TYPE, getClass().toString()));
         return null;
     }

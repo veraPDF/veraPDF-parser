@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ public abstract class PDSimpleFont extends PDFont {
     public String toUnicode(int code) {
 
         String unicodeString = super.toUnicode(code);
-        if(unicodeString != null) {
+        if (unicodeString != null) {
             return unicodeString;
         }
 

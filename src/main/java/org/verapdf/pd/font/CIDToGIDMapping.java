@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -58,8 +58,6 @@ public class CIDToGIDMapping {
             } else {
                 this.isIdentity = false;
                 try (ASInputStream stream = obj.getData(COSStream.FilterFlags.DECODE)) {
-                    mapping = new
-                            int[(obj.getIntegerKey(ASAtom.LENGTH).intValue() + 1) / 2];
                     parseCIDToGIDStream(stream);
                 }
                 return;
@@ -108,35 +106,16 @@ public class CIDToGIDMapping {
     }
 
     private void parseCIDToGIDStream(ASInputStream stream) throws IOException {
-        int b = stream.read();
-        int i = 0;
-        while (b != -1) {
-            int res = b;
-            res <<= 8;
-            b = stream.read();
-            if (b != -1) {
-                res += b;
-                mapping[i++] = res;
-                b = stream.read();
-            } else {
-                mapping[i++] = res;
-            }
-            if(i == mapping.length) {
-                LOGGER.log(Level.FINE, "CIDToGID mapping has more items than specified in dict");
-                List<Integer> endOfMapping = readEndOfMapping(stream, b);
-                int[] newMapping = new int[mapping.length + endOfMapping.size()];
-                System.arraycopy(mapping, 0, newMapping, 0, mapping.length);
-                for(int j = mapping.length; j < newMapping.length; ++j) {
-                    newMapping[j] = endOfMapping.get(j - mapping.length);
-                }
-                this.mapping = newMapping;
-                break;
-            }
+        List<Integer> mappingList = readMapping(stream);
+        mapping = new int[mappingList.size()];
+        for (int i = 0; i < mappingList.size(); ++i) {
+            mapping[i] = mappingList.get(i);
         }
     }
 
-    private static List<Integer> readEndOfMapping(ASInputStream stream, int b) throws IOException {
+    private static List<Integer> readMapping(ASInputStream stream) throws IOException {
         List<Integer> res = new ArrayList<>();
+        int b = stream.read();
         while (b != -1) {
             int num = b;
             num <<= 8;

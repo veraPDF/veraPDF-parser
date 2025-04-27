@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -57,8 +57,8 @@ public class DecodedObjectStreamParser extends SeekableCOSParser {
         keyOfCurrentObject = streamKey;
         try {
             calculateInternalOffsets();
-        } catch (IOException e) {
-            throw new IOException(getErrorMessage("Object stream has invalid N value"), e);
+        } catch (Exception e) {
+            throw new IOException(getErrorMessage("Object stream has invalid N or First entry"), e);
         }
     }
 
@@ -66,15 +66,13 @@ public class DecodedObjectStreamParser extends SeekableCOSParser {
         int n = (int) ((COSInteger) this.objectStream.getKey(ASAtom.N).getDirectBase()).get();
         long first = ((COSInteger) this.objectStream.getKey(ASAtom.FIRST).getDirectBase()).get();
         for (int i = 0; i < n; ++i) {
-            Long objNum;
-            Long objOffset;
             getBaseParser().skipSpaces(false);
             getBaseParser().readNumber();
-            objNum = getBaseParser().getToken().integer;
+            long objNum = getBaseParser().getToken().integer;
             getBaseParser().skipSpaces(false);
             getBaseParser().readNumber();
-            objOffset = getBaseParser().getToken().integer;
-            internalOffsets.put(objNum.intValue(), objOffset + first);
+            long objOffset = getBaseParser().getToken().integer;
+            internalOffsets.put((int) objNum, objOffset + first);
         }
     }
 

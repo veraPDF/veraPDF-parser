@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -24,8 +24,10 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
+import org.verapdf.exceptions.LoopedException;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -302,6 +304,11 @@ public class COSIndirect extends COSBase {
     }
 
     @Override
+    public String getNameKeyUnicodeValue(final ASAtom key) {
+        return getDirect().getNameKeyUnicodeValue(key);
+    }
+
+    @Override
     public boolean setNameKey(final ASAtom key, final ASAtom value) {
         getDirect().setNameKey(key, value);
         return true;
@@ -425,14 +432,32 @@ public class COSIndirect extends COSBase {
         return true;
     }
 
-    @Override
-    public COSObject getDirect() {
+    private COSObject getChildObject() {
         return this.document != null ? this.document.getObject(key) : this.child;
     }
 
     @Override
+    public COSObject getDirect() {
+        COSObject object = getChildObject();
+        if (Boolean.TRUE.equals(object.isIndirect())) {
+            Set<COSKey> keys = new HashSet<>();
+            keys.add(getObjectKey());
+            while (Boolean.TRUE.equals(object.isIndirect())) {
+                COSKey key = object.getObjectKey();
+                if (keys.contains(key)) {
+                    throw new LoopedException("Loop in indirect references starting from indirect object " + getObjectKey());
+                }
+                keys.add(key);
+                object = ((COSIndirect)object.get()).getChildObject();
+            }
+        }
+        return object;
+    }
+
+    @Override
     public COSBase getDirectBase() {
-        return this.document != null ? this.document.getObject(key).get() : this.child.get();
+        COSObject direct = getDirect();
+        return direct != null ? direct.getDirectBase() : null;
     }
 
     @Override

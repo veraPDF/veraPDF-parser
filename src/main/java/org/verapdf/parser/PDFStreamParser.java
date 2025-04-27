@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -85,7 +85,6 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 	 * @throws IOException If an io error occurs while parsing the stream.
 	 */
 	public Object parseNextToken() throws IOException {
-		Object result = null;
 
 		getBaseParser().skipSpaces(true);
 		int nextByte = getSource().peek();
@@ -95,6 +94,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 
 		int c = nextByte;
 
+		Object result = null;
 		switch (c) {
 			case '(':
                 getBaseParser().nextToken();

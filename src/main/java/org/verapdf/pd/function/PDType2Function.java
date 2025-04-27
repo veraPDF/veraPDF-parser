@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -97,10 +97,10 @@ public class PDType2Function extends PDFunction {
 
     @Override
     public List<COSObject> getResult(List<COSObject> ops) {
-        List<COSObject> operands = new ArrayList<>();
         if (ops.size() > 1) {
             LOGGER.log(Level.WARNING, "Too many operands. The first one will be chosen");
         }
+        List<COSObject> operands = new ArrayList<>();
         operands.add(ops.get(0));
         operands = getValuesInIntervals(operands, getDomain());
         COSObject operand = operands.get(0);
@@ -108,13 +108,13 @@ public class PDType2Function extends PDFunction {
             LOGGER.log(Level.WARNING, "Invalid operands stream or N key value in Type 2 Function dictionary");
             return null;
         }
-        List<COSObject> result = new ArrayList<>();
         if (ZERO.equals(operand.getReal())) {
             return C0;
         }
         if (ONE.equals(operand.getReal())) {
             return C1;
         }
+        List<COSObject> result = new ArrayList<>();
         for (int i = 0; i < C0.size(); ++i) {
             result.add(COSReal.construct(C0.get(i).getReal()
                     + (C1.get(i).getReal() - C0.get(i).getReal()) *

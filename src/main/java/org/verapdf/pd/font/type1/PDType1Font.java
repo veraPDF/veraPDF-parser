@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -172,7 +172,7 @@ public class PDType1Font extends PDSimpleFont {
                             if (fontProgram == null) {
                                 try (ASInputStream fontData = type1FontFile.getData(COSStream.FilterFlags.DECODE)) {
                                     this.fontProgram = new OpenTypeFontProgram(fontData, true, false, isSymbolic,
-                                            encoding, null, isSubset, null);
+                                            encoding, null, isSubset, null, key);
                                     StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                                 }
                             }
@@ -292,7 +292,7 @@ public class PDType1Font extends PDSimpleFont {
      */
     public String toUnicodePDFA1(int code) {
         String unicodeString = super.cMapToUnicode(code);
-        if(unicodeString != null) {
+        if (unicodeString != null) {
             return unicodeString;
         }
         Encoding fontEncoding = this.getEncodingMapping();

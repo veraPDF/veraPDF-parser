@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -77,7 +77,7 @@ public abstract class PDFont extends PDResource {
         } else {
             fontDescriptor = new PDFontDescriptor(null);
         }
-        this.fontName = this.dictionary.getNameKeyStringValue(ASAtom.BASE_FONT);
+        this.fontName = this.dictionary.getNameKeyUnicodeValue(ASAtom.BASE_FONT);
         this.fontNameWithoutSubset = fontName != null ? (fontName.matches("^[A-Z]{6}+.+") ? fontName.substring(7) : fontName) : null;
         if (!(this instanceof PDType3Font)) {
             this.boundingBox = fontDescriptor.getFontBoundingBox();
@@ -162,9 +162,9 @@ public abstract class PDFont extends PDResource {
      * @return encoding object for given COSObject.
      */
     private static Encoding getEncodingMappingFromCOSObject(COSObject e) {
-        Encoding encodingObj;
         COSBase cosEncoding = e.getDirectBase();
         if (cosEncoding != null) {
+            Encoding encodingObj;
             if (cosEncoding.getType() == COSObjType.COS_NAME) {
                 encodingObj = new Encoding(cosEncoding.getName());
                 return encodingObj;

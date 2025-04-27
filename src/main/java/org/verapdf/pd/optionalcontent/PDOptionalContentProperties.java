@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ public class PDOptionalContentProperties extends PDObject {
 			int size = ocgsArray.size();
 			String[] groups = new String[size];
 
-			for(int i = 0; i < size; ++i) {
+			for (int i = 0; i < size; ++i) {
 				COSObject obj = ocgs.at(i);
 				if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
 					COSDictionary ocgDict = (COSDictionary) obj.getDirectBase();

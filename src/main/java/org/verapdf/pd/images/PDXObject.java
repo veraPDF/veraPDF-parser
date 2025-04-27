@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -56,6 +56,14 @@ public abstract class PDXObject extends PDResource {
 			return new PDXImage(smask, null);
 			// TODO: see pdfbox PBoxPDXObject getSMask() and getXObject(COSBase smaskDictionary) methods.
 			// Implement everything nicely.
+		}
+		return null;
+	}
+
+	public PDXImage getMask() {
+		COSObject mask = getKey(ASAtom.MASK);
+		if (mask != null && mask.getType() == COSObjType.COS_STREAM) {
+			return new PDXImage(mask, null);
 		}
 		return null;
 	}

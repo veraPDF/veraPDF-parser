@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -112,7 +112,7 @@ public class COSObject {
 	}
 
 	public void setBoolean(final boolean value) {
-		if(this.base == null || !this.base.setBoolean(value)) {
+		if (this.base == null || !this.base.setBoolean(value)) {
 			this.base = new COSBoolean(value);
 		}
 	}
@@ -286,6 +286,10 @@ public class COSObject {
 
 	public String getNameKeyStringValue(final ASAtom key) {
 		return this.base != null ? this.base.getNameKeyStringValue(key) : null;
+	}
+
+	public String getNameKeyUnicodeValue(final ASAtom key) {
+		return this.base != null ? this.base.getNameKeyUnicodeValue(key) : null;
 	}
 
 	public void setNameKey(final ASAtom key, final ASAtom value) {

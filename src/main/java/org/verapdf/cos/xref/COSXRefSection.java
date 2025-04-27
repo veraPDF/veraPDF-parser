@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -87,9 +87,8 @@ public class COSXRefSection {
 
 		Iterator<Map.Entry<Integer, COSXRefEntry>> iterator = this.entries.entrySet().iterator();
 		COSXRefRange segment = new COSXRefRange(iterator.next().getKey());
-		int nextSegment;
 		while(iterator.hasNext()) {
-			nextSegment = iterator.next().getKey();
+			int nextSegment = iterator.next().getKey();
 			if (nextSegment == segment.next()) {
 				segment.count++;
 			} else {

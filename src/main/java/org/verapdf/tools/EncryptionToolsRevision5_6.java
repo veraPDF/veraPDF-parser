@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -66,7 +66,6 @@ public class EncryptionToolsRevision5_6 {
             }
         }
 
-        byte[] res = null;
         byte[] e;
         byte[] stringForSalt;
         if (isUser) {
@@ -77,6 +76,7 @@ public class EncryptionToolsRevision5_6 {
             e = oe;
         }
 
+        byte[] res = null;
         if (e != null) {
             byte[] aesKey = computeHash(password, getKeySaltFromString(stringForSalt), u, !isUser, revision);
             enableAES256();
@@ -111,9 +111,9 @@ public class EncryptionToolsRevision5_6 {
         if (isCheckingOwnerPassword) {
             hashInput = ASBufferedInFilter.concatenate(hashInput, hashInput.length, u, u.length);
         }
-        int rounds = 0;
         byte[] k = getSHAHash(256, hashInput);
         if (revision > 5) {
+            int rounds = 0;
             while (true) {
                 byte[] sequence = ASBufferedInFilter.concatenate(password, password.length, k, k.length);
                 if (isCheckingOwnerPassword) {

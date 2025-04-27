@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -50,6 +50,8 @@ public class PDFParser extends SeekableCOSParser {
      * Linearization dictionary must be in first 1024 bytes of document
      */
     protected static final int LINEARIZATION_DICTIONARY_LOOKUP_SIZE = 1024;
+    protected static final int STARTXREF_KEYWORD_LOOKUP_SIZE = 1024;
+
     private static final String HEADER_PATTERN = "%PDF-";
     private static final String PDF_DEFAULT_VERSION = "1.4";
     private static final byte[] STARTXREF = "startxref".getBytes(StandardCharsets.ISO_8859_1);
@@ -248,14 +250,11 @@ public class PDFParser extends SeekableCOSParser {
 
         final Token token = getBaseParser().getToken();
 
-        boolean headerOfObjectComplyPDFA = true;
-        boolean headerFormatComplyPDFA = true;
-        boolean endOfObjectComplyPDFA = true;
-
         //Check that if offset doesn't point to obj key there is eol character before obj key
         //pdf/a-1b spec, clause 6.1.8
         getBaseParser().skipSpaces(false);
         getSource().seek(getSource().getOffset() - 1);
+        boolean headerOfObjectComplyPDFA = true;
         if (!getBaseParser().isNextByteEOL()) {
             headerOfObjectComplyPDFA = false;
         }
@@ -267,6 +266,7 @@ public class PDFParser extends SeekableCOSParser {
         }
         long number = token.integer;
 
+        boolean headerFormatComplyPDFA = true;
         if (!CharTable.isSpace(getSource().read()) || CharTable.isSpace(getSource().peek())) {
             //check correct spacing (6.1.8 clause)
             headerFormatComplyPDFA = false;
@@ -302,13 +302,11 @@ public class PDFParser extends SeekableCOSParser {
 
         COSObject obj = nextObject();
 
-        if (obj.getType() == COSObjType.COS_STREAM) {
+        if (Boolean.FALSE.equals(obj.isIndirect()) && obj.getType() == COSObjType.COS_STREAM
+                && this.document.isEncrypted()) {
             try {
-                if (this.document.isEncrypted()) {
-                    this.document.getStandardSecurityHandler().decryptStream(
-                            (COSStream) obj.getDirectBase(), new COSKey((int) number,
-                                    (int) generation));
-                }
+                this.document.getStandardSecurityHandler().decryptStream((COSStream) obj.getDirectBase(), 
+                        new COSKey((int) number, (int) generation));
             } catch (GeneralSecurityException e) {
                 throw new IOException(getErrorMessage("Stream cannot be decrypted"), e);
             }
@@ -319,6 +317,7 @@ public class PDFParser extends SeekableCOSParser {
         if (this.getSource().getOffset() != beforeSkip) {
             this.getSource().unread();
         }
+        boolean endOfObjectComplyPDFA = true;
         if (!getBaseParser().isNextByteEOL()) {
             endOfObjectComplyPDFA = false;
         }
@@ -356,7 +355,7 @@ public class PDFParser extends SeekableCOSParser {
     private Long findLastXRef() throws IOException {
         getSource().seekFromEnd(STARTXREF.length);
         byte[] buf = new byte[STARTXREF.length];
-        while (getSource().getStreamLength() - getSource().getOffset() < 1024) {
+        while (getSource().getStreamLength() - getSource().getOffset() < STARTXREF_KEYWORD_LOOKUP_SIZE) {
             getSource().read(buf);
             if (Arrays.equals(buf, STARTXREF)) {
                 getBaseParser().nextToken();
@@ -367,7 +366,7 @@ public class PDFParser extends SeekableCOSParser {
             }
             getSource().seekFromCurrentPosition(-STARTXREF.length - 1);
         }
-        return null;
+        throw new IOException("Document doesn't contain startxref keyword in the last "+ STARTXREF_KEYWORD_LOOKUP_SIZE + " bytes");
     }
 
     private void calculatePostEOFDataSize() throws IOException {
@@ -433,13 +432,7 @@ public class PDFParser extends SeekableCOSParser {
         boolean isLastTrailer = false;
         if (this.lastTrailerOffset == 0) {
             isLastTrailer = true;
-            this.lastTrailerOffset = this.getSource().getOffset();
-        }
-        getBaseParser().nextToken();
-        if ((getBaseParser().getToken().type != Token.Type.TT_KEYWORD ||
-                getBaseParser().getToken().keyword != Token.Keyword.KW_XREF) &&
-                (getBaseParser().getToken().type != Token.Type.TT_INTEGER)) {
-            throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+            this.lastTrailerOffset = section.getStartXRef();
         }
         if (this.getBaseParser().getToken().type != Token.Type.TT_INTEGER) { // Parsing usual xref table
             parseXrefTable(section.getXRefSection());
@@ -476,9 +469,8 @@ public class PDFParser extends SeekableCOSParser {
             int number = (int) getBaseParser().getToken().integer;
             getBaseParser().nextToken();
             int count = (int) getBaseParser().getToken().integer;
-            COSXRefEntry xref;
             for (int i = 0; i < count; ++i) {
-                xref = new COSXRefEntry();
+                COSXRefEntry xref = new COSXRefEntry();
                 getBaseParser().nextToken();
                 xref.offset = getBaseParser().getToken().integer;
                 getBaseParser().nextToken();
@@ -522,7 +514,7 @@ public class PDFParser extends SeekableCOSParser {
             isLastBytesCorrect = false;
         }
 
-        if (!isLastBytesCorrect){
+        if (!isLastBytesCorrect) {
             this.getSource().unread();
             LOGGER.log(Level.WARNING, getErrorMessage("Incorrect end of line in cross-reference table"));
         }
@@ -560,46 +552,69 @@ public class PDFParser extends SeekableCOSParser {
         }
     }
 
-	private void getXRefInfo(final List<COSXRefInfo> info, Set<Long> processedOffsets, Long offset) throws IOException {
+    private long findActualXrefOffset(long offset) throws IOException{
+        long endSearchOffset = Math.max(0, offset - 1);
+        for (long currentOffset = Math.max(0, offset); currentOffset >= endSearchOffset; currentOffset--) {
+            getSource().seek(currentOffset);
+            getBaseParser().nextToken();
+            if ((getBaseParser().getToken().type == Token.Type.TT_KEYWORD &&
+                    getBaseParser().getToken().keyword == Token.Keyword.KW_XREF) ||
+                    (getBaseParser().getToken().type == Token.Type.TT_INTEGER)) {
+                return currentOffset;
+            }
+        }
+        throw new IOException(StringExceptions.CAN_NOT_LOCATE_XREF_TABLE);
+    }
+
+    private void getXRefInfo(final List<COSXRefInfo> info, Set<Long> processedOffsets, Long offset) throws IOException {
         if (offset == null) {
-			offset = findLastXRef();
-			if (offset == null) {
-				throw new IOException(StringExceptions.START_XREF_VALIDATION);
-			}
-		}
-
-        if (processedOffsets.contains(offset)) {
-            throw new LoopedException(getErrorMessage("XRef loop"));
-        }
-        processedOffsets.add(offset);
-
-		clear();
-
-        //for files with junk before header
-        if (offsetShift > 0) {
-            offset += offsetShift;
+            offset = findLastXRef();
+            if (offset == null) {
+                throw new IOException(StringExceptions.START_XREF_VALIDATION);
+            }
         }
 
-        //we will skip eol marker in any case
-        getSource().seek(Math.max(0, offset - 1));
+        Stack<Long> prevOffsets = new Stack<>();
+        while (offset != null || !prevOffsets.empty()) {
+            if (offset == null) {
+                offset = prevOffsets.pop();
+                if (processedOffsets.contains(offset)) {
+                    throw new LoopedException(getErrorMessage("XRef loop"));
+                }
+            } else if (processedOffsets.contains(offset)) {
+                offset = null;
+                continue;
+            }
+            processedOffsets.add(offset);
 
-		COSXRefInfo section = new COSXRefInfo();
-		info.add(0, section);
+            clear();
 
-		section.setStartXRef(offset);
-        getXRefSectionAndTrailer(section);
+            //for files with junk before header
+            if (offsetShift > 0) {
+                offset += offsetShift;
+            }
 
-        COSTrailer trailer = section.getTrailer();
+            COSXRefInfo section = new COSXRefInfo();
+            info.add(0, section);
 
-        offset = trailer.getXRefStm();
-        if (offset != null) {
-            getXRefInfo(info, processedOffsets, offset);
+            long actualOffset = findActualXrefOffset(offset);
+            if (offset != actualOffset) {
+                LOGGER.log(Level.WARNING, "Actual startxref offset " + actualOffset +
+                        " is different from the specified offset " + offset);
+            }
+
+            section.setStartXRef(actualOffset);
+
+            getXRefSectionAndTrailer(section);
+            COSTrailer trailer = section.getTrailer();
+
+            Long prevOffset = trailer.getPrev();
+            if (prevOffset != null) {
+                prevOffsets.push(prevOffset);
+            }
+
+            offset = trailer.getXRefStm();
         }
-
-        offset = trailer.getPrev();
-		if (offset != null) {
-            getXRefInfo(info, processedOffsets, offset);
-		}
 	}
 
 	private void getTrailer(final COSTrailer trailer) throws IOException {

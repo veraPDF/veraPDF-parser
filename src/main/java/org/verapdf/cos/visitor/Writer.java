@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -199,7 +199,6 @@ public class Writer implements IVisitor {
 
 	@Override
 	public void visitFromStream(COSStream obj) {
-		long length;
 
 		ASInputStream in = obj.getData();
 
@@ -220,15 +219,13 @@ public class Writer implements IVisitor {
 			this.write("stream");
 			this.write(EOL);
 
-			length = getOffset();
-
-			byte[] buffer = new byte[1024];
-			long count;
+			long length = getOffset();
 
 			in.reset();
 
+			byte[] buffer = new byte[1024];
 			while(true) {
-				count = in.read(buffer, 1024);
+				long count = in.read(buffer, 1024);
 				if (count == -1) {
 					break;
 				}
@@ -413,10 +410,9 @@ public class Writer implements IVisitor {
 
 	protected void generateID() {
 		// TODO : finish this method
-		Long idTime = System.currentTimeMillis();
-		MessageDigest md5;
+		long idTime = System.currentTimeMillis();
 		try	{
-			md5 = MessageDigest.getInstance("MD5");
+			MessageDigest md5 = MessageDigest.getInstance("MD5");
 			md5.update(Long.toString(idTime).getBytes(StandardCharsets.ISO_8859_1));
 			COSObject idString = COSString.construct(md5.digest(), true);
 			//TODO : convert to COSArray

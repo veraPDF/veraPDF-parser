@@ -1,3 +1,23 @@
+/**
+ * This file is part of veraPDF Parser, a module of the veraPDF project.
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
+ * All rights reserved.
+ *
+ * veraPDF Parser is free software: you can redistribute it and/or modify
+ * it under the terms of either:
+ *
+ * The GNU General public license GPLv3+.
+ * You should have received a copy of the GNU General Public License
+ * along with veraPDF Parser as the LICENSE.GPL file in the root of the source
+ * tree.  If not, see http://www.gnu.org/licenses/ or
+ * https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ * The Mozilla Public License MPLv2+.
+ * You should have received a copy of the Mozilla Public License along with
+ * veraPDF Parser as the LICENSE.MPL file in the root of the source tree.
+ * If a copy of the MPL was not distributed with this file, you can obtain one at
+ * http://mozilla.org/MPL/2.0/.
+ */
 package org.verapdf.parser;
 
 import org.verapdf.as.CharTable;
@@ -147,9 +167,8 @@ public abstract class BaseParser {
 
     private void readToken() throws IOException {
         this.token.clearValue();
-        byte ch;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (CharTable.isTokenDelimiter(ch)) {
                 this.source.unread();
                 break;
@@ -273,9 +292,7 @@ public abstract class BaseParser {
 
     private void readHexString() throws IOException {
         this.token.clearValue();
-        byte ch;
         int uc = 0;
-        int hex;
 
         //these are required for pdf/a validation
         boolean containsOnlyHex = true;
@@ -283,7 +300,7 @@ public abstract class BaseParser {
 
         boolean odd = false;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (ch == '>') {
                 if (odd) {
                     uc <<= 4;
@@ -293,7 +310,7 @@ public abstract class BaseParser {
                 this.token.setHexCount(hexCount);
                 return;
             } else if (!CharTable.isSpace(ch)) {
-                hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
+                int hex = COSFilterASCIIHexDecode.decodeLoHex(ch);
                 hexCount++;
                 if (hex < 16 && hex > -1) { // skip all non-Hex characters
                     if (odd) {
@@ -316,13 +333,12 @@ public abstract class BaseParser {
 
     protected void readNumber() throws IOException {
         try {
-            int radix = 10;
             initializeToken();
             this.token.clearValue();
             this.token.type = Token.Type.TT_INTEGER;
-            byte ch;
+            int radix = 10;
             while (!this.source.isEOF()) {
-                ch = this.source.readByte();
+                byte ch = this.source.readByte();
                 if (CharTable.isTokenDelimiter(ch)) {
                     this.source.unread();
                     break;
@@ -352,7 +368,7 @@ public abstract class BaseParser {
                 this.token.real = value;
             }
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.FINE, getErrorMessage(""), e);
+            LOGGER.log(Level.FINE, getErrorMessage(e.getMessage()));
             this.token.integer = Math.round(Double.MAX_VALUE);
             this.token.real = Double.MAX_VALUE;
         }
@@ -455,9 +471,8 @@ public abstract class BaseParser {
 
     protected void readName() throws IOException {
         this.token.clearValue();
-        byte ch;
         while (!this.source.isEOF()) {
-            ch = this.source.readByte();
+            byte ch = this.source.readByte();
             if (CharTable.isTokenDelimiter(ch)) {
                 this.source.unread();
                 break;
@@ -465,13 +480,10 @@ public abstract class BaseParser {
 
             // if ch == # (0x23)
             if (ch == '#' && !isPSParser) {
-                byte ch1;
-                byte ch2;
-                byte dc;
-                ch1 = this.source.readByte();
+                byte ch1 = this.source.readByte();
                 if (!source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch1) != COSFilterASCIIHexDecode.ER) {
-                    dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
-                    ch2 = this.source.readByte();
+                    byte dc = COSFilterASCIIHexDecode.decodeLoHex(ch1);
+                    byte ch2 = this.source.readByte();
                     if (!this.source.isEOF() && COSFilterASCIIHexDecode.decodeLoHex(ch2) != COSFilterASCIIHexDecode.ER) {
                         dc = (byte) ((dc << 4) + COSFilterASCIIHexDecode.decodeLoHex(ch2));
                         appendToToken(dc);

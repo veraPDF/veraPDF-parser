@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2023, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -43,10 +43,10 @@ public class InternalInputStreamTest {
 
     @Test
     public void substreamOfStreamAtOffsetShouldReportCorrectOffset() throws IOException {
-        byte[] buf = { 0 };
         File file = temporaryFolder.newFile();
         Files.write(file.toPath(), new byte[] { 1, 2, 3 });
 
+        byte[] buf = {0};
         try (InternalInputStream stream = InternalInputStream.createConcatenated(buf, Files.newInputStream(file.toPath()), null)) {
             assertEquals(0, stream.getOffset());
         }

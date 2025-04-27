@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -19,6 +19,8 @@
  * http://mozilla.org/MPL/2.0/.
  */
 package org.verapdf.pd.font.cmap;
+
+import org.verapdf.exceptions.VeraPDFParserException;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -92,6 +94,12 @@ class CodeSpace {
      * @return true if there is a match.
      */
     public boolean isPartialMatch(byte toBeMatched, int position) {
+        if (position < 0) {
+            throw new VeraPDFParserException("Position is " + position + ". Must be non-negative");
+        } else if (position >= this.getLength()) {
+            throw new VeraPDFParserException("Checking position " + position
+                                                + " while there are only " + this.getLength() + " positions to check");
+        }
         int beginNum = begin[position] & 0xFF;
         int endNum = end[position] & 0xFF;
         int charNum = toBeMatched & 0xFF;

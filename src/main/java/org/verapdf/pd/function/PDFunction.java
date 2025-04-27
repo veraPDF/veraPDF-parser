@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -69,16 +69,16 @@ public class PDFunction extends PDObject {
         return getObject().getIntegerKey(ASAtom.FUNCTION_TYPE);
     }
 
-    public COSArray getCOSArray(final ASAtom key){
+    public COSArray getCOSArray(final ASAtom key) {
         COSObject obj = this.getKey(key);
         return obj == null ? null : (COSArray) obj.getDirectBase();
     }
 
-    public COSArray getDomain(){
+    public COSArray getDomain() {
         return getCOSArray(ASAtom.DOMAIN);
     }
 
-    public COSArray getRange(){
+    public COSArray getRange() {
         return getCOSArray(ASAtom.RANGE);
     }
 

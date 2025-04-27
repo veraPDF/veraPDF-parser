@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -69,9 +69,9 @@ public abstract class PSObject extends COSObject {
         }
         COSObjType type = obj.getType();
         if (type == COSObjType.COS_NAME && isExecutable) {
-            return new PSOperator((COSName) obj.get());
+            return new PSOperator((COSName) obj.getDirectBase());
         } else if (type == COSObjType.COS_ARRAY && isExecutable) {
-            return new PSProcedure((COSArray) obj.get());
+            return new PSProcedure((COSArray) obj.getDirectBase());
         } else if (type.isNumber() || type == COSObjType.COS_STRING ||
                 type == COSObjType.COS_BOOLEAN || type == COSObjType.COS_DICT ||
                 type == COSObjType.COS_NAME || type == COSObjType.COS_ARRAY) {

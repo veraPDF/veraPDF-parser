@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -29,6 +29,7 @@ import org.verapdf.pd.actions.PDAction;
 import org.verapdf.pd.actions.PDCatalogAdditionalActions;
 import org.verapdf.pd.form.PDAcroForm;
 import org.verapdf.pd.optionalcontent.PDOptionalContentProperties;
+import org.verapdf.pd.structure.PDNumberTreeNode;
 import org.verapdf.pd.structure.PDStructTreeRoot;
 import org.verapdf.tools.PageLabels;
 
@@ -46,6 +47,9 @@ public class PDCatalog extends PDObject {
 	private static final Logger LOGGER = Logger.getLogger(PDCatalog.class.getCanonicalName());
 
 	private final PDPageTree pages;
+	private PDNamesDictionary namesDictionary;
+	private PDNumberTreeNode pageLabelsTree;
+	private PageLabels pageLabels;
 
 	public PDCatalog() {
 		super();
@@ -145,19 +149,33 @@ public class PDCatalog extends PDObject {
 	}
 
 	public PDNamesDictionary getNamesDictionary() {
-		COSObject buffer = getKey(ASAtom.NAMES);
-		if (buffer != null && buffer.getType() == COSObjType.COS_DICT) {
-			return new PDNamesDictionary(buffer);
+		if (namesDictionary == null) {
+			COSObject buffer = getKey(ASAtom.NAMES);
+			if (buffer != null && buffer.getType() == COSObjType.COS_DICT) {
+				namesDictionary = new PDNamesDictionary(buffer);
+			}
 		}
-		return null;
+		return namesDictionary;
 	}
 
 	public PageLabels getPageLabels() {
-		COSObject labelsTree = getKey(ASAtom.PAGE_LABELS);
-		if (labelsTree != null && !labelsTree.empty() && labelsTree.getType() == COSObjType.COS_DICT) {
-			return new PageLabels((COSDictionary) labelsTree.getDirectBase());
+		if (pageLabels == null) {
+			PDNumberTreeNode pageLabelsTree = getPageLabelsTree();
+			if (pageLabelsTree != null) {
+				pageLabels = new PageLabels(pageLabelsTree);
+			}
 		}
 		return null;
+	}
+	
+	public PDNumberTreeNode getPageLabelsTree() {
+		if (pageLabelsTree == null) {
+			COSObject labelsTree = getKey(ASAtom.PAGE_LABELS);
+			if (labelsTree != null && !labelsTree.empty() && labelsTree.getType() == COSObjType.COS_DICT) {
+				pageLabelsTree = new PDNumberTreeNode(labelsTree);
+			}
+		}
+		return pageLabelsTree;
 	}
 
 	public String getVersion() {

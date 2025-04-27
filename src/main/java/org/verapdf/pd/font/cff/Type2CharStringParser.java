@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -118,7 +118,7 @@ class Type2CharStringParser extends BaseCharStringParser {
 
     private boolean execSubr(CFFIndex subrs, int bias) throws IOException {
         int subrNum = (int) this.stack.pop().getInteger();
-        if(subrs.size() > Math.max(subrNum + bias, 0)) {
+        if (subrs.size() > Math.max(subrNum + bias, 0)) {
             byte[] subr = subrs.get(subrNum + bias);
             ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
             addStream(subrStream);

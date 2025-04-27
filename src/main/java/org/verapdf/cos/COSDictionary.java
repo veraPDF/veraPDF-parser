@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -236,6 +236,12 @@ public class COSDictionary extends COSDirect {
     }
 
     @Override
+    public final String getNameKeyUnicodeValue(final ASAtom key) {
+        ASAtom value = getNameKey(key);
+        return value != null ? ((COSName)COSName.fromValue(value)).getUnicodeValue() : null;
+    }
+
+    @Override
     public boolean setNameKey(final ASAtom key, final ASAtom value) {
         COSObject obj = new COSObject();
         obj.setName(value);
@@ -295,13 +301,13 @@ public class COSDictionary extends COSDirect {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) {
+        if (this == obj) {
             return true;
         }
-        if(obj == null) {
+        if (obj == null) {
             return false;
         }
-        if(obj instanceof COSObject) {
+        if (obj instanceof COSObject) {
             return this.equals(((COSObject) obj).get());
         }
         List<COSBasePair> checkedObjects = new LinkedList<>();
@@ -316,7 +322,7 @@ public class COSDictionary extends COSDirect {
         if (obj == null) {
             return false;
         }
-        if(obj instanceof COSObject) {
+        if (obj instanceof COSObject) {
             return this.equals(((COSObject) obj).get());
         }
         if (COSBasePair.listContainsPair(checkedObjects, this, (COSBase) obj)) {

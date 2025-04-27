@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -151,8 +151,8 @@ class TrueTypeCmapTable extends TrueTypeTable {
      * Gets the gid for given code from any of the cmap subtables.
      */
     public int getGID(int code) {
-        for(TrueTypeCmapSubtable ttcs : cmapInfos) {
-            if(ttcs.containsCID(code)) {
+        for (TrueTypeCmapSubtable ttcs : cmapInfos) {
+            if (ttcs.containsCID(code)) {
                 return ttcs.getGlyph(code);
             }
         }

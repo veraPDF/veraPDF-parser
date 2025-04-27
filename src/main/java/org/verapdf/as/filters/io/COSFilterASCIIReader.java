@@ -1,6 +1,6 @@
 /**
  * This file is part of veraPDF Parser, a module of the veraPDF project.
- * Copyright (c) 2015, veraPDF Consortium <info@verapdf.org>
+ * Copyright (c) 2015-2025, veraPDF Consortium <info@verapdf.org>
  * All rights reserved.
  *
  * veraPDF Parser is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ public class COSFilterASCIIReader {
         this.isASCIIHex = isASCIIHex;
         this.buf = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
         bufPointer = 0;
-        if(buf[0] == '<' && buf[1] == '~') {    //Skipping leading <~
+        if (buf[0] == '<' && buf[1] == '~') {    //Skipping leading <~
             bufPointer += 2;
         }
         isEOD = false;
@@ -85,11 +85,11 @@ public class COSFilterASCIIReader {
     }
 
     private byte[] getNextASCIIHexBytes() throws IOException {
-        byte[] twoBytes = new byte[2];
         byte b;
         do {
             b = readByte();
         } while (isWS(b) && b != -1);
+        byte[] twoBytes = new byte[2];
         if (b == -1 || b == ASCII_HEX_EOD) {
             isEOD = true;
             return null;
@@ -186,7 +186,7 @@ public class COSFilterASCIIReader {
     }
 
     private void processCaseOfZ(byte[] fiveBytes, int i) {  
-        for(int j = i; j < 5; ++j) {
+        for (int j = i; j < 5; ++j) {
             fiveBytes[j] = EXCLAM_MARK;
         }
         ascii85ZeroRemains = i;
