@@ -226,8 +226,13 @@ class Type1PrivateParser extends SeekableBaseParser {
 
     private void skipRD() throws IOException {
         this.skipSpaces();
-        if (this.source.read() != 45 || this.source.read() != 124) { // we read "-|"
-            LOGGER.log(Level.FINE, getErrorMessage("Error in Type1 private parser in parsing RD in Subrs"));
+        if (this.source.read() == 45) { // we read "-" of "-|"
+            if (this.source.read() != 124) { 
+                LOGGER.log(Level.FINE, getErrorMessage("Error in Type1 private parser in parsing RD in Subrs"));
+            }
+        } else {
+            this.source.unread();
+            nextToken();
         }
     }
 
