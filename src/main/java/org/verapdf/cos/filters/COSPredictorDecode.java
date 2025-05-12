@@ -173,21 +173,21 @@ public class COSPredictorDecode extends ASBufferedInFilter {
                     break;
                 case 13: // Avg
                     for (int i = 0; i < lineLength; i++) {
-                        byte value = currentLine[i];
-                        byte left = i - bytesPerChar >= 0 ?
-                                currentLine[i - bytesPerChar] : 0;
-                        byte up = previousLine[i];
+                        int value = currentLine[i] & 0xFF;
+                        int left = i - bytesPerChar >= 0 ?
+                                currentLine[i - bytesPerChar] & 0xFF : 0;
+                        int up = previousLine[i] & 0xFF;
                         currentLine[i] = (byte) (value + (left + up) / 2);
                     }
                     break;
                 case 14: // Paeth
                     for (int i = 0; i < lineLength; i++) {
-                        byte value = currentLine[i];
-                        byte left = i - bytesPerChar >= 0 ?
-                                currentLine[i - bytesPerChar] : 0;
-                        byte up = previousLine[i];
-                        byte upLeft = i - bytesPerChar >= 0 ?
-                                previousLine[i - bytesPerChar] : 0;
+                        int value = currentLine[i] & 0xFF;
+                        int left = i - bytesPerChar >= 0 ?
+                                currentLine[i - bytesPerChar] & 0xFF : 0;
+                        int up = previousLine[i] & 0xFF;
+                        int upLeft = i - bytesPerChar >= 0 ?
+                                previousLine[i - bytesPerChar] & 0xFF : 0;
                         int res = left + up - upLeft;
                         int leftDiff = Math.abs(res - left);
                         int upDiff = Math.abs(res - up);
