@@ -40,7 +40,8 @@ public enum PDFFlavour {
 	WTPDF_1_0_REUSE(Specification.WTPDF_1_0),
 	WTPDF_1_0_ACCESSIBILITY(Specification.WTPDF_1_0),
 	WCAG_2_1(Specification.WCAG_2_1),
-	WCAG_2_2(Specification.WCAG_2_2);
+	WCAG_2_2_MACHINE(Specification.WCAG_2_2),
+	WCAG_2_2_HUMAN(Specification.WCAG_2_2);
 
 	private final Specification specification;
 
