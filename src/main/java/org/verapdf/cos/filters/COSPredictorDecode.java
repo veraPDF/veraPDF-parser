@@ -45,6 +45,7 @@ public class COSPredictorDecode extends ASBufferedInFilter {
     private byte predictor;
     private byte[] previousLine = null;
     private boolean streamEnded = false;
+    private Integer numberOfExtraBytes = null;
 
     /**
      * Constructor from stream and decode parameters.
@@ -83,21 +84,27 @@ public class COSPredictorDecode extends ASBufferedInFilter {
         if (streamEnded) {
             return -1;
         }
-        if (this.bufferSize() == 0) {
-            if (this.feedBuffer(getBufferCapacity()) == -1) {
-                this.streamEnded = true;
+        int outputPointer = 0;
+        if (numberOfExtraBytes != null) {
+            if (numberOfExtraBytes >= size) {
+                System.arraycopy(previousLine, lineLength - numberOfExtraBytes, buffer, 0, size);
+                numberOfExtraBytes -= size;
+                return size;
             }
+            System.arraycopy(previousLine, lineLength - numberOfExtraBytes, buffer, 0, numberOfExtraBytes);
+            outputPointer = numberOfExtraBytes;
+            numberOfExtraBytes = null;
+        }
+        if (this.bufferSize() == 0 && this.feedBuffer(getBufferCapacity()) == -1) {
+            this.streamEnded = true;
         }
         if (predictor == 1) {
             int popped = bufferPopArray(buffer, size);
-            if (this.bufferSize() == 0) {
-                if (this.feedBuffer(getBufferCapacity()) == -1) {
-                    this.streamEnded = true;
-                }
+            if (this.bufferSize() == 0 && this.feedBuffer(getBufferCapacity()) == -1) {
+                this.streamEnded = true;
             }
             return popped;
         }
-        int outputPointer = 0;
         byte linePredictor = predictor;
         byte[] currentLine = new byte[lineLength];
 
@@ -105,11 +112,9 @@ public class COSPredictorDecode extends ASBufferedInFilter {
 
             // Determine if PNG predictor
             if (predictor >= 10) {
-                if (bufferSize() == 0) {
-                    if (this.feedBuffer(getBufferCapacity()) == -1) {
-                        this.streamEnded = true;
-                        break;
-                    }
+                if (bufferSize() == 0 && this.feedBuffer(getBufferCapacity()) == -1) {
+                    this.streamEnded = true;
+                    break;
                 }
                 // each line starts with type 0 - 4
                 linePredictor = bufferPop();
@@ -205,10 +210,16 @@ public class COSPredictorDecode extends ASBufferedInFilter {
                 default:
                     break;
             }
-            System.arraycopy(currentLine, 0, buffer, outputPointer, lineLength);
             System.arraycopy(currentLine, 0, previousLine, 0, lineLength);
+            int leftBufferSize = size - outputPointer;
+            if (lineLength > leftBufferSize) {
+                System.arraycopy(currentLine, 0, buffer, outputPointer, leftBufferSize);
+                numberOfExtraBytes = lineLength - leftBufferSize;
+                return size;
+            }
+            System.arraycopy(currentLine, 0, buffer, outputPointer, lineLength);
             outputPointer += lineLength;
-            if (outputPointer + lineLength > size) {
+            if (lineLength > leftBufferSize) {
                 return outputPointer;
             }
         }
