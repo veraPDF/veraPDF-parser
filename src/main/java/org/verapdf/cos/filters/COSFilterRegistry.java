@@ -54,6 +54,7 @@ public class COSFilterRegistry {
 			registerFactory(ASAtom.ASCII_HEX_DECODE, new ASFilterFactory(ASAtom.ASCII_HEX_DECODE));
 			registerFactory(ASAtom.ASCII85_DECODE, new ASFilterFactory(ASAtom.ASCII85_DECODE));
 			registerFactory(ASAtom.LZW_DECODE, new ASFilterFactory(ASAtom.LZW_DECODE));
+			registerFactory(ASAtom.RUN_LENGTH_DECODE, new ASFilterFactory(ASAtom.RUN_LENGTH_DECODE));
 		} catch (VeraPDFParserException e) {
 			LOGGER.log(Level.FINE, "Trying to register factory twice", e);
 		}
