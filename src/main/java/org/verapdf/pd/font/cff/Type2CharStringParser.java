@@ -60,7 +60,7 @@ class Type2CharStringParser extends BaseCharStringParser {
         switch (nextByte) {
             case 19:    // cntrmask
             case 20:    // hintmask
-                if (!this.stack.empty()) {
+                if (this.stack.size() % 2 == 1) {
                     this.setWidth(this.stack.get(0));
                 }
                 break;
