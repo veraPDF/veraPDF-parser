@@ -39,6 +39,8 @@ import java.util.logging.Logger;
 public class SeekableCOSParser extends COSParser {
 
 	private static final Logger LOGGER = Logger.getLogger(SeekableCOSParser.class.getCanonicalName());
+	
+	private boolean isLengthParsing = false;
 
 	public SeekableCOSParser(final SeekableInputStream seekableInputStream) throws IOException {
 		super(new SeekableBaseParser(seekableInputStream));
@@ -103,13 +105,19 @@ public class SeekableCOSParser extends COSParser {
 
 		checkStreamSpacings(dict);
 		long streamStartOffset = getSource().getOffset();
-
-		COSObject length = dict.getKey(ASAtom.LENGTH);
-		if (this.keyOfCurrentObject != null && Boolean.TRUE.equals(length.isIndirect()) && this.keyOfCurrentObject.equals(length.getKey())) {
-			throw new VeraPDFParserException(getErrorMessage("Object has stream length value" +
-					" which references to its own object key"));
+		if (isLengthParsing) {
+			throw new VeraPDFParserException(getErrorMessage("Incorrect type of Length value in stream dictionary"));
 		}
-		Long size = length.getInteger();
+		Long size = null;
+		try {
+			isLengthParsing = true;
+			COSObject length = dict.getKey(ASAtom.LENGTH);
+			size = length.getInteger();
+		} catch (Exception exception) {
+			LOGGER.log(Level.WARNING, exception.getMessage());
+		} finally {
+			isLengthParsing = false;
+		}
 		getSource().seek(streamStartOffset);
 
 		boolean streamLengthValid = checkStreamLength(size);
@@ -195,7 +203,7 @@ public class SeekableCOSParser extends COSParser {
 
 	private boolean checkStreamLength(Long streamLength) throws IOException {
 		if (streamLength == null) {
-			LOGGER.log(Level.WARNING, getErrorMessage("Stream length is missing"));
+			LOGGER.log(Level.WARNING, getErrorMessage("Stream length has wrong value or is missing"));
 			return false;
 		}
 		boolean validLength = true;
