@@ -46,7 +46,7 @@ public class StructureElementAccessObject {
         if (structParent != null) {
             return parentTreeRoot.getObject(structParent);
         }
-        if (mcid != null && structParents != null) {
+        if (mcid != null && mcid > -1 && structParents != null) {
             COSObject parents = parentTreeRoot.getObject(structParents);
             if (parents != null && !parents.empty() && parents.getType() == COSObjType.COS_ARRAY &&
                     parents.size() > mcid) {
