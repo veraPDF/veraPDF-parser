@@ -82,10 +82,12 @@ public class PDType0Font extends PDCIDFont {
 
     private static COSDictionary getDescendantCOSDictionary(COSDictionary dict) {
         if (dict != null) {
-            COSArray array =
-                    (COSArray) dict.getKey(ASAtom.DESCENDANT_FONTS).getDirectBase();
-            if (array != null && array.size() > 0 && array.at(0) != null && array.at(0).getType() == COSObjType.COS_DICT) {
-                return (COSDictionary) array.at(0).getDirectBase();
+            COSObject descendantFonts = dict.getKey(ASAtom.DESCENDANT_FONTS);
+            if (descendantFonts.getType() == COSObjType.COS_ARRAY) {
+                COSArray array = (COSArray) descendantFonts.getDirectBase();
+                if (array != null && array.size() > 0 && array.at(0) != null && array.at(0).getType() == COSObjType.COS_DICT) {
+                    return (COSDictionary) array.at(0).getDirectBase();
+                }   
             }
         }
         return null;
