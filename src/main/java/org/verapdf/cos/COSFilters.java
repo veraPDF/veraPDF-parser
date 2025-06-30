@@ -79,8 +79,8 @@ public class COSFilters extends PDObject {
 			}
 		}
 		if (decodeParameters.size() != entries.size()) {
-			LOGGER.log(Level.FINE, "Amount of DecodeParams dictionaries and " +
-					"amount of decode filters in COSStream shall be equal.");
+			throw new IOException( "Amount of DecodeParams dictionaries and " +
+					"amount of decode filters in COSStream are not equal.");
 		}
 		for (int i = 0; i < entries.size(); ++i) {
 			inputStream = COSFilterRegistry.getDecodeFilter(entries.get(i),
