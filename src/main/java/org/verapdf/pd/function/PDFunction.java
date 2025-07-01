@@ -22,6 +22,7 @@ package org.verapdf.pd.function;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.cos.COSReal;
 import org.verapdf.pd.PDObject;
@@ -69,20 +70,20 @@ public class PDFunction extends PDObject {
         return getObject().getIntegerKey(ASAtom.FUNCTION_TYPE);
     }
 
-    public COSArray getCOSArray(final ASAtom key) {
+    protected COSArray getCOSArray(final ASAtom key) {
         COSObject obj = this.getKey(key);
-        return obj == null ? null : (COSArray) obj.getDirectBase();
+        return obj != null && obj.getType() == COSObjType.COS_ARRAY ? (COSArray) obj.getDirectBase() : null;
     }
 
-    public COSArray getDomain() {
+    protected COSArray getDomain() {
         return getCOSArray(ASAtom.DOMAIN);
     }
 
-    public COSArray getRange() {
+    protected COSArray getRange() {
         return getCOSArray(ASAtom.RANGE);
     }
 
-    public List<COSObject> getValuesInIntervals(List<COSObject> values, COSArray intervals) {
+    protected List<COSObject> getValuesInIntervals(List<COSObject> values, COSArray intervals) {
         if (intervals != null && intervals.size() >= values.size() * 2) {
             List<COSObject> result = new ArrayList<>();
             for (int i = 0; i < values.size(); ++i) {
@@ -95,7 +96,7 @@ public class PDFunction extends PDObject {
         }
     }
 
-    public COSObject interpolate(COSObject x, COSObject xMin, COSObject xMax, COSObject encodeLeft, COSObject encodeRight) {
+    protected COSObject interpolate(COSObject x, COSObject xMin, COSObject xMax, COSObject encodeLeft, COSObject encodeRight) {
         if (!xMax.getReal().equals(xMin.getReal())) {
             return COSReal.construct(encodeLeft.getReal() + (x.getReal() - xMin.getReal()) * (encodeRight.getReal() - encodeLeft.getReal()) / (xMax.getReal() - xMin.getReal()));
         }

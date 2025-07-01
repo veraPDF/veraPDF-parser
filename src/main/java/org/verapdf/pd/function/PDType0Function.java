@@ -36,7 +36,7 @@ public class PDType0Function extends PDFunction {
     private final COSArray domain;
     private final COSArray encode;
     private final COSArray decode;
-    private final int outputDimension = getRange().size() / 2;
+    private final int outputDimension;
     private List<Integer> sizesProducts;
     private long numberOfSampleBytes = 0;
 
@@ -50,9 +50,11 @@ public class PDType0Function extends PDFunction {
         encode = getEncode();
         decode = getDecode();
         sizesProducts = getSizesProducts();
+        COSArray range = getRange();
+        outputDimension = range != null ? range.size() / 2 : 0;
     }
 
-    public COSArray getEncode() {
+    private COSArray getEncode() {
         COSArray encode = getCOSArray(ASAtom.ENCODE);
         if (encode == null) {
             encode = getDefaultEncode();
@@ -62,14 +64,14 @@ public class PDType0Function extends PDFunction {
 
     private COSArray getDefaultEncode() {
         List<COSObject> encodeFromSize = new ArrayList<>();
-        for (int i = 0; i < size.size(); ++i) {
+        for (COSObject item : size) {
             encodeFromSize.add(COSReal.construct(0));
-            encodeFromSize.add(COSReal.construct(size.at(i).getInteger() - 1));
+            encodeFromSize.add(COSReal.construct(item.getType() == COSObjType.COS_INTEGER ? item.getInteger() - 1 : 0));
         }
         return new COSArray(encodeFromSize);
     }
 
-    public COSArray getDecode() {
+    private COSArray getDecode() {
         COSArray decode = getCOSArray(ASAtom.DECODE);
         if (decode == null) {
             decode = getRange();
@@ -77,7 +79,7 @@ public class PDType0Function extends PDFunction {
         return decode;
     }
 
-    public Long getBitsPerSample() {
+    private Long getBitsPerSample() {
         Long bitsPerSample = getIntegerKey(ASAtom.BITS_PER_SAMPLE);
         List<Long> validBitsPerSample = Arrays.asList(1L, 2L, 4L, 8L, 12L, 16L, 24L, 32L);
         if (validBitsPerSample.contains(bitsPerSample)) {
@@ -88,7 +90,7 @@ public class PDType0Function extends PDFunction {
         return null;
     }
 
-    public Long getOrder() {
+    private Long getOrder() {
         Long order = getIntegerKey(ASAtom.ORDER);
         if (order == null || (order != 1L && order != 3L)) {
             return 1L;
@@ -102,7 +104,12 @@ public class PDType0Function extends PDFunction {
     }
 
     private COSArray getSize() {
-        return getCOSArray(ASAtom.SIZE);
+        COSArray size = getCOSArray(ASAtom.SIZE);
+        if (size == null) {
+            LOGGER.log(Level.WARNING, "Type 0 Function does not contain the Size entry or the Size entry has incorrect value");
+            return (COSArray) COSArray.construct().get();
+        }
+        return size;
     }
 
     private List<Integer> getSizesProducts() {
@@ -111,14 +118,14 @@ public class PDType0Function extends PDFunction {
             int valueToBeAdded = 1;
             sizesProducts.add(valueToBeAdded);
             for (COSObject item : size) {
-                valueToBeAdded *= item.getInteger().intValue();
+                valueToBeAdded *= item.getType() == COSObjType.COS_INTEGER ? item.getInteger().intValue() : 1;
                 sizesProducts.add(valueToBeAdded);
             }
         }
         return sizesProducts;
     }
 
-    public BitSet getSampleTable() {
+    private BitSet getSampleTable() {
         if (sampleTable == null) {
             sampleTable = getSamples();
         }

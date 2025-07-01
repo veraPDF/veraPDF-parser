@@ -58,7 +58,7 @@ public class PDType3Function extends PDFunction {
 
     public List<COSObject> getSubdomains() {
         if (subdomains == null) {
-            if (domain == null) {
+            if (domain == null || domain.size() < 2) {
                 LOGGER.log(Level.WARNING, "Invalid Domain key value in Type 3 Function dictionary");
                 return null;
             }

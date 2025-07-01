@@ -36,9 +36,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PDType4Function extends PDFunction {
+
+    private static final Logger LOGGER = Logger.getLogger(PDType4Function.class.getCanonicalName());
     private List<COSObject> operators;
     private List<COSObject> modifiedOperators;
-    private static final Logger LOGGER = Logger.getLogger(PDType4Function.class.getCanonicalName());
     private FunctionParser parser;
 
     protected PDType4Function(COSObject obj) {
