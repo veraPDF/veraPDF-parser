@@ -114,7 +114,7 @@ public class SeekableCOSParser extends COSParser {
 			COSObject length = dict.getKey(ASAtom.LENGTH);
 			size = length.getInteger();
 		} catch (Exception exception) {
-			LOGGER.log(Level.WARNING, exception.getMessage());
+			LOGGER.log(Level.WARNING, "Exception during parsing Length entry of stream: " + exception.getMessage());
 		} finally {
 			isLengthParsing = false;
 		}
