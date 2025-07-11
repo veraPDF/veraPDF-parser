@@ -40,7 +40,9 @@ class TrueTypeBaseParser {
         try {
             this.source = SeekableInputStream.getSeekableStream(stream);
         } finally {
-            stream.close();
+            if (stream != null) {
+                stream.close();
+            }
         }
     }
 
