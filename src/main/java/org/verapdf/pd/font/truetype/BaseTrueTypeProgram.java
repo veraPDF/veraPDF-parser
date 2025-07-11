@@ -116,13 +116,14 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
     protected float getWidthWithCheck(int gid) {
         if (gid < widths.length) {
             return widths[gid];
-        } else {
-            if (gid < this.parser.getMaxpParser().getNumGlyphs()) {
-                return widths[widths.length - 1];   // case of monospaced fonts
-            } else {
-                return widths.length > 0 ? widths[0] : 0;
-            }
         }
+        if (widths.length == 0) {
+            return 0;
+        }
+        if (gid < this.parser.getMaxpParser().getNumGlyphs()) {
+            return widths[widths.length - 1];   // case of monospaced fonts
+        }
+        return widths[0];
     }
 
     @Override
