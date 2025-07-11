@@ -184,7 +184,7 @@ public class PDFormField extends PDObject {
 	}
 	
 	public static boolean isField(COSObject obj) {
-		return obj != null && !obj.empty() && obj.knownKey(ASAtom.T);
+		return obj != null && obj.getType().isDictionaryBased() && obj.knownKey(ASAtom.T);
 	}
 
 }
