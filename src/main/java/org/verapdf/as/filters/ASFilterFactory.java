@@ -54,6 +54,8 @@ public class ASFilterFactory implements IASFilterFactory{
         switch (filterType.getValue()) {
             case "ASCIIHexDecode":
                 return new COSFilterASCIIHexDecode(inputStream);
+            case "RunLengthDecode":
+                return new RunLengthDecode(inputStream);
             case "FlateDecode":
                 return new COSPredictorDecode(new COSFilterFlateDecode(inputStream), decodeParams);
             case "ASCII85Decode":
