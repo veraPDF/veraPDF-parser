@@ -68,7 +68,8 @@ public class OpenTypeFontProgram implements FontProgram {
      * @param encoding   is value of /Encoding in font dictionary.
      */
     public OpenTypeFontProgram(ASInputStream source, boolean isCFF, boolean isCIDFontType2, boolean isSymbolic,
-                               COSObject encoding, CMap externalCMap, boolean isSubset, COSObject cidToGIDMap, COSKey key) {
+                               COSObject encoding, CMap externalCMap, boolean isSubset, COSObject cidToGIDMap, 
+                               COSKey key) throws IOException {
         this.source = source;
         this.isCFF = isCFF;
         this.isCIDFontType2 = isCIDFontType2;
@@ -78,6 +79,9 @@ public class OpenTypeFontProgram implements FontProgram {
         this.isSubset = isSubset;
         this.cidToGIDMap = cidToGIDMap;
         this.key = key;
+        if (StaticResources.getIsFontProgramsParsing()) {
+            parseFont();
+        }
     }
 
     /**

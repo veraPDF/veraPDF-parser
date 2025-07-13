@@ -24,6 +24,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
+import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
@@ -57,6 +58,9 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         super(stream);
         this.externalCMap = cMap;
         this.isSubset = isSubset;
+        if (StaticResources.getIsFontProgramsParsing()) {
+            parseFont();
+        }
     }
 
     /**

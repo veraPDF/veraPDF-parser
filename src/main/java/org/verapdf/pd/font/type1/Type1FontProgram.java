@@ -35,6 +35,7 @@ import org.verapdf.parser.postscript.PostScriptException;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.truetype.TrueTypePredefined;
 import org.verapdf.pd.function.PSOperatorsConstants;
+import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
@@ -112,6 +113,9 @@ public class Type1FontProgram extends PSParser implements FontProgram {
         super(fileStream);
         encoding = new String[256];
         this.key = key;
+        if (StaticResources.getIsFontProgramsParsing()) {
+            parseFont();
+        }
     }
 
     /**

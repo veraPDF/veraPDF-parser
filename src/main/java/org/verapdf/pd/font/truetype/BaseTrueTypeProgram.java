@@ -24,6 +24,7 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSKey;
 import org.verapdf.pd.font.FontProgram;
+import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
@@ -53,6 +54,9 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
             throws IOException {
         this.parser = new TrueTypeFontParser(stream, key);
         this.key = key;
+        if (StaticResources.getIsFontProgramsParsing()) {
+            parseFont();
+        }
     }
 
     /**

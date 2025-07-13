@@ -55,7 +55,7 @@ public class StaticResources {
 	private static final ThreadLocal<Map<String, CMap>> cMapCache = new ThreadLocal<>();
 	private static final ThreadLocal<Map<COSKey, PDStructureNameSpace>> structureNameSpaceCache = new ThreadLocal<>();
 	private static final ThreadLocal<Map<String, FontProgram>> cachedFonts = new ThreadLocal<>();
-
+	private static final ThreadLocal<Boolean> isFontProgramsParsing = new ThreadLocal<>();
 	private static final ThreadLocal<String> password = new ThreadLocal<>();
 
 	private StaticResources() {
@@ -153,6 +153,7 @@ public class StaticResources {
 		StaticResources.cachedFonts.set(new HashMap<>());
 		StaticResources.flavour.set(new LinkedList<>());
 		StaticResources.document.set(null);
+		StaticResources.isFontProgramsParsing.set(false);
 		StaticResources.setPassword(null);
 		StaticResources.roleMapHelper.set(null);
 	}
@@ -213,5 +214,13 @@ public class StaticResources {
 
 	public static void setRoleMapHelper(TaggedPDFRoleMapHelper roleMapHelper) {
 		StaticResources.roleMapHelper.set(roleMapHelper);
+	}
+
+	public static void setIsFontProgramsParsing(Boolean isFontProgramsParsing) {
+		StaticResources.isFontProgramsParsing.set(isFontProgramsParsing);
+	}
+
+	public static Boolean getIsFontProgramsParsing() {
+		return StaticResources.isFontProgramsParsing.get();
 	}
 }

@@ -23,6 +23,7 @@ package org.verapdf.pd.font.cff;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
 import java.util.*;
@@ -56,9 +57,12 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
 
     CFFCIDFontProgram(SeekableInputStream stream, CFFIndex definedNames, CFFIndex globalSubrs,
                       long topDictBeginOffset, long topDictEndOffset, CMap externalCMap,
-                      boolean isSubset) {
+                      boolean isSubset) throws IOException {
         super(stream, definedNames, globalSubrs, topDictBeginOffset, topDictEndOffset, isSubset);
         this.externalCMap = externalCMap;
+        if (StaticResources.getIsFontProgramsParsing()) {
+            parseFont();
+        }
     }
 
     /**

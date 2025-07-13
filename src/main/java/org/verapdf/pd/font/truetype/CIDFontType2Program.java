@@ -26,6 +26,7 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.pd.font.CIDToGIDMapping;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,6 +54,9 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
         super(stream, key);
         this.cMap = cMap;
         this.cidToGID = new CIDToGIDMapping(cidToGID);
+        if (StaticResources.getIsFontProgramsParsing()) {
+            parseFont();
+        }
     }
 
     /**

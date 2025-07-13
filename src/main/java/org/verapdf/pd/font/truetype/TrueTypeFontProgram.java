@@ -28,6 +28,7 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.PDFont;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -62,6 +63,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         this.isSymbolic = isSymbolic;
         if (encoding != null) {
             this.encoding = encoding;
+        }
+        if (StaticResources.getIsFontProgramsParsing()) {
+            parseFont();
         }
     }
 
