@@ -116,12 +116,14 @@ class Type2CharStringParser extends BaseCharStringParser {
         return true;    // We can set width only by first operator.
     }
 
-    private boolean execSubr(CFFIndex subrs, int bias) throws IOException {
-        int subrNum = (int) this.stack.pop().getInteger();
-        if (subrs.size() > Math.max(subrNum + bias, 0)) {
-            byte[] subr = subrs.get(subrNum + bias);
-            ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
-            addStream(subrStream);
+    private boolean execSubr(CFFIndex subrs, int bias) {
+        if (!this.stack.isEmpty()) {
+            int subrNum = (int) this.stack.pop().getInteger();
+            if (subrs.size() > Math.max(subrNum + bias, 0)) {
+                byte[] subr = subrs.get(subrNum + bias);
+                ASMemoryInStream subrStream = new ASMemoryInStream(subr, subr.length, false);
+                addStream(subrStream);
+            }
         }
         return false;
     }
