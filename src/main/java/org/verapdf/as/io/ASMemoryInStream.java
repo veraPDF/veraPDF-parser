@@ -85,7 +85,7 @@ public class ASMemoryInStream extends SeekableInputStream {
         this.copiedBuffer = false;
         this.bufferOffset = offset + stream.bufferOffset;
         if (this.bufferOffset < 0) {
-            throw new IllegalArgumentException("Range preceeds start of buffer");
+            throw new IllegalArgumentException("Range precedes start of buffer");
         }
         if (this.bufferOffset + length > stream.bufferSize) {
             throw new IllegalArgumentException("Range exceeds end of buffer");
