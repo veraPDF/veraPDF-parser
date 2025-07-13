@@ -131,7 +131,7 @@ class XrefStreamParser {
 
         while (true) {
             byte[] buffer = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
-            long read = xrefInputStream.read(buffer, ASBufferedInFilter.BF_BUFFER_SIZE);
+            long read = xrefInputStream != null ? xrefInputStream.read(buffer, ASBufferedInFilter.BF_BUFFER_SIZE) : -1;
             if (read == -1) {
                 break;
             }
