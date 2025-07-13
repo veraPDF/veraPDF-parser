@@ -78,7 +78,7 @@ public class COSFilters extends PDObject {
 				decodeParameters.add((COSDictionary) COSDictionary.construct().get());
 			}
 		}
-		if (decodeParameters.size() != entries.size()) {
+		if (!entries.isEmpty() && decodeParameters.size() != entries.size()) {
 			throw new IOException( "Amount of DecodeParams dictionaries and " +
 					"amount of decode filters in COSStream are not equal.");
 		}
