@@ -54,9 +54,6 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
             throws IOException {
         this.parser = new TrueTypeFontParser(stream, key);
         this.key = key;
-        if (StaticResources.getIsFontProgramsParsing()) {
-            parseFont();
-        }
     }
 
     /**
