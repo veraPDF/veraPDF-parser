@@ -27,6 +27,7 @@ import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.pd.font.cff.CFFFontProgram;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
 
@@ -42,6 +43,7 @@ public class OpenTypeCFFTest {
 
     @Test
     public void test() throws IOException {
+        StaticResources.clear();
         COSObject encoding = COSName.construct(ASAtom.WIN_ANSI_ENCODING);
         ASInputStream stream = new InternalInputStream(fontFilePath, 2);
         OpenTypeFontProgram font = new OpenTypeFontProgram(stream, true, false, false,
