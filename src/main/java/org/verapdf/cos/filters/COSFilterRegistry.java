@@ -85,18 +85,19 @@ public class COSFilterRegistry {
 	public static ASInputStream getDecodeFilter(final ASAtom filterName,
 											 final ASInputStream inputStream,
 											 COSDictionary decodeParams) throws IOException {
-		if (ASAtom.CRYPT.equals(filterName) && ASAtom.IDENTITY.equals(decodeParams.getNameKey(ASAtom.NAME))) {
-			return inputStream;
+		if (ASAtom.CRYPT.equals(filterName)) {
+			if (ASAtom.IDENTITY.equals(decodeParams.getNameKey(ASAtom.NAME)) || decodeParams.getNameKey(ASAtom.NAME) == null) {
+				return inputStream;
+			} else {
+				LOGGER.log(Level.SEVERE, "VeraPDF doesn't support /Crypt filter with non /Identity decodeParam");
+			}
+		} else {
+			final IASFilterFactory filterFactory = factoryByName(filterName);
+			if (filterFactory != null) {
+				return filterFactory.getInFilter(inputStream, decodeParams);
+			}
+			LOGGER.log(Level.SEVERE, "Unknown decode filter " + filterName);
 		}
-		if (ASAtom.CRYPT.equals(filterName) && decodeParams.getNameKey(ASAtom.NAME) == null) {
-			LOGGER.log(Level.SEVERE, "VeraPDF doesn't support /Crypt filter with non /Identity decodeParam");
-			return inputStream;
-		}
-		final IASFilterFactory filterFactory = factoryByName(filterName);
-		if (filterFactory != null) {
-			return filterFactory.getInFilter(inputStream, decodeParams);
-		}
-		LOGGER.log(Level.SEVERE, "Unknown decode filter " + filterName);
 		return new ASInFilter(inputStream) {
 			@Override
 			public int read() {
