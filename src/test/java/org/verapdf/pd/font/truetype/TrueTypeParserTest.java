@@ -25,6 +25,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
 import org.verapdf.io.InternalInputStream;
+import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
 
@@ -52,6 +53,7 @@ public class TrueTypeParserTest {
 
     @Test
     public void testRegular() throws IOException {
+        StaticResources.clear();
         TrueTypeFontProgram font = new TrueTypeFontProgram(new InternalInputStream(REGULAR_FONT_PATH, 2),
                 IS_SYMBOLIC, ENCODING, null);
         font.parseFont();
