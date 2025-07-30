@@ -129,8 +129,7 @@ public class Type1CharStringParser extends BaseCharStringParser {
                     if (this.stack.size() > 1) {
                         double num2 = this.stack.pop().getReal();
                         double num1 = this.stack.pop().getReal();
-                        this.stack.push(new CFFNumber((float) (num1 / num2)));  // That is not exactly what we should do, pushed number should be real. But we know that
-                        // width is integer, so the result of division is not needed.
+                        this.stack.push(new CFFNumber((float) (num1 / num2)));
                     }
                     break;
                 default:
