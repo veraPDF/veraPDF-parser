@@ -85,14 +85,19 @@ public class COSFilterRegistry {
 	public static ASInputStream getDecodeFilter(final ASAtom filterName,
 											 final ASInputStream inputStream,
 											 COSDictionary decodeParams) throws IOException {
-		if (ASAtom.CRYPT.equals(filterName) && ASAtom.IDENTITY.equals(decodeParams.getNameKey(ASAtom.NAME))) {
-			return inputStream;
+		if (ASAtom.CRYPT.equals(filterName)) {
+			if (ASAtom.IDENTITY.equals(decodeParams.getNameKey(ASAtom.NAME)) || decodeParams.getNameKey(ASAtom.NAME) == null) {
+				return inputStream;
+			} else {
+				LOGGER.log(Level.SEVERE, "/Crypt filter with non /Identity decode parameters is not supported");
+			}
+		} else {
+			final IASFilterFactory filterFactory = factoryByName(filterName);
+			if (filterFactory != null) {
+				return filterFactory.getInFilter(inputStream, decodeParams);
+			}
+			LOGGER.log(Level.SEVERE, "Unknown decode filter " + filterName);
 		}
-		final IASFilterFactory filterFactory = factoryByName(filterName);
-		if (filterFactory != null) {
-			return filterFactory.getInFilter(inputStream, decodeParams);
-		}
-		LOGGER.log(Level.SEVERE, "Unknown decode filter " + filterName);
 		return new ASInFilter(inputStream) {
 			@Override
 			public int read() {
