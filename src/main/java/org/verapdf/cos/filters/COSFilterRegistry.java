@@ -89,7 +89,7 @@ public class COSFilterRegistry {
 			if (ASAtom.IDENTITY.equals(decodeParams.getNameKey(ASAtom.NAME)) || decodeParams.getNameKey(ASAtom.NAME) == null) {
 				return inputStream;
 			} else {
-				LOGGER.log(Level.SEVERE, "VeraPDF doesn't support /Crypt filter with non /Identity decodeParam");
+				LOGGER.log(Level.SEVERE, "/Crypt filter with non /Identity decode parameters is not supported");
 			}
 		} else {
 			final IASFilterFactory filterFactory = factoryByName(filterName);
