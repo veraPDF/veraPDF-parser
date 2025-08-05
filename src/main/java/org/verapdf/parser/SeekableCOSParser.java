@@ -30,6 +30,7 @@ import org.verapdf.tools.resource.ASFileStreamCloser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +41,7 @@ public class SeekableCOSParser extends COSParser {
 
 	private static final Logger LOGGER = Logger.getLogger(SeekableCOSParser.class.getCanonicalName());
 	
-	private boolean isLengthParsing = false;
+	private Stack<Long> streamStartOffsets = new Stack<>();
 
 	public SeekableCOSParser(final SeekableInputStream seekableInputStream) throws IOException {
 		super(new SeekableBaseParser(seekableInputStream));
@@ -105,18 +106,18 @@ public class SeekableCOSParser extends COSParser {
 
 		checkStreamSpacings(dict);
 		long streamStartOffset = getSource().getOffset();
-		if (isLengthParsing) {
+		if (streamStartOffsets.contains(streamStartOffset)) {
 			throw new VeraPDFParserException(getErrorMessage("Incorrect type of Length value in stream dictionary"));
 		}
+		streamStartOffsets.add(streamStartOffset);
 		Long size = null;
 		try {
-			isLengthParsing = true;
 			COSObject length = dict.getKey(ASAtom.LENGTH);
 			size = length.getInteger();
 		} catch (Exception exception) {
 			LOGGER.log(Level.WARNING, "Exception during parsing Length entry of stream: " + exception.getMessage());
 		} finally {
-			isLengthParsing = false;
+			streamStartOffsets.pop();
 		}
 		getSource().seek(streamStartOffset);
 
