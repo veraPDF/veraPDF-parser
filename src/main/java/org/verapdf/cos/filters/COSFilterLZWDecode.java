@@ -169,10 +169,18 @@ public class COSFilterLZWDecode extends ASBufferedInFilter {
         }
     }
 
+    private void checkIndex(long index, int tableSize) throws IOException {
+        if (index >= tableSize || index < 0) {
+            throw new IOException("Error in decoding LZW");
+        }
+    }
+
     private byte[] getChunkFromLZWTable() throws IOException {
         if (thisWord < lzwTable.size()) {
+            checkIndex(thisWord, lzwTable.size());
             byte[] res = lzwTable.get((int) thisWord);
             if (previousWord != -1) {
+                checkIndex(previousWord, lzwTable.size());
                 byte[] previous = lzwTable.get((int) previousWord);
                 byte[] newWord = Arrays.copyOf(previous, previous.length + 1);
                 newWord[previous.length] = res[0];
@@ -185,6 +193,7 @@ public class COSFilterLZWDecode extends ASBufferedInFilter {
             if (previousWord == -1) {
                 throw new IOException("Error in decoding LZW: first symbol in message can't be decoded.");
             }
+            checkIndex(previousWord, lzwTable.size());
             byte[] previous = lzwTable.get((int) previousWord);
             byte[] res = Arrays.copyOf(previous, previous.length + 1);
             res[previous.length] = previous[0];
