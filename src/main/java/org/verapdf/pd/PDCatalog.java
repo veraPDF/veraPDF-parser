@@ -190,4 +190,19 @@ public class PDCatalog extends PDObject {
 		return version.getString();
 	}
 
+	public Float getFloatVersion() {
+		try {
+			String version = getVersion();
+			if (version != null) {
+				return Float.parseFloat(version);
+			} else {
+				return null;
+			}
+		}
+		catch (NumberFormatException e) {
+			LOGGER.log(Level.WARNING, "Entry Version in the catalog cannot be converted to number");
+			return null;
+		}
+	}
+
 }
