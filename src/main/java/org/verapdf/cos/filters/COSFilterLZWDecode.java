@@ -170,6 +170,9 @@ public class COSFilterLZWDecode extends ASBufferedInFilter {
     }
 
     private byte[] getChunkFromLZWTable() throws IOException {
+        if (previousWord >= lzwTable.size()) {
+            throw new IOException("Error in decoding LZW");
+        }
         if (thisWord < lzwTable.size()) {
             byte[] res = lzwTable.get((int) thisWord);
             if (previousWord != -1) {
