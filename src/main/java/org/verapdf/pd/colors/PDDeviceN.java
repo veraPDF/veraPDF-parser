@@ -23,6 +23,7 @@ package org.verapdf.pd.colors;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.factory.colors.ColorSpaceFactory;
 import org.verapdf.pd.PDResources;
 import org.verapdf.pd.function.PDFunction;
 
@@ -62,7 +63,7 @@ public class PDDeviceN extends PDSpecialColorSpace {
             COSObject colorantsDict = attributes.getKey(ASAtom.COLORANTS);
             if (colorantsDict.getType() == COSObjType.COS_DICT) {
                 for (COSObject value : colorantsDict.getValues()) {
-                    colorants.add(org.verapdf.factory.colors.ColorSpaceFactory.getColorSpace(value, getResources()));
+                    colorants.add(ColorSpaceFactory.getColorSpace(value, getResources()));
                 }
             }
         }
@@ -111,5 +112,22 @@ public class PDDeviceN extends PDSpecialColorSpace {
     public double[] toRGB(double[] value) {
         double[] altValue = getDoubleArrayResult(value, getTintTransform());
         return getAlternateSpace().toRGB(altValue);
+    }
+    
+    public PDColorSpace getProcessColorSpace() {
+        COSObject attributes = getAttributes();
+        if (isNullOrNotDictionary(attributes)) {
+            return null;
+        }
+        COSObject processDict = attributes.getKey(ASAtom.PROCESS);
+        if (isNullOrNotDictionary(processDict)) {
+            return null;
+        }
+        COSObject cs = processDict.getKey(ASAtom.COLORSPACE);
+        return ColorSpaceFactory.getColorSpace(cs, this.resources, this.wasDefault);
+    }
+
+    private boolean isNullOrNotDictionary(COSObject toCheck) {
+        return toCheck == null || toCheck.getType() != COSObjType.COS_DICT;
     }
 }

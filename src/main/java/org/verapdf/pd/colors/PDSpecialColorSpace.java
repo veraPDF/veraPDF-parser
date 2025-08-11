@@ -36,8 +36,8 @@ import java.util.List;
  */
 public abstract class PDSpecialColorSpace extends PDColorSpace {
 
-    private final PDResources resources;
-    private boolean wasDefault;
+    protected final PDResources resources;
+    protected boolean wasDefault;
 
     /**
      * Constructor from colorspace COSObject and resources.
