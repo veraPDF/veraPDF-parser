@@ -21,6 +21,7 @@
 package org.verapdf.cos;
 
 import org.verapdf.as.ASAtom;
+import org.verapdf.as.filters.ASInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.as.io.ASOutputStream;
@@ -166,7 +167,12 @@ public class COSStream extends COSDictionary {
 			return result;
 		} catch (IOException e) {
 			LOGGER.log(Level.FINE, "Can't get stream data", e);
-			return null;
+			return new ASInFilter(this.stream) {
+				@Override
+				public int read() {
+					return -1;
+				}
+			};
 		}
 	}
 
