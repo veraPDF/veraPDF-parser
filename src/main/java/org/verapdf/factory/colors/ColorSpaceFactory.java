@@ -111,7 +111,7 @@ public class ColorSpaceFactory {
                     }
                 }
             }
-            LOGGER.log(Level.FINE, "Unknown ColorSpace name " + name);
+            LOGGER.log(Level.FINE, "Invalid use of ColorSpace name " + name);
             return null;
         }
     }
@@ -145,7 +145,7 @@ public class ColorSpaceFactory {
             return getColorSpaceFromName(COSName.construct(ASAtom.DEVICECMYK), resources,
                     wasDefault);
         } else {
-            LOGGER.log(Level.FINE, "Unknown ColorSpace name");
+            LOGGER.log(Level.FINE, "Invalid use of ColorSpace name " + name);
             return null;
         }
     }
