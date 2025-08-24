@@ -145,6 +145,30 @@ public class TaggedPDFHelper {
 		PDF_2_0_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_2_0);
 		WCAG_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(wcag);
 	}
+	
+	private static final Set<String> inlineStructureTypes = new HashSet<>(Arrays.asList(TaggedPDFConstants.SPAN,
+			TaggedPDFConstants.EM, TaggedPDFConstants.STRONG, TaggedPDFConstants.SUB, TaggedPDFConstants.RUBY, 
+			TaggedPDFConstants.RUBY, TaggedPDFConstants.RB, TaggedPDFConstants.RP, TaggedPDFConstants.RT, 
+			TaggedPDFConstants.WARICHU, TaggedPDFConstants.WT, TaggedPDFConstants.WP));
+//	private static final Set<String> documentStructureTypes = new HashSet<>(Arrays.asList(TaggedPDFConstants.DOCUMENT, 
+//			TaggedPDFConstants.DOCUMENT_FRAGMENT));
+	private static final Set<String> groupingStructureTypes = new HashSet<>(Arrays.asList(TaggedPDFConstants.ART, 
+			TaggedPDFConstants.PART, TaggedPDFConstants.TOC, TaggedPDFConstants.TOCI, TaggedPDFConstants.INDEX, 
+			TaggedPDFConstants.SECT, TaggedPDFConstants.DIV, TaggedPDFConstants.ASIDE, TaggedPDFConstants.NON_STRUCT));
+//	private static final Set<String> blockStructureTypes = new HashSet<>(Arrays.asList(TaggedPDFConstants.P, 
+//			TaggedPDFConstants.H, TaggedPDFConstants.LBODY, TaggedPDFConstants.LI));
+	private static final Set<String> blockOrGroupingStructureTypes = new HashSet<>(Arrays.asList(TaggedPDFConstants.TITLE,
+			TaggedPDFConstants.BLOCK_QUOTE, TaggedPDFConstants.CAPTION));
+	private static final Set<String> blockOrGroupingOrInlineStructureTypes = new HashSet<>(Arrays.asList(
+			TaggedPDFConstants.LINK, TaggedPDFConstants.ARTIFACT, TaggedPDFConstants.REFERENCE, TaggedPDFConstants.BIB_ENTRY, 
+			TaggedPDFConstants.NOTE, TaggedPDFConstants.QUOTE, TaggedPDFConstants.FORMULA, TaggedPDFConstants.PRIVATE, 
+			TaggedPDFConstants.FIGURE, TaggedPDFConstants.FORM, TaggedPDFConstants.CODE, TaggedPDFConstants.ANNOT, 
+			TaggedPDFConstants.FENOTE));
+//	private static final Set<String> inlineOrBlockStructureTypes = new HashSet<>(Arrays.asList(TaggedPDFConstants.L,
+//			TaggedPDFConstants.LBL, TaggedPDFConstants.TABLE));
+//	private static final Set<String> tableStructureTypes = new HashSet<>(Arrays.asList(TaggedPDFConstants.TBODY, 
+//			TaggedPDFConstants.TFOOT, TaggedPDFConstants.THEAD, TaggedPDFConstants.TD, TaggedPDFConstants.TH, 
+//			TaggedPDFConstants.TR));
 
 	private static final int MAX_NUMBER_OF_ELEMENTS = 1;
 	private static final Map<ASAtom, Set<COSKey>> visitedWithNS = new HashMap<>();
@@ -471,5 +495,21 @@ public class TaggedPDFHelper {
 
 	public static Set<String> getWcagStandardRoleTypes() {
 		return WCAG_STANDARD_ROLE_TYPES;
+	}
+	
+	public static Set<String> getInlineStructureTypes() {
+		return inlineStructureTypes;
+	}
+	
+	public static Set<String> getGroupingStructureTypes() {
+		return groupingStructureTypes;
+	}
+	
+	public static Set<String> getBlockOrGroupingStructureTypes() {
+		return blockOrGroupingStructureTypes;
+	}
+	
+	public static Set<String> getBlockOrGroupingOrInlineStructureTypes() {
+		return blockOrGroupingOrInlineStructureTypes;
 	}
 }
