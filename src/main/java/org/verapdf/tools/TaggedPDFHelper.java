@@ -497,19 +497,19 @@ public class TaggedPDFHelper {
 		return WCAG_STANDARD_ROLE_TYPES;
 	}
 	
-	public static Set<String> getInlineStructureTypes() {
-		return inlineStructureTypes;
+	public static boolean isInlineStructureType(String standardType) {
+		return inlineStructureTypes.contains(standardType);
 	}
 	
-	public static Set<String> getGroupingStructureTypes() {
-		return groupingStructureTypes;
+	public static boolean isGroupingStructureType(String standardType) {
+		return groupingStructureTypes.contains(standardType);
 	}
 	
-	public static Set<String> getBlockOrGroupingStructureTypes() {
-		return blockOrGroupingStructureTypes;
+	public static boolean isBlockOrGroupingStructureType(String standardType) {
+		return blockOrGroupingStructureTypes.contains(standardType);
 	}
 	
-	public static Set<String> getBlockOrGroupingOrInlineStructureTypes() {
-		return blockOrGroupingOrInlineStructureTypes;
+	public static boolean isBlockOrGroupingOrInlineStructureType(String standardType) {
+		return blockOrGroupingOrInlineStructureTypes.contains(standardType);
 	}
 }
