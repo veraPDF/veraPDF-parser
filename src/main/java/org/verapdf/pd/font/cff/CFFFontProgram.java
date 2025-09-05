@@ -221,7 +221,7 @@ public class CFFFontProgram extends CFFFileBaseParser implements FontProgram {
         } catch (IOException exception) {
             return null;
         }
-        return font.getWeight();
+        return font != null ? font.getWeight() : null;
     }
 
     @Override
