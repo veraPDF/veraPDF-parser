@@ -49,6 +49,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom AA = new ASAtom("AA");
     public static final ASAtom ACRO_FORM = new ASAtom("AcroForm");
     public static final ASAtom ACTUAL_TEXT = new ASAtom("ActualText");
+    public static final ASAtom ADBE = new ASAtom("ADBE");
     public static final ASAtom ADBE_PKCS7_DETACHED = new ASAtom("adbe.pkcs7.detached");
     public static final ASAtom ADBE_PKCS7_SHA1 = new ASAtom("adbe.pkcs7.sha1");
     public static final ASAtom ADBE_X509_RSA_SHA1 = new ASAtom("adbe.x509.rsa_sha1");
@@ -242,6 +243,8 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom EXT_G_STATE = new ASAtom("ExtGState");
     public static final ASAtom EXTEND = new ASAtom("Extend");
     public static final ASAtom EXTENDS = new ASAtom("Extends");
+    public static final ASAtom EXTENSION_LEVEL = new ASAtom("ExtensionLevel");
+    public static final ASAtom EXTENSIONS = new ASAtom("Extensions");
     public static final ASAtom EVENT = new ASAtom("Event");
     // F
     public static final ASAtom F = new ASAtom("F");
@@ -321,6 +324,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom INKLIST = new ASAtom("InkList");
     public static final ASAtom INTENT = new ASAtom("Intent");
     public static final ASAtom INTERPOLATE = new ASAtom("Interpolate");
+    public static final ASAtom ISO_ = new ASAtom("ISO_");
     public static final ASAtom IT = new ASAtom("IT");
     public static final ASAtom ITALIC_ANGLE = new ASAtom("ItalicAngle");
     // J
