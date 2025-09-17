@@ -58,4 +58,50 @@ public class PDOptionalContentProperties extends PDObject {
 		}
 	}
 
+    public boolean isVisibleLayer(String name) {
+        COSObject d = getObject().getKey(ASAtom.D);
+        if (d != null && d.getType() == COSObjType.COS_DICT) {
+            COSDictionary dict = (COSDictionary) d.getDirectBase();
+            COSObject on = dict.getKey(ASAtom.ON);
+            if (on != null && on.getType() == COSObjType.COS_ARRAY) {
+                COSArray onBase = (COSArray) on.getDirectBase();
+                int size = onBase.size();
+
+                for (int i = 0; i < size; ++i) {
+                    COSObject obj = onBase.at(i);
+                    if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
+                        COSDictionary ocgDict = (COSDictionary) obj.getDirectBase();
+                        String ocgName = ocgDict.getStringKey(ASAtom.NAME);
+                        if (name.equals(ocgName)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            COSObject off = dict.getKey(ASAtom.OFF);
+            if (off != null && off.getType() == COSObjType.COS_ARRAY) {
+                COSArray offBase = (COSArray) off.getDirectBase();
+                int size = offBase.size();
+
+                for (int i = 0; i < size; ++i) {
+                    COSObject obj = offBase.at(i);
+                    if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
+                        COSDictionary ocgDict = (COSDictionary) obj.getDirectBase();
+                        String ocgName = ocgDict.getStringKey(ASAtom.NAME);
+                        if (name.equals(ocgName)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            ASAtom baseState = dict.getNameKey(ASAtom.BASE_STATE);
+            if (baseState != null) {
+                return baseState.getValue().equals("ON");
+            }
+        }
+        return true;
+    }
+
 }
