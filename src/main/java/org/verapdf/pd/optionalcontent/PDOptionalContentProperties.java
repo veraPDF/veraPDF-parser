@@ -59,49 +59,43 @@ public class PDOptionalContentProperties extends PDObject {
 	}
 
     public boolean isVisibleLayer(String name) {
+        if (name == null) {
+            return true;
+        }
         COSObject d = getObject().getKey(ASAtom.D);
         if (d != null && d.getType() == COSObjType.COS_DICT) {
             COSDictionary dict = (COSDictionary) d.getDirectBase();
-            COSObject on = dict.getKey(ASAtom.ON);
-            if (on != null && on.getType() == COSObjType.COS_ARRAY) {
-                COSArray onBase = (COSArray) on.getDirectBase();
-                int size = onBase.size();
 
-                for (int i = 0; i < size; ++i) {
-                    COSObject obj = onBase.at(i);
-                    if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
-                        COSDictionary ocgDict = (COSDictionary) obj.getDirectBase();
-                        String ocgName = ocgDict.getStringKey(ASAtom.NAME);
-                        if (name.equals(ocgName)) {
-                            return true;
-                        }
-                    }
-                }
+            Boolean checkOnState = checkDProperties(dict, ASAtom.ON, name);
+            if (checkOnState != null) {
+                return checkOnState;
             }
 
-            COSObject off = dict.getKey(ASAtom.OFF);
-            if (off != null && off.getType() == COSObjType.COS_ARRAY) {
-                COSArray offBase = (COSArray) off.getDirectBase();
-                int size = offBase.size();
-
-                for (int i = 0; i < size; ++i) {
-                    COSObject obj = offBase.at(i);
-                    if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
-                        COSDictionary ocgDict = (COSDictionary) obj.getDirectBase();
-                        String ocgName = ocgDict.getStringKey(ASAtom.NAME);
-                        if (name.equals(ocgName)) {
-                            return false;
-                        }
-                    }
-                }
+            Boolean checkOffState = checkDProperties(dict, ASAtom.OFF, name);
+            if (checkOffState != null) {
+                return checkOffState;
             }
 
             ASAtom baseState = dict.getNameKey(ASAtom.BASE_STATE);
             if (baseState != null) {
-                return baseState.getValue().equals("ON");
+                return baseState.equals(ASAtom.ON);
             }
         }
         return true;
     }
 
+    public Boolean checkDProperties(COSDictionary dict, ASAtom state, String name) {
+        COSObject cosObject = dict.getKey(state);
+        if (cosObject != null && cosObject.getType() == COSObjType.COS_ARRAY) {
+            for (COSObject obj : (COSArray) cosObject.getDirectBase()) {
+                if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
+                    String ocgName = obj.getDirectBase().getStringKey(ASAtom.NAME);
+                    if (name.equals(ocgName)) {
+                        return state.equals(ASAtom.ON);
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }
