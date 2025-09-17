@@ -41,19 +41,18 @@ public class PDOptionalContentProperties extends PDObject {
 
 	public List<String> getGroupNames() {
 		COSObject ocgs = getObject().getKey(ASAtom.OCGS);
+        List<String> groups = new ArrayList<>();
 		if (!ocgs.empty() && ocgs.getType() == COSObjType.COS_ARRAY) {
-            List<String> groups = new ArrayList<>();
-			for (COSObject obj: (COSArray) ocgs.getDirectBase()) {
-				if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
-					String ocgName = obj.getStringKey(ASAtom.NAME);
-					groups.add(ocgName == null ? "" : ocgName);
-				}
-			}
 
-			return groups;
-		} else {
-			return null;
-		}
+            for (COSObject obj : (COSArray) ocgs.getDirectBase()) {
+                if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
+                    String ocgName = obj.getStringKey(ASAtom.NAME);
+                    groups.add(ocgName == null ? "" : ocgName);
+                }
+            }
+        }
+
+        return groups;
 	}
 
     public boolean isVisibleLayer(String name) {
