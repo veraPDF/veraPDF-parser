@@ -27,6 +27,9 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Timur Kamalov
  */
@@ -36,19 +39,14 @@ public class PDOptionalContentProperties extends PDObject {
 		super(obj);
 	}
 
-	public String[] getGroupNames() {
+	public ArrayList<String> getGroupNames() {
 		COSObject ocgs = getObject().getKey(ASAtom.OCGS);
 		if (!ocgs.empty() && ocgs.getType() == COSObjType.COS_ARRAY) {
-			COSArray ocgsArray = (COSArray) ocgs.getDirectBase();
-			int size = ocgsArray.size();
-			String[] groups = new String[size];
-
-			for (int i = 0; i < size; ++i) {
-				COSObject obj = ocgs.at(i);
+            ArrayList<String> groups = new ArrayList<>();
+			for (COSObject obj: (COSArray) ocgs.getDirectBase()) {
 				if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
-					COSDictionary ocgDict = (COSDictionary) obj.getDirectBase();
-					String ocgName = ocgDict.getStringKey(ASAtom.NAME);
-					groups[i] = ocgName == null ? "" : ocgName;
+					String ocgName = obj.getStringKey(ASAtom.NAME);
+					groups.add(ocgName == null ? "" : ocgName);
 				}
 			}
 
@@ -65,15 +63,11 @@ public class PDOptionalContentProperties extends PDObject {
         COSObject d = getObject().getKey(ASAtom.D);
         if (d != null && d.getType() == COSObjType.COS_DICT) {
             COSDictionary dict = (COSDictionary) d.getDirectBase();
-
-            Boolean checkOnState = checkDProperties(dict, ASAtom.ON, name);
-            if (checkOnState != null) {
-                return checkOnState;
+            if (isDContainsOCGWithName(dict, ASAtom.ON, name)) {
+                return true;
             }
-
-            Boolean checkOffState = checkDProperties(dict, ASAtom.OFF, name);
-            if (checkOffState != null) {
-                return checkOffState;
+            if (isDContainsOCGWithName(dict, ASAtom.OFF, name)) {
+                return false;
             }
 
             ASAtom baseState = dict.getNameKey(ASAtom.BASE_STATE);
@@ -84,18 +78,18 @@ public class PDOptionalContentProperties extends PDObject {
         return true;
     }
 
-    public Boolean checkDProperties(COSDictionary dict, ASAtom state, String name) {
+    public Boolean isDContainsOCGWithName(COSDictionary dict, ASAtom state, String name) {
         COSObject cosObject = dict.getKey(state);
         if (cosObject != null && cosObject.getType() == COSObjType.COS_ARRAY) {
             for (COSObject obj : (COSArray) cosObject.getDirectBase()) {
                 if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
-                    String ocgName = obj.getDirectBase().getStringKey(ASAtom.NAME);
+                    String ocgName = obj.getStringKey(ASAtom.NAME);
                     if (name.equals(ocgName)) {
-                        return state.equals(ASAtom.ON);
+                        return true;
                     }
                 }
             }
         }
-        return null;
+        return false;
     }
 }
