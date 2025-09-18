@@ -77,7 +77,7 @@ public class PDOptionalContentProperties extends PDObject {
         return true;
     }
 
-    public Boolean isDContainsOCGWithName(COSDictionary dict, ASAtom state, String name) {
+    public static boolean isDContainsOCGWithName(COSDictionary dict, ASAtom state, String name) {
         COSObject cosObject = dict.getKey(state);
         if (cosObject != null && cosObject.getType() == COSObjType.COS_ARRAY) {
             for (COSObject obj : (COSArray) cosObject.getDirectBase()) {
