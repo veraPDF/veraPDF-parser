@@ -27,6 +27,9 @@ import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 import org.verapdf.pd.PDObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Timur Kamalov
  */
@@ -36,26 +39,56 @@ public class PDOptionalContentProperties extends PDObject {
 		super(obj);
 	}
 
-	public String[] getGroupNames() {
+	public List<String> getGroupNames() {
 		COSObject ocgs = getObject().getKey(ASAtom.OCGS);
+        List<String> groups = new ArrayList<>();
 		if (!ocgs.empty() && ocgs.getType() == COSObjType.COS_ARRAY) {
-			COSArray ocgsArray = (COSArray) ocgs.getDirectBase();
-			int size = ocgsArray.size();
-			String[] groups = new String[size];
 
-			for (int i = 0; i < size; ++i) {
-				COSObject obj = ocgs.at(i);
-				if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
-					COSDictionary ocgDict = (COSDictionary) obj.getDirectBase();
-					String ocgName = ocgDict.getStringKey(ASAtom.NAME);
-					groups[i] = ocgName == null ? "" : ocgName;
-				}
-			}
+            for (COSObject obj : (COSArray) ocgs.getDirectBase()) {
+                if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
+                    String ocgName = obj.getStringKey(ASAtom.NAME);
+                    groups.add(ocgName == null ? "" : ocgName);
+                }
+            }
+        }
 
-			return groups;
-		} else {
-			return null;
-		}
+        return groups;
 	}
 
+    public boolean isVisibleLayer(String name) {
+        if (name == null) {
+            return true;
+        }
+        COSObject d = getObject().getKey(ASAtom.D);
+        if (d != null && d.getType() == COSObjType.COS_DICT) {
+            COSDictionary dict = (COSDictionary) d.getDirectBase();
+            if (isDContainsOCGWithName(dict, ASAtom.ON, name)) {
+                return true;
+            }
+            if (isDContainsOCGWithName(dict, ASAtom.OFF, name)) {
+                return false;
+            }
+
+            ASAtom baseState = dict.getNameKey(ASAtom.BASE_STATE);
+            if (baseState != null) {
+                return baseState.equals(ASAtom.ON);
+            }
+        }
+        return true;
+    }
+
+    private static boolean isDContainsOCGWithName(COSDictionary dict, ASAtom state, String name) {
+        COSObject cosObject = dict.getKey(state);
+        if (cosObject != null && cosObject.getType() == COSObjType.COS_ARRAY) {
+            for (COSObject obj : (COSArray) cosObject.getDirectBase()) {
+                if (!obj.empty() && obj.getType() == COSObjType.COS_DICT) {
+                    String ocgName = obj.getStringKey(ASAtom.NAME);
+                    if (name.equals(ocgName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
