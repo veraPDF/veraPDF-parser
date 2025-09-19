@@ -21,10 +21,7 @@
 package org.verapdf.pd.optionalcontent;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSDictionary;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
 import org.verapdf.pd.PDObject;
 
 import java.util.ArrayList;
@@ -54,6 +51,19 @@ public class PDOptionalContentProperties extends PDObject {
 
         return groups;
 	}
+
+    public String getObjectName(COSObject object) {
+        COSObject ocgs = getObject().getKey(ASAtom.OCGS);
+        if (!ocgs.empty() && ocgs.getType() == COSObjType.COS_ARRAY) {
+
+            for (COSObject obj : (COSArray) ocgs.getDirectBase()) {
+                if (!obj.empty() && obj.getType() == COSObjType.COS_DICT && object.equals(obj)) {
+                    return obj.getStringKey(ASAtom.NAME);
+                }
+            }
+        }
+        return null;
+    }
 
     public boolean isVisibleLayer(String name) {
         if (name == null) {
