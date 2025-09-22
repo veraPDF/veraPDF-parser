@@ -53,7 +53,18 @@ public class PDOptionalContentProperties extends PDObject {
 	}
 
     public boolean isContainsName(String name) {
-        return getGroupNames().contains(name);
+        if (name == null) {
+            return false;
+        }
+        COSObject ocgs = getObject().getKey(ASAtom.OCGS);
+        if (!ocgs.empty() && ocgs.getType() == COSObjType.COS_ARRAY) {
+            for (COSObject obj : (COSArray) ocgs.getDirectBase()) {
+                if (!obj.empty() && obj.getType() == COSObjType.COS_DICT && name.equals(obj.getStringKey(ASAtom.NAME))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public boolean isVisibleLayer(String name) {

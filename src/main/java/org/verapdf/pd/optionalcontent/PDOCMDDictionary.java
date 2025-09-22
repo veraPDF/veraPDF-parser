@@ -2,17 +2,18 @@ package org.verapdf.pd.optionalcontent;
 
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSArray;
+import org.verapdf.cos.COSBase;
+import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PDOCMDDictionary {
-    public static boolean isVisibleOCMDByP(ASAtom pValue, COSObject ocgProperty, PDOptionalContentProperties optProperties) {
-        COSArray ocgs = (COSArray) ocgProperty.getDirectBase();
-        if (ocgs == null) {
+    public static boolean isVisibleOCMDByP(COSBase property, PDOptionalContentProperties optProperties) {
+        COSObject ocgProperty = property.getKey(ASAtom.OCGS);
+        if (ocgProperty == null || ocgProperty.getType() != COSObjType.COS_ARRAY) {
             return true;
         }
+        COSArray ocgs = (COSArray) ocgProperty.getDirectBase();
+        ASAtom pValue = property.getNameKey(ASAtom.P);
         for (COSObject obj : ocgs) {
             boolean isVisible = optProperties.isVisibleLayer(obj.getStringKey(ASAtom.NAME));
             if (isVisible) {
