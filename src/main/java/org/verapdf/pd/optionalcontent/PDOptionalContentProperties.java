@@ -52,6 +52,10 @@ public class PDOptionalContentProperties extends PDObject {
         return groups;
 	}
 
+    public boolean isContainsName(String name) {
+        return getGroupNames().contains(name);
+    }
+
     public boolean isVisibleLayer(String name) {
         if (name == null) {
             return true;
