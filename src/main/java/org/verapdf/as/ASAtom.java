@@ -60,13 +60,17 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom AF_RELATIONSHIP = new ASAtom("AFRelationship");
     public static final ASAtom AFTER = new ASAtom("After");
     public static final ASAtom AIS = new ASAtom("AIS");
-    public static final ASAtom ALT = new ASAtom("Alt");
+    public static final ASAtom ALL_OFF = new ASAtom("AllOff");
+    public static final ASAtom ALL_ON = new ASAtom("AllOn");
     public static final ASAtom ALPHA = new ASAtom("Alpha");
+    public static final ASAtom ALT = new ASAtom("Alt");
     public static final ASAtom ALTERNATE = new ASAtom("Alternate");
     public static final ASAtom ALTERNATES = new ASAtom("Alternates");
     public static final ASAtom ANNOT = new ASAtom("Annot");
     public static final ASAtom ANNOTS = new ASAtom("Annots");
     public static final ASAtom ANTI_ALIAS = new ASAtom("AntiAlias");
+    public static final ASAtom ANY_OFF = new ASAtom("AnyOff");
+    public static final ASAtom ANY_ON = new ASAtom("AnyOn");
     public static final ASAtom AP = new ASAtom("AP");
     public static final ASAtom AP_REF = new ASAtom("APRef");
     public static final ASAtom APP = new ASAtom("App");
@@ -408,6 +412,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom OBJR = new ASAtom("OBJR");
     public static final ASAtom OBJ_STM = new ASAtom("ObjStm");
     public static final ASAtom OC = new ASAtom("OC");
+    public static final ASAtom OCMD = new ASAtom("OCMD");
     public static final ASAtom OCG = new ASAtom("OCG");
     public static final ASAtom OCGS = new ASAtom("OCGs");
     public static final ASAtom OCPROPERTIES = new ASAtom("OCProperties");
