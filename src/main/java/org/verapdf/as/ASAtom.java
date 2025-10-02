@@ -66,6 +66,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom ALT = new ASAtom("Alt");
     public static final ASAtom ALTERNATE = new ASAtom("Alternate");
     public static final ASAtom ALTERNATES = new ASAtom("Alternates");
+    public static final ASAtom AND = new ASAtom("And");
     public static final ASAtom ANNOT = new ASAtom("Annot");
     public static final ASAtom ANNOTS = new ASAtom("Annots");
     public static final ASAtom ANTI_ALIAS = new ASAtom("AntiAlias");
@@ -402,6 +403,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom NON_EFONT_NO_WARN = new ASAtom("NonEFontNoWarn");
     public static final ASAtom NON_FULL_SCREEN_PAGE_MODE = new ASAtom("NonFullScreenPageMode");
     public static final ASAtom NONE = new ASAtom("None");
+    public static final ASAtom NOT = new ASAtom("Not");
     public static final ASAtom NOTE_TYPE = new ASAtom("NoteType");
     public static final ASAtom NORMAL = new ASAtom("Normal");
     public static final ASAtom NS = new ASAtom("NS");
@@ -426,6 +428,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom OPI = new ASAtom("OPI");
     public static final ASAtom OPM = new ASAtom("OPM");
     public static final ASAtom OPT = new ASAtom("Opt");
+    public static final ASAtom OR = new ASAtom("Or");
     public static final ASAtom ORDER = new ASAtom("Order");
     public static final ASAtom ORDERING = new ASAtom("Ordering");
     public static final ASAtom OS = new ASAtom("OS");
@@ -603,6 +606,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom USE_CMAP = new ASAtom("UseCMap");
     // V
     public static final ASAtom V = new ASAtom("V");
+    public static final ASAtom VE = new ASAtom("VE");
     public static final ASAtom VERISIGN_PPKVS = new ASAtom("VeriSign.PPKVS");
     public static final ASAtom VERSION = new ASAtom("Version");
     public static final ASAtom VERTICES = new ASAtom("Vertices");
