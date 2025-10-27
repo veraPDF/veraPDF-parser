@@ -41,7 +41,17 @@ public enum PDFFlavour {
 	WTPDF_1_0_ACCESSIBILITY(Specification.WTPDF_1_0),
 	WCAG_2_1(Specification.WCAG_2_1),
 	WCAG_2_2_MACHINE(Specification.WCAG_2_2),
-	WCAG_2_2_HUMAN(Specification.WCAG_2_2);
+	WCAG_2_2_HUMAN(Specification.WCAG_2_2),
+	NO_ARLINGTON_FLAVOUR(Specification.NO_STANDARD),
+	ARLINGTON1_0(Specification.PDF_1_0),
+	ARLINGTON1_1(Specification.PDF_1_1),
+	ARLINGTON1_2(Specification.PDF_1_2),
+	ARLINGTON1_3(Specification.PDF_1_3),
+	ARLINGTON1_4(Specification.PDF_1_4),
+	ARLINGTON1_5(Specification.PDF_1_5),
+	ARLINGTON1_6(Specification.PDF_1_6),
+	ARLINGTON1_7(Specification.ISO_32000_1_7),
+	ARLINGTON2_0(Specification.ISO_32000_2_0);
 
 	private final Specification specification;
 
@@ -63,7 +73,16 @@ public enum PDFFlavour {
 		ISO_19005_4(SpecificationFamily.PDF_A, PDFSpecification.ISO_32000_2_0),
 		WTPDF_1_0(SpecificationFamily.WTPDF, PDFSpecification.ISO_32000_2_0),
 		WCAG_2_1(SpecificationFamily.WCAG, PDFSpecification.ISO_32000_2_0),
-		WCAG_2_2(SpecificationFamily.WCAG, PDFSpecification.ISO_32000_2_0);
+		WCAG_2_2(SpecificationFamily.WCAG, PDFSpecification.ISO_32000_2_0),
+		PDF_1_0(SpecificationFamily.ARLINGTON, PDFSpecification.PDF_REFERENCE_1_0),
+		PDF_1_1(SpecificationFamily.ARLINGTON, PDFSpecification.PDF_REFERENCE_1_1),
+		PDF_1_2(SpecificationFamily.ARLINGTON, PDFSpecification.PDF_REFERENCE_1_2),
+		PDF_1_3(SpecificationFamily.ARLINGTON, PDFSpecification.PDF_REFERENCE_1_3),
+		PDF_1_4(SpecificationFamily.ARLINGTON, PDFSpecification.PDF_REFERENCE_1_4),
+		PDF_1_5(SpecificationFamily.ARLINGTON, PDFSpecification.PDF_REFERENCE_1_5),
+		PDF_1_6(SpecificationFamily.ARLINGTON, PDFSpecification.PDF_REFERENCE_1_6),
+		ISO_32000_1_7(SpecificationFamily.ARLINGTON, PDFSpecification.ISO_32000_1_7),
+		ISO_32000_2_0(SpecificationFamily.ARLINGTON, PDFSpecification.ISO_32000_2_0);
 
 		private final SpecificationFamily family;
 		private final PDFSpecification pdfSpecification;
@@ -87,12 +106,19 @@ public enum PDFFlavour {
 		PDF_A,
 		PDF_UA,
 		WCAG,
-		WTPDF
+		WTPDF,
+		ARLINGTON
 	}
 
 	public enum PDFSpecification {
 		NO_SPECIFICATION,
+		PDF_REFERENCE_1_0,
+		PDF_REFERENCE_1_1,
+		PDF_REFERENCE_1_2,
+		PDF_REFERENCE_1_3,
 		PDF_REFERENCE_1_4,
+		PDF_REFERENCE_1_5,
+		PDF_REFERENCE_1_6,
 		ISO_32000_1_7,
 		ISO_32000_2_0
 	}
