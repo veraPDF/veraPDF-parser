@@ -251,4 +251,16 @@ public class PDDocument {
 			throw new IOException("Pages not found");
 		}
 	}
+	
+	public Float getVersion() {
+		COSDocument cosDocument = getDocument();
+		Float version = cosDocument != null ? cosDocument.getHeader().getVersion() : null;
+
+		Float catalogVersion = getCatalog().getFloatVersion();
+
+		if (catalogVersion != null && (version == null || version < catalogVersion)) {
+			version = catalogVersion;
+		}
+		return version;
+	}
 }
