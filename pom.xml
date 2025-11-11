@@ -29,7 +29,7 @@
     <parent>
       <artifactId>verapdf-parent</artifactId>
       <groupId>org.verapdf</groupId>
-      <version>1.29.1</version>
+      <version>1.29.6</version>
     </parent>
 
     <groupId>org.verapdf</groupId>
@@ -84,6 +84,17 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>org.verapdf.parser</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
