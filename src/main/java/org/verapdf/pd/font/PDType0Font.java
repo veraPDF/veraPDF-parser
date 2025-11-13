@@ -23,7 +23,6 @@ package org.verapdf.pd.font;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.exceptions.VeraPDFParserException;
-import org.verapdf.pd.font.cmap.CMap;
 import org.verapdf.pd.font.cmap.PDCMap;
 
 import java.util.logging.Level;
@@ -51,6 +50,7 @@ public class PDType0Font extends PDCIDFont {
     private PDCMap pdcMap;
     private PDCMap ucsCMap;
     private final COSDictionary type0FontDict;
+    private boolean isParsedUcsCMap = false;
 
     /**
      * Constructs PD Type 0 font from font dictionary.
@@ -133,39 +133,33 @@ public class PDType0Font extends PDCIDFont {
             return unicode;
         }
 
-        if (ucsCMap != null) {
-            return ucsCMap.toUnicode(code);
-        }
-
-        if (IDENTITY_H.equals(pdcMap.getCMapName()) ||
-                IDENTITY_V.equals(pdcMap.getCMapName())) {
-            setUcsCMapFromIdentity(this.getCIDSystemInfo());
-            if (this.ucsCMap == null) {
-                LOGGER.log(Level.FINE, "Can't create toUnicode CMap from " + pdcMap.getCMapName());
-                return null;
-            }
-            return ucsCMap.toUnicode(code);
-        }
-        PDCMap pdcMap = this.getCMap();
-        if (pdcMap != null && pdcMap.getCMapFile() != null) {
-            String registry = pdcMap.getRegistry();
-            String ordering = pdcMap.getOrdering();
-            String ucsName = registry + '-' + ordering + '-' + UCS2;
-            PDCMap pdUCSCMap = new PDCMap(COSName.construct(ucsName));
-            CMap ucsCMap = pdUCSCMap.getCMapFile();
-            if (ucsCMap != null) {
-                this.ucsCMap = pdUCSCMap;
-                int cid = pdcMap.getCMapFile().toCID(code);
-                return ucsCMap.getUnicode(cid);
-            }
-            LOGGER.log(Level.FINE, "Can't load CMap " + ucsName);
+        if (this.pdcMap == null) {
+            LOGGER.log(Level.FINE, "Can't get CMap for font " + this.getName());
             return null;
         }
-        LOGGER.log(Level.FINE, "Can't get CMap for font " + this.getName());
-        return null;
+
+        boolean isIdentity = IDENTITY_H.equals(this.pdcMap.getCMapName()) ||
+                IDENTITY_V.equals(this.pdcMap.getCMapName());
+        
+        if (!isParsedUcsCMap) {
+            if (isIdentity) {
+                setUcsCMapFromIdentity(this.getCIDSystemInfo());
+            } else {
+                setUcsCMap();
+            }
+        }
+        if (isIdentity) {
+            return this.ucsCMap != null ? this.ucsCMap.toUnicode(code) : null;
+        }
+        if (this.ucsCMap == null || this.cMap == null) {
+            return null;
+        }
+        int cid = this.cMap.toCID(code);
+        return this.ucsCMap.getCMapFile().getUnicode(cid);
     }
 
     private void setUcsCMapFromIdentity(PDCIDSystemInfo cidSystemInfo) {
+        isParsedUcsCMap = true;
         if (cidSystemInfo != null) {
             String registry = cidSystemInfo.getRegistry();
             if (ADOBE.equals(registry)) {
@@ -176,6 +170,22 @@ public class PDType0Font extends PDCIDFont {
                     this.ucsCMap = new PDCMap(COSName.construct(ucsName));
                 }
             }
+        }
+        if (ucsCMap == null) {
+            LOGGER.log(Level.FINE, "Can't create toUnicode CMap from " + pdcMap.getCMapName());
+        }
+    }
+    
+    private void setUcsCMap() {
+        isParsedUcsCMap = true;
+        String registry = pdcMap.getRegistry();
+        String ordering = pdcMap.getOrdering();
+        String ucsName = registry + '-' + ordering + '-' + UCS2;
+        PDCMap pdUCSCMap = new PDCMap(COSName.construct(ucsName));
+        if (pdUCSCMap.getCMapFile() != null) {
+            this.ucsCMap = pdUCSCMap;
+        } else {
+            LOGGER.log(Level.FINE, "Can't load CMap " + ucsName);
         }
     }
 
