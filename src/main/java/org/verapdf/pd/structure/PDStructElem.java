@@ -135,7 +135,7 @@ public class PDStructElem extends PDStructTreeNode {
 				return defaultStructureType;
 			}
 		}
-		if (!PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0) || PDFFlavour.isFlavourFamily(flavour, PDFFlavour.SpecificationFamily.WCAG)) {
+		if (!PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 			if (type != null) {
 				return StructureType.createStructureType(ASAtom.getASAtom(
 						StaticResources.getRoleMapHelper().getStandardType(type.getType())), type.getNameSpace());
@@ -159,11 +159,8 @@ public class PDStructElem extends PDStructTreeNode {
 		boolean isStandard = false;
 		if (PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0)) {
 			isStandard = TaggedPDFHelper.isStandardType(type);
-		}
-		if (!PDFFlavour.isFlavourPDFSpecification(flavour, PDFFlavour.PDFSpecification.ISO_32000_2_0) || PDFFlavour.isFlavourFamily(flavour, PDFFlavour.SpecificationFamily.WCAG)) {
-			if (type != null) {
-				isStandard |= TaggedPDFRoleMapHelper.isStandardType(type);
-			}
+		} else if (type != null) {
+			isStandard |= TaggedPDFRoleMapHelper.isStandardType(type);
 		}
 		return isStandard;
 	}
