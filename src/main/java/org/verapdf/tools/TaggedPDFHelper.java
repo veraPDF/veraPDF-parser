@@ -40,7 +40,6 @@ public class TaggedPDFHelper {
 	private static final Set<String> PDF_1_4_STANDARD_ROLE_TYPES;
 	private static final Set<String> PDF_1_7_STANDARD_ROLE_TYPES;
 	private static final Set<String> PDF_2_0_STANDARD_ROLE_TYPES;
-	private static final Set<String> WCAG_STANDARD_ROLE_TYPES;
 
 	static {
 		Set<String> tempSet = new HashSet<>();
@@ -127,10 +126,6 @@ public class TaggedPDFHelper {
 		pdf_1_7.addAll(tempSet);
 		pdf_2_0.addAll(tempSet);
 
-		Set<String> wcag = new HashSet<>(pdf_1_7);
-		wcag.add(TaggedPDFConstants.ARTIFACT);
-		wcag.add(TaggedPDFConstants.TITLE);
-
 		pdf_2_0.add(TaggedPDFConstants.DOCUMENT_FRAGMENT);
 		pdf_2_0.add(TaggedPDFConstants.ASIDE);
 		pdf_2_0.add(TaggedPDFConstants.TITLE);
@@ -143,7 +138,6 @@ public class TaggedPDFHelper {
 		PDF_1_4_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_4);
 		PDF_1_7_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_1_7);
 		PDF_2_0_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(pdf_2_0);
-		WCAG_STANDARD_ROLE_TYPES = Collections.unmodifiableSet(wcag);
 	}
 	
 	private static final Set<String> inlineStructureTypes = new HashSet<>(Arrays.asList(TaggedPDFConstants.SPAN,
@@ -292,11 +286,6 @@ public class TaggedPDFHelper {
 		} else {
 			return PDF_1_7_STANDARD_ROLE_TYPES.contains(structureType);
 		}
-	}
-
-	public static boolean isWCAGStandardType(StructureType type) {
-		String structureType = type.getType().getValue();
-		return WCAG_STANDARD_ROLE_TYPES.contains(structureType);
 	}
 
 	private static void addVisited(StructureType type) {
@@ -491,10 +480,6 @@ public class TaggedPDFHelper {
 
 	public static Set<String> getPdf20StandardRoleTypes() {
 		return PDF_2_0_STANDARD_ROLE_TYPES;
-	}
-
-	public static Set<String> getWcagStandardRoleTypes() {
-		return WCAG_STANDARD_ROLE_TYPES;
 	}
 	
 	public static boolean isInlineStructureType(String standardType) {

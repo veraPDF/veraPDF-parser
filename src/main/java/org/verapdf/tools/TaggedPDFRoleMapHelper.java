@@ -65,9 +65,6 @@ public class TaggedPDFRoleMapHelper {
 		if (PDFFlavour.isFlavourPart(StaticResources.getFlavour(), PDFFlavour.Specification.ISO_19005_1)) {
 			return TaggedPDFHelper.getPdf14StandardRoleTypes();
 		}
-		if (PDFFlavour.isFlavourFamily(StaticResources.getFlavour(), PDFFlavour.SpecificationFamily.WCAG)) {
-			return TaggedPDFHelper.getWcagStandardRoleTypes();
-		}
 		return TaggedPDFHelper.getPdf17StandardRoleTypes();
 	}
 
