@@ -179,7 +179,7 @@ class Type1PrivateParser extends SeekableBaseParser {
             // There are files with wrong charstring amount specified. Actual
             // amount can be determined from "end" keyword.
             if (getToken().type == Token.Type.TT_KEYWORD && "end".equals(getToken().getValue())) {
-                LOGGER.log(Level.WARNING, getErrorMessage("Error in parsing private data in Type 1 font: incorrect amount of charstings specified"));
+                LOGGER.log(Level.WARNING, getErrorMessage("Error in parsing private data in Type 1 font: incorrect amount of charstrings specified"));
                 return false;
             } else {
                 throw e;
