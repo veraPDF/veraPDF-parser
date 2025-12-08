@@ -126,6 +126,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
                 width = getWidth(TrueTypePredefined.NOTDEF_STRING);
             }
             if (width == -1) {
+                if (this.parser.getCmapParser() == null) {
+                    return 0;
+                }
                 int gid = this.parser.getCmapParser().getGID(code);
                 return getWidthWithCheck(gid);
             }
