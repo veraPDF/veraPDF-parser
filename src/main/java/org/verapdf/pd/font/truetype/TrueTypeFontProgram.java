@@ -126,6 +126,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
                 width = getWidth(TrueTypePredefined.NOTDEF_STRING);
             }
             if (width == -1) {
+                if (this.parser.getCmapParser() == null) {
+                    return 0;
+                }
                 int gid = this.parser.getCmapParser().getGID(code);
                 return getWidthWithCheck(gid);
             }
@@ -220,6 +223,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
         if (cmap10 != null) {
             gid = cmap10.getGlyph(code);
             return getWidthWithCheck(gid);
+        }
+        if (this.parser.getCmapParser() == null) {
+            return 0;
         }
         gid = this.parser.getCmapParser().getGID(code);
         return getWidthWithCheck(gid);
