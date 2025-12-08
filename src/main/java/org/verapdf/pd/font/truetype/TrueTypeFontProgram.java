@@ -224,6 +224,9 @@ public class TrueTypeFontProgram extends BaseTrueTypeProgram implements FontProg
             gid = cmap10.getGlyph(code);
             return getWidthWithCheck(gid);
         }
+        if (this.parser.getCmapParser() == null) {
+            return 0;
+        }
         gid = this.parser.getCmapParser().getGID(code);
         return getWidthWithCheck(gid);
     }
