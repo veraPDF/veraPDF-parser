@@ -20,6 +20,7 @@
  */
 package org.verapdf.cos;
 
+import org.verapdf.as.warnings.StringWarnings;
 import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
@@ -111,7 +112,7 @@ public class COSString extends COSDirect {
                 return new String(value, 2, value.length - 2, StandardCharsets.UTF_16BE);
             }
             if ((value[0] & 0xFF) == 0xFF && (value[1] & 0xFF) == 0xFE) {
-                LOGGER.log(Level.WARNING, "String object uses encoding UTF16-LE not supported by PDF");
+                LOGGER.log(Level.WARNING, StringWarnings.NOT_SUPPORTED_UTF16LE_ENCODING);
             }
         }
         if (value.length >= 3) {
@@ -242,7 +243,7 @@ public class COSString extends COSDirect {
                         i += 5;
                         continue;
                     } else {
-                        LOGGER.warning("Text string language escape sequence contains character (not ASCII letter)");
+                        LOGGER.log(Level.WARNING, StringWarnings.NOT_ASCII_LETTER);
                         return false;
                     }
                 }
@@ -253,11 +254,11 @@ public class COSString extends COSDirect {
                         i += 7;
                         continue;
                     } else {
-                        LOGGER.warning("Text string language escape sequence contains character (not ASCII letter)");
+                        LOGGER.log(Level.WARNING, StringWarnings.NOT_ASCII_LETTER);
                         return false;
                     }
                 }
-                LOGGER.warning("Text string language escape sequence has invalid length");
+                LOGGER.log(Level.WARNING,StringWarnings.INVALID_LANGUAGE_ESCAPE_SEQUENCE_LENGTH);
                 return false;
             }
         }
@@ -272,7 +273,7 @@ public class COSString extends COSDirect {
                         i += 3;
                         continue;
                     } else {
-                        LOGGER.warning("Text string language escape sequence contains character (not ASCII letter)");
+                        LOGGER.log(Level.WARNING, StringWarnings.NOT_ASCII_LETTER);
                         return false;
                     }
                 }
@@ -283,12 +284,12 @@ public class COSString extends COSDirect {
                         i += 5;
                         continue;
                     } else {
-                        LOGGER.warning("Text string language escape sequence contains character (not ASCII letter)");
+                        LOGGER.log(Level.WARNING, StringWarnings.NOT_ASCII_LETTER);
                         return false;
                     }
                 }
 
-                LOGGER.warning("Text string language escape sequence has invalid length");
+                LOGGER.log(Level.WARNING,StringWarnings.INVALID_LANGUAGE_ESCAPE_SEQUENCE_LENGTH);
                 return false;
             }
         }
