@@ -257,7 +257,7 @@ public class COSString extends COSDirect {
                         return false;
                     }
                 }
-                LOGGER.warning("Text string language escape sequence have invalid length");
+                LOGGER.warning("Text string language escape sequence has invalid length");
                 return false;
             }
         }
@@ -288,7 +288,7 @@ public class COSString extends COSDirect {
                     }
                 }
 
-                LOGGER.warning("Text string language escape sequence have invalid length");
+                LOGGER.warning("Text string language escape sequence has invalid length");
                 return false;
             }
         }
