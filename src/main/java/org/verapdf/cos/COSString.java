@@ -20,6 +20,7 @@
  */
 package org.verapdf.cos;
 
+import org.verapdf.as.warnings.StringWarnings;
 import org.verapdf.cos.filters.COSFilterASCIIHexEncode;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
@@ -111,7 +112,7 @@ public class COSString extends COSDirect {
                 return new String(value, 2, value.length - 2, StandardCharsets.UTF_16BE);
             }
             if ((value[0] & 0xFF) == 0xFF && (value[1] & 0xFF) == 0xFE) {
-                LOGGER.log(Level.WARNING, "String object uses encoding UTF16-LE not supported by PDF");
+                LOGGER.log(Level.WARNING, StringWarnings.NOT_SUPPORTED_UTF16LE_ENCODING);
             }
         }
         if (value.length >= 3) {
@@ -221,15 +222,83 @@ public class COSString extends COSDirect {
     public boolean isTextString() {
         if (value.length > 2) {
             if ((value[0] & 0xFF) == 0xFE && (value[1] & 0xFF) == 0xFF) {
+                checkUTF16BEEscapeSequence(value);
                 return true;
             }
         }
         if (value.length > 3) {
             if ((value[0] & 0xFF) == 0xEF && (value[1] & 0xFF) == 0xBB && (value[2] & 0xFF) == 0xBF) {
+                checkUTF8EscapeSequence(value);
                 return true;
             }
         }
         return PDFDocEncoding.isPDFDocEncodingString(value);
+    }
+
+    private boolean checkUTF16BEEscapeSequence(byte[] value) {
+        for (int i = 0; i < value.length; i++) {
+            if (i + 1 < value.length && value[i] == 0x00 && value[i + 1] == 0x1B) {
+                if (i + 5 < value.length && value[i + 4] == 0x00 && value[i + 5] == 0x1B) {
+                    if (isASCIILetter(value[i + 2]) && isASCIILetter(value[i + 3])) {
+                        i += 5;
+                        continue;
+                    } else {
+                        LOGGER.log(Level.WARNING, StringWarnings.NOT_ASCII_LETTER);
+                        return false;
+                    }
+                }
+
+                if (i + 7 < value.length && value[i + 6] == 0x00 && value[i + 7] == 0x1B) {
+                    if (isASCIILetter(value[i + 2]) && isASCIILetter(value[i + 3]) &&
+                            isASCIILetter(value[i + 4]) && isASCIILetter(value[i + 5])) {
+                        i += 7;
+                        continue;
+                    } else {
+                        LOGGER.log(Level.WARNING, StringWarnings.NOT_ASCII_LETTER);
+                        return false;
+                    }
+                }
+                LOGGER.log(Level.WARNING,StringWarnings.INVALID_LANGUAGE_ESCAPE_SEQUENCE_LENGTH);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkUTF8EscapeSequence(byte[] value) {
+        for (int i = 0; i < value.length; i++) {
+            if (value[i] == 0x1B) {
+                if (i + 3 < value.length && value[i + 3] == 0x1B) {
+                    if (isASCIILetter(value[i + 1]) && isASCIILetter(value[i + 2])) {
+                        i += 3;
+                        continue;
+                    } else {
+                        LOGGER.log(Level.WARNING, StringWarnings.NOT_ASCII_LETTER);
+                        return false;
+                    }
+                }
+
+                if (i + 5 < value.length && value[i + 5] == 0x1B) {
+                    if (isASCIILetter(value[i + 1]) && isASCIILetter(value[i + 2]) &&
+                            isASCIILetter(value[i + 3]) && isASCIILetter(value[i + 4])) {
+                        i += 5;
+                        continue;
+                    } else {
+                        LOGGER.log(Level.WARNING, StringWarnings.NOT_ASCII_LETTER);
+                        return false;
+                    }
+                }
+
+                LOGGER.log(Level.WARNING,StringWarnings.INVALID_LANGUAGE_ESCAPE_SEQUENCE_LENGTH);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isASCIILetter(byte b) {
+        int c = b & 0xFF;
+        return (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A);
     }
 
     protected String toLitString() {
