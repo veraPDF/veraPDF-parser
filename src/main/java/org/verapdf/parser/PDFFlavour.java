@@ -179,6 +179,7 @@ public enum PDFFlavour {
 	}
 
 	public static boolean isPDFUA2RelatedFlavour(PDFFlavour flavour) {
-		return isFlavour(flavour, PDFFlavour.PDFUA_2) || isFlavourPart(flavour, Specification.WTPDF_1_0);
+		return isFlavour(flavour, PDFFlavour.PDFUA_2) || isFlavourPart(flavour, Specification.WTPDF_1_0) || 
+				isFlavourPart(flavour, Specification.WCAG_2_2_PDF_2_0) ;
 	}
 } 
