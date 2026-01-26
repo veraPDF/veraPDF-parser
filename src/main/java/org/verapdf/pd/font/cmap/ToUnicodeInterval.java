@@ -21,7 +21,6 @@
 package org.verapdf.pd.font.cmap;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
@@ -35,7 +34,8 @@ public class ToUnicodeInterval {
 
     private final long intervalBegin;
     private final long intervalEnd;
-    private final byte[] startingValue;
+    private final int length;
+    private final long startingValue;
 
     /**
      * @param intervalBegin is the first code of mapping interval.
@@ -45,7 +45,8 @@ public class ToUnicodeInterval {
     public ToUnicodeInterval(long intervalBegin, long intervalEnd, byte[] startingValue) {
         this.intervalBegin = intervalBegin;
         this.intervalEnd = intervalEnd;
-        this.startingValue = startingValue;
+        this.length = startingValue.length;
+        this.startingValue = CMapParser.numberFromBytes(startingValue);
     }
 
     /**
@@ -68,8 +69,12 @@ public class ToUnicodeInterval {
      * @return Unicode value for character code as a String object.
      */
     public String toUnicode(int code) {
-        byte[] unicode = Arrays.copyOf(startingValue, startingValue.length);
-        unicode[unicode.length - 1] = (byte) (code - intervalBegin + startingValue[startingValue.length - 1]);
+        byte[] unicode = new byte[length];
+        long unicodeNumber = code - intervalBegin + startingValue;
+        for (int index = unicode.length - 1; index >= 0; index--) {
+            unicode[index] = (byte) (unicodeNumber & 0xFF);
+            unicodeNumber = unicodeNumber >> 8;
+        }
         return getUnicodeNameFromLong(unicode);
     }
 
