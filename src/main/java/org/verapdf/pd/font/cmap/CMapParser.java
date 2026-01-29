@@ -283,7 +283,7 @@ public class CMapParser extends PSParser {
     public static long numberFromBytes(byte[] num) {
         long res = 0;
         for (int i = 0; i < num.length; ++i) {
-            res += (num[i] & 0x00FF) << ((num.length - i - 1) * 8);
+            res += (num[i] & 0xFFL) << ((num.length - i - 1) * 8);
         }
         return res;
     }
