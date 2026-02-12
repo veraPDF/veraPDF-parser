@@ -157,9 +157,11 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom COLUMNS = new ASAtom("Columns");
     public static final ASAtom COMPATIBLE = new ASAtom("Compatible");
     public static final ASAtom COMPONENTS = new ASAtom("Components");
+    public static final ASAtom CONFIGS = new ASAtom("Configs");
     public static final ASAtom CONTACT_INFO = new ASAtom("ContactInfo");
     public static final ASAtom CONTENTS = new ASAtom("Contents");
-    public static final ASAtom CONFIGS = new ASAtom("Configs");
+    public static final ASAtom CONTINUED_FROM = new ASAtom("ContinuedFrom");
+    public static final ASAtom CONTINUED_LIST = new ASAtom("ContinuedList");
     public static final ASAtom COORDS = new ASAtom("Coords");
     public static final ASAtom COUNT = new ASAtom("Count");
     public static final ASAtom COURIER = new ASAtom("Courier");
