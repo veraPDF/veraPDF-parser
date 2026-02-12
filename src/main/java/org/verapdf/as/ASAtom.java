@@ -182,6 +182,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom DATE = new ASAtom("Date");
     public static final ASAtom DCT_DECODE = new ASAtom("DCTDecode");
     public static final ASAtom DCT_DECODE_ABBREVIATION = new ASAtom("DCT");
+    public static final ASAtom DECIMAL = new ASAtom("Decimal");
     public static final ASAtom DECODE = new ASAtom("Decode");
     public static final ASAtom DECODE_PARMS = new ASAtom("DecodeParms");
     public static final ASAtom DEFAULT = new ASAtom("Default");
@@ -367,6 +368,8 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom LLE = new ASAtom("LLE");
     public static final ASAtom LLO = new ASAtom("LLO");
     public static final ASAtom LOCATION = new ASAtom("Location");
+    public static final ASAtom LOWER_ALPHA = new ASAtom("LowerAlpha");
+    public static final ASAtom LOWER_ROMAN = new ASAtom("LowerRoman");
     public static final ASAtom LUMINOSITY = new ASAtom("Luminosity");
     public static final ASAtom LW = new ASAtom("LW");
     public static final ASAtom LZW_DECODE = new ASAtom("LZWDecode");
@@ -432,6 +435,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom OPT = new ASAtom("Opt");
     public static final ASAtom OR = new ASAtom("Or");
     public static final ASAtom ORDER = new ASAtom("Order");
+    public static final ASAtom ORDERED = new ASAtom("Ordered");
     public static final ASAtom ORDERING = new ASAtom("Ordering");
     public static final ASAtom OS = new ASAtom("OS");
     public static final ASAtom OUTLINES = new ASAtom("Outlines");
@@ -603,6 +607,9 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom UF = new ASAtom("UF");
     public static final ASAtom UNCHANGED = new ASAtom("Unchanged");
     public static final ASAtom UNIX = new ASAtom("Unix");
+    public static final ASAtom UNORDERED = new ASAtom("Unordered");
+    public static final ASAtom UPPER_ALPHA = new ASAtom("UpperAlpha");
+    public static final ASAtom UPPER_ROMAN = new ASAtom("UpperRoman");
     public static final ASAtom URI = new ASAtom("URI");
     public static final ASAtom URL = new ASAtom("URL");
     public static final ASAtom USE_CMAP = new ASAtom("UseCMap");
