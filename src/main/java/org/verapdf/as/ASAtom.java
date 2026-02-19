@@ -352,6 +352,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom LAST = new ASAtom("Last");
     public static final ASAtom LAST_CHAR = new ASAtom("LastChar");
     public static final ASAtom LAST_MODIFIED = new ASAtom("LastModified");
+    public static final ASAtom LAYOUT = new ASAtom("Layout");
     public static final ASAtom LC = new ASAtom("LC");
     public static final ASAtom LE = new ASAtom("LE");
     public static final ASAtom LEADING = new ASAtom("Leading");
@@ -362,6 +363,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom LENGTH2 = new ASAtom("Length2");
     public static final ASAtom LIGHTEN = new ASAtom("Lighten");
     public static final ASAtom LIMITS = new ASAtom("Limits");
+    public static final ASAtom LIST = new ASAtom("List");
     public static final ASAtom LIST_NUMBERING = new ASAtom("ListNumbering");
     public static final ASAtom LJ = new ASAtom("LJ");
     public static final ASAtom LL = new ASAtom("LL");
@@ -568,6 +570,7 @@ public class ASAtom implements Comparable<ASAtom> {
     // T
     public static final ASAtom T = new ASAtom("T");
     public static final ASAtom TABS = new ASAtom("Tabs");
+    public static final ASAtom TABLE = new ASAtom("Table");
     public static final ASAtom TARGET = new ASAtom("Target");
     public static final ASAtom TEMPLATES = new ASAtom("Templates");
     public static final ASAtom THREADS = new ASAtom("Threads");
