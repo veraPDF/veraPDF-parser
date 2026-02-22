@@ -102,8 +102,7 @@ public class Writer implements IVisitor {
 		this.writeBody();
 		COSTrailer trailer = document.getTrailer();
 
-		// document.getLastTrailerOffset() + 1 point EXACTLY at first byte of xref
-		this.setTrailer(trailer, document.getLastTrailerOffset() + 1);
+		this.setTrailer(trailer, document.getLastTrailerOffset());
 		this.writeXRefInfo();
 		this.clear();
 	}
