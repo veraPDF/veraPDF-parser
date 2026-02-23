@@ -281,8 +281,8 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		if (!imageEndFound) {
 			LOGGER.log(Level.WARNING, "End of inline image not found");
 		}
-		return new ASMemoryInStream(getByteArrayFromArrayList(image),
-				getSource().getReadCounter(), false);
+		byte[] buffer = getByteArrayFromArrayList(image);
+		return new ASMemoryInStream(buffer, buffer.length, false);
 	}
 
 	private boolean checkInlineImage() throws IOException {
