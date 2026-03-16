@@ -403,6 +403,8 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom NA = new ASAtom("NA");
     public static final ASAtom NAME = new ASAtom("Name");
     public static final ASAtom NAMES = new ASAtom("Names");
+    public static final ASAtom NAMESPACE = new ASAtom("Namespace");
+    public static final ASAtom NAMESPACES = new ASAtom("Namespaces");
     public static final ASAtom NEED_APPEARANCES = new ASAtom("NeedAppearances");
     public static final ASAtom NEEDS_RENDERING = new ASAtom("NeedsRendering");
     public static final ASAtom NEXT = new ASAtom("Next");
