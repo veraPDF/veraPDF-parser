@@ -315,7 +315,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom HIDE_MENUBAR = new ASAtom("HideMenubar");
     public static final ASAtom HIDE_TOOLBAR = new ASAtom("HideToolbar");
     public static final ASAtom HIDE_WINDOWUI = new ASAtom("HideWindowUI");
-    public static final ASAtom HIGHTLIGHT = new ASAtom("Hightlight");
+    public static final ASAtom HIGHLIGHT = new ASAtom("Highlight");
     public static final ASAtom HT = new ASAtom("HT");
     public static final ASAtom HTO = new ASAtom("HTO");
     public static final ASAtom HTP = new ASAtom("HTP");

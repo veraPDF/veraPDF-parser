@@ -47,7 +47,7 @@ public class PDAnnotation extends PDObject {
         markupAnnotationTypes.add(ASAtom.CIRCLE);
         markupAnnotationTypes.add(ASAtom.POLYGON);
         markupAnnotationTypes.add(ASAtom.POLYLINE);
-        markupAnnotationTypes.add(ASAtom.HIGHTLIGHT);
+        markupAnnotationTypes.add(ASAtom.HIGHLIGHT);
         markupAnnotationTypes.add(ASAtom.UNDERLINE);
         markupAnnotationTypes.add(ASAtom.SQUIGGLY);
         markupAnnotationTypes.add(ASAtom.STRIKEOUT);
