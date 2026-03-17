@@ -264,7 +264,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom FDF = new ASAtom("FDF");
     public static final ASAtom FF = new ASAtom("Ff");
     public static final ASAtom FIELDS = new ASAtom("Fields");
-    public static final ASAtom FILEATTACHMENT = new ASAtom("FileAttachment");
+    public static final ASAtom FILE_ATTACHMENT = new ASAtom("FileAttachment");
     public static final ASAtom FILESPEC = new ASAtom("Filespec");
     public static final ASAtom FILTER = new ASAtom("Filter");
     public static final ASAtom FIRST = new ASAtom("First");
@@ -288,7 +288,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom FONT_WEIGHT = new ASAtom("FontWeight");
     public static final ASAtom FORM = new ASAtom("Form");
     public static final ASAtom FORMTYPE = new ASAtom("FormType");
-    public static final ASAtom FREETEXT = new ASAtom("FreeText");
+    public static final ASAtom FREE_TEXT = new ASAtom("FreeText");
     public static final ASAtom FRM = new ASAtom("FRM");
     public static final ASAtom FS = new ASAtom("FS");
     public static final ASAtom FT = new ASAtom("FT");
@@ -482,7 +482,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom PIECE_INFO = new ASAtom("PieceInfo");
     public static final ASAtom PO = new ASAtom("PO");
     public static final ASAtom POLYGON = new ASAtom("Polygon");
-    public static final ASAtom POLYLINE = new ASAtom("PolyLine");
+    public static final ASAtom POLY_LINE = new ASAtom("PolyLine");
     public static final ASAtom POPUP = new ASAtom("Popup");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");
     public static final ASAtom PREDICTOR = new ASAtom("Predictor");
@@ -491,7 +491,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom PRINT_AREA = new ASAtom("PrintArea");
     public static final ASAtom PRINT_CLIP = new ASAtom("PrintClip");
     public static final ASAtom PRINT_SCALING = new ASAtom("PrintScaling");
-    public static final ASAtom PRINTERMARK =  new ASAtom("PrinterMark");
+    public static final ASAtom PRINTER_MARK =  new ASAtom("PrinterMark");
     public static final ASAtom PROC_SET = new ASAtom("ProcSet");
     public static final ASAtom PROCESS = new ASAtom("Process");
     public static final ASAtom PRODUCER = new ASAtom("Producer");
@@ -525,7 +525,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom REQUIREMENTS = new ASAtom("Requirements");
     public static final ASAtom RGB = new ASAtom("RGB");
     public static final ASAtom RI = new ASAtom("RI");
-    public static final ASAtom RICHMEDIA = new ASAtom("RichMedia");
+    public static final ASAtom RICH_MEDIA = new ASAtom("RichMedia");
     public static final ASAtom ROLE = new ASAtom("Role");
     public static final ASAtom ROLE_MAP = new ASAtom("RoleMap");
     public static final ASAtom ROLE_MAP_NS = new ASAtom("RoleMapNS");
@@ -572,7 +572,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom STM = new ASAtom("Stm");
     public static final ASAtom STM_F = new ASAtom("StmF");
     public static final ASAtom STR_F = new ASAtom("StrF");
-    public static final ASAtom STRIKEOUT = new ASAtom("StrikeOut");
+    public static final ASAtom STRIKE_OUT = new ASAtom("StrikeOut");
     public static final ASAtom STRUCT_ELEM = new ASAtom("StructElem");
     public static final ASAtom STRUCT_PARENT = new ASAtom("StructParent");
     public static final ASAtom STRUCT_PARENTS = new ASAtom("StructParents");
@@ -611,7 +611,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom TO_UNICODE = new ASAtom("ToUnicode");
     public static final ASAtom TR = new ASAtom("TR");
     public static final ASAtom TR2 = new ASAtom("TR2");
-    public static final ASAtom TRAPNET =  new ASAtom("TrapNet");
+    public static final ASAtom TRAP_NET =  new ASAtom("TrapNet");
     public static final ASAtom TRAPPED = new ASAtom("Trapped");
     public static final ASAtom TRANS = new ASAtom("Trans");
     public static final ASAtom TRANSFER_FUNCTION = new ASAtom("TransferFunction");

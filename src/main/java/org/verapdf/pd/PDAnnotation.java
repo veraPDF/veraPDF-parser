@@ -41,20 +41,20 @@ public class PDAnnotation extends PDObject {
 
     static {
         markupAnnotationTypes.add(ASAtom.TEXT);
-        markupAnnotationTypes.add(ASAtom.FREETEXT);
+        markupAnnotationTypes.add(ASAtom.FREE_TEXT);
         markupAnnotationTypes.add(ASAtom.LINE);
         markupAnnotationTypes.add(ASAtom.SQUARE);
         markupAnnotationTypes.add(ASAtom.CIRCLE);
         markupAnnotationTypes.add(ASAtom.POLYGON);
-        markupAnnotationTypes.add(ASAtom.POLYLINE);
+        markupAnnotationTypes.add(ASAtom.POLY_LINE);
         markupAnnotationTypes.add(ASAtom.HIGHLIGHT);
         markupAnnotationTypes.add(ASAtom.UNDERLINE);
         markupAnnotationTypes.add(ASAtom.SQUIGGLY);
-        markupAnnotationTypes.add(ASAtom.STRIKEOUT);
+        markupAnnotationTypes.add(ASAtom.STRIKE_OUT);
         markupAnnotationTypes.add(ASAtom.CARET);
         markupAnnotationTypes.add(ASAtom.STAMP);
         markupAnnotationTypes.add(ASAtom.INK);
-        markupAnnotationTypes.add(ASAtom.FILEATTACHMENT);
+        markupAnnotationTypes.add(ASAtom.FILE_ATTACHMENT);
         markupAnnotationTypes.add(ASAtom.SOUND);
         markupAnnotationTypes.add(ASAtom.REDACT);
         markupAnnotationTypes.add(ASAtom.PROJECTION);
