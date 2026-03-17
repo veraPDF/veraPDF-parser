@@ -37,6 +37,29 @@ import java.util.Set;
  */
 public class PDAnnotation extends PDObject {
 
+    private static final Set<ASAtom> markupAnnotationTypes = new HashSet<>();
+
+    static {
+        markupAnnotationTypes.add(ASAtom.TEXT);
+        markupAnnotationTypes.add(ASAtom.FREE_TEXT);
+        markupAnnotationTypes.add(ASAtom.LINE);
+        markupAnnotationTypes.add(ASAtom.SQUARE);
+        markupAnnotationTypes.add(ASAtom.CIRCLE);
+        markupAnnotationTypes.add(ASAtom.POLYGON);
+        markupAnnotationTypes.add(ASAtom.POLY_LINE);
+        markupAnnotationTypes.add(ASAtom.HIGHLIGHT);
+        markupAnnotationTypes.add(ASAtom.UNDERLINE);
+        markupAnnotationTypes.add(ASAtom.SQUIGGLY);
+        markupAnnotationTypes.add(ASAtom.STRIKE_OUT);
+        markupAnnotationTypes.add(ASAtom.CARET);
+        markupAnnotationTypes.add(ASAtom.STAMP);
+        markupAnnotationTypes.add(ASAtom.INK);
+        markupAnnotationTypes.add(ASAtom.FILE_ATTACHMENT);
+        markupAnnotationTypes.add(ASAtom.SOUND);
+        markupAnnotationTypes.add(ASAtom.REDACT);
+        markupAnnotationTypes.add(ASAtom.PROJECTION);
+    }
+
 	public PDAnnotation(COSObject obj) {
 		super(obj);
 	}
@@ -76,6 +99,10 @@ public class PDAnnotation extends PDObject {
 		}
 		return null;
 	}
+
+    public boolean isMarkup() {
+        return markupAnnotationTypes.contains(getSubtype());
+    }
 
 	public COSObject getBM() {
 		return this.getKey(ASAtom.BM);

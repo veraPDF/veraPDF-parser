@@ -123,6 +123,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom CALRGB = new ASAtom("CalRGB");
     public static final ASAtom CAP = new ASAtom("Cap");
     public static final ASAtom CAP_HEIGHT = new ASAtom("CapHeight");
+    public static final ASAtom CARET =  new ASAtom("Caret");
     public static final ASAtom CATALOG = new ASAtom("Catalog");
     public static final ASAtom CCITTFAX_DECODE = new ASAtom("CCITTFaxDecode");
     public static final ASAtom CCITTFAX_DECODE_ABBREVIATION = new ASAtom("CCF");
@@ -141,6 +142,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom CID_TO_GID_MAP = new ASAtom("CIDToGIDMap");
     public static final ASAtom CID_SET = new ASAtom("CIDSet");
     public static final ASAtom CID_SYSTEM_INFO = new ASAtom("CIDSystemInfo");
+    public static final ASAtom CIRCLE = new ASAtom("Circle");
     public static final ASAtom CLASS_MAP = new ASAtom("ClassMap");
     public static final ASAtom CLR_F = new ASAtom("ClrF");
     public static final ASAtom CLR_FF = new ASAtom("ClrFf");
@@ -262,6 +264,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom FDF = new ASAtom("FDF");
     public static final ASAtom FF = new ASAtom("Ff");
     public static final ASAtom FIELDS = new ASAtom("Fields");
+    public static final ASAtom FILE_ATTACHMENT = new ASAtom("FileAttachment");
     public static final ASAtom FILESPEC = new ASAtom("Filespec");
     public static final ASAtom FILTER = new ASAtom("Filter");
     public static final ASAtom FIRST = new ASAtom("First");
@@ -285,6 +288,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom FONT_WEIGHT = new ASAtom("FontWeight");
     public static final ASAtom FORM = new ASAtom("Form");
     public static final ASAtom FORMTYPE = new ASAtom("FormType");
+    public static final ASAtom FREE_TEXT = new ASAtom("FreeText");
     public static final ASAtom FRM = new ASAtom("FRM");
     public static final ASAtom FS = new ASAtom("FS");
     public static final ASAtom FT = new ASAtom("FT");
@@ -311,6 +315,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom HIDE_MENUBAR = new ASAtom("HideMenubar");
     public static final ASAtom HIDE_TOOLBAR = new ASAtom("HideToolbar");
     public static final ASAtom HIDE_WINDOWUI = new ASAtom("HideWindowUI");
+    public static final ASAtom HIGHLIGHT = new ASAtom("Highlight");
     public static final ASAtom HT = new ASAtom("HT");
     public static final ASAtom HTO = new ASAtom("HTO");
     public static final ASAtom HTP = new ASAtom("HTP");
@@ -329,6 +334,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom INDEX = new ASAtom("Index");
     public static final ASAtom INDEXED = new ASAtom("Indexed");
     public static final ASAtom INFO = new ASAtom("Info");
+    public static final ASAtom INK =  new ASAtom("Ink");
     public static final ASAtom INKLIST = new ASAtom("InkList");
     public static final ASAtom INTENT = new ASAtom("Intent");
     public static final ASAtom INTERPOLATE = new ASAtom("Interpolate");
@@ -363,6 +369,8 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom LENGTH2 = new ASAtom("Length2");
     public static final ASAtom LIGHTEN = new ASAtom("Lighten");
     public static final ASAtom LIMITS = new ASAtom("Limits");
+    public static final ASAtom LINE =  new ASAtom("Line");
+    public static final ASAtom LINK = new ASAtom("Link");
     public static final ASAtom LIST = new ASAtom("List");
     public static final ASAtom LIST_NUMBERING = new ASAtom("ListNumbering");
     public static final ASAtom LJ = new ASAtom("LJ");
@@ -397,12 +405,15 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom ML = new ASAtom("ML");
     public static final ASAtom MM_TYPE1 = new ASAtom("MMType1");
     public static final ASAtom MOD_DATE = new ASAtom("ModDate");
+    public static final ASAtom MOVIE =  new ASAtom("Movie");
     public static final ASAtom MULTIPLY = new ASAtom("Multiply");
     // N
     public static final ASAtom N = new ASAtom("N");
     public static final ASAtom NA = new ASAtom("NA");
     public static final ASAtom NAME = new ASAtom("Name");
     public static final ASAtom NAMES = new ASAtom("Names");
+    public static final ASAtom NAMESPACE = new ASAtom("Namespace");
+    public static final ASAtom NAMESPACES = new ASAtom("Namespaces");
     public static final ASAtom NEED_APPEARANCES = new ASAtom("NeedAppearances");
     public static final ASAtom NEEDS_RENDERING = new ASAtom("NeedsRendering");
     public static final ASAtom NEXT = new ASAtom("Next");
@@ -470,6 +481,8 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom PI = new ASAtom("PI");
     public static final ASAtom PIECE_INFO = new ASAtom("PieceInfo");
     public static final ASAtom PO = new ASAtom("PO");
+    public static final ASAtom POLYGON = new ASAtom("Polygon");
+    public static final ASAtom POLY_LINE = new ASAtom("PolyLine");
     public static final ASAtom POPUP = new ASAtom("Popup");
     public static final ASAtom PRE_RELEASE = new ASAtom("PreRelease");
     public static final ASAtom PREDICTOR = new ASAtom("Predictor");
@@ -478,9 +491,11 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom PRINT_AREA = new ASAtom("PrintArea");
     public static final ASAtom PRINT_CLIP = new ASAtom("PrintClip");
     public static final ASAtom PRINT_SCALING = new ASAtom("PrintScaling");
+    public static final ASAtom PRINTER_MARK =  new ASAtom("PrinterMark");
     public static final ASAtom PROC_SET = new ASAtom("ProcSet");
     public static final ASAtom PROCESS = new ASAtom("Process");
     public static final ASAtom PRODUCER = new ASAtom("Producer");
+    public static final ASAtom PROJECTION = new ASAtom("Projection");
     public static final ASAtom PROP_BUILD = new ASAtom("Prop_Build");
     public static final ASAtom PROPERTIES = new ASAtom("Properties");
     public static final ASAtom PS = new ASAtom("PS");
@@ -500,6 +515,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom REASONS = new ASAtom("Reasons");
     public static final ASAtom RECIPIENTS = new ASAtom("Recipients");
     public static final ASAtom RECT = new ASAtom("Rect");
+    public static final ASAtom REDACT =  new ASAtom("Redact");
     public static final ASAtom REF = new ASAtom("Ref");
     public static final ASAtom REFERENCE = new ASAtom("Reference");
     public static final ASAtom REGISTRY = new ASAtom("Registry");
@@ -509,6 +525,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom REQUIREMENTS = new ASAtom("Requirements");
     public static final ASAtom RGB = new ASAtom("RGB");
     public static final ASAtom RI = new ASAtom("RI");
+    public static final ASAtom RICH_MEDIA = new ASAtom("RichMedia");
     public static final ASAtom ROLE = new ASAtom("Role");
     public static final ASAtom ROLE_MAP = new ASAtom("RoleMap");
     public static final ASAtom ROLE_MAP_NS = new ASAtom("RoleMapNS");
@@ -538,8 +555,12 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom SMASK = new ASAtom("SMask");
     public static final ASAtom SMASK_IN_DATA = new ASAtom("SMaskInData");
     public static final ASAtom SOFT_LIGHT = new ASAtom("SoftLight");
+    public static final ASAtom SOUND  = new ASAtom("Sound");
+    public static final ASAtom SQUARE = new ASAtom("Square");
+    public static final ASAtom SQUIGGLY = new ASAtom("Squiggly");
     public static final ASAtom SS = new ASAtom("SS");
     public static final ASAtom ST = new ASAtom("St");
+    public static final ASAtom STAMP = new ASAtom("Stamp");
     public static final ASAtom STANDARD = new ASAtom("Standard");
     public static final ASAtom STANDARD_ENCODING = new ASAtom("StandardEncoding");
     public static final ASAtom STATE = new ASAtom("State");
@@ -551,6 +572,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom STM = new ASAtom("Stm");
     public static final ASAtom STM_F = new ASAtom("StmF");
     public static final ASAtom STR_F = new ASAtom("StrF");
+    public static final ASAtom STRIKE_OUT = new ASAtom("StrikeOut");
     public static final ASAtom STRUCT_ELEM = new ASAtom("StructElem");
     public static final ASAtom STRUCT_PARENT = new ASAtom("StructParent");
     public static final ASAtom STRUCT_PARENTS = new ASAtom("StructParents");
@@ -573,6 +595,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom TABLE = new ASAtom("Table");
     public static final ASAtom TARGET = new ASAtom("Target");
     public static final ASAtom TEMPLATES = new ASAtom("Templates");
+    public static final ASAtom TEXT = new ASAtom("Text");
     public static final ASAtom THREADS = new ASAtom("Threads");
     public static final ASAtom THUMB = new ASAtom("Thumb");
     public static final ASAtom TI = new ASAtom("TI");
@@ -588,6 +611,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom TO_UNICODE = new ASAtom("ToUnicode");
     public static final ASAtom TR = new ASAtom("TR");
     public static final ASAtom TR2 = new ASAtom("TR2");
+    public static final ASAtom TRAP_NET =  new ASAtom("TrapNet");
     public static final ASAtom TRAPPED = new ASAtom("Trapped");
     public static final ASAtom TRANS = new ASAtom("Trans");
     public static final ASAtom TRANSFER_FUNCTION = new ASAtom("TransferFunction");
@@ -609,6 +633,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom UE = new ASAtom("UE");
     public static final ASAtom UF = new ASAtom("UF");
     public static final ASAtom UNCHANGED = new ASAtom("Unchanged");
+    public static final ASAtom UNDERLINE = new ASAtom("Underline");
     public static final ASAtom UNIX = new ASAtom("Unix");
     public static final ASAtom UNORDERED = new ASAtom("Unordered");
     public static final ASAtom UPPER_ALPHA = new ASAtom("UpperAlpha");
@@ -629,6 +654,7 @@ public class ASAtom implements Comparable<ASAtom> {
     // W
     public static final ASAtom W = new ASAtom("W");
     public static final ASAtom W2 = new ASAtom("W2");
+    public static final ASAtom WATERMARK = new ASAtom("Watermark");
     public static final ASAtom WC = new ASAtom("WC");
     public static final ASAtom WHITE_POINT = new ASAtom("WhitePoint");
     public static final ASAtom WIDGET = new ASAtom("Widget");
