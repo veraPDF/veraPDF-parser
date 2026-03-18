@@ -34,7 +34,7 @@ public class COSReal extends COSNumber {
     private static final DecimalFormat FORMATTER;
 
     static {
-        FORMATTER = new DecimalFormat("#0.000000");
+        FORMATTER = new DecimalFormat("#0.0000000000000000000000000000000000000000");
         DecimalFormatSymbols decFormSymbols = FORMATTER.getDecimalFormatSymbols();
         decFormSymbols.setDecimalSeparator('.');
         FORMATTER.setDecimalFormatSymbols(decFormSymbols);
