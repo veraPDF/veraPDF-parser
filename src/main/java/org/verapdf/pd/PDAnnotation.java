@@ -280,4 +280,14 @@ public class PDAnnotation extends PDObject {
 		}
 		return null;
 	}
+
+    public static Boolean isOutsideCropBox(PDPage page, PDAnnotation annotation) {
+        double[] cropBox = page.getCropBox();
+        double[] rectangle = annotation.getRect();
+        if (rectangle != null && rectangle.length >= 4) {
+            return cropBox[1] >= rectangle[3] || cropBox[0] >= rectangle[2]
+                    || cropBox[3] <= rectangle[1] || cropBox[2] <= rectangle[0];
+        }
+        return null;
+    }
 }
