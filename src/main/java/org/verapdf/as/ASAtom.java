@@ -264,6 +264,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom FDF = new ASAtom("FDF");
     public static final ASAtom FF = new ASAtom("Ff");
     public static final ASAtom FIELDS = new ASAtom("Fields");
+    public static final ASAtom FIGURE = new ASAtom("Figure");
     public static final ASAtom FILE_ATTACHMENT = new ASAtom("FileAttachment");
     public static final ASAtom FILESPEC = new ASAtom("Filespec");
     public static final ASAtom FILTER = new ASAtom("Filter");
@@ -288,6 +289,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom FONT_WEIGHT = new ASAtom("FontWeight");
     public static final ASAtom FORM = new ASAtom("Form");
     public static final ASAtom FORMTYPE = new ASAtom("FormType");
+    public static final ASAtom FORMULA = new ASAtom("Formula");
     public static final ASAtom FREE_TEXT = new ASAtom("FreeText");
     public static final ASAtom FRM = new ASAtom("FRM");
     public static final ASAtom FS = new ASAtom("FS");
