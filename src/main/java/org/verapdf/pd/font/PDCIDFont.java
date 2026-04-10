@@ -211,7 +211,7 @@ public class PDCIDFont extends PDFont {
                     } else {
                         LOGGER.warning("Invalid subtype of the embedded font stream");
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     LOGGER.log(Level.FINE, "Can't read font program.", e);
                 }
             } else {

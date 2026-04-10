@@ -180,7 +180,7 @@ public class PDType1Font extends PDSimpleFont {
                             LOGGER.warning("Invalid subtype of the embedded font stream");
                         }
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
                 }
             }
