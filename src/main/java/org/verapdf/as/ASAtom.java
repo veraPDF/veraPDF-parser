@@ -397,6 +397,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom MATRIX = new ASAtom("Matrix");
     public static final ASAtom MAX_LEN = new ASAtom("MaxLen");
     public static final ASAtom MAX_WIDTH = new ASAtom("MaxWidth");
+    public static final ASAtom MCD = new ASAtom("MCD");
     public static final ASAtom MCID = new ASAtom("MCID");
     public static final ASAtom MCR = new ASAtom("MCR");
     public static final ASAtom MDP = new ASAtom("MDP");
