@@ -55,4 +55,22 @@ public class PDMediaClip extends PDObject {
 		}
 		return Collections.emptyList();
 	}
+
+    public Boolean hasCorrectAlt() {
+        COSObject object = getObject().getKey(ASAtom.ALT);
+        if (object == null || object.getType() != COSObjType.COS_ARRAY) {
+            return false;
+        }
+        COSArray array = (COSArray)object.getDirectBase();
+        if (array.size() % 2 != 0) {
+            return false;
+        }
+        for (int i = 0; i < array.size(); i++) {
+            COSObject elem = array.at(i);
+            if (elem.getType() != COSObjType.COS_STRING || (i % 2 == 1 && elem.getString().isEmpty())) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
