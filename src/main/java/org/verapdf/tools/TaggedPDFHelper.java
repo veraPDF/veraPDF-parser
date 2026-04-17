@@ -165,14 +165,14 @@ public class TaggedPDFHelper {
 //			TaggedPDFConstants.TR));
 
 	private static final int MAX_NUMBER_OF_ELEMENTS = 1;
-	private static final Map<ASAtom, Set<COSKey>> visitedWithNS = new HashMap<>();
-	private static final Set<ASAtom> visitedWithoutNS = new HashSet<>();
+	private final Map<ASAtom, Set<COSKey>> visitedWithNS = new HashMap<>();
+	private final Set<ASAtom> visitedWithoutNS = new HashSet<>();
 
-	private TaggedPDFHelper() {
+	public TaggedPDFHelper() {
 		// disable default constructor
 	}
 
-	public static StructureType getDefaultStructureType(StructureType type) {
+	public StructureType getDefaultStructureType(StructureType type) {
 		if (type == null) {
 			return null;
 		}
@@ -193,7 +193,7 @@ public class TaggedPDFHelper {
 		return null;
 	}
 
-	public static String getRoleMapToSameNamespaceTag(StructureType type) {
+	public String getRoleMapToSameNamespaceTag(StructureType type) {
 		if (type == null) {
 			return null;
 		}
@@ -224,7 +224,7 @@ public class TaggedPDFHelper {
 		return null;
 	}
 
-	public static Boolean isCircularMappingExist(StructureType type) {
+	public Boolean isCircularMappingExist(StructureType type) {
 		if (type == null) {
 			return null;
 		}
@@ -288,7 +288,7 @@ public class TaggedPDFHelper {
 		}
 	}
 
-	private static void addVisited(StructureType type) {
+	private void addVisited(StructureType type) {
 		ASAtom structType = type.getType();
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {
@@ -306,7 +306,7 @@ public class TaggedPDFHelper {
 		}
 	}
 
-	private static boolean isVisited(StructureType type) {
+	private boolean isVisited(StructureType type) {
 		ASAtom structType = type.getType();
 		PDStructureNameSpace nameSpace = type.getNameSpace();
 		if (nameSpace != null) {
