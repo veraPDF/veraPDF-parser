@@ -116,11 +116,11 @@ public class PDStructElem extends PDStructTreeNode {
 	}
 
 	public static StructureType getDefaultStructureType(StructureType structureType) {
-		return TaggedPDFHelper.getDefaultStructureType(structureType);
+		return new TaggedPDFHelper().getDefaultStructureType(structureType);
 	}
 	
 	public String getRoleMapToSameNamespaceTag() {
-		return TaggedPDFHelper.getRoleMapToSameNamespaceTag(getStructureType());
+		return new TaggedPDFHelper().getRoleMapToSameNamespaceTag(getStructureType());
 	}
 
 	public static StructureType getStructureElementStandardStructureType(PDStructElem pdStructElem) {
