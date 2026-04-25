@@ -47,6 +47,8 @@ public abstract class PDFont extends PDResource {
 
     private static final Logger LOGGER = Logger.getLogger(PDFont.class.getCanonicalName());
 
+    public static final String SUBSET_REGEX = "^[A-Z]{6}\\+.+";
+
     protected COSDictionary dictionary;
     protected PDFontDescriptor fontDescriptor;
     protected PDCMap toUnicodeCMap;
@@ -78,7 +80,7 @@ public abstract class PDFont extends PDResource {
             fontDescriptor = new PDFontDescriptor(null);
         }
         this.fontName = this.dictionary.getNameKeyUnicodeValue(ASAtom.BASE_FONT);
-        this.fontNameWithoutSubset = fontName != null ? (fontName.matches("^[A-Z]{6}+.+") ? fontName.substring(7) : fontName) : null;
+        this.fontNameWithoutSubset = fontName != null ? (fontName.matches(SUBSET_REGEX) ? fontName.substring(7) : fontName) : null;
         if (!(this instanceof PDType3Font)) {
             this.boundingBox = fontDescriptor.getFontBoundingBox();
             if (this.boundingBox == null) {
