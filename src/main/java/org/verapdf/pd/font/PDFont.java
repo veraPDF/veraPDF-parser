@@ -47,7 +47,7 @@ public abstract class PDFont extends PDResource {
 
     private static final Logger LOGGER = Logger.getLogger(PDFont.class.getCanonicalName());
 
-    public static final String SUBSET_REGEX = "^[A-Z]{6}+.+";
+    public static final String SUBSET_REGEX = "^[A-Z]{6}\\+.+";
 
     protected COSDictionary dictionary;
     protected PDFontDescriptor fontDescriptor;
