@@ -27,6 +27,7 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.exceptions.LoopedException;
 import org.verapdf.pd.actions.PDAction;
 import org.verapdf.pd.actions.PDAnnotationAdditionalActions;
+import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.TypeConverter;
 
 import java.util.HashSet;
@@ -289,5 +290,37 @@ public class PDAnnotation extends PDObject {
                     || cropBox[3] <= rectangle[1] || cropBox[2] <= rectangle[0];
         }
         return null;
+    }
+
+    public static COSObject getPageFromDestination(COSObject destination,  ASAtom key) {
+        if (destination.getType() == COSObjType.COS_STRING) {
+            PDNamesDictionary namesDictionary = StaticResources.getDocument().getCatalog().getNamesDictionary();
+            if (namesDictionary == null) {
+                return null;
+            }
+            PDNameTreeNode dests = namesDictionary.getDests();
+            if (dests != null) {
+                destination = dests.getObject(destination.getString());
+                if (destination == null) {
+                    return null;
+                }
+            }
+        } else if (destination.getType() == COSObjType.COS_NAME) {
+            COSObject dests = StaticResources.getDocument().getCatalog().getDests();
+            if (dests != null) {
+                destination = dests.getKey(destination.getDirectBase().getName());
+                if (destination == null) {
+                    return null;
+                }
+            }
+        }
+        if (destination.getType() == COSObjType.COS_DICT) {
+            destination = destination.getKey(key);
+        }
+        COSObject obj = null;
+        if (destination.getType() == COSObjType.COS_ARRAY && destination.size() > 0) {
+            obj = destination.at(0);
+        }
+        return obj;
     }
 }
