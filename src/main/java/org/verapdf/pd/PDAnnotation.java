@@ -323,4 +323,9 @@ public class PDAnnotation extends PDObject {
         }
         return obj;
     }
+
+    public static boolean isVisibleAnnotation(PDAnnotation annotation) {
+        Long f = annotation.getIntegerKey(ASAtom.F);
+        return (f == null || (f & 2) != 2);
+    }
 }
