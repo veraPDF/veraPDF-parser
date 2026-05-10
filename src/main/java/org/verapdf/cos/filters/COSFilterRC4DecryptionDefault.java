@@ -73,19 +73,28 @@ public class COSFilterRC4DecryptionDefault extends ASBufferedInFilter {
      */
     @Override
     public int read(byte[] buffer, int off, int size) throws IOException {
-        if (this.bufferSize() == 0) {
-            int bytesFed = this.feedBuffer(getBufferCapacity());
-            if (bytesFed == -1) {
-                return -1;
+        if (size == 0) {
+            return 0;
+        }
+        int read = 0;
+        while (read < size) {
+            if (this.bufferSize() == 0) {
+                int bytesFed = this.feedBuffer(getBufferCapacity());
+                if (bytesFed == -1) {
+                    return read == 0 ? -1 : read;
+                }
+            }
+            byte[] encData = new byte[BF_BUFFER_SIZE];
+            int encDataLength = this.bufferPopArray(encData, size - read);
+            if (encDataLength >= 0) {
+                byte[] res = rc4.process(encData, 0, encDataLength);
+                System.arraycopy(res, 0, buffer, off + read, encDataLength);
+                read += encDataLength;
+            } else {
+                return read == 0 ? -1 : read;
             }
         }
-        byte[] encData = new byte[BF_BUFFER_SIZE];
-        int encDataLength = this.bufferPopArray(encData, size);
-        if (encDataLength >= 0) {
-            byte[] res = rc4.process(encData, 0, encDataLength);
-            System.arraycopy(res, 0, buffer, off, encDataLength);
-        }
-        return encDataLength;
+        return read;
     }
 
     /**
