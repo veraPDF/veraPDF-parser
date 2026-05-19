@@ -192,7 +192,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     }
 
     private void toExecute(COSObject next, int depth) throws PostScriptException {
-        if (depth > MAX_TO_EXECUTE_DEPTH) {
+        if (depth >= MAX_TO_EXECUTE_DEPTH) {
             throw new PostScriptException("Type 1 font program exceeded toExecute recursion depth");
         }
         PSObject operator = PSObject.getPSObject(next);
