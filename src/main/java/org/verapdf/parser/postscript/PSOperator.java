@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents executable PostScript operator.
@@ -35,6 +37,8 @@ import java.util.Stack;
  * @author Sergey Shemyakov
  */
 public class PSOperator extends PSObject {
+
+    private static final Logger LOGGER = Logger.getLogger(PSOperator.class.getCanonicalName());
     private static final int MAX_PS_ARRAY_SIZE = 1 << 16;
     private static final int MAX_PS_FOR_ITERATIONS = 10_000;
     private Stack<COSObject> operandStack;
@@ -537,11 +541,11 @@ public class PSOperator extends PSObject {
 
     private void array() throws PostScriptException {
         try {
-            int arraySize = getTopNumber().getInteger().intValue();
+            Long arraySize = getTopNumber().getInteger();
             if (arraySize < 0 || arraySize > MAX_PS_ARRAY_SIZE) {
                 throw new PostScriptException("Array size " + arraySize + " is out of range");
             }
-            COSObject array = COSArray.construct(arraySize);
+            COSObject array = COSArray.construct(arraySize.intValue());
             for (int i = 0; i < arraySize; i++) {
                 array.add(COSObject.getEmpty());
             }
@@ -586,15 +590,18 @@ public class PSOperator extends PSObject {
             long increment = getTopNumber().getInteger();
             long initial = getTopNumber().getInteger();
             if (increment == 0 || (increment > 0 && initial > limit) || (increment < 0 && initial < limit)) {
-                throw new PostScriptException("Wrong increment value " + increment);
+                LOGGER.log(Level.WARNING, "Wrong increment value " + increment + " for operator 'for'");
+                increment = 0;
             }
-            long iterations = Math.abs((limit - initial) / increment) + 1;
-            if (iterations > MAX_PS_FOR_ITERATIONS) {
-                throw new PostScriptException("Loop iteration count " + iterations + " is too large");
-            }
-            for (long i = initial; (increment > 0 ? i <= limit : i >= limit); i += increment) {
-                operandStack.push(COSInteger.construct(i));
-                ((PSProcedure) proc).executeProcedure(operandStack, userDict);
+            if (increment != 0) {
+                long iterations = Math.abs((limit - initial) / increment) + 1;
+                if (iterations > MAX_PS_FOR_ITERATIONS) {
+                    throw new PostScriptException("Loop iteration count " + iterations + " is too large");
+                }
+                for (long i = initial; (increment > 0 ? i <= limit : i >= limit); i += increment) {
+                    operandStack.push(COSInteger.construct(i));
+                    ((PSProcedure) proc).executeProcedure(operandStack, userDict);
+                }
             }
 
         } catch (PostScriptException e) {
