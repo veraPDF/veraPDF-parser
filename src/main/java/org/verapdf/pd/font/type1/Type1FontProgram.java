@@ -54,6 +54,7 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     public static final Logger LOGGER =
             Logger.getLogger(Type1FontProgram.class.getCanonicalName());
     static final double[] DEFAULT_FONT_MATRIX = {0.001, 0, 0, 0.001, 0, 0};
+    private static final int MAX_TO_EXECUTE_DEPTH = 64;
 
     private final COSKey key;
 
@@ -187,12 +188,19 @@ public class Type1FontProgram extends PSParser implements FontProgram {
     }
 
     private void toExecute(COSObject next) throws PostScriptException {
+        toExecute(next, 0);
+    }
+
+    private void toExecute(COSObject next, int depth) throws PostScriptException {
+        if (depth > MAX_TO_EXECUTE_DEPTH) {
+            throw new PostScriptException("Type 1 font program exceeded toExecute recursion depth");
+        }
         PSObject operator = PSObject.getPSObject(next);
         if (operator instanceof PSOperator) {
             if (!OPERATORS_KEYWORDS.contains(((PSOperator) operator).getOperator())) {
                 COSObject dictEntry = userDict.get(ASAtom.getASAtom(((PSOperator) operator).getOperator()));
                 if (dictEntry != null) {
-                    toExecute(dictEntry);
+                    toExecute(dictEntry, depth + 1);
                 }
             } else {
                 operator.execute(operandStack, userDict);

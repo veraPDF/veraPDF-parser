@@ -35,6 +35,8 @@ import java.util.Stack;
  * @author Sergey Shemyakov
  */
 public class PSOperator extends PSObject {
+    private static final int MAX_PS_ARRAY_SIZE = 1 << 16;
+    private static final int MAX_PS_FOR_ITERATIONS = 10_000;
     private Stack<COSObject> operandStack;
     private Map<ASAtom, COSObject> userDict;
     private final String operator;
@@ -536,6 +538,9 @@ public class PSOperator extends PSObject {
     private void array() throws PostScriptException {
         try {
             int arraySize = getTopNumber().getInteger().intValue();
+            if (arraySize < 0 || arraySize > MAX_PS_ARRAY_SIZE) {
+                throw new PostScriptException("Array size " + arraySize + " is out of range");
+            }
             COSObject array = COSArray.construct(arraySize);
             for (int i = 0; i < arraySize; i++) {
                 array.add(COSObject.getEmpty());
@@ -577,11 +582,17 @@ public class PSOperator extends PSObject {
             if (!(proc instanceof PSProcedure)) {
                 throw new PostScriptException("Object is not a procedure");
             }
-            COSObject limit = getTopNumber();
-            COSObject increment = getTopNumber();
-            COSObject initial = getTopNumber();
-            for (long i = initial.getInteger(); i <= limit.getInteger();
-                 i += increment.getInteger()) {
+            long limit = getTopNumber().getInteger();
+            long increment = getTopNumber().getInteger();
+            long initial = getTopNumber().getInteger();
+            if (increment == 0 || (increment > 0 && initial > limit) || (increment < 0 && initial < limit)) {
+                throw new PostScriptException("Wrong increment value " + increment);
+            }
+            long iterations = Math.abs((limit - initial) / increment) + 1;
+            if (iterations > MAX_PS_FOR_ITERATIONS) {
+                throw new PostScriptException("Loop iteration count " + iterations + " is too large");
+            }
+            for (long i = initial; (increment > 0 ? i <= limit : i >= limit); i += increment) {
                 operandStack.push(COSInteger.construct(i));
                 ((PSProcedure) proc).executeProcedure(operandStack, userDict);
             }
