@@ -23,6 +23,7 @@ package org.verapdf.pd.font.cff;
 import org.verapdf.io.SeekableInputStream;
 import org.verapdf.pd.font.FontProgram;
 import org.verapdf.pd.font.cmap.CMap;
+import org.verapdf.pd.font.opentype.OpenTypeFontProgram;
 import org.verapdf.tools.StaticResources;
 
 import java.io.IOException;
@@ -403,13 +404,15 @@ public class CFFType1FontProgram extends CFFFontBaseParser implements FontProgra
      * can be obtained.
      */
     public static CFFType1FontProgram getCFFType1(FontProgram fontProgram) {
-        if (fontProgram instanceof CFFType1FontProgram) {
-            return (CFFType1FontProgram) fontProgram;
-        } else if (fontProgram instanceof CFFFontProgram) {
-            FontProgram innerCFF = ((CFFFontProgram) fontProgram).getFont();
-            if (innerCFF instanceof CFFType1FontProgram) {
-                return (CFFType1FontProgram) innerCFF;
-            }
+        FontProgram currentFotProgram = fontProgram;
+        if (currentFotProgram instanceof OpenTypeFontProgram) {
+            currentFotProgram = ((OpenTypeFontProgram)currentFotProgram).getFont();
+        }
+        if (currentFotProgram instanceof CFFFontProgram) {
+            currentFotProgram = ((CFFFontProgram) currentFotProgram).getFont();
+        }
+        if (currentFotProgram instanceof CFFType1FontProgram) {
+            return (CFFType1FontProgram) currentFotProgram;
         }
         return null;
     }
