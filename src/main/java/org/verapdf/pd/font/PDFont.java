@@ -286,6 +286,7 @@ public abstract class PDFont extends PDResource {
     public abstract FontProgram getFontProgram();
     
     public boolean parseFontProgram() {
+        getFontProgram();
         if (fontProgram != null) {
             try {
                 if (!fontProgram.isAttemptedParsing()) {
