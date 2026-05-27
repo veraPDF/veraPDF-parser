@@ -284,6 +284,22 @@ public abstract class PDFont extends PDResource {
      * @return embedded font program fo this PDFont.
      */
     public abstract FontProgram getFontProgram();
+    
+    public boolean parseFontProgram() {
+        if (fontProgram != null) {
+            try {
+                if (!fontProgram.isAttemptedParsing()) {
+                    fontProgram.parseFont();
+                }
+                setSuccessfullyParsed(fontProgram.isSuccessfulParsing());
+                return fontProgram.isSuccessfulParsing();
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Can't parse font program of font " + getName(), e);
+                setSuccessfullyParsed(false);
+            }
+        }
+        return false;
+    }
 
     /**
      * Gets width of given code from font program.
