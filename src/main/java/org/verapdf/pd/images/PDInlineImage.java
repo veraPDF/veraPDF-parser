@@ -92,7 +92,7 @@ public class PDInlineImage extends PDResource {
 				return result;
 			}
 		}
-		PDColorSpace result = ColorSpaceFactory.getColorSpace(cs, imageResources);
+		PDColorSpace result = imageResources != null ? ColorSpaceFactory.getColorSpace(cs, imageResources) : null;
 		if (result == null) {
 			result = ColorSpaceFactory.getColorSpace(cs, pageResources);
 		}
