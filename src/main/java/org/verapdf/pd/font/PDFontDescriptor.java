@@ -25,10 +25,11 @@ import org.verapdf.cos.*;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
 
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents font descriptor.
@@ -54,6 +55,12 @@ public class PDFontDescriptor extends PDObject {
     private static final Double DEFAULT_XHEIGHT = 0d;
     private static final Double DEFAULT_STEM_H = 0d;
     private static final Double DEFAULT_WIDTH = 0d;
+    private static final List<String> STYLE_SUFFIXES = Arrays.asList(
+            "Semibold", "BoldSemiExt", "BoldItalic", "RomanSmallCaps",
+            "SmallCaps", "SemiboldIt", "BoldIt", "Regular", "Italic",
+            "Oblique", "Bold", "Light", "Medium", "Black", "Condensed",
+            "Extended", "Exp", "Roman", "Book", "Std", "MT", "PS", "It"
+    );
 
     // values
     private String fontName;
@@ -120,6 +127,33 @@ public class PDFontDescriptor extends PDObject {
             fontFamily = getStringKey(ASAtom.FONT_FAMILY);
         }
         return fontFamily;
+    }
+
+    public static String extractFontFamily(String fontName) {
+        if (fontName == null || fontName.isEmpty()) return null;
+
+        String name = fontName.trim();
+        name = name.replaceAll("\\*\\d+", "");
+
+        boolean changed;
+        do {
+            changed = false;
+            for (String suffix : STYLE_SUFFIXES) {
+                Pattern p = Pattern.compile("(-?)" + Pattern.quote(suffix) + "$", Pattern.CASE_INSENSITIVE);
+                Matcher m = p.matcher(name);
+                if (m.find()) {
+                    name = name.substring(0, m.start());
+                    changed = true;
+                    break;
+                }
+            }
+        } while (changed);
+
+        name = name.replaceAll("-$", "");
+        String spaced = name.replaceAll("([a-z])([A-Z])", "$1 $2");
+        spaced = spaced.trim().replaceAll("\\s+", " ");
+
+        return spaced.isEmpty() ? "sans-serif" : spaced;
     }
 
     /**
