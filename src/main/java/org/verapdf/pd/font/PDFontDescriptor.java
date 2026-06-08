@@ -56,10 +56,74 @@ public class PDFontDescriptor extends PDObject {
     private static final Double DEFAULT_STEM_H = 0d;
     private static final Double DEFAULT_WIDTH = 0d;
     private static final List<String> STYLE_SUFFIXES = Arrays.asList(
-            "Semibold", "BoldSemiExt", "BoldItalic", "RomanSmallCaps",
-            "SmallCaps", "SemiboldIt", "BoldIt", "Regular", "Italic",
-            "Oblique", "Bold", "Light", "Medium", "Black", "Condensed",
-            "Extended", "Exp", "Roman", "Book", "Std", "MT", "PS", "It"
+            // ---- Weight ----
+            "Hairline", "Thin",
+            "ExtraLight", "ExtLt", "Extra Light", "Extra-Light",
+            "UltraLight", "UltLt", "Ultra Light", "Ultra-Light",
+            "Light", "Lt",
+            "Book",
+            "Normal",
+            "Regular", "Rg", "Roman",
+            "Medium", "Md",
+            "Demi", "DemiBold", "Demi Bold", "Demi-Bold",
+            "SemiBold", "Semibold", "SemiBd", "Semi Bold", "Semi-Bold",
+            "Bold", "Bd",
+            "ExtraBold", "ExtBd", "Extra Bold", "Extra-Bold",
+            "UltraBold", "UltBd", "Ultra Bold", "Ultra-Bold",
+            "Black", "Blk",
+            "Heavy", "Hv",
+            "Ultra", "Fat", "Poster",
+
+            // ---- Slope ----
+            "Italic", "Ita", "It",
+            "Oblique", "Obl",
+            "Backslant",
+
+            // ---- Width ----
+            "Compressed",
+            "ExtraCondensed", "UltraCondensed",
+            "Condensed", "Cond", "Cn",
+            "SemiCondensed",
+            "Narrow",
+            "SemiExpanded",
+            "Expanded", "Exp", "Extended",
+            "ExtraExpanded", "UltraExpanded",
+            "Wide",
+
+            // ---- Optical size ----
+            "Caption", "Text", "Subhead", "Deck", "Display", "Titling",
+
+            // ---- Weight + Italic/Oblique (common combinations) ----
+            "ThinItalic", "ThinIt",
+            "LightItalic", "LightOblique", "LightIt",
+            "BookItalic", "BookOblique",
+            "MediumItalic", "MediumOblique", "MediumIt",
+            "DemiItalic", "DemiOblique",
+            "SemiBoldItalic", "SemiboldItalic", "SemiBoldIt", "SemiboldIt",
+            "BoldItalic", "BoldIt", "BoldOblique", "BoldObl",
+            "ExtraBoldItalic", "ExtraBoldIt",
+            "BlackItalic", "BlackIt", "HeavyItalic",
+
+            // ---- Width + Weight / Slope (common combos) ----
+            "BoldCondensed", "BoldCond", "BoldCn",
+            "BoldExpanded", "BoldExp", "BoldExtended",
+            "BoldSemiExt",
+            "LightCondensed", "LightCond",
+            "MediumCondensed", "MediumCond",
+            "CondensedBold", "CondBold",
+            "CondensedLight",
+            "ExpandedBold", "ExtendedBold",
+
+            // ---- SmallCaps & other variants ----
+            "SmallCaps", "SC", "PetiteCaps",
+            "RomanSmallCaps",
+            "BoldSmallCaps",
+            "Inline", "Outline", "Shadow",
+            "Engraved", "Stencil", "Swash",
+            "Ornaments", "Symbols", "Icons",
+
+            // ---- Foundry / vendor tags ----
+            "Std", "MT", "PS", "LT", "Pro", "Com", "W1G", "EF", "CE"
     );
 
     // values
