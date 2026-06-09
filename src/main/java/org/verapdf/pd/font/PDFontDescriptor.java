@@ -128,31 +128,27 @@ public class PDFontDescriptor extends PDObject {
         String name = fontNameWithoutSubset.trim();
         name = name.replaceAll("\\*\\d+", "");
 
-        boolean changed;
-        do {
+        boolean changed = true;
+        while (changed) {
             changed = false;
             for (String suffix : FontConstants.STYLE_SUFFIXES) {
                 String lowerName = name.toLowerCase();
                 String lowerSuffix = suffix.toLowerCase();
-
-                if (lowerName.endsWith("-" + lowerSuffix)) {
-                    name = name.substring(0, name.length() - suffix.length() - 1);
-                    changed = true;
-                    break;
-                }
                 if (lowerName.endsWith(lowerSuffix)) {
                     name = name.substring(0, name.length() - suffix.length());
+                    if (name.endsWith("-")) {
+                        name = name.substring(0, name.length() - 1);
+                    }
                     changed = true;
                     break;
                 }
             }
-        } while (changed);
+        }
 
-        name = name.replaceAll("-$", "");
         String spaced = name.replaceAll("([a-z])([A-Z])", "$1 $2");
         spaced = spaced.trim().replaceAll("\\s+", " ");
 
-        return spaced.isEmpty() ? "sans-serif" : spaced;
+        return spaced.isEmpty() ? null : spaced;
     }
 
     /**
