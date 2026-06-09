@@ -24,12 +24,11 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
+import org.verapdf.tools.FontConstants;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Represents font descriptor.
@@ -55,76 +54,6 @@ public class PDFontDescriptor extends PDObject {
     private static final Double DEFAULT_XHEIGHT = 0d;
     private static final Double DEFAULT_STEM_H = 0d;
     private static final Double DEFAULT_WIDTH = 0d;
-    private static final List<String> STYLE_SUFFIXES = Arrays.asList(
-            // ---- Weight ----
-            "Hairline", "Thin",
-            "ExtraLight", "ExtLt", "Extra Light", "Extra-Light",
-            "UltraLight", "UltLt", "Ultra Light", "Ultra-Light",
-            "Light", "Lt",
-            "Book",
-            "Normal",
-            "Regular", "Rg", "Roman",
-            "Medium", "Md",
-            "Demi", "DemiBold", "Demi Bold", "Demi-Bold",
-            "SemiBold", "Semibold", "SemiBd", "Semi Bold", "Semi-Bold",
-            "Bold", "Bd",
-            "ExtraBold", "ExtBd", "Extra Bold", "Extra-Bold",
-            "UltraBold", "UltBd", "Ultra Bold", "Ultra-Bold",
-            "Black", "Blk",
-            "Heavy", "Hv",
-            "Ultra", "Fat", "Poster",
-
-            // ---- Slope ----
-            "Italic", "Ita", "It",
-            "Oblique", "Obl",
-            "Backslant",
-
-            // ---- Width ----
-            "Compressed",
-            "ExtraCondensed", "UltraCondensed",
-            "Condensed", "Cond", "Cn",
-            "SemiCondensed",
-            "Narrow",
-            "SemiExpanded",
-            "Expanded", "Exp", "Extended",
-            "ExtraExpanded", "UltraExpanded",
-            "Wide",
-
-            // ---- Optical size ----
-            "Caption", "Text", "Subhead", "Deck", "Display", "Titling",
-
-            // ---- Weight + Italic/Oblique (common combinations) ----
-            "ThinItalic", "ThinIt",
-            "LightItalic", "LightOblique", "LightIt",
-            "BookItalic", "BookOblique",
-            "MediumItalic", "MediumOblique", "MediumIt",
-            "DemiItalic", "DemiOblique",
-            "SemiBoldItalic", "SemiboldItalic", "SemiBoldIt", "SemiboldIt",
-            "BoldItalic", "BoldIt", "BoldOblique", "BoldObl",
-            "ExtraBoldItalic", "ExtraBoldIt",
-            "BlackItalic", "BlackIt", "HeavyItalic",
-
-            // ---- Width + Weight / Slope (common combos) ----
-            "BoldCondensed", "BoldCond", "BoldCn",
-            "BoldExpanded", "BoldExp", "BoldExtended",
-            "BoldSemiExt",
-            "LightCondensed", "LightCond",
-            "MediumCondensed", "MediumCond",
-            "CondensedBold", "CondBold",
-            "CondensedLight",
-            "ExpandedBold", "ExtendedBold",
-
-            // ---- SmallCaps & other variants ----
-            "SmallCaps", "SC", "PetiteCaps",
-            "RomanSmallCaps",
-            "BoldSmallCaps",
-            "Inline", "Outline", "Shadow",
-            "Engraved", "Stencil", "Swash",
-            "Ornaments", "Symbols", "Icons",
-
-            // ---- Foundry / vendor tags ----
-            "Std", "MT", "PS", "LT", "Pro", "Com", "W1G", "EF", "CE"
-    );
 
     // values
     private String fontName;
@@ -193,20 +122,26 @@ public class PDFontDescriptor extends PDObject {
         return fontFamily;
     }
 
-    public static String extractFontFamily(String fontName) {
-        if (fontName == null || fontName.isEmpty()) return null;
+    public static String extractFontFamilyFromFontName(String fontNameWithoutSubset) {
+        if (fontNameWithoutSubset == null || fontNameWithoutSubset.isEmpty()) return null;
 
-        String name = fontName.trim();
+        String name = fontNameWithoutSubset.trim();
         name = name.replaceAll("\\*\\d+", "");
 
         boolean changed;
         do {
             changed = false;
-            for (String suffix : STYLE_SUFFIXES) {
-                Pattern p = Pattern.compile("(-?)" + Pattern.quote(suffix) + "$", Pattern.CASE_INSENSITIVE);
-                Matcher m = p.matcher(name);
-                if (m.find()) {
-                    name = name.substring(0, m.start());
+            for (String suffix : FontConstants.STYLE_SUFFIXES) {
+                String lowerName = name.toLowerCase();
+                String lowerSuffix = suffix.toLowerCase();
+
+                if (lowerName.endsWith("-" + lowerSuffix)) {
+                    name = name.substring(0, name.length() - suffix.length() - 1);
+                    changed = true;
+                    break;
+                }
+                if (lowerName.endsWith(lowerSuffix)) {
+                    name = name.substring(0, name.length() - suffix.length());
                     changed = true;
                     break;
                 }
