@@ -126,6 +126,7 @@ public class PDFontDescriptor extends PDObject {
         if (fontNameWithoutSubset == null || fontNameWithoutSubset.isEmpty()) return null;
 
         String name = fontNameWithoutSubset.trim();
+        name = name.replaceAll("[^a-zA-Z0-9\\s-]+", "");
         name = name.replaceAll("\\*\\d+", "");
 
         boolean changed = true;
