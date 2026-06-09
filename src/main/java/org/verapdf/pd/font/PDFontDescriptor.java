@@ -24,9 +24,9 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 import org.verapdf.pd.PDObject;
 import org.verapdf.pd.font.stdmetrics.StandardFontMetrics;
+import org.verapdf.tools.FontConstants;
 
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -120,6 +120,35 @@ public class PDFontDescriptor extends PDObject {
             fontFamily = getStringKey(ASAtom.FONT_FAMILY);
         }
         return fontFamily;
+    }
+
+    public static String extractFontFamilyFromFontName(String fontNameWithoutSubset) {
+        if (fontNameWithoutSubset == null || fontNameWithoutSubset.isEmpty()) return null;
+
+        String name = fontNameWithoutSubset.trim();
+        name = name.replaceAll("\\*\\d+", "");
+
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (String suffix : FontConstants.STYLE_SUFFIXES) {
+                String lowerName = name.toLowerCase();
+                String lowerSuffix = suffix.toLowerCase();
+                if (lowerName.endsWith(lowerSuffix)) {
+                    name = name.substring(0, name.length() - suffix.length());
+                    if (name.endsWith("-")) {
+                        name = name.substring(0, name.length() - 1);
+                    }
+                    changed = true;
+                    break;
+                }
+            }
+        }
+
+        String spaced = name.replaceAll("([a-z])([A-Z])", "$1 $2");
+        spaced = spaced.trim().replaceAll("\\s+", " ");
+
+        return spaced.isEmpty() ? null : spaced;
     }
 
     /**
