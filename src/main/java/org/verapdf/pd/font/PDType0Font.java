@@ -38,8 +38,8 @@ public class PDType0Font extends PDCIDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDType0Font.class.getCanonicalName());
     private static final String UCS2 = "UCS2";
-    private static final String IDENTITY_H = "Identity-H";
-    private static final String IDENTITY_V = "Identity-V";
+    public static final String IDENTITY_H = "Identity-H";
+    public static final String IDENTITY_V = "Identity-V";
     private static final String JAPAN_1 = "Japan1";
     private static final String KOREA_1 = "Korea1";
     private static final String KR_9 = "KR";
