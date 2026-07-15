@@ -53,18 +53,22 @@ public class CIDWArray {
         ranges = new ArrayList<>();
         if (w != null) {
             for (int i = 0; i < w.size(); ++i) {
-                int cidBegin = w.at(i++).getInteger().intValue();
+                Long cidBegin = w.at(i++).getInteger();
+                if (cidBegin == null) {
+                    LOGGER.log(Level.FINE, "W array in CIDFont is invalid.");
+                    return;
+                }
                 COSObject obj = w.at(i);
                 if (obj.getType() == COSObjType.COS_INTEGER) {
                     int cidEnd = obj.getInteger().intValue();
                     Double width = w.at(++i).getReal();
                     if (width == null) {
-                        LOGGER.log(Level.FINE, "Unexpected end of W array in CID font");
+                        LOGGER.log(Level.FINE, "W array in CIDFont is invalid.");
                         return;
                     }
-                    this.ranges.add(new CIDWArrayRange(cidBegin, cidEnd, width));
+                    this.ranges.add(new CIDWArrayRange(cidBegin.intValue(), cidEnd, width));
                 } else if (obj.getType() == COSObjType.COS_ARRAY) {
-                    addSingleMappings(cidBegin, (COSArray) obj.getDirectBase());
+                    addSingleMappings(cidBegin.intValue(), (COSArray) obj.getDirectBase());
                 }
             }
         }
@@ -73,7 +77,7 @@ public class CIDWArray {
     private void addSingleMappings(int cidBegin, COSArray arr) {
         for (int i = 0; i < arr.size(); i++) {
             if (!arr.at(i).getType().isNumber()) {
-                LOGGER.log(Level.SEVERE, "W array in CIDFont has invalid entry.");
+                LOGGER.log(Level.FINE, "W array in CIDFont is invalid.");
                 continue;
             }
             this.singleMappings.put(cidBegin + i, arr.at(i).getReal());

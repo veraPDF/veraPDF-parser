@@ -38,35 +38,10 @@ import java.util.logging.Logger;
  */
 public class CIDW2Array {
 
-    private static final Logger LOGGER = Logger.getLogger(CIDWArray.class.getCanonicalName());
+    private static final Logger LOGGER = Logger.getLogger(CIDW2Array.class.getCanonicalName());
 
     private final Map<Integer, CIDVerticalMetrics> singleMappings;
     private final List<CIDW2ArrayRange> ranges;
-
-    /**
-     * Get vertical metrics from W2 array.
-     * @param arr is COSArray.
-     * @param index is position of displacement vector in COSArray.
-     * @return vertical metrics as it is specified in W2 array.
-     */
-    private CIDVerticalMetrics getVerticalMetricsFromCOSArray(COSArray arr, int index) {
-        Double displacement = arr.at(index).getReal();
-        if (displacement == null) {
-            LOGGER.log(Level.FINE, "Unexpected end of W2 array in CID font");
-            return null;
-        }
-        Double positionVectorH = arr.at(++index).getReal();
-        if (positionVectorH == null) {
-            LOGGER.log(Level.FINE, "Unexpected end of W2 array in CID font");
-            return null;
-        }
-        Double positionVectorV = arr.at(++index).getReal();
-        if (positionVectorV == null) {
-            LOGGER.log(Level.FINE, "Unexpected end of W2 array in CID font");
-            return null;
-        }
-        return new CIDVerticalMetrics(displacement, positionVectorH, positionVectorV);
-    }
 
     /**
      * Constructor from a COSObject.
@@ -78,27 +53,58 @@ public class CIDW2Array {
         ranges = new ArrayList<>();
         if (w2 != null) {
             for (int i = 0; i < w2.size(); ++i) {
-                int cidBegin = w2.at(i++).getInteger().intValue();
+                Long cidBegin = w2.at(i++).getInteger();
+                if (cidBegin == null) {
+                    LOGGER.log(Level.FINE, "W2 array in CIDFont is invalid.");
+                    return;
+                }
                 COSObject obj = w2.at(i);
                 if (obj.getType() == COSObjType.COS_INTEGER) {
                     int cidEnd = obj.getInteger().intValue();
                     CIDVerticalMetrics verticalMetrics = getVerticalMetricsFromCOSArray(w2, ++i);
-                    if (verticalMetrics == null) return;
+                    if (verticalMetrics == null) {
+                        LOGGER.log(Level.FINE, "W2 array in CIDFont is invalid.");
+                        return;
+                    }
                     i += 2;
-                    this.ranges.add(new CIDW2ArrayRange(cidBegin, cidEnd, verticalMetrics));
+                    this.ranges.add(new CIDW2ArrayRange(cidBegin.intValue(), cidEnd, verticalMetrics));
                 } else if (obj.getType() == COSObjType.COS_ARRAY) {
-                    addSingleMappings(cidBegin, (COSArray) obj.getDirectBase());
+                    addSingleMappings(cidBegin.intValue(), (COSArray) obj.getDirectBase());
                 }
             }
         }
     }
 
+    /**
+     * Get vertical metrics from W2 array.
+     * @param arr is COSArray.
+     * @param index is position of displacement vector in COSArray.
+     * @return vertical metrics as it is specified in W2 array.
+     */
+    private CIDVerticalMetrics getVerticalMetricsFromCOSArray(COSArray arr, int index) {
+        Double displacement = arr.at(index).getReal();
+        if (displacement == null) {
+            return null;
+        }
+        Double positionVectorH = arr.at(++index).getReal();
+        if (positionVectorH == null) {
+            return null;
+        }
+        Double positionVectorV = arr.at(++index).getReal();
+        if (positionVectorV == null) {
+            return null;
+        }
+        return new CIDVerticalMetrics(displacement, positionVectorH, positionVectorV);
+    }
+
     private void addSingleMappings(int cidBegin, COSArray arr) {
-        for (int i = 0; i < arr.size(); i++) {
+        for (int i = 0; i < arr.size(); i += 3) {
             CIDVerticalMetrics verticalMetrics = getVerticalMetricsFromCOSArray(arr, i);
-            if (verticalMetrics == null) return;
-            i += 2;
-            this.singleMappings.put(cidBegin + (int) (i / 3), verticalMetrics);
+            if (verticalMetrics == null) {
+                LOGGER.log(Level.FINE, "W2 array in CIDFont is invalid.");
+                return;
+            }
+            this.singleMappings.put(cidBegin + i / 3, verticalMetrics);
         }
     }
 
@@ -110,11 +116,9 @@ public class CIDW2Array {
     public Double getDisplacement(int cid) {
         CIDVerticalMetrics res = singleMappings.get(cid);
         if (res != null) return res.getDisplacement();
-        else {
-            for (CIDW2ArrayRange range : ranges) {
-                if (range.contains(cid)) {
-                    return range.getDisplacement();
-                }
+        for (CIDW2ArrayRange range : ranges) {
+            if (range.contains(cid)) {
+                return range.getDisplacement();
             }
         }
         return null;
