@@ -44,10 +44,12 @@ import java.util.logging.Logger;
 public class PDCIDFont extends PDFont {
 
     private static final Logger LOGGER = Logger.getLogger(PDCIDFont.class.getCanonicalName());
+    private static final Double[] DEFAULT_CID_FONT_VERTICAL_WIDTH = { 880d, -1000d };
     private static final Double DEFAULT_CID_FONT_WIDTH = 1000d;
 
     protected CMap cMap;
     private CIDWArray widths;
+    private CIDW2Array verticalMetrics;
     private PDCIDSystemInfo cidSystemInfo;
 
     /**
@@ -86,6 +88,13 @@ public class PDCIDFont extends PDFont {
      */
     protected PDCIDFont(COSDictionary dictionary) {
         super(dictionary);
+    }
+
+    /**
+     * @return true if font is vertical.
+     */
+    public boolean isVertical() {
+        return cMap.getwMode() == 1;
     }
 
     /**
@@ -129,6 +138,25 @@ public class PDCIDFont extends PDFont {
     }
 
     /**
+     * Gets vertical width for glyph with given code in this font.
+     *
+     * @param code is code of glyph.
+     * @return vertical width for glyph with given code as specified in Widths 2 array.
+     */
+    public Double getVerticalWidth(int code) {
+        Double[] defaultMetrics = getDefaultVMetrics();
+        if (this.verticalMetrics == null) {
+            COSObject w2 = this.dictionary.getKey(ASAtom.W2);
+            if (w2.empty() || w2.getType() != COSObjType.COS_ARRAY) {
+                return defaultMetrics[1];
+            }
+            this.verticalMetrics = new CIDW2Array((COSArray) w2.getDirectBase());
+        }
+        Double res = verticalMetrics.getDisplacement(this.cMap.toCID(code));
+        return res == null ? defaultMetrics[1] : res;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -139,6 +167,22 @@ public class PDCIDFont extends PDFont {
         } else {
             return DEFAULT_CID_FONT_WIDTH;
         }
+    }
+
+    /**
+     * @return default vertical metrics for this font as specified in font descriptor.
+     */
+    public Double[] getDefaultVMetrics() {
+        COSObject dw2 = this.dictionary.getKey(ASAtom.DW2);
+        if (dw2.getType() == COSObjType.COS_ARRAY && dw2.size() == 2) {
+            Double[] result = new Double[2];
+			result[0] = dw2.at(0).getReal();
+            if (result[0] == null) return DEFAULT_CID_FONT_VERTICAL_WIDTH;
+			result[1] = dw2.at(1).getReal();
+            if (result[1] == null) return DEFAULT_CID_FONT_VERTICAL_WIDTH;
+			return result;
+        }
+        return DEFAULT_CID_FONT_VERTICAL_WIDTH;
     }
 
     /**
