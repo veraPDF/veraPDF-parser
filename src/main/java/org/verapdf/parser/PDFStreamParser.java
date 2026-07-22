@@ -281,6 +281,10 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 		if (!imageEndFound) {
 			LOGGER.log(Level.WARNING, "End of inline image not found");
 		}
+        int lastIndex = image.size() - 1;
+        if (CharTable.isSpace(image.get(lastIndex))) {
+            image.remove(lastIndex);
+        }
 		byte[] buffer = getByteArrayFromArrayList(image);
 		return new ASMemoryInStream(buffer, buffer.length, false);
 	}

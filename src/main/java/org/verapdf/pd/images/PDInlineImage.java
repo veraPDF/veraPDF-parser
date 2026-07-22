@@ -43,13 +43,15 @@ public class PDInlineImage extends PDResource {
 
 	private final PDResources imageResources;
 	private final PDResources pageResources;
+    private final long dataStreamLength;
 
 	public PDInlineImage(COSObject obj, PDResources imageResources,
-						 PDResources pageResources) {
+                         PDResources pageResources, long dataStreamLength) {
 		super(obj);
 		this.imageResources = imageResources;
 		this.pageResources = pageResources;
-	}
+        this.dataStreamLength = dataStreamLength;
+    }
 
 	public boolean isInterpolate() {
 		COSObject interpolate = getInlineImageKey(getObject().get(), ASAtom.INTERPOLATE);
@@ -61,6 +63,14 @@ public class PDInlineImage extends PDResource {
 		COSObject bitsPerComponent = getInlineImageKey(getObject().get(), ASAtom.BITS_PER_COMPONENT);
 		return bitsPerComponent.getInteger();
 	}
+
+    public Long getL() {
+        return getInlineImageKey(getObject().get(), ASAtom.LENGTH).getInteger();
+    }
+
+    public Long getStreamLength() {
+        return this.dataStreamLength;
+    }
 
 	public List<COSName> getCOSFilters() {
 		COSObject filters = getInlineImageKey(getObject().get(), ASAtom.FILTER);
