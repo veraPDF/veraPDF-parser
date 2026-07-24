@@ -214,6 +214,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom DIGEST_SHA512 = new ASAtom("SHA512");
     public static final ASAtom DIGEST_VALUE = new ASAtom("DigestValue");
     public static final ASAtom DIRECTION = new ASAtom("Direction");
+    public static final ASAtom DISC = new ASAtom("Disc");
     public static final ASAtom DISPLAY_DOC_TITLE = new ASAtom("DisplayDocTitle");
     public static final ASAtom DL = new ASAtom("DL");
     public static final ASAtom DM = new ASAtom("Dm");
