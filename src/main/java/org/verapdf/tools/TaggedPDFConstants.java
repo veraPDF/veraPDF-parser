@@ -20,12 +20,15 @@
  */
 package org.verapdf.tools;
 
+import java.util.regex.Pattern;
+
 /**
  * Class with constants for tagged pdf structure
  */
 public final class TaggedPDFConstants {
 
     public static final String HN_REGEXP = "^H[1-9][0-9]*$";
+    public static final Pattern HN_REGEXP_PATTERN = Pattern.compile(HN_REGEXP);
 
     public static final String PDF_NAMESPACE = "http://iso.org/pdf/ssn";
     public static final String PDF2_NAMESPACE = "http://iso.org/pdf2/ssn";

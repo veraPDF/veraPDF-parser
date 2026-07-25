@@ -277,7 +277,7 @@ public class TaggedPDFHelper {
 					return PDF_1_7_STANDARD_ROLE_TYPES.contains(structureType);
 				case TaggedPDFConstants.PDF2_NAMESPACE:
 					return PDF_2_0_STANDARD_ROLE_TYPES.contains(structureType)
-							|| structureType.matches(TaggedPDFConstants.HN_REGEXP);
+							|| TaggedPDFConstants.HN_REGEXP_PATTERN.matcher(structureType).matches();
 				case TaggedPDFConstants.MATH_ML_NAMESPACE:
 					return true;
 				default:

@@ -35,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * This is PD representation of font.
@@ -48,6 +49,8 @@ public abstract class PDFont extends PDResource {
     private static final Logger LOGGER = Logger.getLogger(PDFont.class.getCanonicalName());
 
     public static final String SUBSET_REGEX = "^[A-Z]{6}\\+.+";
+    public static final Pattern SUBSET_REGEX_PATTERN = Pattern.compile("^[A-Z]{6}\\+");
+
 
     protected COSDictionary dictionary;
     protected PDFontDescriptor fontDescriptor;
@@ -80,7 +83,7 @@ public abstract class PDFont extends PDResource {
             fontDescriptor = new PDFontDescriptor(null);
         }
         this.fontName = this.dictionary.getNameKeyUnicodeValue(ASAtom.BASE_FONT);
-        this.fontNameWithoutSubset = fontName != null ? (fontName.matches(SUBSET_REGEX) ? fontName.substring(7) : fontName) : null;
+        this.fontNameWithoutSubset = fontName != null ? (SUBSET_REGEX_PATTERN.matcher(fontName).find() ? fontName.substring(7) : fontName) : null;
         if (!(this instanceof PDType3Font)) {
             this.boundingBox = fontDescriptor.getFontBoundingBox();
             if (this.boundingBox == null) {

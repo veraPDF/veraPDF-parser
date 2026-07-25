@@ -67,7 +67,7 @@ public class PDOutputIntent extends PDObject {
 
 	public String getColorSpace() {
 		ICCProfile iccProfile = getDestOutputProfile();
-		if (iccProfile != null && "GTS_PDFA1".equals(getSubtype())) {
+		if (iccProfile != null && ASAtom.GTS_PDFA1.getValue().equals(getSubtype())) {
 			return iccProfile.getColorSpace();
 		}
 		return null;
