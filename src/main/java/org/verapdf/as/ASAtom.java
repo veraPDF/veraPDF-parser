@@ -194,6 +194,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom DESC = new ASAtom("Desc");
     public static final ASAtom DESCENDANT_FONTS = new ASAtom("DescendantFonts");
     public static final ASAtom DESCENT = new ASAtom("Descent");
+    public static final ASAtom DESCRIPTION = new ASAtom("Description");
     public static final ASAtom DEST = new ASAtom("Dest");
     public static final ASAtom DEST_OUTPUT_PROFILE = new ASAtom("DestOutputProfile");
     public static final ASAtom DEST_OUTPUT_PROFILE_REF = new ASAtom("DestOutputProfileRef");
