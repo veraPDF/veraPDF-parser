@@ -43,10 +43,10 @@ public class PDInlineImage extends PDResource {
 
 	private final PDResources imageResources;
 	private final PDResources pageResources;
-    private final long dataStreamLength;
+    private final Long dataStreamLength;
 
 	public PDInlineImage(COSObject obj, PDResources imageResources,
-                         PDResources pageResources, long dataStreamLength) {
+                         PDResources pageResources, Long dataStreamLength) {
 		super(obj);
 		this.imageResources = imageResources;
 		this.pageResources = pageResources;
