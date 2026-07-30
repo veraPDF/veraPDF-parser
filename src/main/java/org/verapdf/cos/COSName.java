@@ -25,6 +25,7 @@ import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -89,6 +90,19 @@ public class COSName extends COSDirect {
     public boolean setName(final ASAtom value) {
         set(value);
         return true;
+    }
+
+    @Override
+    public boolean isEquivalentTo(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSName)) return false;
+
+        COSName that = (COSName) o;
+
+        byte[] thisBytes = this.getName().getValue().getBytes(StandardCharsets.ISO_8859_1);
+        byte[] thatBytes = that.getName().getValue().getBytes(StandardCharsets.ISO_8859_1);
+
+        return Arrays.equals(thisBytes, thatBytes);
     }
 
     public ASAtom get() {

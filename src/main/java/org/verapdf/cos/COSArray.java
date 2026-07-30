@@ -190,6 +190,51 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
     }
 
     @Override
+    public boolean isEquivalentTo(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        if (o instanceof COSObject) {
+            return this.isEquivalentTo(((COSObject) o).get());
+        }
+        if (!(o instanceof COSArray)) return false;
+        List<COSBasePair> checkedObjects = new LinkedList<>();
+        return isEquivalentTo(o, checkedObjects);
+    }
+
+    @Override
+    boolean isEquivalentTo(Object o, List<COSBasePair> checkedObjects) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        if (o instanceof COSObject) {
+            return this.isEquivalentTo(((COSObject) o).get(), checkedObjects);
+        }
+        if (!(o instanceof COSArray)) return false;
+
+        COSArray that = (COSArray) o;
+        if (COSBasePair.listContainsPair(checkedObjects, this, that)) {
+            return true;
+        }
+        COSBasePair.addPairToList(checkedObjects, this, that);
+
+        if (this.size() != that.size()) return false;
+
+        for (int i = 0; i < this.size(); ++i) {
+            COSBase thisElem = this.at(i).getDirectBase();
+            COSBase thatElem = that.at(i).getDirectBase();
+
+            if (thisElem == null && thatElem == null) continue;
+            if (thisElem == null || thatElem == null) return false;
+
+            if (!thisElem.isEquivalentTo(thatElem, checkedObjects)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

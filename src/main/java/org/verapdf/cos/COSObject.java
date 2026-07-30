@@ -494,6 +494,19 @@ public class COSObject {
 		this.isHeaderFormatComplyPDFA = isHeaderFormatComplyPDFA;
 	}
 
+    public boolean isEquivalentTo(Object o) {
+        if (o == this) return true;
+        if (o instanceof COSObject) {
+            COSObject cosObject = (COSObject) o;
+            return base.isEquivalentTo(cosObject.base);
+        }
+
+        if (o instanceof COSIndirect) {
+            return base.isEquivalentTo(((COSIndirect) o).getDirect().base);
+        }
+        return false;
+    }
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

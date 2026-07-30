@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author Timur Kamalov
@@ -362,6 +363,88 @@ public class COSString extends COSDirect {
 
     public void setHexCount(long hexCount) {
         this.hexCount = hexCount;
+    }
+
+    private byte[] getCanonicalBytes() {
+        if (isHex) {
+            return Arrays.copyOf(value, value.length);
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int i = 0;
+        while (i < value.length) {
+            byte b = value[i];
+            if (b == '\\') {
+                if (i + 1 >= value.length) {
+                    break;
+                }
+                byte next = value[i + 1];
+
+                if (next >= '0' && next <= '7') {
+                    int octal = 0;
+                    int count = 0;
+                    while (i + 1 < value.length && count < 3) {
+                        byte c = value[i + 1];
+                        if (c >= '0' && c <= '7') {
+                            octal = octal * 8 + (c - '0');
+                            i++;
+                            count++;
+                        } else {
+                            break;
+                        }
+                    }
+                    out.write(octal);
+                    continue;
+                }
+
+                if (next == '\r') {
+                    i += 2;
+                    if (i < value.length && value[i] == '\n') {
+                        i++;
+                    }
+                    continue;
+                } else if (next == '\n') {
+                    i += 2;
+                    continue;
+                }
+
+                i++;
+                if (i >= value.length) break;
+                byte esc = value[i];
+                byte replacement;
+                switch (esc) {
+                    case 'n':  replacement = '\n'; break;
+                    case 'r':  replacement = '\r'; break;
+                    case 't':  replacement = '\t'; break;
+                    case 'b':  replacement = '\b'; break;
+                    case 'f':  replacement = '\f'; break;
+                    case '(':  replacement = '(';  break;
+                    case ')':  replacement = ')';  break;
+                    case '\\': replacement = '\\'; break;
+                    default:
+                        replacement = esc;
+                        break;
+                }
+                out.write(replacement);
+            } else {
+                out.write(b);
+            }
+            i++;
+        }
+        return out.toByteArray();
+    }
+
+    @Override
+    public boolean isEquivalentTo(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof COSString)) return false;
+
+        COSString that = (COSString) o;
+
+        byte[] thisBytes = this.getCanonicalBytes();
+        byte[] thatBytes = that.getCanonicalBytes();
+
+        return Arrays.equals(thisBytes, thatBytes);
     }
 
     @Override

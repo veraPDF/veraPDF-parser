@@ -23,6 +23,7 @@ package org.verapdf.cos;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
@@ -43,6 +44,11 @@ public class COSReal extends COSNumber {
     private double value;
 
     protected COSReal() {
+    }
+
+    @Override
+    public BigDecimal getDecimalValue() {
+        return BigDecimal.valueOf(value);
     }
 
     protected COSReal(final double value) {
@@ -86,6 +92,23 @@ public class COSReal extends COSNumber {
     public boolean setReal(final double value) {
         set(value);
         return true;
+    }
+
+    @Override
+    public boolean isEquivalentTo(Object o) {
+        if (this == o) return true;
+
+        if (o instanceof COSReal) {
+            COSReal thatReal = (COSReal) o;
+            return this.getDecimalValue().compareTo(thatReal.getDecimalValue()) == 0;
+        }
+
+        if (o instanceof COSInteger) {
+            COSInteger thatInt = (COSInteger) o;
+            return this.getDecimalValue().compareTo(thatInt.getDecimalValue()) == 0;
+        }
+
+        return false;
     }
 
     public double get() {

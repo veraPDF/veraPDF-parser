@@ -52,6 +52,11 @@ public class COSNull extends COSDirect {
     }
 
     @Override
+    public boolean isEquivalentTo(Object o) {
+        return equals(o);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         return o instanceof COSNull;
