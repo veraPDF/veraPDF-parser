@@ -88,6 +88,9 @@ public class PDType4Function extends PDFunction {
     private List<COSObject> getOperatorsWithProcedures() {
         if (modifiedOperators == null) {
             modifiedOperators = new ArrayList<>();
+            if (getOperators().isEmpty()) {
+                return modifiedOperators;
+            }
             Iterator<COSObject> ops = getOperators().iterator();
             if (PSOperatorsConstants.LEFT_CURLY_BRACE.equals(getOperators().get(0).getString())) {
                 ops.next();
