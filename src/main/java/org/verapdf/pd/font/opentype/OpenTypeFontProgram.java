@@ -120,7 +120,7 @@ public class OpenTypeFontProgram implements FontProgram {
 
     @Override
     public String getGlyphName(int code) {
-        return this.font.getGlyphName(code);
+        return this.font != null ? this.font.getGlyphName(code) : null;
     }
 
     /**
