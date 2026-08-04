@@ -72,8 +72,13 @@ public class COSBoolean extends COSDirect {
     }
 
     @Override
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;
+
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
+        }
+
         if (!(o instanceof COSBoolean)) return false;
 
         COSBoolean that = (COSBoolean) o;

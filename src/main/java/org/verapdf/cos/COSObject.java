@@ -494,17 +494,16 @@ public class COSObject {
 		this.isHeaderFormatComplyPDFA = isHeaderFormatComplyPDFA;
 	}
 
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSObject o) {
         if (o == this) return true;
-        if (o instanceof COSObject) {
-            COSObject cosObject = (COSObject) o;
-            return base.isEquivalentTo(cosObject.base);
-        }
+        if (o == null) return false;
 
-        if (o instanceof COSIndirect) {
-            return base.isEquivalentTo(((COSIndirect) o).getDirect().base);
-        }
-        return false;
+        COSBase thisBase = this.getDirectBase();
+        COSBase otherBase = o.getDirectBase();
+        if (thisBase == null && otherBase == null) return true;
+        if (thisBase == null || otherBase == null) return false;
+
+        return thisBase.isEquivalentTo(otherBase);
     }
 
 	@Override

@@ -302,7 +302,7 @@ public class COSDictionary extends COSDirect {
     private Set<ASAtom> getNonNullKeySet() {
         Set<ASAtom> nonNullKeys = new HashSet<>();
         for (ASAtom key : getKeySet()) {
-            COSBase value = getKey(key).get(); // assume getKey returns a COSBase wrapper
+            COSBase value = getKey(key).getDirectBase();
             if (value != null) {
                 nonNullKeys.add(key);
             }
@@ -311,12 +311,14 @@ public class COSDictionary extends COSDirect {
     }
 
     @Override
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;
         if (o == null) return false;
-        if (o instanceof COSObject) {
-            return this.isEquivalentTo(((COSObject) o).get());
+
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
         }
+
         if (!(o instanceof COSDictionary)) return false;
 
         List<COSBasePair> checkedObjects = new LinkedList<>();
@@ -326,12 +328,9 @@ public class COSDictionary extends COSDirect {
     /**
      * Internal recursive comparison with cycle detection.
      */
-    boolean isEquivalentTo(Object o, List<COSBasePair> checkedObjects) {
+    boolean isEquivalentTo(COSBase o, List<COSBasePair> checkedObjects) {
         if (this == o) return true;
         if (o == null) return false;
-        if (o instanceof COSObject) {
-            return this.isEquivalentTo(((COSObject) o).get(), checkedObjects);
-        }
         if (!(o instanceof COSDictionary)) return false;
 
         COSDictionary that = (COSDictionary) o;
@@ -348,9 +347,13 @@ public class COSDictionary extends COSDirect {
             return false;
         }
 
+        return isEquivalentKeys(that, thisKeys, checkedObjects);
+    }
+
+    protected boolean isEquivalentKeys(COSDictionary that, Set<ASAtom> thisKeys, List<COSBasePair> checkedObjects) {
         for (ASAtom key : thisKeys) {
-            COSBase thisVal = this.getKey(key).get();
-            COSBase thatVal = that.getKey(key).get();
+            COSBase thisVal = this.getKey(key).getDirectBase();
+            COSBase thatVal = that.getKey(key).getDirectBase();
 
             if (thisVal == null && thatVal == null) continue;
             if (thisVal == null || thatVal == null) return false;

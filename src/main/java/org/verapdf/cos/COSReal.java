@@ -95,8 +95,12 @@ public class COSReal extends COSNumber {
     }
 
     @Override
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;
+
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
+        }
 
         if (o instanceof COSReal) {
             COSReal thatReal = (COSReal) o;

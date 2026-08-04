@@ -481,19 +481,14 @@ public class COSIndirect extends COSBase {
     }
 
     @Override
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;
 
-        if (o instanceof COSIndirect) {
-            COSIndirect that = (COSIndirect) o;
-            return this.getDirect().isEquivalentTo(that.getDirect());
-        }
+        COSBase thisBase = this.getDirectBase();
+        if (thisBase == null && o == null) return true;
+        if (thisBase == null || o == null) return false;
 
-        if (o instanceof COSObject) {
-            return this.getDirect().isEquivalentTo(o);
-        }
-
-        return false;
+        return thisBase.isEquivalentTo(o.getDirectBase());
     }
 
     @Override

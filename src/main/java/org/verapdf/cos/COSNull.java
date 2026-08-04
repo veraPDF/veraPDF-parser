@@ -52,7 +52,7 @@ public class COSNull extends COSDirect {
     }
 
     @Override
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSBase o) {
         return equals(o);
     }
 

@@ -78,8 +78,12 @@ public class COSInteger extends COSNumber {
     }
 
     @Override
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;
+
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
+        }
 
         if (o instanceof COSInteger) {
             return this.value == ((COSInteger) o).value;

@@ -190,26 +190,24 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
     }
 
     @Override
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;
         if (o == null) return false;
 
-        if (o instanceof COSObject) {
-            return this.isEquivalentTo(((COSObject) o).get());
+        if (o.isIndirect()) {
+            return this.isEquivalentTo(o.getDirectBase());
         }
+
         if (!(o instanceof COSArray)) return false;
         List<COSBasePair> checkedObjects = new LinkedList<>();
         return isEquivalentTo(o, checkedObjects);
     }
 
     @Override
-    boolean isEquivalentTo(Object o, List<COSBasePair> checkedObjects) {
+    boolean isEquivalentTo(COSBase o, List<COSBasePair> checkedObjects) {
         if (this == o) return true;
         if (o == null) return false;
 
-        if (o instanceof COSObject) {
-            return this.isEquivalentTo(((COSObject) o).get(), checkedObjects);
-        }
         if (!(o instanceof COSArray)) return false;
 
         COSArray that = (COSArray) o;
@@ -218,7 +216,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
         }
         COSBasePair.addPairToList(checkedObjects, this, that);
 
-        if (this.size() != that.size()) return false;
+        if (!Objects.equals(this.size(), that.size())) return false;
 
         for (int i = 0; i < this.size(); ++i) {
             COSBase thisElem = this.at(i).getDirectBase();

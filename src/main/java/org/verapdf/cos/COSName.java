@@ -93,16 +93,18 @@ public class COSName extends COSDirect {
     }
 
     @Override
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;
+
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
+        }
+
         if (!(o instanceof COSName)) return false;
 
         COSName that = (COSName) o;
 
-        byte[] thisBytes = this.getName().getValue().getBytes(StandardCharsets.ISO_8859_1);
-        byte[] thatBytes = that.getName().getValue().getBytes(StandardCharsets.ISO_8859_1);
-
-        return Arrays.equals(thisBytes, thatBytes);
+        return Objects.equals(value, that.value);
     }
 
     public ASAtom get() {

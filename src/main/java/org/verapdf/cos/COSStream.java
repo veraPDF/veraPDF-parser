@@ -286,16 +286,16 @@ public class COSStream extends COSDictionary {
     private Set<ASAtom> getNonNullKeysExcluding(Set<ASAtom> exclude) {
         Set<ASAtom> keys = new HashSet<>(this.getKeySet());
         keys.removeAll(exclude);
-        keys.removeIf(key -> this.getKey(key).get() == null);
+        keys.removeIf(key -> this.getKey(key).getDirectBase() == null);
         return keys;
     }
 
     @Override
-    public boolean isEquivalentTo(Object o) {
+    public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;
         if (o == null) return false;
-        if (o instanceof COSObject) {
-            return this.isEquivalentTo(((COSObject) o).get());
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
         }
         if (!(o instanceof COSStream)) return false;
         List<COSBasePair> checkedObjects = new LinkedList<>();
@@ -303,12 +303,10 @@ public class COSStream extends COSDictionary {
     }
 
     @Override
-    boolean isEquivalentTo(Object o, List<COSBasePair> checkedObjects) {
+    boolean isEquivalentTo(COSBase o, List<COSBasePair> checkedObjects) {
         if (this == o) return true;
         if (o == null) return false;
-        if (o instanceof COSObject) {
-            return this.isEquivalentTo(((COSObject) o).get(), checkedObjects);
-        }
+
         if (!(o instanceof COSStream)) return false;
         COSStream that = (COSStream) o;
 
@@ -324,7 +322,7 @@ public class COSStream extends COSDictionary {
                 return false;
             }
         } catch (IOException e) {
-            LOGGER.log(Level.FINE, "Exception during comparing decoded streams", e);
+            LOGGER.log(Level.FINE, "Exception during comparing decoded streams");
             return false;
         }
 
@@ -335,17 +333,8 @@ public class COSStream extends COSDictionary {
         if (!thisKeys.equals(thatKeys)) {
             return false;
         }
-        for (ASAtom key : thisKeys) {
-            COSBase thisVal = this.getKey(key).get();
-            COSBase thatVal = that.getKey(key).get();
-            if (thisVal == null && thatVal == null) continue;
-            if (thisVal == null || thatVal == null) return false;
-            if (!thisVal.isEquivalentTo(thatVal, checkedObjects)) {
-                return false;
-            }
-        }
 
-        return true;
+        return isEquivalentKeys(that, thisKeys, checkedObjects);
     }
 
     private static boolean equalsDecodedStreams(ASInputStream first, ASInputStream second) throws IOException {
