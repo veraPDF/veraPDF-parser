@@ -95,6 +95,7 @@ public class COSName extends COSDirect {
     @Override
     public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;
+        if (o == null) return false;
 
         if (o.isIndirect()) {
             return isEquivalentTo(o.getDirectBase());
