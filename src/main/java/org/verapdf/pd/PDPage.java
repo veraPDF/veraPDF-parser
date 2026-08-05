@@ -160,7 +160,12 @@ public class PDPage extends PDPageTreeNode {
             return null;
         }
         double[] res = new double[4];
-        for (int i = 0; i < array.size(); ++i) {
+        int size = array.size();
+        if (array.size() > 4) {
+            size = 4;
+            LOGGER.log(Level.WARNING, "Rectangle has more than 4 elements");
+        }
+        for (int i = 0; i < size; ++i) {
             COSObject obj = array.at(i);
             if (obj.getType().isNumber()) {
                 res[i] = obj.getReal();
