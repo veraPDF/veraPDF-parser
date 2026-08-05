@@ -299,6 +299,73 @@ public class COSDictionary extends COSDirect {
         return this.entries.values();
     }
 
+    private Set<ASAtom> getNonNullKeySet() {
+        Set<ASAtom> nonNullKeys = new HashSet<>();
+        for (ASAtom key : getKeySet()) {
+            COSBase value = getKey(key).getDirectBase();
+            if (value != null) {
+                nonNullKeys.add(key);
+            }
+        }
+        return nonNullKeys;
+    }
+
+    @Override
+    public boolean isEquivalentTo(COSBase o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
+        }
+
+        if (!(o instanceof COSDictionary)) return false;
+
+        List<COSBasePair> checkedObjects = new LinkedList<>();
+        return isEquivalentTo(o, checkedObjects);
+    }
+
+    /**
+     * Internal recursive comparison with cycle detection.
+     */
+    boolean isEquivalentTo(COSBase o, List<COSBasePair> checkedObjects) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!(o instanceof COSDictionary)) return false;
+
+        COSDictionary that = (COSDictionary) o;
+
+        if (COSBasePair.listContainsPair(checkedObjects, this, that)) {
+            return true;
+        }
+        COSBasePair.addPairToList(checkedObjects, this, that);
+
+        Set<ASAtom> thisKeys = this.getNonNullKeySet();
+        Set<ASAtom> thatKeys = that.getNonNullKeySet();
+
+        if (!thisKeys.equals(thatKeys)) {
+            return false;
+        }
+
+        return isEquivalentKeys(that, thisKeys, checkedObjects);
+    }
+
+    protected boolean isEquivalentKeys(COSDictionary that, Set<ASAtom> thisKeys, List<COSBasePair> checkedObjects) {
+        for (ASAtom key : thisKeys) {
+            COSBase thisVal = this.getKey(key).getDirectBase();
+            COSBase thatVal = that.getKey(key).getDirectBase();
+
+            if (thisVal == null && thatVal == null) continue;
+            if (thisVal == null || thatVal == null) return false;
+
+            if (!thisVal.isEquivalentTo(thatVal, checkedObjects)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

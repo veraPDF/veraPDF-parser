@@ -23,6 +23,8 @@ package org.verapdf.cos;
 import org.verapdf.cos.visitor.ICOSVisitor;
 import org.verapdf.cos.visitor.IVisitor;
 
+import java.math.BigDecimal;
+
 /**
  * @author Timur Kamalov
  */
@@ -75,6 +77,27 @@ public class COSInteger extends COSNumber {
         return true;
     }
 
+    @Override
+    public boolean isEquivalentTo(COSBase o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
+        }
+
+        if (o instanceof COSInteger) {
+            return this.value == ((COSInteger) o).value;
+        }
+
+        if (o instanceof COSReal) {
+            COSReal thatReal = (COSReal) o;
+            return BigDecimal.valueOf(this.value).compareTo(thatReal.getDecimalValue()) == 0;
+        }
+
+        return false;
+    }
+
     public long get() {
         return this.value;
     }
@@ -96,5 +119,10 @@ public class COSInteger extends COSNumber {
 
         return value == that.value;
 
+    }
+
+    @Override
+    public BigDecimal getDecimalValue() {
+        return BigDecimal.valueOf(value);
     }
 }

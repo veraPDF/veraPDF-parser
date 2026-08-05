@@ -20,6 +20,8 @@
  */
 package org.verapdf.cos;
 
+import java.math.BigDecimal;
+
 /**
  * @author Timur Kamalov
  */
@@ -28,5 +30,7 @@ public abstract class COSNumber extends COSDirect {
     public COSNumber() {
         super();
     }
+
+    public abstract BigDecimal getDecimalValue();
 
 }

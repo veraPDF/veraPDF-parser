@@ -283,6 +283,79 @@ public class COSStream extends COSDictionary {
 		DECRYPT_AND_DECODE
 	}
 
+    private Set<ASAtom> getNonNullKeysExcluding(Set<ASAtom> exclude) {
+        Set<ASAtom> keys = new HashSet<>(this.getKeySet());
+        keys.removeAll(exclude);
+        keys.removeIf(key -> this.getKey(key).getDirectBase() == null);
+        return keys;
+    }
+
+    @Override
+    public boolean isEquivalentTo(COSBase o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
+        }
+        if (!(o instanceof COSStream)) return false;
+        List<COSBasePair> checkedObjects = new LinkedList<>();
+        return isEquivalentTo(o, checkedObjects);
+    }
+
+    @Override
+    boolean isEquivalentTo(COSBase o, List<COSBasePair> checkedObjects) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        if (!(o instanceof COSStream)) return false;
+        COSStream that = (COSStream) o;
+
+        if (COSBasePair.listContainsPair(checkedObjects, this, that)) {
+            return true;
+        }
+        COSBasePair.addPairToList(checkedObjects, this, that);
+
+        if (this.stream == null || that.stream == null) {
+            return this.stream == that.stream;
+        }
+
+        try (ASInputStream thisDecoded = this.getData(FilterFlags.DECODE);
+             ASInputStream thatDecoded = that.getData(FilterFlags.DECODE)) {
+            if (!equalsDecodedStreams(thisDecoded, thatDecoded)) {
+                return false;
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.FINE, "Exception during comparing decoded streams");
+            return false;
+        }
+
+        Set<ASAtom> excluded = new HashSet<>(Arrays.asList(ASAtom.LENGTH, ASAtom.FILTER, ASAtom.DECODE_PARMS));
+        Set<ASAtom> thisKeys = this.getNonNullKeysExcluding(excluded);
+        Set<ASAtom> thatKeys = that.getNonNullKeysExcluding(excluded);
+
+        if (!thisKeys.equals(thatKeys)) {
+            return false;
+        }
+
+        return isEquivalentKeys(that, thisKeys, checkedObjects);
+    }
+
+    private static boolean equalsDecodedStreams(ASInputStream first, ASInputStream second) throws IOException {
+        byte[] buf1 = new byte[8192];
+        byte[] buf2 = new byte[8192];
+        int read1, read2;
+        while (true) {
+            read1 = first.read(buf1);
+            read2 = second.read(buf2);
+            if (read1 != read2) return false;
+            if (read1 == -1) break;
+            for (int i = 0; i < read1; i++) {
+                if (buf1[i] != buf2[i]) return false;
+            }
+        }
+        return true;
+    }
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {

@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author Timur Kamalov
@@ -362,6 +363,25 @@ public class COSString extends COSDirect {
 
     public void setHexCount(long hexCount) {
         this.hexCount = hexCount;
+    }
+
+    @Override
+    public boolean isEquivalentTo(COSBase o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        if (o.isIndirect()) {
+            return isEquivalentTo(o.getDirectBase());
+        }
+
+        if (!(o instanceof COSString)) return false;
+
+        COSString that = (COSString) o;
+
+        String thisString = this.getString();
+        String thatString = that.getString();
+
+        return thisString.equals(thatString);
     }
 
     @Override

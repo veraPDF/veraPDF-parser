@@ -140,6 +140,12 @@ public abstract class COSBase {
 
 	public abstract void mark();
 
+    public abstract boolean isEquivalentTo(COSBase obj);
+
+    boolean isEquivalentTo(COSBase o, List<COSBasePair> checkedObjects) {
+        return isEquivalentTo(o);
+    }
+
 	boolean equals(Object obj, List<COSBasePair> checkedObjects) {
 		return this.equals(obj);
 	}
