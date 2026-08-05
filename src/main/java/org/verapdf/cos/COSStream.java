@@ -315,9 +315,12 @@ public class COSStream extends COSDictionary {
         }
         COSBasePair.addPairToList(checkedObjects, this, that);
 
-        try {
-            ASInputStream thisDecoded = this.getData(FilterFlags.DECODE);
-            ASInputStream thatDecoded = that.getData(FilterFlags.DECODE);
+        if (this.stream == null || that.stream == null) {
+            return this.stream == that.stream;
+        }
+
+        try (ASInputStream thisDecoded = this.getData(FilterFlags.DECODE);
+             ASInputStream thatDecoded = that.getData(FilterFlags.DECODE)) {
             if (!equalsDecodedStreams(thisDecoded, thatDecoded)) {
                 return false;
             }
