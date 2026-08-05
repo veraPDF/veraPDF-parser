@@ -163,7 +163,7 @@ public class PDPage extends PDPageTreeNode {
         int size = array.size();
         if (array.size() > 4) {
             size = 4;
-            LOGGER.log(Level.WARNING, "BBox Array size is greater than 4 in COSArray");
+            LOGGER.log(Level.WARNING, "Rectangle has more than 4 elements");
         }
         for (int i = 0; i < size; ++i) {
             COSObject obj = array.at(i);
