@@ -151,6 +151,9 @@ public class PDPage extends PDPageTreeNode {
         if (mediaBox == null) {
             return box;
         }
+        if (box == null) {
+            return mediaBox;
+        }
         res[0] = Math.max(box[0], mediaBox[0]);
         res[1] = Math.max(box[1], mediaBox[1]);
         res[2] = Math.min(box[2], mediaBox[2]);
