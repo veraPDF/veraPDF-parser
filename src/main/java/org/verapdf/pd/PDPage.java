@@ -149,7 +149,7 @@ public class PDPage extends PDPageTreeNode {
         double[] res = new double[4];
         double[] mediaBox = getMediaBox();
         if (mediaBox == null) {
-            return null;
+            return box;
         }
         res[0] = Math.max(box[0], mediaBox[0]);
         res[1] = Math.max(box[1], mediaBox[1]);
