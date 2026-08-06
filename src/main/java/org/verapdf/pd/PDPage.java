@@ -148,6 +148,9 @@ public class PDPage extends PDPageTreeNode {
     private double[] clipToMediaBox(double[] box) {
         double[] res = new double[4];
         double[] mediaBox = getMediaBox();
+        if (mediaBox == null) {
+            return null;
+        }
         res[0] = Math.max(box[0], mediaBox[0]);
         res[1] = Math.max(box[1], mediaBox[1]);
         res[2] = Math.min(box[2], mediaBox[2]);
