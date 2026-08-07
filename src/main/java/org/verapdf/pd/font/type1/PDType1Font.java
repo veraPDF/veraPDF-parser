@@ -107,7 +107,7 @@ public class PDType1Font extends PDSimpleFont {
                 }
                 return descriptorCharSet;
             } catch (IOException ex) {
-                LOGGER.log(Level.FINE, "Can't parse /CharSet entry in Type 1 font descriptor", ex);
+                LOGGER.log(Level.FINE, "Can't parse /CharSet entry in Type 1 font descriptor");
                 return Collections.emptySet();
             }
         }
@@ -181,7 +181,7 @@ public class PDType1Font extends PDSimpleFont {
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.log(Level.FINE, "Can't read Type 1 font program.", e);
+                    LOGGER.log(Level.FINE, "Can't read Type 1 font program.");
                 }
             }
         }

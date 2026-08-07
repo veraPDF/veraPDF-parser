@@ -154,7 +154,7 @@ public class PDType0Function extends PDFunction {
             functionStream.read(bytes);
             return BitSet.valueOf(bytes);
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Can not parse function", e);
+            LOGGER.log(Level.WARNING, "Can not parse function");
             return new BitSet();
         }
     }
@@ -210,7 +210,7 @@ public class PDType0Function extends PDFunction {
             }
             return Collections.unmodifiableList(getValuesInIntervals(result, getRange()));
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error while evaluating type 0 function", e);
+            LOGGER.log(Level.WARNING, "Error while evaluating type 0 function");
             return null;
         }
     }

@@ -105,7 +105,7 @@ public class StandardSecurityHandler {
                 this.isPasswordCorrect = this.encryptionKey != null;
                 return this.isPasswordCorrect;
             } catch (GeneralSecurityException e) {
-                LOGGER.log(Level.FINE, "Caught Security Exception while document decryption", e);
+                LOGGER.log(Level.FINE, "Caught Security Exception while document decryption");
                 this.isPasswordCorrect = false;
                 return false;
             }

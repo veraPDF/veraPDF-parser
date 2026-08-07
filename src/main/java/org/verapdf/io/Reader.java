@@ -200,7 +200,7 @@ public class Reader extends XRefReader {
 			}
 			return res;
 		} catch (IOException e) {
-			LOGGER.log(Level.FINE, "Cannot read object " + this.parser.getEncryption().getObjectKey(), e);
+			LOGGER.log(Level.FINE, "Cannot read object " + this.parser.getEncryption().getObjectKey());
 			return false;
 		}
 	}

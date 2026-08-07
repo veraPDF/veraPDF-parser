@@ -298,7 +298,7 @@ public abstract class PDFont extends PDResource {
                 setSuccessfullyParsed(fontProgram.isSuccessfulParsing());
                 return fontProgram.isSuccessfulParsing();
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can't parse font program of font " + getName(), e);
+                LOGGER.log(Level.WARNING, "Can't parse font program of font " + getName());
                 setSuccessfullyParsed(false);
             }
         }

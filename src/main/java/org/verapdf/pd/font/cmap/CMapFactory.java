@@ -60,7 +60,7 @@ class CMapFactory {
             parser.parse();
             res = parser.getCMap();
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Can't parse CMap " + name + ", using default", e);
+            LOGGER.log(Level.WARNING, "Can't parse CMap " + name + ", using default");
             res = new CMap();
         } catch (PostScriptException e) {
             LOGGER.log(Level.WARNING, "PostScript exception while parsing CMap " + name);

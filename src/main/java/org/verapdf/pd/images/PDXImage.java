@@ -70,7 +70,7 @@ public class PDXImage extends PDXObject {
 				this.jpxStream = JPEG2000.fromStream(stream);
 				this.imageCS = this.imageCS == null ? this.jpxStream.getImageColorSpace() : this.imageCS;
 			} catch (IOException e) {
-				LOGGER.log(Level.FINE, "IO Exception reading JP2K stream", e);
+				LOGGER.log(Level.FINE, "IO Exception reading JP2K stream");
 			}
 		}
 		COSObject rawColorSpace = getKey(ASAtom.COLORSPACE);

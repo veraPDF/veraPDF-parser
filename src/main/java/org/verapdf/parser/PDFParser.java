@@ -151,7 +151,7 @@ public class PDFParser extends SeekableCOSParser {
                 headerVersion = Float.parseFloat(headerParts[1]);
             }
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.FINE, getErrorMessage("Can't parse the document header"), e);
+            LOGGER.log(Level.FINE, getErrorMessage("Can't parse the document header"));
         }
 
         result.setVersion(headerVersion);
@@ -173,7 +173,7 @@ public class PDFParser extends SeekableCOSParser {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "IO error while trying to find first document dictionary", e);
+            LOGGER.log(Level.WARNING, "IO error while trying to find first document dictionary");
         }
 
         return false;
@@ -186,7 +186,7 @@ public class PDFParser extends SeekableCOSParser {
                 return linDict;
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "IO error while trying to find linearization dictionary", e);
+            LOGGER.log(Level.WARNING, "IO error while trying to find linearization dictionary");
         }
         return null;
     }

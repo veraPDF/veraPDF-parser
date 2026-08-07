@@ -208,7 +208,7 @@ public class Writer implements IVisitor {
 		try {
 			obj.setIntegerKey(ASAtom.LENGTH, getASInputStreamLength(in));
 		} catch (IOException e) {
-			LOGGER.log(Level.FINE, "Can't calculate length of ASInputStream", e);
+			LOGGER.log(Level.FINE, "Can't calculate length of ASInputStream");
 		}
 
 		visitFromDictionary(obj);

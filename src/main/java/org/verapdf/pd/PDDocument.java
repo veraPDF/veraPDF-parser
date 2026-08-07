@@ -110,7 +110,7 @@ public class PDDocument {
 				}
 				document.getResourceHandler().close();
 			} catch (IOException e) {
-				LOGGER.log(Level.FINE, "Error in closing stream", e);
+				LOGGER.log(Level.FINE, "Error in closing stream");
 			}
 			document = null;
 		}

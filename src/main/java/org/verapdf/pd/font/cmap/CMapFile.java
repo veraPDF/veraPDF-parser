@@ -87,7 +87,7 @@ public class CMapFile {
         try (ASInputStream data = this.parentStream.getData(COSStream.FilterFlags.DECODE)) {
             cMap = CMapFactory.getCMap(PDCMap.getCMapID(parentStream), data);
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Exception while parsing cmap file", e);
+            LOGGER.log(Level.WARNING, "Exception while parsing cmap file");
         }
     }
 }

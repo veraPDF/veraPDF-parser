@@ -98,7 +98,7 @@ public class JPEG2000 {
             }
 
         } catch (IOException e) {
-            LOGGER.log(Level.FINE, "IO Exception reading JP2K stream", e);
+            LOGGER.log(Level.FINE, "IO Exception reading JP2K stream");
         }
         return builder.build();
     }

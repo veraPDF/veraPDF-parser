@@ -297,7 +297,7 @@ public class COSArray extends COSDirect implements Iterable<COSObject> {
                 try {
                     stream.close();
                 } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "Error in closing stream", e);
+                    LOGGER.log(Level.SEVERE, "Error in closing stream");
                 }
             }
             throw any;

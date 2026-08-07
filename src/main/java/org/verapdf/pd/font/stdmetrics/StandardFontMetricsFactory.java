@@ -59,7 +59,7 @@ public class StandardFontMetricsFactory {
                 res = parser.parse();
                 FONT_METRICS_MAP.put(fontName, res);
             } catch (IOException e) {
-                LOGGER.log(Level.FINE, "Can't open file input stream for predefined font file " + DIR_PATH + fontName + EXTENSION, e);
+                LOGGER.log(Level.FINE, "Can't open file input stream for predefined font file " + DIR_PATH + fontName + EXTENSION);
                 return null;
             }
         }
@@ -77,7 +77,7 @@ public class StandardFontMetricsFactory {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.FINE, "Error in opening predefined font metrics file " + fileName, e);
+            LOGGER.log(Level.FINE, "Error in opening predefined font metrics file " + fileName);
             return null;
         }
     }

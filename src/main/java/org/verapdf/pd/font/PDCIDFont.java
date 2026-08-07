@@ -217,7 +217,7 @@ public class PDCIDFont extends PDFont {
                         this.fontProgram = new CIDFontType2Program(fontData, this.cMap, cidToGIDMap, key);
                         StaticResources.cacheFontProgram(fontProgramID, this.fontProgram);
                     } catch (IOException e) {
-                        LOGGER.log(Level.FINE, "Can't read TrueType font program.", e);
+                        LOGGER.log(Level.FINE, "Can't read TrueType font program.");
                     }
                 }
             } else if (fontDescriptor.canParseFontFile(ASAtom.FONT_FILE3)) {
@@ -256,7 +256,7 @@ public class PDCIDFont extends PDFont {
                         LOGGER.warning("Invalid subtype of the embedded font stream");
                     }
                 } catch (Exception e) {
-                    LOGGER.log(Level.FINE, "Can't read font program.", e);
+                    LOGGER.log(Level.FINE, "Can't read font program.");
                 }
             } else {
                 this.fontProgram = null;

@@ -118,7 +118,7 @@ public class ICCProfile extends PDObject {
 			parseTags(data);
 		} catch (IOException e) {
 			this.isLooksValid = false;
-			LOGGER.log(Level.FINE, "Exception during obtaining ICCProfile header", e);
+			LOGGER.log(Level.FINE, "Exception during obtaining ICCProfile header");
 		}
 	}
 
@@ -142,7 +142,7 @@ public class ICCProfile extends PDObject {
 				md5.update(buffer);
 				md5ByteValue = md5.digest();
 			} catch (NoSuchAlgorithmException | IOException  e) {
-				LOGGER.log(Level.FINE, "Exception during calculating ICCProfile md5 value", e);
+				LOGGER.log(Level.FINE, "Exception during calculating ICCProfile md5 value");
 				md5ByteValue = new byte[0];
 				return null;
 			}
