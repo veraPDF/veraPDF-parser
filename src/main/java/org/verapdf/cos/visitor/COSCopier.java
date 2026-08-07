@@ -103,7 +103,6 @@ public class COSCopier implements IVisitor {
 			this.copy.set(obj);
 		} catch (Exception e) {
 			//TODO : throw
-			e.printStackTrace();
 		}
 	}
 }
