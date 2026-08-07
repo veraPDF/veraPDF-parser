@@ -294,7 +294,7 @@ public class PDType0Function extends PDFunction {
             }
             return result;
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed to get interpolant coefficients", e);
+            LOGGER.log(Level.WARNING, "Failed to get interpolant coefficients");
             return null;
         }
     }
@@ -316,7 +316,7 @@ public class PDType0Function extends PDFunction {
             }
             return result;
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed to get interpolant coefficients", e);
+            LOGGER.log(Level.WARNING, "Failed to get interpolant coefficients");
             return null;
         }
     }

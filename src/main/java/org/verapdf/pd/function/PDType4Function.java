@@ -73,7 +73,7 @@ public class PDType4Function extends PDFunction {
             try {
                 parseStream();
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can not parse function", e);
+                LOGGER.log(Level.WARNING, "Can not parse function");
                 return Collections.emptyList();
             }
         }
@@ -142,7 +142,7 @@ public class PDType4Function extends PDFunction {
             List<COSObject> operandsInRange = new ArrayList<>(operandStack);
             return Collections.unmodifiableList(getValuesInIntervals(operandsInRange, getRange()));
         } catch (PostScriptException e) {
-            LOGGER.log(Level.WARNING, "Invalid operators stream", e);
+            LOGGER.log(Level.WARNING, "Invalid operators stream");
             return null;
         }
     }
