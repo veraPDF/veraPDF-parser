@@ -145,15 +145,24 @@ public class Reader extends XRefReader {
     @Override
     public void checkDocCanBeDecrypted() throws IOException {
         if (this.parser.isEncrypted() && !docCanBeDecrypted()) {
-            this.getPDFSource().close();
+            InvalidPasswordException failure = new InvalidPasswordException(StringExceptions.ENCRYPTED_PDF);
+            try {
+                this.getPDFSource().close();
+            } catch (IOException e) {
+                failure.addSuppressed(e);
+            }
             if (this.parser.getDocument() != null) {
                 FileResourceHandler handler =
                         this.parser.getDocument().getResourceHandler();
                 if (handler != null) {
-                    handler.close();
+                    try {
+                        handler.close();
+                    }  catch (IOException e) {
+                        failure.addSuppressed(e);
+                    }
                 }
             }
-            throw new InvalidPasswordException(StringExceptions.ENCRYPTED_PDF);
+            throw failure;
         }
     }
 
