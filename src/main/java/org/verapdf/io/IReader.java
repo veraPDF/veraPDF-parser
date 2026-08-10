@@ -70,4 +70,6 @@ public interface IReader extends Closeable {
 	List<COSObject> getObjectStreamsList();
 
 	int getGreatestKeyNumberFromXref();
+
+    void checkDocCanBeDecrypted() throws IOException;
 }
