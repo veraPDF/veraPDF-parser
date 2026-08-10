@@ -126,6 +126,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(String.valueOf(obj.get()));
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to write boolean");
 		}
 	}
 
@@ -134,6 +135,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(obj.toString());
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to write integer");
 		}
 	}
 
@@ -142,6 +144,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(obj.toString());
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to write real");
 		}
 	}
 
@@ -150,6 +153,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(obj.getPrintableString());
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to write string");
 		}
 	}
 
@@ -158,6 +162,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(obj.toString());
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to write name");
 		}
 	}
 
@@ -171,6 +176,7 @@ public class Writer implements IVisitor {
 			}
 			this.write("]");
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to write array");
 		}
 	}
 
@@ -186,6 +192,7 @@ public class Writer implements IVisitor {
 			}
 			this.write(">>");
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to write dictionary");
 		}
 	}
 
@@ -258,6 +265,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write("null");
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to write null");
 		}
 	}
 
@@ -289,7 +297,7 @@ public class Writer implements IVisitor {
 			this.write(comment);
 			this.write(EOL);
 		} catch (IOException e) {
-
+            LOGGER.log(Level.WARNING, "Failed to write header");
 		}
 	}
 
@@ -352,6 +360,7 @@ public class Writer implements IVisitor {
 			this.write("startxref"); this.write(EOL); this.write(this.info.getStartXRef()); this.write(EOL);
 			this.write("%%EOF"); this.write(EOL);
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to write XRefInfo");
 		}
 	}
 
@@ -366,6 +375,7 @@ public class Writer implements IVisitor {
 			this.toWrite.clear();
 			this.written.clear();
 		} catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to clear XRefInfo");
 		}
 	}
 
@@ -373,6 +383,7 @@ public class Writer implements IVisitor {
 		try {
 			this.os.close();
 		} catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to close stream");
 		}
 	}
 
@@ -405,6 +416,7 @@ public class Writer implements IVisitor {
 			//TODO : convert to COSArray
 			this.info.getTrailer().setID(idString);
 		} catch (NoSuchAlgorithmException e) {
+            LOGGER.log(Level.WARNING, "Failed to generate id");
 		}
 	}
 

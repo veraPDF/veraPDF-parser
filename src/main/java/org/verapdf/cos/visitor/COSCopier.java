@@ -24,11 +24,15 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.*;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Timur Kamalov
  */
 public class COSCopier implements IVisitor {
+
+    private static final Logger LOGGER = Logger.getLogger(COSCopier.class.getCanonicalName());
 
 	private final COSObject copy;
 
@@ -103,6 +107,7 @@ public class COSCopier implements IVisitor {
 			this.copy.set(obj);
 		} catch (Exception e) {
 			//TODO : throw
+            LOGGER.log(Level.WARNING, "Failed to copy from Indirect object");
 		}
 	}
 }
