@@ -126,7 +126,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(String.valueOf(obj.get()));
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write boolean");
 		}
 	}
 
@@ -135,7 +135,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(obj.toString());
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write integer");
 		}
 	}
 
@@ -144,7 +144,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(obj.toString());
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write real");
 		}
 	}
 
@@ -153,7 +153,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(obj.getPrintableString());
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write string");
 		}
 	}
 
@@ -162,7 +162,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write(obj.toString());
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write name");
 		}
 	}
 
@@ -176,7 +176,7 @@ public class Writer implements IVisitor {
 			}
 			this.write("]");
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write array");
 		}
 	}
 
@@ -192,7 +192,7 @@ public class Writer implements IVisitor {
 			}
 			this.write(">>");
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write dictionary");
 		}
 	}
 
@@ -208,7 +208,7 @@ public class Writer implements IVisitor {
 		try {
 			obj.setIntegerKey(ASAtom.LENGTH, getASInputStreamLength(in));
 		} catch (IOException e) {
-			LOGGER.log(Level.FINE, "Can't calculate length of ASInputStream", e);
+			LOGGER.log(Level.FINE, "Can't calculate length of ASInputStream");
 		}
 
 		visitFromDictionary(obj);
@@ -265,7 +265,7 @@ public class Writer implements IVisitor {
 		try {
 			this.write("null");
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write null");
 		}
 	}
 
@@ -297,7 +297,7 @@ public class Writer implements IVisitor {
 			this.write(comment);
 			this.write(EOL);
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write header");
 		}
 	}
 
@@ -360,7 +360,7 @@ public class Writer implements IVisitor {
 			this.write("startxref"); this.write(EOL); this.write(this.info.getStartXRef()); this.write(EOL);
 			this.write("%%EOF"); this.write(EOL);
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to write XRefInfo");
 		}
 	}
 
@@ -375,7 +375,7 @@ public class Writer implements IVisitor {
 			this.toWrite.clear();
 			this.written.clear();
 		} catch (Exception e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to clear XRefInfo");
 		}
 	}
 
@@ -383,7 +383,7 @@ public class Writer implements IVisitor {
 		try {
 			this.os.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to close stream");
 		}
 	}
 
@@ -391,7 +391,6 @@ public class Writer implements IVisitor {
 		try {
 			return this.os.getOffset();
 		} catch (IOException e) {
-			e.printStackTrace();
 			return 0;
 		}
 	}
@@ -417,7 +416,7 @@ public class Writer implements IVisitor {
 			//TODO : convert to COSArray
 			this.info.getTrailer().setID(idString);
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to generate id");
 		}
 	}
 

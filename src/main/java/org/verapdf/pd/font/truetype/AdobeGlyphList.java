@@ -77,7 +77,7 @@ public class AdobeGlyphList {
                 scanner.close();
             }
         } catch (IOException e) {
-            LOGGER.log(Level.FINE, "Error in opening Adobe Glyph List file", e);
+            LOGGER.log(Level.FINE, "Error in opening Adobe Glyph List file");
         }
     }
 

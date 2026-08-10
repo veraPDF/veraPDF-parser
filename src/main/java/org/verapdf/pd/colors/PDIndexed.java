@@ -111,7 +111,7 @@ public class PDIndexed extends PDSpecialColorSpace {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Error reading color table for PDIndexed", e);
+            LOGGER.log(Level.WARNING, "Error reading color table for PDIndexed");
         }
 
         return getBaseColorSpace().toRGB(colorTable[index]);

@@ -166,7 +166,7 @@ public class COSStream extends COSDictionary {
 			result.reset();
 			return result;
 		} catch (IOException e) {
-			LOGGER.log(Level.FINE, "Can't get stream data", e);
+			LOGGER.log(Level.FINE, "Can't get stream data");
 			return new ASInFilter(this.stream) {
 				@Override
 				public int read() {
@@ -188,7 +188,7 @@ public class COSStream extends COSDictionary {
 			File encodedDataFile = fileWithData.getFile();
 			return setData(new InternalInputStream(encodedDataFile, true), FilterFlags.RAW_DATA);
 		} catch (IOException e) {
-			LOGGER.log(Level.FINE, "Can not set data", e);
+			LOGGER.log(Level.FINE, "Can not set data");
 			return false;
 		}
 	}
@@ -419,7 +419,7 @@ public class COSStream extends COSDictionary {
 				return false;
 			}
 		} catch (IOException e) {
-			LOGGER.log(Level.FINE, "Exception during comparing streams", e);
+			LOGGER.log(Level.FINE, "Exception during comparing streams");
 			return false;
 		}
 		return flags == that.flags;

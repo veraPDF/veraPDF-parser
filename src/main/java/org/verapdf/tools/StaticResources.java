@@ -144,7 +144,7 @@ public class StaticResources {
 				try {
 					fpr.close();
 				} catch (IOException e) {
-					LOGGER.log(Level.WARNING, "Exception while closing font program", e);
+					LOGGER.log(Level.WARNING, "Exception while closing font program");
 				}
 			}
 		}

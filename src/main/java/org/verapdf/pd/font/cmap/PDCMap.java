@@ -118,7 +118,7 @@ public class PDCMap extends PDObject {
                 try (ASInputStream cMapStream = this.getObject().getData(COSStream.FilterFlags.DECODE)) {
                     this.cMapFile = CMapFactory.getCMap(getCMapID(), cMapStream);
                 } catch (IOException e) {
-                    LOGGER.log(Level.FINE, "Can't close stream", e);
+                    LOGGER.log(Level.FINE, "Can't close stream");
                 }
             } else if (this.getObject().getType() == COSObjType.COS_NAME) {
                 String name = this.getObject().getString();
@@ -128,7 +128,7 @@ public class PDCMap extends PDObject {
                         this.cMapFile = CMapFactory.getCMap(getCMapID(), cMapStream);
                     }
                 } catch (IOException e) {
-                    LOGGER.log(Level.FINE, "Can't close stream", e);
+                    LOGGER.log(Level.FINE, "Can't close stream");
                 }
             } else {
                 return null;
@@ -249,7 +249,7 @@ public class PDCMap extends PDObject {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.FINE, "Error in opening predefined CMap " + cMapName, e);
+            LOGGER.log(Level.FINE, "Error in opening predefined CMap " + cMapName);
             return null;
         }
     }

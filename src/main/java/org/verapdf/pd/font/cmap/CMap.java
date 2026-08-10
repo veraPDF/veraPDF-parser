@@ -147,7 +147,7 @@ public class CMap {
                     }
                 }
             } catch (VeraPDFParserException e) {
-                LOGGER.log(Level.WARNING, "CMap " + this.name + " has invalid codespace range.", e);
+                LOGGER.log(Level.WARNING, "CMap " + this.name + " has invalid codespace range.");
             }
             if (shortestMatchingCodeSpaceLength == Integer.MAX_VALUE && !codeSpaces.isEmpty()) {
                 byte[] tmp = new byte[previousShortestMatchingCodeSpaceLength - i - 1];

@@ -147,7 +147,7 @@ public class PDType3Font extends PDSimpleFont {
                 parser.parse();
                 return (float) parser.getWidth();
             } catch (IOException e) {
-                LOGGER.log(Level.FINE, "Can't get width from type 3 char proc", e);
+                LOGGER.log(Level.FINE, "Can't get width from type 3 char proc");
             }
         }
         return -1;

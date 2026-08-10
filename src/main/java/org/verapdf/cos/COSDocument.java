@@ -150,7 +150,7 @@ public class COSDocument {
 					result.add(newObj);
 				} catch (IOException e) {
 					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
-							' ' + key.getGeneration(), e);
+							' ' + key.getGeneration());
 				} catch (StackOverflowError e) {
 					// TODO: double check this StackOverflow catching
 					throw new LoopedException("Loop in getting object from reader", e);
@@ -174,7 +174,7 @@ public class COSDocument {
 					addObjectWithTypeKeyCheck(result, obj, type);
 				} catch (IOException e) {
 					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
-							' ' + key.getGeneration(), e);
+							' ' + key.getGeneration());
 				}
 			}
 		}
@@ -205,7 +205,7 @@ public class COSDocument {
 					result.put(key, newObj);
 				} catch (IOException e) {
 					LOGGER.log(Level.FINE, "Error while parsing object : " + key.getNumber() +
-							' ' + key.getGeneration(), e);
+							' ' + key.getGeneration());
 				}
 			}
 		}
@@ -357,7 +357,7 @@ public class COSDocument {
 			writeInputIntoOutput(pdf, stream);
 			pdf.close();
 		} catch (IOException e) {
-			LOGGER.log(Level.FINE, "Can't write COSDocument to stream", e);
+			LOGGER.log(Level.FINE, "Can't write COSDocument to stream");
 		} finally {
 			if (temp != null && !temp.delete()) {
 				temp.deleteOnExit();
