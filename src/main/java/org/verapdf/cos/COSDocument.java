@@ -102,9 +102,10 @@ public class COSDocument {
 		initCOSDocument(document);
 	}
 
-	private void initCOSDocument(final PDDocument document) {
+	private void initCOSDocument(final PDDocument document) throws IOException {
 		this.doc = document;
 		this.body = new COSBody();
+        this.reader.checkDocCanBeDecrypted();
 
 		this.header = this.reader.getHeader();
 		this.xref = new COSXRefTable();

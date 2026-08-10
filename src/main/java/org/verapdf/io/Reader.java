@@ -142,6 +142,20 @@ public class Reader extends XRefReader {
 		return this.parser.getLinearizationDictionary();
 	}
 
+    @Override
+    public void checkDocCanBeDecrypted() throws IOException {
+        if (this.parser.isEncrypted() && !docCanBeDecrypted()) {
+            this.getPDFSource().close();
+            if (this.parser.getDocument() != null) {
+                FileResourceHandler handler =
+                        this.parser.getDocument().getResourceHandler();
+                if (handler != null) {
+                    handler.close();
+                }
+            }
+            throw new InvalidPasswordException(StringExceptions.ENCRYPTED_PDF);
+        }
+    }
 
 	// PRIVATE METHODS
 	private void init() throws IOException {
@@ -152,17 +166,6 @@ public class Reader extends XRefReader {
 			this.parser.getXRefInfo(infos);
 			setXRefInfo(infos);
 
-			if (this.parser.isEncrypted() && !docCanBeDecrypted()) {
-				this.getPDFSource().close();
-				if (this.parser.getDocument() != null) {
-					FileResourceHandler handler =
-							this.parser.getDocument().getResourceHandler();
-					if (handler != null) {
-						handler.close();
-					}
-				}
-				throw new InvalidPasswordException(StringExceptions.ENCRYPTED_PDF);
-			}
 		} catch (IOException e) {	// If exception is thrown in init() someone
 			// should close document stream
 			this.parser.closeInputStream();
