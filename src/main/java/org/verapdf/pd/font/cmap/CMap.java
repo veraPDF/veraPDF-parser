@@ -167,7 +167,7 @@ public class CMap {
      */
     public void useCMap(CMap another) {
         if (another == null) {
-            LOGGER.log(Level.WARNING, "The provided CMap is null. No data merged into the current CMap.");
+            LOGGER.log(Level.WARNING, "UseCMap has an invalid value and will be ignored.");
             return;
         }
         this.cidMappings.addAll(another.cidMappings);
