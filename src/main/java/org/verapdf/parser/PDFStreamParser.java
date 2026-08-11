@@ -194,7 +194,7 @@ public class PDFStreamParser extends NotSeekableCOSParser {
 						imageOperator.setImageData(((InlineImageOperator) nextToken).getImageData());
 					} else {
 						throw new IOException("Unexpected token instead of " +
-								"operator in operator parsing: " + nextToken.toString());
+								"operator in operator parsing: " + (nextToken != null ? nextToken.toString() : "null"));
 					}
 				}
 				break;
