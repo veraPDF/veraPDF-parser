@@ -166,6 +166,10 @@ public class CMap {
      * @param another is another CMap.
      */
     public void useCMap(CMap another) {
+        if (another == null) {
+            LOGGER.log(Level.WARNING, "UseCMap has an invalid value and will be ignored.");
+            return;
+        }
         this.cidMappings.addAll(another.cidMappings);
         this.codeSpaces.addAll(another.codeSpaces);
         this.notDefMappings.addAll(another.notDefMappings);
