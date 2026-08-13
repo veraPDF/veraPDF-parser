@@ -22,6 +22,7 @@ package org.verapdf.pd.font.truetype;
 
 
 import org.verapdf.io.SeekableInputStream;
+import org.verapdf.pd.font.type1.ZapfDingbats;
 
 import java.io.File;
 import java.io.IOException;
@@ -160,5 +161,95 @@ public class AdobeGlyphList {
             System.arraycopy(diacriticCodes, 0, res, 1, diacriticCodes.length);
             return new String(res, 0, res.length);
         }
+    }
+
+    public static String mapGlyphNameToUnicode(String glyphName) {
+        int dot = glyphName.indexOf('.');
+        if (dot >= 0) {
+            glyphName = glyphName.substring(0, dot);
+        }
+
+        String[] components = glyphName.split("_", -1);
+        StringBuilder result = new StringBuilder();
+        for (String comp : components) {
+            result.append(mapComponent(comp));
+        }
+        return result.toString();
+    }
+
+    private static String mapComponent(String component) {
+        if (ZapfDingbats.hasGlyphName(component)) {
+            return ZapfDingbats.toUnicode(component);
+        }
+
+        AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(component);
+        if (unicode != AdobeGlyphList.empty()) {
+            return unicode.getUnicodeString();
+        }
+
+        if (component.startsWith("uni") && component.length() > 3) {
+            String result = parseUniComponent(component);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        if (component.startsWith("u") && component.length() > 1) {
+            String result = parseUComponent(component);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        return "";
+    }
+
+    private static String parseUniComponent(String component) {
+        String hex = component.substring(3);
+        if (hex.isEmpty() || hex.length() % 4 != 0) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(hex.length() / 4);
+        for (int i = 0; i < hex.length(); i += 4) {
+            String group = hex.substring(i, i + 4);
+            if (isNotValidHex(hex)) {
+                return null;
+            }
+            int cp = Integer.parseInt(group, 16);
+            if (!((cp >= 0x0000 && cp <= 0xD7FF) || (cp >= 0xE000 && cp <= 0xFFFF))) {
+                return null;
+            }
+            sb.append((char) cp);
+        }
+        return sb.toString();
+    }
+
+    private static String parseUComponent(String component) {
+        String hex = component.substring(1);
+        if (hex.length() < 4 || hex.length() > 6) {
+            return null;
+        }
+        if (isNotValidHex(hex)) {
+            return null;
+        }
+        int cp = Integer.parseInt(hex, 16);
+        if (!((cp >= 0x0000 && cp <= 0xD7FF) || (cp >= 0xE000 && cp <= 0x10FFFF))) {
+            return null;
+        }
+        if (cp <= 0xFFFF) {
+            return String.valueOf((char) cp);
+        } else {
+            return new String(Character.toChars(cp));
+        }
+    }
+
+    private static boolean isNotValidHex(String hex) {
+        for (int i = 0; i < hex.length(); i++) {
+            char c = hex.charAt(i);
+            if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

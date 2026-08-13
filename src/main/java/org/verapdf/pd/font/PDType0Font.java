@@ -158,11 +158,6 @@ public class PDType0Font extends PDCIDFont {
         return this.ucsCMap.getCMapFile().getUnicode(cid);
     }
 
-    @Override
-    public String toUnicode(int code, boolean isStrict) {
-        return toUnicode(code);
-    }
-
     private void setUcsCMapFromIdentity(PDCIDSystemInfo cidSystemInfo) {
         isParsedUcsCMap = true;
         if (cidSystemInfo != null) {
