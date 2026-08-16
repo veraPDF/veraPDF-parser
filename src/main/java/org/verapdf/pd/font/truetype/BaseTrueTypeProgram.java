@@ -52,7 +52,12 @@ public abstract class BaseTrueTypeProgram implements FontProgram {
      */
     public BaseTrueTypeProgram(ASInputStream stream, COSKey key)
             throws IOException {
-        this.parser = new TrueTypeFontParser(stream, key);
+        this(stream, key, false);
+    }
+
+    public BaseTrueTypeProgram(ASInputStream stream, COSKey key, boolean isCIDFontType2Program)
+            throws IOException {
+        this.parser = new TrueTypeFontParser(stream, key, isCIDFontType2Program);
         this.key = key;
     }
 

@@ -51,10 +51,12 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
     private TrueTypePostTable postParser;
     private TrueTypeMaxpTable maxpParser;
     private COSKey key;
+    private boolean isCIDFontType2Program;
 
-    TrueTypeFontParser(ASInputStream source, COSKey key) throws IOException {
+    TrueTypeFontParser(ASInputStream source, COSKey key, boolean isCIDFontType2Program) throws IOException {
         super(source);
         this.key = key;
+        this.isCIDFontType2Program = isCIDFontType2Program;
     }
 
     void readHeader() throws IOException {
@@ -108,7 +110,7 @@ class TrueTypeFontParser extends TrueTypeBaseParser {
 
         if (cmapParser != null) {
             this.cmapParser.readTable();
-        } else {
+        } else if (!isCIDFontType2Program) {
             LOGGER.log(Level.FINE, getErrorMessage("True type font doesn't contain cmap table."));
         }
 
