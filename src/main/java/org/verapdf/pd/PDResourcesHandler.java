@@ -315,7 +315,7 @@ public class PDResourcesHandler {
 		return this.pageResources;
 	}
 
-	private boolean isDefaultColorSpaceUsed(ASAtom name) {
+	public boolean isDefaultColorSpaceUsed(ASAtom name) {
 		if (PDResourcesHandler.isDeviceDependent(name)) {
 			if (objectResources != null) {
 				ASAtom value = org.verapdf.factory.colors.ColorSpaceFactory.getDefaultValue(objectResources, name);
