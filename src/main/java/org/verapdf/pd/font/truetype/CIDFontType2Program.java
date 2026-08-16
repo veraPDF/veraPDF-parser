@@ -51,7 +51,7 @@ public class CIDFontType2Program extends BaseTrueTypeProgram implements FontProg
      * @throws IOException
      */
     public CIDFontType2Program(ASInputStream stream, CMap cMap, COSObject cidToGID, COSKey key) throws IOException {
-        super(stream, key);
+        super(stream, key, true);
         this.cMap = cMap;
         this.cidToGID = new CIDToGIDMapping(cidToGID);
         if (StaticResources.getIsFontProgramsParsing()) {
