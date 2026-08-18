@@ -172,7 +172,11 @@ public class AdobeGlyphList {
         String[] components = glyphName.split("_", -1);
         StringBuilder result = new StringBuilder();
         for (String comp : components) {
-            result.append(mapComponent(comp));
+            String mapped = mapComponent(comp);
+            if (mapped.isEmpty()) {
+                return "";
+            }
+            result.append(mapped);
         }
         return result.toString();
     }
