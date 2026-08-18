@@ -334,6 +334,10 @@ public abstract class PDFont extends PDResource {
         return cMapToUnicode(code);
     }
 
+    public String toUnicode(int code, boolean isStrict) {
+        return toUnicode(code);
+    }
+
     /**
      * Gets toUnicode value just from toUnicode cMap.
      *

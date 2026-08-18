@@ -55,7 +55,11 @@ public abstract class PDSimpleFont extends PDFont {
      */
     @Override
     public String toUnicode(int code) {
+        return toUnicode(code, true);
+    }
 
+    @Override
+    public String toUnicode(int code, boolean isStrict) {
         String unicodeString = super.toUnicode(code);
         if (unicodeString != null) {
             return unicodeString;
@@ -70,14 +74,23 @@ public abstract class PDSimpleFont extends PDFont {
             glyphName = fontProgram.getGlyphName(code);
         }
         if (glyphName != null) {
-            AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
-            if (unicode != AdobeGlyphList.empty()) {
-                return unicode.getUnicodeString();
+            if (isStrict) {
+                AdobeGlyphList.AGLUnicode unicode = AdobeGlyphList.get(glyphName);
+                if (unicode != AdobeGlyphList.empty()) {
+                    return unicode.getUnicodeString();
+                }
+                LOGGER.log(Level.FINE, "Cannot find glyph " + glyphName + " in Adobe Glyph List.");
+                if (ZapfDingbats.hasGlyphName(glyphName) || SymbolSet.hasGlyphName(glyphName)) {
+                    return " "; // indicates that toUnicode should not be checked.
+                }
+            } else {
+                String mapped = AdobeGlyphList.mapGlyphNameToUnicode(glyphName);
+                if (!mapped.isEmpty()) {
+                    return mapped;
+                }
+                LOGGER.log(Level.FINE, "Cannot find glyph " + glyphName + " in Adobe Glyph List, Zapf Dingbats, or as uni/u name.");
             }
-            LOGGER.log(Level.FINE, "Cannot find glyph " + glyphName + " in Adobe Glyph List.");
-            if (ZapfDingbats.hasGlyphName(glyphName) || SymbolSet.hasGlyphName(glyphName)) {
-                return " "; // indicates that toUnicode should not be checked.
-            }
+
             return null;
         }
         LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code " + code + " in font " + this.getName());
