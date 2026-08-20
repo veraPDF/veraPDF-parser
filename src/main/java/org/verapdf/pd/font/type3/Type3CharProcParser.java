@@ -34,6 +34,8 @@ import java.io.IOException;
 public class Type3CharProcParser extends NotSeekableBaseParser {
 
     private double width = -1;
+    private double ascent = 0;
+    private double descent = 0;
     private static final String D0 = "d0";
     private static final String D1 = "d1";
 
@@ -64,12 +66,20 @@ public class Type3CharProcParser extends NotSeekableBaseParser {
         }   // else ll_x
 
         nextToken();    // ll_y
+        if (getToken().type == Token.Type.TT_INTEGER || getToken().type == Token.Type.TT_REAL) {
+            this.descent = getToken().real;
+        }
         nextToken();    // ur_x
         nextToken();    // ur_y
+        if (getToken().type == Token.Type.TT_INTEGER || getToken().type == Token.Type.TT_REAL) {
+            this.ascent = getToken().real;
+        }
         nextToken();    // d1
 
         if (getToken().type != Token.Type.TT_KEYWORD || !getToken().getValue().equals(D1)) {    // stream is corrupted
             this.width = -1;
+            this.ascent = 0;
+            this.descent = 0;
             throw new IOException("Can't parse type 3 char proc");
         }
     }
@@ -80,5 +90,13 @@ public class Type3CharProcParser extends NotSeekableBaseParser {
      */
     public double getWidth() {
         return width;
+    }
+
+    public double getAscent() {
+        return ascent;
+    }
+
+    public double getDescent() {
+        return descent;
     }
 }

@@ -157,4 +157,30 @@ public class PDType3Font extends PDSimpleFont {
     public boolean glyphIsPresent(int code) {
         return containsCharString(code);
     }
+
+    public float getAscentFromProgram(int code) {
+        COSObject charProc = getCharProc(code);
+        if (charProc.getType() == COSObjType.COS_STREAM) {
+            try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData(COSStream.FilterFlags.DECODE))) {
+                parser.parse();
+                return (float) parser.getAscent();
+            } catch (IOException e) {
+                LOGGER.log(Level.FINE, "Can't get ascent from type 3 char proc");
+            }
+        }
+        return 0;
+    }
+
+    public float getDescentFromProgram(int code) {
+        COSObject charProc = getCharProc(code);
+        if (charProc.getType() == COSObjType.COS_STREAM) {
+            try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData(COSStream.FilterFlags.DECODE))) {
+                parser.parse();
+                return (float) parser.getDescent();
+            } catch (IOException e) {
+                LOGGER.log(Level.FINE, "Can't get descent from type 3 char proc");
+            }
+        }
+        return 0;
+    }
 }
