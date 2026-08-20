@@ -158,29 +158,29 @@ public class PDType3Font extends PDSimpleFont {
         return containsCharString(code);
     }
 
-    public float getAscentFromProgram(int code) {
+    public Double getAscentFromProgram(int code) {
         COSObject charProc = getCharProc(code);
         if (charProc.getType() == COSObjType.COS_STREAM) {
             try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData(COSStream.FilterFlags.DECODE))) {
                 parser.parse();
-                return (float) parser.getAscent();
+                return parser.getAscent();
             } catch (IOException e) {
                 LOGGER.log(Level.FINE, "Can't get ascent from type 3 char proc");
             }
         }
-        return 0;
+        return null;
     }
 
-    public float getDescentFromProgram(int code) {
+    public Double getDescentFromProgram(int code) {
         COSObject charProc = getCharProc(code);
         if (charProc.getType() == COSObjType.COS_STREAM) {
             try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData(COSStream.FilterFlags.DECODE))) {
                 parser.parse();
-                return (float) parser.getDescent();
+                return parser.getDescent();
             } catch (IOException e) {
                 LOGGER.log(Level.FINE, "Can't get descent from type 3 char proc");
             }
         }
-        return 0;
+        return null;
     }
 }
