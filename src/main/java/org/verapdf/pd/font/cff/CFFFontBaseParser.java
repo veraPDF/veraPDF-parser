@@ -142,7 +142,8 @@ class CFFFontBaseParser extends CFFFileBaseParser {
                                 case 7:     // FontMatrix
                                     fontMatrix = new float[6];
                                     for (int i = 0; i < 6; ++i) {
-                                        fontMatrix[i] = this.stack.get(i).getReal();
+                                        fontMatrix[i] =
+                                                this.stack.get(this.stack.size() - 6 + i).getReal();
                                     }
                                     this.stack.clear();
                                     break;
@@ -153,6 +154,7 @@ class CFFFontBaseParser extends CFFFileBaseParser {
                                     break;
                                 case 30:
                                     this.containsROS = true;
+                                    this.stack.clear();
                                     break;
                                 default:
                                     readTopDictTwoByteOps(next);
