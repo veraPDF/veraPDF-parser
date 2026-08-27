@@ -95,7 +95,9 @@ public class PDEncryption extends PDObject {
      */
     public int getLength() {
         int v = getV();
-        if (v == 4) {
+        if (v == 1) {
+            return DEFAULT_LENGTH;
+        } else if (v == 4) {
             return DEFAULT_V4_LENGTH;
         } else if (v == 5) {
             return DEFAULT_V5_LENGTH;
