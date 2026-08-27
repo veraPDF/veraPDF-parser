@@ -43,6 +43,8 @@ public class PDEncryption extends PDObject {
 
     private static final boolean DEFAULT_ENCRYPT_METADATA = true;
     private static final int DEFAULT_LENGTH = 40;
+    private static final int DEFAULT_V4_LENGTH = 128;
+    private static final int DEFAULT_V5_LENGTH = 256;
     private static final int DEFAULT_V = 0;
     private Map<ASAtom, PDCryptFilter> cryptFilters;
 
@@ -92,6 +94,12 @@ public class PDEncryption extends PDObject {
      * @return the length of the encryption key, in bits.
      */
     public int getLength() {
+        int v = getV();
+        if (v == 4) {
+            return DEFAULT_V4_LENGTH;
+        } else if (v == 5) {
+            return DEFAULT_V5_LENGTH;
+        }
         return getIntWithDefault(ASAtom.LENGTH, DEFAULT_LENGTH);
     }
 
