@@ -163,7 +163,7 @@ public class PDType3Font extends PDSimpleFont {
         if (charProc.getType() == COSObjType.COS_STREAM) {
             try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData(COSStream.FilterFlags.DECODE))) {
                 parser.parse();
-                return parser.getAscent();
+                return parser.getAscentOrNull();
             } catch (IOException e) {
                 LOGGER.log(Level.FINE, "Can't get ascent from type 3 char proc");
             }
@@ -176,7 +176,7 @@ public class PDType3Font extends PDSimpleFont {
         if (charProc.getType() == COSObjType.COS_STREAM) {
             try (Type3CharProcParser parser = new Type3CharProcParser(charProc.getData(COSStream.FilterFlags.DECODE))) {
                 parser.parse();
-                return parser.getDescent();
+                return parser.getDescentOrNull();
             } catch (IOException e) {
                 LOGGER.log(Level.FINE, "Can't get descent from type 3 char proc");
             }

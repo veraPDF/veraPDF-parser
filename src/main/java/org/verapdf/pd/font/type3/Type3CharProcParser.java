@@ -92,11 +92,45 @@ public class Type3CharProcParser extends NotSeekableBaseParser {
         return width;
     }
 
+    /**
+     * @return ascent of the glyph presented by given char proc, or 0 if the char
+     * proc declares no glyph bounding box.
+     * @deprecated a char proc that begins with the d0 operator specifies the
+     * glyph width only (ISO 32000-1, 9.6.5.3) and declares no glyph bounding
+     * box, so its ascent is undefined rather than 0. This method cannot express
+     * that; use {@link #getAscentOrNull()} instead.
+     */
+    @Deprecated
     public double getAscent() {
+        return ascent == null ? 0 : ascent;
+    }
+
+    /**
+     * @return descent of the glyph presented by given char proc, or 0 if the
+     * char proc declares no glyph bounding box.
+     * @deprecated undefined descent cannot be distinguished from 0; use
+     * {@link #getDescentOrNull()} instead. See {@link #getAscent()}.
+     */
+    @Deprecated
+    public double getDescent() {
+        return descent == null ? 0 : descent;
+    }
+
+    /**
+     * @return ascent of the glyph presented by given char proc, or null if the
+     * char proc declares no glyph bounding box. A char proc that begins with
+     * the d0 operator specifies the glyph width only (ISO 32000-1, 9.6.5.3),
+     * so its ascent is undefined rather than 0.
+     */
+    public Double getAscentOrNull() {
         return ascent;
     }
 
-    public double getDescent() {
+    /**
+     * @return descent of the glyph presented by given char proc, or null if the
+     * char proc declares no glyph bounding box. See {@link #getAscentOrNull()}.
+     */
+    public Double getDescentOrNull() {
         return descent;
     }
 }
