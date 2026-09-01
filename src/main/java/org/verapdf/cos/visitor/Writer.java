@@ -344,6 +344,11 @@ public class Writer implements IVisitor {
 
 		this.info.getTrailer().setPrev(prev);
 
+		// This writer only ever emits a classic cross-reference table, so a
+		// /XRefStm inherited from the source trailer cannot describe the
+		// section written here (ISO 32000-1, 7.5.8.4).
+		this.info.getTrailer().removeKey(ASAtom.XREF_STM);
+
 		if (prev == 0) {
 			this.info.getTrailer().removeKey(ASAtom.ID);
 		}
