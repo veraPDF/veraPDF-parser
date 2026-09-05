@@ -44,7 +44,7 @@ public class InternalOutputStream implements ASOutputStream, Closeable {
 	 * @throws IOException
 	 */
 	public static InternalOutputStream getInternalOutputStream() throws IOException {
-		File tempFile = File.createTempFile("tmp_pdf_file", ".pdf");
+		File tempFile = TempFileHandler.createTempFile("tmp_pdf_file", ".pdf");
 		return new InternalOutputStream(tempFile);
 	}
 
