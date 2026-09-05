@@ -50,6 +50,8 @@ public class COSDocument {
 
 	private static final Logger LOGGER = Logger.getLogger(COSDocument.class.getCanonicalName());
 
+	private static volatile int maxNumberOfObjects = -1;
+
 	private PDDocument doc;
 	private IReader reader;
 	private COSHeader header;
@@ -136,7 +138,39 @@ public class COSDocument {
 		this.header.setHeader(header);
 	}
 
+	/**
+	 * Sets an upper bound on the number of indirect objects the document may declare in its
+	 * cross-reference table. Enumerating the objects materialises one entry per key, so a document that
+	 * declares an extreme number of objects (a small compressed input can, via an object stream) can
+	 * exhaust the heap; with a bound set it is rejected with a {@link VeraPDFParserException} before the
+	 * objects are materialised, instead of failing with an OutOfMemoryError. A negative value (the
+	 * default) removes the bound, keeping the historical behaviour.
+	 *
+	 * @param max maximum number of indirect objects, or a negative value for no bound
+	 */
+	public static void setMaxNumberOfObjects(int max) {
+		maxNumberOfObjects = max;
+	}
+
+	/**
+	 * @return the current upper bound on the number of indirect objects, or {@code -1} if unbounded
+	 */
+	public static int getMaxNumberOfObjects() {
+		return maxNumberOfObjects;
+	}
+
+	private void checkObjectCountLimit() {
+		if (maxNumberOfObjects >= 0) {
+			int declared = this.xref.getAllKeys().size();
+			if (declared > maxNumberOfObjects) {
+				throw new VeraPDFParserException("Number of indirect objects (" + declared
+						+ ") exceeds the configured maximum of " + maxNumberOfObjects);
+			}
+		}
+	}
+
 	public List<COSObject> getObjects() {
+		checkObjectCountLimit();
 		List<COSObject> result = new ArrayList<>();
 		for (COSKey key : this.xref.getAllKeys()) {
 			COSObject obj = this.body.get(key);
@@ -161,6 +195,7 @@ public class COSDocument {
 	}
 
 	public List<COSObject> getObjectsByType(ASAtom type) {
+		checkObjectCountLimit();
 		List<COSObject> result = new ArrayList<>();
 		for (COSKey key : this.xref.getAllKeys()) {
 			COSObject obj = this.body.get(key);
@@ -192,6 +227,7 @@ public class COSDocument {
 	}
 
 	public Map<COSKey, COSObject> getObjectsMap() {
+		checkObjectCountLimit();
 		Map<COSKey, COSObject> result = new HashMap<>();
 		for (COSKey key : this.xref.getAllKeys()) {
 			COSObject obj = this.body.get(key);
