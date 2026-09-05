@@ -23,7 +23,7 @@ package org.verapdf.io;
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.exceptions.VeraPDFParserException;
+import org.verapdf.exceptions.ResourceLimitExceededException;
 import org.verapdf.parser.BaseParserInputStream;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
      * Optional hard cap, in bytes, on the size of a single stream that is spilled to a temporary file
      * ({@code null} means no cap). It guards against a small input whose decoded content expands without
      * bound (a "decompression bomb"): a stream that exceeds the cap is rejected with a
-     * {@link org.verapdf.exceptions.VeraPDFParserException} instead of being written out in full. The
+     * {@link org.verapdf.exceptions.ResourceLimitExceededException} instead of being written out in full. The
      * limit is wired into {@link #getSeekableStream(InputStream)}, which is the path taken by decoded
      * object streams and other non-seekable input. Default {@code null}, so behaviour is unchanged.
      */
@@ -237,7 +237,7 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
             totalRead += read;
         }
         if (maxStreamSize != null && totalRead > maxStreamSize) {
-            throw new VeraPDFParserException("Maximum allowed stream size exceeded");
+            throw new ResourceLimitExceededException("Maximum allowed stream size exceeded");
         }
         return InternalInputStream.createConcatenated(buffer, stream, maxStreamSize);
     }
