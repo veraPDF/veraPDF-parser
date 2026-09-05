@@ -286,7 +286,7 @@ public class InternalInputStream extends SeekableInputStream {
 		if (maxStreamSize != null && alreadyRead.length > maxStreamSize) {
 			throw new VeraPDFParserException("Maximum allowed stream size exceeded");
 		}
-		File tmpFile = File.createTempFile("tmp_pdf_file", ".pdf");
+		File tmpFile = TempFileHandler.createTempFile("tmp_pdf_file", ".pdf");
 		try (FileOutputStream output = new FileOutputStream(tmpFile)) {
 			output.write(alreadyRead);
 			int totalRead = alreadyRead.length;

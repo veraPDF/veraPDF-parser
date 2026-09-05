@@ -41,6 +41,29 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
     private static final int MAX_BUFFER_SIZE = 10240;
 
     /**
+     * Configurable in-memory buffer threshold: input up to this size is kept in memory, larger
+     * input is spilled to a temporary file. Defaults to {@link #MAX_BUFFER_SIZE}. A larger value
+     * trades memory for fewer temporary files; a smaller value does the opposite.
+     */
+    private static volatile int maxBufferSize = MAX_BUFFER_SIZE;
+
+    /**
+     * Sets the in-memory buffer threshold in bytes. Values below 1 restore the default.
+     *
+     * @param bytes buffer threshold in bytes, or a non-positive value for the default
+     */
+    public static void setMaxBufferSize(int bytes) {
+        maxBufferSize = bytes > 0 ? bytes : MAX_BUFFER_SIZE;
+    }
+
+    /**
+     * @return the current in-memory buffer threshold in bytes
+     */
+    public static int getMaxBufferSize() {
+        return maxBufferSize;
+    }
+
+    /**
      * Goes to a particular byte in stream.
      *
      * @param offset is offset of a byte to go to.
@@ -177,7 +200,8 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
         int totalRead = 0;
         byte[] buffer = new byte[0];
         byte[] temp = new byte[ASBufferedInFilter.BF_BUFFER_SIZE];
-        int maximumSize = maxStreamSize == null ? MAX_BUFFER_SIZE : Math.min(MAX_BUFFER_SIZE, maxStreamSize + 1);
+        int bufferThreshold = maxBufferSize;
+        int maximumSize = maxStreamSize == null ? bufferThreshold : Math.min(bufferThreshold, maxStreamSize + 1);
         while (totalRead < maximumSize) {
             int read = stream.read(temp);
             if (read == -1) {
