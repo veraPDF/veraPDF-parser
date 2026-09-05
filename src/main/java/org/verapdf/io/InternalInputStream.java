@@ -22,6 +22,7 @@ package org.verapdf.io;
 
 import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.as.io.ASInputStream;
+import org.verapdf.exceptions.ResourceLimitExceededException;
 import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.tools.IntReference;
 
@@ -284,7 +285,7 @@ public class InternalInputStream extends SeekableInputStream {
 
 	private static File createTempFile(byte[] alreadyRead, InputStream input, Integer maxStreamSize) throws IOException {
 		if (maxStreamSize != null && alreadyRead.length > maxStreamSize) {
-			throw new VeraPDFParserException("Maximum allowed stream size exceeded");
+			throw new ResourceLimitExceededException("Maximum allowed stream size exceeded");
 		}
 		File tmpFile = TempFileHandler.createTempFile("tmp_pdf_file", ".pdf");
 		try (FileOutputStream output = new FileOutputStream(tmpFile)) {
@@ -297,7 +298,7 @@ public class InternalInputStream extends SeekableInputStream {
 			while ((n = input.read(buffer, 0, ASBufferedInFilter.BF_BUFFER_SIZE)) != -1) {
 				totalRead += n;
 				if (maxStreamSize != null && totalRead > maxStreamSize) {
-					throw new VeraPDFParserException("Maximum allowed stream size exceeded");
+					throw new ResourceLimitExceededException("Maximum allowed stream size exceeded");
 				}
 				output.write(buffer, 0, n);
 			}

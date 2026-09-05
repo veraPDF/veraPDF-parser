@@ -25,6 +25,7 @@ import org.verapdf.as.filters.io.ASBufferedInFilter;
 import org.verapdf.cos.visitor.Writer;
 import org.verapdf.cos.xref.COSXRefTable;
 import org.verapdf.exceptions.LoopedException;
+import org.verapdf.exceptions.ResourceLimitExceededException;
 import org.verapdf.exceptions.VeraPDFParserException;
 import org.verapdf.io.IReader;
 import org.verapdf.io.InternalInputStream;
@@ -143,9 +144,10 @@ public class COSDocument {
 	 * Sets an upper bound on the number of indirect objects the document may declare in its
 	 * cross-reference table. Enumerating the objects materialises one entry per key, so a document that
 	 * declares an extreme number of objects (a small compressed input can, via an object stream) can
-	 * exhaust the heap; with a bound set it is rejected with a {@link VeraPDFParserException} before the
-	 * objects are materialised, instead of failing with an OutOfMemoryError. A negative value (the
-	 * default) removes the bound, keeping the historical behaviour.
+	 * exhaust the heap; with a bound set it is rejected with a {@link ResourceLimitExceededException}
+	 * (a {@link VeraPDFParserException} subclass, so existing catches keep working) before the objects
+	 * are materialised, instead of failing with an OutOfMemoryError. A negative value (the default)
+	 * removes the bound, keeping the historical behaviour.
 	 *
 	 * @param max maximum number of indirect objects, or a negative value for no bound
 	 */
@@ -164,7 +166,7 @@ public class COSDocument {
 		if (maxNumberOfObjects >= 0) {
 			int declared = this.xref.getAllKeys().size();
 			if (declared > maxNumberOfObjects) {
-				throw new VeraPDFParserException("Number of indirect objects (" + declared
+				throw new ResourceLimitExceededException("Number of indirect objects (" + declared
 						+ ") exceeds the configured maximum of " + maxNumberOfObjects);
 			}
 		}
