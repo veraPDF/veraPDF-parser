@@ -35,7 +35,7 @@ import java.nio.file.Path;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.verapdf.exceptions.VeraPDFParserException;
+import org.verapdf.exceptions.ResourceLimitExceededException;
 
 public class InternalInputStreamTest {
     @Rule
@@ -273,8 +273,8 @@ public class InternalInputStreamTest {
     public void shouldThrowExceptionWhenAlreadyReadIsLargerThanMaxSizeAndStreamIsEmpty() {
         byte[] alreadyRead = "abc".getBytes();
         ByteArrayInputStream stream = new ByteArrayInputStream("".getBytes());
-        VeraPDFParserException thrown = assertThrows(
-            VeraPDFParserException.class,
+        ResourceLimitExceededException thrown = assertThrows(
+            ResourceLimitExceededException.class,
             () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
         );
         assertTrue(thrown.getMessage().contains("size exceeded"));
@@ -284,8 +284,8 @@ public class InternalInputStreamTest {
     public void shouldThrowExceptionWhenAlreadyReadIsLargerThanMaxSizeAndStreamIsNotEmpty() {
         byte[] alreadyRead = "abc".getBytes();
         ByteArrayInputStream stream = new ByteArrayInputStream("1".getBytes());
-        VeraPDFParserException thrown = assertThrows(
-            VeraPDFParserException.class,
+        ResourceLimitExceededException thrown = assertThrows(
+            ResourceLimitExceededException.class,
             () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
         );
         assertTrue(thrown.getMessage().contains("size exceeded"));
@@ -295,8 +295,8 @@ public class InternalInputStreamTest {
     public void shouldThrowExceptionWhenStreamIsLargerThanMaxSizeAndAlreadyReadIsEmpty() {
         byte[] alreadyRead = "".getBytes();
         ByteArrayInputStream stream = new ByteArrayInputStream("abc".getBytes());
-        VeraPDFParserException thrown = assertThrows(
-            VeraPDFParserException.class,
+        ResourceLimitExceededException thrown = assertThrows(
+            ResourceLimitExceededException.class,
             () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
         );
         assertTrue(thrown.getMessage().contains("size exceeded"));
@@ -306,8 +306,8 @@ public class InternalInputStreamTest {
     public void shouldThrowExceptionWhenStreamIsLargerThanMaxSizeAndAlreadyReadIsNotEmpty() {
         byte[] alreadyRead = "1".getBytes();
         ByteArrayInputStream stream = new ByteArrayInputStream("abc".getBytes());
-        VeraPDFParserException thrown = assertThrows(
-            VeraPDFParserException.class,
+        ResourceLimitExceededException thrown = assertThrows(
+            ResourceLimitExceededException.class,
             () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
         );
         assertTrue(thrown.getMessage().contains("size exceeded"));
@@ -317,8 +317,8 @@ public class InternalInputStreamTest {
     public void shouldThrowExceptionWhenSumOfAlreadyReadAndStreamIsLargerThanMaxSize() {
         byte[] alreadyRead = "ab".getBytes();
         ByteArrayInputStream stream = new ByteArrayInputStream("cd".getBytes());
-        VeraPDFParserException thrown = assertThrows(
-            VeraPDFParserException.class,
+        ResourceLimitExceededException thrown = assertThrows(
+            ResourceLimitExceededException.class,
             () -> InternalInputStream.createConcatenated(alreadyRead, stream, 2)
         );
         assertTrue(thrown.getMessage().contains("size exceeded"));

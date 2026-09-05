@@ -26,7 +26,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.verapdf.as.io.ASInputStream;
 import org.verapdf.as.io.ASMemoryInStream;
-import org.verapdf.exceptions.VeraPDFParserException;
+import org.verapdf.exceptions.ResourceLimitExceededException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -398,7 +398,7 @@ public class SeekableInputStreamParametricTest {
 
     @Test
     public void shouldThrowExceptionsAboutExceedingMaxSizeWhenExeedingMaxSize() {
-        assertThrows(VeraPDFParserException.class, () -> SeekableInputStream.getSeekableStream(input, size - 1));
+        assertThrows(ResourceLimitExceededException.class, () -> SeekableInputStream.getSeekableStream(input, size - 1));
     }
 
     @Test
