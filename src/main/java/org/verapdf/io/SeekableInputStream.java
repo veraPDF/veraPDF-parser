@@ -41,6 +41,32 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
     private static final int MAX_BUFFER_SIZE = 10240;
 
     /**
+     * Optional hard cap, in bytes, on the size of a single stream that is spilled to a temporary file
+     * ({@code null} means no cap). It guards against a small input whose decoded content expands without
+     * bound (a "decompression bomb"): a stream that exceeds the cap is rejected with a
+     * {@link org.verapdf.exceptions.VeraPDFParserException} instead of being written out in full. The
+     * limit is wired into {@link #getSeekableStream(InputStream)}, which is the path taken by decoded
+     * object streams and other non-seekable input. Default {@code null}, so behaviour is unchanged.
+     */
+    private static volatile Integer maxStreamSize = null;
+
+    /**
+     * Sets the hard cap in bytes for a single spilled stream. A non-positive value removes the cap.
+     *
+     * @param bytes maximum stream size in bytes, or a non-positive value to remove the cap
+     */
+    public static void setMaxStreamSize(int bytes) {
+        maxStreamSize = bytes > 0 ? bytes : null;
+    }
+
+    /**
+     * @return the current spilled-stream cap in bytes, or {@code null} if no cap is set
+     */
+    public static Integer getMaxStreamSize() {
+        return maxStreamSize;
+    }
+
+    /**
      * Goes to a particular byte in stream.
      *
      * @param offset is offset of a byte to go to.
@@ -170,7 +196,7 @@ public abstract class SeekableInputStream extends ASInputStream implements BaseP
             seekableStream.seekFromEnd(0);
             return result;
         }
-        return getSeekableStream(stream, null);
+        return getSeekableStream(stream, maxStreamSize);
     }
 
     public static SeekableInputStream getSeekableStream(InputStream stream, Integer maxStreamSize) throws IOException {
