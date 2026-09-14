@@ -30,6 +30,7 @@ import org.verapdf.io.IReader;
 import org.verapdf.io.InternalInputStream;
 import org.verapdf.io.Reader;
 import org.verapdf.io.SeekableInputStream;
+import org.verapdf.io.TempFileHandler;
 import org.verapdf.pd.PDDocument;
 import org.verapdf.pd.encryption.StandardSecurityHandler;
 import org.verapdf.tools.resource.ASFileStreamCloser;
@@ -346,7 +347,7 @@ public class COSDocument {
 	public void saveTo(final OutputStream stream) {
 		File temp = null;
 		try {
-			temp = File.createTempFile("tmp_pdf_file", ".pdf");
+			temp = TempFileHandler.createTempFile("tmp_pdf_file", ".pdf");
 			Writer pdfWriter = new Writer(this, temp.getAbsolutePath(),
 					this.getPDFSource().getStreamLength());
 			pdfWriter.writeIncrementalUpdate(changedObjects, addedObjects);
