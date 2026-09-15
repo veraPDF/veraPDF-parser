@@ -113,7 +113,7 @@ public class EncryptionToolsRevision5_6 {
         }
         byte[] k = getSHAHash(256, hashInput);
         if (revision > 5) {
-            int rounds = 0;
+            int rounds = 1;
             while (true) {
                 byte[] sequence = ASBufferedInFilter.concatenate(password, password.length, k, k.length);
                 if (isCheckingOwnerPassword) {
@@ -128,7 +128,7 @@ public class EncryptionToolsRevision5_6 {
                 byte[] e = aes.doFinal(k1);
                 int shaType = getReminderByModulo3(Arrays.copyOf(e, 16));
                 k = getSHAHash(shaType == 0 ? 256 : shaType == 1 ? 384 : 512, e);
-                if (rounds >= 63 && (e[e.length - 1] & 0xFF) <= rounds - 31) {
+                if (rounds >= 64 && (e[e.length - 1] & 0xFF) <= rounds - 32) {
                     break;
                 }
                 rounds++;
