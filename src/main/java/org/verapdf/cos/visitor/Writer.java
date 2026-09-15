@@ -198,22 +198,18 @@ public class Writer implements IVisitor {
 
 	@Override
 	public void visitFromStream(COSStream obj) {
+		try (ASInputStream in = obj.getData()) {
+			if (obj.getFilterFlags() == COSStream.FilterFlags.DECODE ||
+					obj.getFilterFlags() == COSStream.FilterFlags.DECRYPT_AND_DECODE) {
+				//TODO : Decode
+			}
+			try {
+				obj.setIntegerKey(ASAtom.LENGTH, getASInputStreamLength(in));
+			} catch (IOException e) {
+				LOGGER.log(Level.FINE, "Can't calculate length of ASInputStream");
+			}
 
-		ASInputStream in = obj.getData();
-
-		if (obj.getFilterFlags() == COSStream.FilterFlags.DECODE ||
-				obj.getFilterFlags() == COSStream.FilterFlags.DECRYPT_AND_DECODE) {
-			//TODO : Decode
-		}
-		try {
-			obj.setIntegerKey(ASAtom.LENGTH, getASInputStreamLength(in));
-		} catch (IOException e) {
-			LOGGER.log(Level.FINE, "Can't calculate length of ASInputStream");
-		}
-
-		visitFromDictionary(obj);
-
-		try {
+			visitFromDictionary(obj);
 			this.write(EOL);
 			this.write("stream");
 			this.write(EOL);
