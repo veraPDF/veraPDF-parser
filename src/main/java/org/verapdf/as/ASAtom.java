@@ -220,6 +220,7 @@ public class ASAtom implements Comparable<ASAtom> {
     public static final ASAtom DL = new ASAtom("DL");
     public static final ASAtom DM = new ASAtom("Dm");
     public static final ASAtom DOC = new ASAtom("Doc");
+    public static final ASAtom DOCUMENT = new ASAtom("Document");
     public static final ASAtom DOC_CHECKSUM = new ASAtom("DocChecksum");
     public static final ASAtom DOC_MDP = new ASAtom("DocMDP");
     public static final ASAtom DOC_TIME_STAMP = new ASAtom("DocTimeStamp");
