@@ -258,8 +258,12 @@ public class PDDocument {
 
 		Float catalogVersion = getCatalog().getFloatVersion();
 
-		if (catalogVersion != null && (version == null || version < catalogVersion)) {
-			version = catalogVersion;
+		if (catalogVersion != null) {
+			if (version == null || version <= catalogVersion) {
+				version = catalogVersion;
+			} else {
+				LOGGER.log(Level.WARNING, "The value of the Version entry in the Catalog is smaller than the version of the document in the header and is ignored");
+			}
 		}
 		return version;
 	}
