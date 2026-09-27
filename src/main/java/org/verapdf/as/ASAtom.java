@@ -38,6 +38,48 @@ public class ASAtom implements Comparable<ASAtom> {
     private static final Map<String, ASAtom> PREDEFINED_PDF_NAMES = Collections.synchronizedMap(new HashMap<>());
     private static final Map<String, ASAtom> CACHED_PDF_NAMES = Collections.synchronizedMap(new HashMap<>());
 
+    /**
+     * Optional upper bound on the number of dynamically encountered PDF names kept in
+     * {@link #CACHED_PDF_NAMES}. The cache is a process-wide memoization of names that are not one of
+     * the predefined constants; it never evicts, so a stream of documents with many unique names keeps
+     * it growing for the lifetime of the process. A value of {@code -1} (the default) keeps the
+     * historical unbounded behaviour; a non-negative value stops adding new names once the cache holds
+     * that many, in which case {@link #getASAtom(String)} still returns a correct atom, just an
+     * uncached one. Equality of atoms is by value ({@link #equals(Object)}), so an uncached atom
+     * behaves identically to a cached one.
+     */
+    private static volatile int maxCachedNames = -1;
+
+    /**
+     * Sets the upper bound on the number of cached dynamic PDF names. A negative value removes the
+     * bound (the default).
+     *
+     * @param max maximum number of cached dynamic names, or a negative value for no bound
+     */
+    public static void setMaxCachedNames(int max) {
+        maxCachedNames = max;
+    }
+
+    /**
+     * @return the current upper bound on cached dynamic names, or {@code -1} if unbounded
+     */
+    public static int getMaxCachedNames() {
+        return maxCachedNames;
+    }
+
+    /**
+     * Clears the cache of dynamically encountered PDF names. The predefined name constants are not
+     * affected. A long-running process that validates untrusted documents can call this between jobs to
+     * release names accumulated from earlier documents.
+     */
+    public static void clearCache() {
+        CACHED_PDF_NAMES.clear();
+    }
+
+    private static boolean isCacheBelowLimit() {
+        return maxCachedNames < 0 || CACHED_PDF_NAMES.size() < maxCachedNames;
+    }
+
     // 3
     public static final ASAtom key3D = new ASAtom("3D");
     public static final ASAtom key3DD = new ASAtom("3DD");
@@ -696,7 +738,7 @@ public class ASAtom implements Comparable<ASAtom> {
         if (predefinedValue) {
             PREDEFINED_PDF_NAMES.put(value, this);
         } else {
-            if (!CACHED_PDF_NAMES.containsKey(value)) {
+            if (isCacheBelowLimit() && !CACHED_PDF_NAMES.containsKey(value)) {
                 CACHED_PDF_NAMES.put(value, this);
             }
         }
@@ -719,9 +761,8 @@ public class ASAtom implements Comparable<ASAtom> {
         if (CACHED_PDF_NAMES.containsKey(value)) {
             return CACHED_PDF_NAMES.get(value);
         }
-        ASAtom result = new ASAtom(value, false);
-        CACHED_PDF_NAMES.put(value, result);
-        return result;
+        // The constructor is the single caching point; it honours the configured cache limit.
+        return new ASAtom(value, false);
     }
 
     /**
