@@ -38,9 +38,12 @@ import java.util.logging.Logger;
 public class PDType4Function extends PDFunction {
 
     private static final Logger LOGGER = Logger.getLogger(PDType4Function.class.getCanonicalName());
+
+    private static final int MAX_PROCEDURE_DEPTH = 64;
     private List<COSObject> operators;
     private List<COSObject> modifiedOperators;
     private FunctionParser parser;
+    private boolean operatorsWithProceduresFailed;
 
     protected PDType4Function(COSObject obj) {
         super(obj);
@@ -83,9 +86,13 @@ public class PDType4Function extends PDFunction {
     public void setOperators(List<COSObject> operators) {
         this.operators = operators;
         this.modifiedOperators = null;
+        this.operatorsWithProceduresFailed = false;
     }
 
-    private List<COSObject> getOperatorsWithProcedures() {
+    private List<COSObject> getOperatorsWithProcedures() throws PostScriptException {
+        if (operatorsWithProceduresFailed) {
+            throw new PostScriptException("Type 4 function operators could not be parsed");
+        }
         if (modifiedOperators == null) {
             modifiedOperators = new ArrayList<>();
             if (getOperators().isEmpty()) {
@@ -95,22 +102,33 @@ public class PDType4Function extends PDFunction {
             if (PSOperatorsConstants.LEFT_CURLY_BRACE.equals(getOperators().get(0).getString())) {
                 ops.next();
             }
-            while (ops.hasNext()) {
-                COSObject obj = ops.next();
-                if (obj != null) {
-                    if (obj instanceof PSOperator &&
-                            PSOperatorsConstants.LEFT_CURLY_BRACE.equals(((PSOperator) obj).getOperator())) {
-                        recursiveProcedure(ops, modifiedOperators);
-                    } else {
-                        modifiedOperators.add(obj);
+            List<COSObject> parsedOperators = new ArrayList<>();
+            try {
+                while (ops.hasNext()) {
+                    COSObject obj = ops.next();
+                    if (obj != null) {
+                        if (obj instanceof PSOperator &&
+                                PSOperatorsConstants.LEFT_CURLY_BRACE.equals(((PSOperator) obj).getOperator())) {
+                            recursiveProcedure(ops, parsedOperators, 0);
+                        } else {
+                            parsedOperators.add(obj);
+                        }
                     }
                 }
+            } catch (PostScriptException e) {
+                operatorsWithProceduresFailed = true;
+                throw e;
             }
+            modifiedOperators = parsedOperators;
         }
         return modifiedOperators;
     }
 
-    private void recursiveProcedure(Iterator<COSObject> ops, List<COSObject> modifiedOperators) {
+    private void recursiveProcedure(Iterator<COSObject> ops, List<COSObject> modifiedOperators, int depth)
+            throws PostScriptException {
+        if (depth >= MAX_PROCEDURE_DEPTH) {
+            throw new PostScriptException("Type 4 function exceeded procedure recursion depth " + MAX_PROCEDURE_DEPTH);
+        }
         List<COSObject> proc = new ArrayList<>();
         while (ops.hasNext()) {
             COSObject obj = ops.next();
@@ -118,7 +136,7 @@ public class PDType4Function extends PDFunction {
                 break;
             }
             if (obj instanceof PSOperator && PSOperatorsConstants.LEFT_CURLY_BRACE.equals(((PSOperator) obj).getOperator())) {
-                recursiveProcedure(ops, proc);
+                recursiveProcedure(ops, proc, depth + 1);
             }
             proc.add(obj);
         }
