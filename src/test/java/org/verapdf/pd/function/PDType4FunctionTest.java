@@ -21,16 +21,23 @@
 package org.verapdf.pd.function;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.verapdf.cos.COSName;
 import org.verapdf.cos.COSObject;
+import org.verapdf.parser.postscript.PSOperator;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.verapdf.pd.function.PDFunctionTestHelper.EPSILON;
+import static org.verapdf.pd.function.PSOperatorsConstants.LEFT_CURLY_BRACE;
+import static org.verapdf.pd.function.PSOperatorsConstants.RIGHT_CURLY_BRACE;
 
 public class PDType4FunctionTest {
     final PDType4Function func = new PDType4Function(new COSObject());
@@ -66,6 +73,21 @@ public class PDType4FunctionTest {
                               @ConvertWith(PDFunctionTestHelper.ListOfCOSObjectsConverter.class) List<COSObject> operands) {
         func.setOperators(operators);
         Assertions.assertNull(func.getResult(operands));
+    }
+
+    @Test
+    public void testGetResultWithExcessiveProcedureNesting() {
+        List<COSObject> operators = new ArrayList<>();
+        for (int i = 0; i < 8001; i++) {
+            operators.add(new PSOperator(COSName.construct(LEFT_CURLY_BRACE)));
+        }
+        for (int i = 0; i < 8001; i++) {
+            operators.add(new PSOperator(COSName.construct(RIGHT_CURLY_BRACE)));
+        }
+
+        func.setOperators(operators);
+        Assertions.assertNull(func.getResult(Collections.emptyList()));
+        Assertions.assertNull(func.getResult(Collections.emptyList()));
     }
 
     private static Stream<Arguments> provideInvalidParameters() {
