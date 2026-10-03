@@ -34,6 +34,8 @@ import java.nio.charset.StandardCharsets;
  */
 class CFFFileBaseParser {
 
+    private static final long MAX_INDEX_DATA_SIZE = 100_000_000;
+
     protected SeekableInputStream source;
     protected CFFIndex definedNames;
 
@@ -73,15 +75,22 @@ class CFFFileBaseParser {
             return new CFFIndex(0, 0, new int[0], new byte[0]);
         }
         int offSize = readCard8();
-        if (offSize == 0) {
-            throw new IOException("Bad offset size");
+        if (offSize < 1 || offSize > 4) {
+            throw new IOException("Bad offset size " + offSize);
         }
         int[] offset = new int[count + 1];
         for (int i = 0; i < count + 1; ++i) {
             offset[i] = (int) readOffset(offSize);
         }
         if (offset[count] < 1) {
-            throw new IOException("Wrong index data offset");
+            throw new IOException("Wrong index data offset " + offset[count]);
+        }
+        long dataSize = offset[count] - 1L;
+        if (dataSize > MAX_INDEX_DATA_SIZE) {
+            throw new IOException("Index data size exceeds maximum allowed size");
+        }
+        if (dataSize > source.getStreamLength() - source.getOffset()) {
+            throw new IOException("Index data size exceeds remaining stream length");
         }
         byte[] data = new byte[offset[count] - 1];
         if (data.length != 0 && source.read(data, data.length) != data.length) {
