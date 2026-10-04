@@ -26,7 +26,6 @@ import org.verapdf.as.io.ASMemoryInStream;
 import org.verapdf.cos.COSKey;
 import org.verapdf.parser.SeekableBaseParser;
 import org.verapdf.parser.Token;
-import org.verapdf.pd.font.CFFNumber;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,7 +54,7 @@ class Type1PrivateParser extends SeekableBaseParser {
     private final double[] fontMatrix;
     private final boolean isDefaultFontMatrix;
     private boolean charStringsFound;
-    private Map<Integer, CFFNumber> subrWidths;
+    private Type1Subroutines subroutines;
 
     private final COSKey key;
 
@@ -129,10 +128,8 @@ class Type1PrivateParser extends SeekableBaseParser {
                         break;
                     case Type1StringConstants.SUBRS:
                         nextToken();
-                        if (subrWidths == null) {
-                            subrWidths = new HashMap<>();
-                        }
                         int amountOfSubrs = (int) this.getToken().integer;
+                        subroutines = new Type1Subroutines(this.getSource());
                         nextToken();    // reading "array"
                         for (int i = 0; i < amountOfSubrs; ++i) {
                             nextToken();    // reading "dup"
@@ -147,14 +144,7 @@ class Type1PrivateParser extends SeekableBaseParser {
                             this.skipSpaces();
                             long beginOffset = this.getSource().getOffset();
                             this.getSource().skip(toSkip);
-                            try (ASInputStream chunk = this.getSource().getStream(beginOffset, toSkip);
-                                 ASInputStream eexecDecode = new EexecFilterDecode(
-                                         chunk, true, this.lenIV); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
-                                Type1CharStringParser parser = new Type1CharStringParser(decodedCharString, subrWidths);
-                                if (parser.getWidth() != null) {
-                                    subrWidths.put((int) number, parser.getWidth());
-                                }
-                            }
+                            subroutines.addSubroutine((int) number, beginOffset, toSkip, this.lenIV);
                             this.nextToken();   // reading "NP"
                             // some fonts have 'noaccess put' instead of 'NP'. Supporting this case as well
                             if (this.getToken().getValue().equals(Type1StringConstants.NOACCESS)) {
@@ -196,7 +186,7 @@ class Type1PrivateParser extends SeekableBaseParser {
         try (ASInputStream chunk = this.getSource().getStream(beginOffset, charstringLength);
              ASInputStream eexecDecode = new EexecFilterDecode(
                      chunk, true, this.lenIV); ASInputStream decodedCharString = new ASMemoryInStream(eexecDecode)) {
-            Type1CharStringParser parser = new Type1CharStringParser(decodedCharString, subrWidths);
+            Type1CharStringParser parser = new Type1CharStringParser(decodedCharString, subroutines);
             if (parser.getWidth() != null) {
                 if (!isDefaultFontMatrix) {
                     glyphWidths.put(glyphName, applyFontMatrix(parser.getWidth().getReal()));
