@@ -25,7 +25,6 @@ import org.verapdf.pd.font.CFFNumber;
 import org.verapdf.pd.font.cff.CFFIndex;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -43,7 +42,7 @@ public abstract class BaseCharStringParser {
     protected final CFFIndex localSubrs;
     protected final int bias;
     protected final int gBias;
-    protected final Map<Integer, CFFNumber> subrWidths;
+    protected final Type1Subroutines subroutines;
 
     /**
      * Constructor that calls method parse(), so width is extracted right after
@@ -56,8 +55,8 @@ public abstract class BaseCharStringParser {
         this(stream, null, 0, null, 0);
     }
 
-    protected BaseCharStringParser(ASInputStream stream, Map<Integer, CFFNumber> subrWidths) throws IOException {
-        this(stream, null, 0, null, 0, subrWidths);
+    protected BaseCharStringParser(ASInputStream stream, Type1Subroutines subroutines) throws IOException {
+        this(stream, null, 0, null, 0, subroutines);
     }
 
     /**
@@ -77,8 +76,9 @@ public abstract class BaseCharStringParser {
         this(stream, localSubrs, bias, globalSubrs, gBias, null);
     }
 
-    protected BaseCharStringParser(ASInputStream stream, CFFIndex localSubrs,
-                                   int bias, CFFIndex globalSubrs, int gBias, Map<Integer, CFFNumber> subrWidths) throws IOException {
+    private BaseCharStringParser(ASInputStream stream, CFFIndex localSubrs, int bias,
+                                 CFFIndex globalSubrs, int gBias, Type1Subroutines subroutines)
+            throws IOException {
         this.streams = new Stack<>();
         this.streams.push(stream);
         this.stack = new Stack<>();
@@ -87,7 +87,7 @@ public abstract class BaseCharStringParser {
         this.localSubrs = localSubrs == null ? CFFIndex.getEmptyIndex() : localSubrs;
         this.bias = bias;
         this.gBias = gBias;
-        this.subrWidths = subrWidths;
+        this.subroutines = subroutines;
         parse();
     }
 

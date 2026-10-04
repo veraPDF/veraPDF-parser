@@ -24,7 +24,6 @@ import org.verapdf.as.io.ASInputStream;
 import org.verapdf.pd.font.CFFNumber;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * This class parses charstring data in font Type 1 files after it was
@@ -41,8 +40,9 @@ public class Type1CharStringParser extends BaseCharStringParser {
         super(decodedCharString);
     }
 
-    public Type1CharStringParser(ASInputStream decodedCharString, Map<Integer, CFFNumber> subrWidths) throws IOException {
-        super(decodedCharString, subrWidths);
+    Type1CharStringParser(ASInputStream decodedCharString, Type1Subroutines subroutines)
+            throws IOException {
+        super(decodedCharString, subroutines);
     }
 
     /**
@@ -83,9 +83,9 @@ public class Type1CharStringParser extends BaseCharStringParser {
                     return true;
                 case 10:    // callsubr
                     if (!this.stack.empty()) {
-                        CFFNumber number = this.stack.pop();
-                        if (subrWidths != null) {
-                            CFFNumber width = subrWidths.get((int) number.getInteger());
+                        int subrNumber = (int) this.stack.pop().getInteger();
+                        if (subroutines != null) {
+                            CFFNumber width = subroutines.getWidth(subrNumber);
                             if (width != null) {
                                 this.setWidth(width);
                                 return true;
