@@ -758,8 +758,10 @@ public class ASAtom implements Comparable<ASAtom> {
         if (PREDEFINED_PDF_NAMES.containsKey(value)) {
             return PREDEFINED_PDF_NAMES.get(value);
         }
-        if (CACHED_PDF_NAMES.containsKey(value)) {
-            return CACHED_PDF_NAMES.get(value);
+        // A single lookup: clearCache() may run on another thread between a containsKey and a get.
+        ASAtom cached = CACHED_PDF_NAMES.get(value);
+        if (cached != null) {
+            return cached;
         }
         // The constructor is the single caching point; it honours the configured cache limit.
         return new ASAtom(value, false);
