@@ -27,6 +27,8 @@ import org.verapdf.cos.COSObject;
 import org.verapdf.exceptions.LoopedException;
 import org.verapdf.pd.actions.PDAction;
 import org.verapdf.pd.actions.PDAnnotationAdditionalActions;
+import org.verapdf.pd.structure.PDNumberTreeNode;
+import org.verapdf.pd.structure.PDStructTreeRoot;
 import org.verapdf.tools.StaticResources;
 import org.verapdf.tools.TypeConverter;
 
@@ -131,6 +133,17 @@ public class PDAnnotation extends PDObject {
 		}
 		return null;
 	}
+
+    public COSObject getStructElement() {
+        PDStructTreeRoot structTreeRoot = StaticResources.getDocument().getStructTreeRoot();
+        Long structParent = this.getStructParent();
+        if (structTreeRoot != null && structParent != null) {
+            PDNumberTreeNode parentTreeRoot = structTreeRoot.getParentTree();
+            return parentTreeRoot == null ? null : parentTreeRoot.getObject(structParent);
+        }
+
+        return null;
+    }
 
 	public double[] getRect() {
 		return TypeConverter.getRealArray(getKey(ASAtom.RECT), 4, "Rect");
