@@ -145,6 +145,17 @@ public class PDAnnotation extends PDObject {
         return null;
     }
 
+    public String getAlt() {
+        COSObject structureElement = getStructElement();
+        if (structureElement != null) {
+            COSObject baseAlt = structureElement.getKey(ASAtom.ALT);
+            if (baseAlt != null && baseAlt.getType() == COSObjType.COS_STRING) {
+                return baseAlt.getString();
+            }
+        }
+        return null;
+    }
+
 	public double[] getRect() {
 		return TypeConverter.getRealArray(getKey(ASAtom.RECT), 4, "Rect");
 	}
