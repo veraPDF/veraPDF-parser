@@ -97,7 +97,7 @@ public class PDStructElem extends PDStructTreeNode {
 
 	public PDStructElem getParent() {
 		COSObject parentObject = getKey(ASAtom.P);
-		if (parentObject != null) {
+		if (parentObject != null && !parentObject.empty()) {
 			return new PDStructElem(parentObject);
 		}
 		return null;
