@@ -365,6 +365,19 @@ public class COSString extends COSDirect {
         this.hexCount = hexCount;
     }
 
+    public static int compareTo(COSString first, COSString second) {
+        byte[] firstBytes = first.get();
+        byte[] secondBytes = second.get();
+        int commonLength = Math.min(firstBytes.length, secondBytes.length);
+        for (int i = 0; i < commonLength; i++) {
+            int comparison = Integer.compare(Byte.toUnsignedInt(firstBytes[i]), Byte.toUnsignedInt(secondBytes[i]));
+            if (comparison != 0) {
+                return comparison;
+            }
+        }
+        return Integer.compare(firstBytes.length, secondBytes.length);
+    }
+
     @Override
     public boolean isEquivalentTo(COSBase o) {
         if (this == o) return true;

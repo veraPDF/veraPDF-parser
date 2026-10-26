@@ -23,6 +23,7 @@ package org.verapdf.pd;
 import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSString;
 import org.verapdf.tools.StaticResources;
 
 import java.util.logging.Level;
@@ -48,7 +49,7 @@ public class PDDestination extends PDObject {
 			}
 			PDNameTreeNode dests = namesDictionary.getDests();
 			if (dests != null) {
-				COSObject dest = dests.getObject(destination.getString());
+				COSObject dest = dests.getObject((COSString) destination.getDirectBase());
 				if (dest == null) {
 					LOGGER.log(Level.WARNING, "Named destination " + destination.getString() +
 							" not found in the Dests name tree in the Names dictionary");
