@@ -35,7 +35,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 
 	private COSString[] limitsArray = null;
 	private List<PDNameTreeNode> kids = null;
-	private Map<String, COSObject> names = null;
+	private Map<COSString, COSObject> names = null;
 
 	private PDNameTreeNode(COSObject obj, Set<COSKey> parents) {
 		super(obj);
@@ -78,23 +78,26 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 		return Collections.emptyList();
 	}
 
-	public Map<String, COSObject> getNames() {
+	public Map<COSString, COSObject> getNames() {
 		if (this.names == null) {
 			this.names = parseNames();
 		}
 		return Collections.unmodifiableMap(this.names);
 	}
 
-	private Map<String, COSObject> parseNames() {
+	private Map<COSString, COSObject> parseNames() {
 		COSObject names = getKey(ASAtom.NAMES);
 		if (names != null && names.getType() == COSObjType.COS_ARRAY) {
-			Map<String, COSObject> res = new LinkedHashMap<>();
+			// COSString.equals also compares hex flags, so name keys are matched by their bytes
+			Map<COSString, COSObject> res = new TreeMap<>(COSString::compareTo);
 			for (int i = 0; i < names.size(); i += 2) {
 				COSObject keyObj = names.at(i);
-				String key = keyObj == null ? null : keyObj.getString();
-				if (key != null) {
-					COSObject value = names.at(i + 1);
-					res.put(key, value);
+				if (keyObj.getType() == COSObjType.COS_STRING) {
+					COSString key = (COSString) keyObj.getDirectBase();
+					if (key != null) {
+						COSObject value = names.at(i + 1);
+						res.put(key, value);
+					}
 				}
 			}
 			return res;
@@ -131,8 +134,8 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 
 		if (this.knownKey(ASAtom.NAMES)) {
 			// just get object from names or check if it is not in names
-			Map<String, COSObject> names = getNames();
-			return names == null ? null : names.get(key.getString());
+			Map<COSString, COSObject> names = getNames();
+			return names == null ? null : names.get(key);
 		}
 
 		if (this.knownKey(ASAtom.KIDS)) {
