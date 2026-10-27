@@ -89,7 +89,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 		COSObject names = getKey(ASAtom.NAMES);
 		if (names != null && names.getType() == COSObjType.COS_ARRAY) {
 			// COSString.equals also compares hex flags, so name keys are matched by their bytes
-			Map<COSString, COSObject> res = new TreeMap<>(COSString::compareTo);
+			Map<COSString, COSObject> res = new TreeMap<>(COSString::compare);
 			for (int i = 0; i < names.size(); i += 2) {
 				COSObject keyObj = names.at(i);
 				if (keyObj.getType() == COSObjType.COS_STRING) {
@@ -127,7 +127,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 
 	public COSObject getObject(COSString key) {
 		COSString[] limits = this.getLimitsArray();
-		if (limits.length == 2 && (COSString.compareTo(key, limits[0]) < 0 || COSString.compareTo(key, limits[1]) > 0)) {
+		if (limits.length == 2 && (COSString.compare(key, limits[0]) < 0 || COSString.compare(key, limits[1]) > 0)) {
 			// string not in the limits
 			return null;
 		}
