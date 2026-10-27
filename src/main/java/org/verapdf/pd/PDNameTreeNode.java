@@ -21,10 +21,7 @@
 package org.verapdf.pd;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSKey;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
 import org.verapdf.exceptions.LoopedException;
 
 import java.util.*;
@@ -36,9 +33,9 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 
 	private final Set<COSKey> parents;
 
-	private String[] limitsArray = null;
+	private COSString[] limitsArray = null;
 	private List<PDNameTreeNode> kids = null;
-	private Map<String, COSObject> names = null;
+	private Map<COSString, COSObject> names = null;
 
 	private PDNameTreeNode(COSObject obj, Set<COSKey> parents) {
 		super(obj);
@@ -81,23 +78,26 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 		return Collections.emptyList();
 	}
 
-	public Map<String, COSObject> getNames() {
+	public Map<COSString, COSObject> getNames() {
 		if (this.names == null) {
 			this.names = parseNames();
 		}
 		return Collections.unmodifiableMap(this.names);
 	}
 
-	private Map<String, COSObject> parseNames() {
+	private Map<COSString, COSObject> parseNames() {
 		COSObject names = getKey(ASAtom.NAMES);
 		if (names != null && names.getType() == COSObjType.COS_ARRAY) {
-			Map<String, COSObject> res = new LinkedHashMap<>();
+			// COSString.equals also compares hex flags, so name keys are matched by their bytes
+			Map<COSString, COSObject> res = new TreeMap<>(COSString::compare);
 			for (int i = 0; i < names.size(); i += 2) {
 				COSObject keyObj = names.at(i);
-				String key = keyObj == null ? null : keyObj.getString();
-				if (key != null) {
-					COSObject value = names.at(i + 1);
-					res.put(key, value);
+				if (keyObj.getType() == COSObjType.COS_STRING) {
+					COSString key = (COSString) keyObj.getDirectBase();
+					if (key != null) {
+						COSObject value = names.at(i + 1);
+						res.put(key, value);
+					}
 				}
 			}
 			return res;
@@ -105,36 +105,36 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 		return Collections.emptyMap();
 	}
 
-	public String[] getLimitsArray() {
+	public COSString[] getLimitsArray() {
 		if (limitsArray == null) {
 			limitsArray = parseLimitsArray();
 		}
 		return limitsArray;
 	}
 
-	public String[] parseLimitsArray() {
+	public COSString[] parseLimitsArray() {
 		COSObject limits = this.getKey(ASAtom.LIMITS);
 		if (limits != null && !limits.empty() && limits.getType() == COSObjType.COS_ARRAY
 				&& limits.size() >= 2 && limits.at(0).getType() == COSObjType.COS_STRING
 				&& limits.at(1).getType() == COSObjType.COS_STRING) {
-			String[] res = new String[2];
-			res[0] = limits.at(0).getString();
-			res[1] = limits.at(1).getString();
+			COSString[] res = new COSString[2];
+			res[0] = (COSString) limits.at(0).getDirectBase();
+			res[1] = (COSString) limits.at(1).getDirectBase();
 			return res;
 		}
-		return new String[0];
+		return new COSString[0];
 	}
 
-	public COSObject getObject(String key) {
-		String[] limits = this.getLimitsArray();
-		if (limits.length == 2 && (key.compareTo(limits[0]) < 0 || key.compareTo(limits[1]) > 0)) {
+	public COSObject getObject(COSString key) {
+		COSString[] limits = this.getLimitsArray();
+		if (limits.length == 2 && (COSString.compare(key, limits[0]) < 0 || COSString.compare(key, limits[1]) > 0)) {
 			// string not in the limits
 			return null;
 		}
 
 		if (this.knownKey(ASAtom.NAMES)) {
 			// just get object from names or check if it is not in names
-			Map<String, COSObject> names = getNames();
+			Map<COSString, COSObject> names = getNames();
 			return names == null ? null : names.get(key);
 		}
 
@@ -175,7 +175,7 @@ public class PDNameTreeNode extends PDObject implements Iterable<COSObject> {
 		return i;
 	}
 	
-	public boolean containsKey(String key) {
+	public boolean containsKey(COSString key) {
 		return getObject(key) != null;
 	}
 	

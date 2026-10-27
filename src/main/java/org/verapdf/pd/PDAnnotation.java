@@ -24,6 +24,7 @@ import org.verapdf.as.ASAtom;
 import org.verapdf.cos.COSKey;
 import org.verapdf.cos.COSObjType;
 import org.verapdf.cos.COSObject;
+import org.verapdf.cos.COSString;
 import org.verapdf.exceptions.LoopedException;
 import org.verapdf.pd.actions.PDAction;
 import org.verapdf.pd.actions.PDAnnotationAdditionalActions;
@@ -325,7 +326,7 @@ public class PDAnnotation extends PDObject {
             }
             PDNameTreeNode dests = namesDictionary.getDests();
             if (dests != null) {
-                destination = dests.getObject(destination.getString());
+                destination = dests.getObject((COSString) destination.getDirectBase());
                 if (destination == null) {
                     return null;
                 }
