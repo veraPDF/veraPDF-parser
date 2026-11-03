@@ -24,6 +24,7 @@ import org.verapdf.cos.COSDictionary;
 import org.verapdf.pd.font.truetype.AdobeGlyphList;
 import org.verapdf.pd.font.type1.SymbolSet;
 import org.verapdf.pd.font.type1.ZapfDingbats;
+import org.verapdf.pd.font.type3.PDType3Font;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -90,10 +91,13 @@ public abstract class PDSimpleFont extends PDFont {
                 }
                 LOGGER.log(Level.FINE, "Cannot find glyph " + glyphName + " in Adobe Glyph List, Zapf Dingbats, or as uni/u name.");
             }
-
-            return null;
+        } else {
+            LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code " + code + " in font " + this.getName());
         }
-        LOGGER.log(Level.FINE, "Cannot find encoding for glyph with code " + code + " in font " + this.getName());
+
+        if (!isStrict && this instanceof PDType3Font && code >= 0x20 && code <= 0x7E) {
+            return Character.toString((char) code);
+        }
         return null;
     }
 }
