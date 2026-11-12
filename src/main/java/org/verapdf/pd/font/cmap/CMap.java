@@ -150,9 +150,19 @@ public class CMap {
                 LOGGER.log(Level.WARNING, "CMap " + this.name + " has invalid codespace range.");
             }
             if (shortestMatchingCodeSpaceLength == Integer.MAX_VALUE && !codeSpaces.isEmpty()) {
-                byte[] tmp = new byte[previousShortestMatchingCodeSpaceLength - i - 1];
-                stream.read(tmp);
-                System.arraycopy(tmp, 0, charCode, 0, tmp.length);      // No described partial matching, reading necessary amount of bytes and returning 0
+                int bytesToSkip = previousShortestMatchingCodeSpaceLength - i - 1;
+                if (previousShortestMatchingCodeSpaceLength != Integer.MAX_VALUE && bytesToSkip > 0) {
+                    while (bytesToSkip > 0) {
+                        long skipped = stream.skip(bytesToSkip);
+                        if (skipped == 0) {
+                            if (stream.read() == -1) {
+                                break;
+                            }
+                            skipped = 1;
+                        }
+                        bytesToSkip -= (int) skipped;
+                    }
+                }
                 return 0;
             }
             previousShortestMatchingCodeSpaceLength = shortestMatchingCodeSpaceLength;
@@ -171,7 +181,9 @@ public class CMap {
             return;
         }
         this.cidMappings.addAll(another.cidMappings);
-        this.codeSpaces.addAll(another.codeSpaces);
+        for (CodeSpace codeSpace : another.codeSpaces) {
+            addCodeSpace(codeSpace);
+        }
         this.notDefMappings.addAll(another.notDefMappings);
         this.toUnicode.putAll(another.toUnicode);
     }
@@ -249,6 +261,15 @@ public class CMap {
      */
     void setCodeSpaces(List<CodeSpace> codeSpaces) {
         this.codeSpaces = codeSpaces;
+        this.shortestCodeSpaceLength = Integer.MAX_VALUE;
+        for (CodeSpace codeSpace : codeSpaces) {
+            this.shortestCodeSpaceLength = Math.min(this.shortestCodeSpaceLength, codeSpace.getLength());
+        }
+    }
+
+    void addCodeSpace(CodeSpace codeSpace) {
+        this.codeSpaces.add(codeSpace);
+        this.shortestCodeSpaceLength = Math.min(this.shortestCodeSpaceLength, codeSpace.getLength());
     }
 
     /**

@@ -28,6 +28,7 @@ import org.verapdf.parser.postscript.PostScriptException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,5 +117,24 @@ public class CMapTest {
             System.out.println("PostScript parsing exception :");
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testUseCMapInProgramPreservesCodeSpaceLength() throws IOException, PostScriptException {
+        String program = "begincmap\n"
+                + "/H usecmap\n"
+                + "1 begincodespacerange\n"
+                + "<0000> <FFFF>\n"
+                + "endcodespacerange\n"
+                + "endcmap\n";
+        CMapParser parser = new CMapParser(new ASMemoryInStream(program.getBytes(StandardCharsets.US_ASCII)));
+        parser.parse();
+
+        CMap cMap = parser.getCMap();
+        assertEquals(2, cMap.shortestCodeSpaceLength);
+
+        ASMemoryInStream stream = new ASMemoryInStream(new byte[] {0x00, 0x21, 0x21});
+        assertEquals(0, cMap.getCodeFromStream(stream));
+        assertEquals(1, stream.available());
     }
 }
