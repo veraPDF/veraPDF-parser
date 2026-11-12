@@ -66,8 +66,8 @@ class CFFFontBaseParser extends CFFFileBaseParser {
     protected CharStringsWidths widths;
 
     //Private DICT
-    protected int defaultWidthX;
-    protected int nominalWidthX;
+    protected float defaultWidthX;
+    protected float nominalWidthX;
 
     //Subrs
     protected long subrsOffset = -1;
@@ -193,8 +193,7 @@ class CFFFontBaseParser extends CFFFileBaseParser {
                 switch (next) {
                     case 20:    // defaultWidthX
                         if (!this.stack.isEmpty()) {
-                            this.defaultWidthX = (int)
-                                    this.stack.get(stack.size() - 1).getInteger();
+                            this.defaultWidthX = this.stack.get(stack.size() - 1).getReal();
                             this.stack.clear();
                         } else {
                             LOGGER.log(Level.FINE, "Empty arguments stack for defaultWidthX operator");
@@ -202,8 +201,7 @@ class CFFFontBaseParser extends CFFFileBaseParser {
                         break;
                     case 21:    // nominalWidthX
                         if (!this.stack.isEmpty()) {
-                            this.nominalWidthX = (int)
-                                    this.stack.get(stack.size() - 1).getInteger();
+                            this.nominalWidthX = this.stack.get(stack.size() - 1).getReal();
                             this.stack.clear();
                         } else {
                             LOGGER.log(Level.FINE, "Empty arguments stack for nominalWidthX operator");

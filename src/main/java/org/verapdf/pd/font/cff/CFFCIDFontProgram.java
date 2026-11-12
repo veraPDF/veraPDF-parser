@@ -44,8 +44,8 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
     private Map<Integer, Integer> charSet;  // mapping cid -> gid
     private boolean isDefaultCharSet = false;
     private int[] fdSelect;     // array with mapping gid -> font dict
-    private int[] nominalWidths;
-    private int[] defaultWidths;
+    private float[] nominalWidths;
+    private float[] defaultWidths;
     private int supplement;
     private String registry;
     private String ordering;
@@ -183,8 +183,8 @@ public class CFFCIDFontProgram extends CFFFontBaseParser implements FontProgram 
 
     private void readFontDicts() throws IOException {
         CFFIndex fontDictIndex = this.readIndex();
-        this.nominalWidths = new int[fontDictIndex.size()];
-        this.defaultWidths = new int[fontDictIndex.size()];
+        this.nominalWidths = new float[fontDictIndex.size()];
+        this.defaultWidths = new float[fontDictIndex.size()];
         this.fontMatrices = new float[fontDictIndex.size()][6];
         this.bias = new int[fontDictIndex.size()];
         this.localSubrIndexes = new CFFIndex[fontDictIndex.size()];

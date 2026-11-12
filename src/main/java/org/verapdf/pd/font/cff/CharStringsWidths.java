@@ -55,8 +55,8 @@ public class CharStringsWidths {
     
     private final CFFIndex[] localSubrIndexes;
     private final int[] bias;
-    private final int[] defaultWidths;
-    private final int[] nominalWidths;
+    private final float[] defaultWidths;
+    private final float[] nominalWidths;
     private final int[] fdSelect;
 
     private float[] subsetFontWidths;
@@ -80,6 +80,28 @@ public class CharStringsWidths {
     public CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
                              float[][] fontMatrices, CFFIndex[] localSubrIndex, CFFIndex globalSubrs,
                              int[] bias, int[] defaultWidths, int[] nominalWidths, int[] fdSelect) {
+        this(isSubset, charStringType, charStrings, fontMatrices, localSubrIndex, globalSubrs,
+                bias, toFloatArray(defaultWidths), toFloatArray(nominalWidths), fdSelect);
+    }
+
+    /**
+     * Initializes handler with per-font default and nominal widths.
+     *
+     * @param isSubset is true if font is subset. In this case all widths will
+     *                 be parsed during handler initialization.
+     * @param charStringType is type of charstring.
+     * @param charStrings is charstring handler with charstring data.
+     * @param fontMatrices is array of font matrix for each FDArray element.
+     * @param localSubrIndex is array of local subrs for each FDArray element.
+     * @param globalSubrs is array of global subrs for each FDArray element.
+     * @param bias is array of bias values for each FDArray element.
+     * @param defaultWidths is an array of default widths for each FDArray element.
+     * @param nominalWidths is an array of nominal widths for each FDArray element.
+     * @param fdSelect is fd select array as specified in CFF font.
+     */
+    CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
+                      float[][] fontMatrices, CFFIndex[] localSubrIndex, CFFIndex globalSubrs,
+                      int[] bias, float[] defaultWidths, float[] nominalWidths, int[] fdSelect) {
         this.isSubset = isSubset;
         this.charStringType = charStringType;
         this.charStrings = charStrings;
@@ -115,6 +137,27 @@ public class CharStringsWidths {
     public CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
                              float[] fontMatrix, CFFIndex localSubrIndex, CFFIndex globalSubrs,
                              int bias, int defaultWidth, int nominalWidth) {
+        this(isSubset, charStringType, charStrings, makeArray(fontMatrix), makeArray(localSubrIndex),
+                globalSubrs, makeArray(bias), makeArray((float) defaultWidth), makeArray((float) nominalWidth), null);
+    }
+
+    /**
+     * Initializes handler with given values.
+     *
+     * @param isSubset is true if font is subset. In this case all widths will
+     *                 be parsed during handler initialization.
+     * @param charStringType is type of charstring.
+     * @param charStrings is charstring handler with charstring data.
+     * @param fontMatrix is font matrix for this charstrings.
+     * @param localSubrIndex is CFFIndex with local subrs.
+     * @param globalSubrs is CFFIndex with global subrs.
+     * @param bias is bias value that depends on local subrs size.
+     * @param defaultWidth is a default width for this font program.
+     * @param nominalWidth is a nominal width for this font program.
+     */
+    CharStringsWidths(boolean isSubset, int charStringType, CFFCharStringsHandler charStrings,
+                      float[] fontMatrix, CFFIndex localSubrIndex, CFFIndex globalSubrs,
+                      int bias, float defaultWidth, float nominalWidth) {
         this(isSubset, charStringType, charStrings, makeArray(fontMatrix), makeArray(localSubrIndex),
                 globalSubrs, makeArray(bias), makeArray(defaultWidth), makeArray(nominalWidth), null);
     }
@@ -190,11 +233,11 @@ public class CharStringsWidths {
         }
     }
 
-    private int getDefaultWidth(int gid) {
+    private float getDefaultWidth(int gid) {
         return getPredefinedValue(gid, this.defaultWidths);
     }
 
-    private int getNominalWidth(int gid) {
+    private float getNominalWidth(int gid) {
         return getPredefinedValue(gid, this.nominalWidths);
     }
 
@@ -214,11 +257,19 @@ public class CharStringsWidths {
         }
     }
 
-    private int getPredefinedValue(int gid, int[] widthArray) {
+    private float getPredefinedValue(int gid, float[] widthArray) {
         if (this.fdSelect == null) {
             return widthArray[0];
         } else {
             return widthArray[this.fdSelect[gid]];
+        }
+    }
+
+    private int getPredefinedValue(int gid, int[] values) {
+        if (this.fdSelect == null) {
+            return values[0];
+        } else {
+            return values[this.fdSelect[gid]];
         }
     }
 
@@ -256,6 +307,20 @@ public class CharStringsWidths {
     private static int[] makeArray(int num) {
         int[] res = new int[1];
         res[0] = num;
+        return res;
+    }
+
+    private static float[] makeArray(float num) {
+        float[] res = new float[1];
+        res[0] = num;
+        return res;
+    }
+
+    private static float[] toFloatArray(int[] values) {
+        float[] res = new float[values.length];
+        for (int i = 0; i < values.length; ++i) {
+            res[i] = values[i];
+        }
         return res;
     }
 
