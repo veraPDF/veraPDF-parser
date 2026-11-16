@@ -71,7 +71,7 @@ public class COSDocument {
 	private String fileName;
 
 	private long fileSize;
-	private byte postEOFDataSize;
+	private long postEOFDataSize;
 
 	private boolean xrefEOLMarkersComplyPDFA = true;
 	private boolean subsectionHeaderSpaceSeparated = true;
@@ -337,11 +337,11 @@ public class COSDocument {
 		this.fileSize = fileSize;
 	}
 
-	public byte getPostEOFDataSize() {
+	public long getPostEOFDataSize() {
 		return postEOFDataSize;
 	}
 
-	public void setPostEOFDataSize(byte postEOFDataSize) {
+	public void setPostEOFDataSize(long postEOFDataSize) {
 		this.postEOFDataSize = postEOFDataSize;
 	}
 

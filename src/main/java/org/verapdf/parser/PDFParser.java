@@ -377,7 +377,7 @@ public class PDFParser extends SeekableCOSParser {
         byte[] buffer = new byte[lookupSize];
         getSource().read(buffer, lookupSize);
 
-        byte postEOFDataSize = -1;
+        long postEOFDataSize = -1;
 
         byte patternSize = (byte) EOF_MARKER.length;
         byte currentMarkerOffset = (byte) (patternSize - 1);
@@ -388,7 +388,7 @@ public class PDFParser extends SeekableCOSParser {
         while (currentBufferOffset >= 0) {
             if (buffer[currentBufferOffset] == lookupByte) {
                 if (currentMarkerOffset == 0) {
-                    postEOFDataSize = (byte) (lookupSize - currentBufferOffset);
+                    postEOFDataSize = lookupSize - currentBufferOffset;
                     postEOFDataSize -= EOF_MARKER.length;
                     if (postEOFDataSize > 0) {
                         if (buffer[currentBufferOffset + EOF_MARKER.length] == 0x0D) {
