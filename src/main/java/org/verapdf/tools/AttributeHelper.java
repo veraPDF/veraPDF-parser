@@ -21,9 +21,7 @@
 package org.verapdf.tools;
 
 import org.verapdf.as.ASAtom;
-import org.verapdf.cos.COSArray;
-import org.verapdf.cos.COSObjType;
-import org.verapdf.cos.COSObject;
+import org.verapdf.cos.*;
 
 public class AttributeHelper {
 
@@ -140,5 +138,48 @@ public class AttributeHelper {
 			return object.getKey(attributeName);
 		}
 		return COSObject.getEmpty();
+	}
+
+	public static void setAttributeValue(COSObject structElement, ASAtom ownerASAtom, ASAtom attributeName,
+										 COSObject attributeValue) {
+		COSObject aObject = structElement.getKey(ASAtom.A);
+		COSObject owner = COSName.construct(ownerASAtom);
+		if (aObject.getType() == COSObjType.COS_DICT) {
+			COSObject ownerObject = aObject.getKey(ASAtom.O);
+			if (ownerObject != null && ownerASAtom.equals(ownerObject.getName())) {
+				aObject.setKey(attributeName, attributeValue);
+			} else {
+				COSObject previousADictionary = aObject;
+				aObject = COSArray.construct();
+				aObject.add(previousADictionary);
+				addAttributeDictionaryToArray(owner, attributeName, attributeValue, aObject);
+			}
+		} else if (aObject.getType() == COSObjType.COS_ARRAY) {
+			boolean isAttributeSet = false;
+			for (COSObject dictionary : (COSArray) aObject.getDirectBase()) {
+				COSObject ownerObject = dictionary.getKey(ASAtom.O);
+				if (ownerObject != null && ownerASAtom.equals(ownerObject.getName())) {
+					dictionary.setKey(attributeName, attributeValue);
+					isAttributeSet = true;
+					break;
+				}
+			}
+			if (!isAttributeSet) {
+				addAttributeDictionaryToArray(owner, attributeName, attributeValue, aObject);
+			}
+		} else {
+			aObject = COSDictionary.construct();
+			aObject.setKey(ASAtom.O, owner);
+			aObject.setKey(attributeName, attributeValue);
+		}
+		structElement.setKey(ASAtom.A, aObject);
+	}
+
+	private static void addAttributeDictionaryToArray(COSObject owner, ASAtom attributeName, COSObject attributeValue,
+													  COSObject aObject) {
+		COSObject newADictionary = COSDictionary.construct();
+		newADictionary.setKey(ASAtom.O, owner);
+		newADictionary.setKey(attributeName, attributeValue);
+		aObject.add(newADictionary);
 	}
 }
