@@ -144,13 +144,9 @@ public class AttributeHelper {
 										 COSObject attributeValue) {
 		COSObject aObject = structElement.getKey(ASAtom.A);
 		COSObject owner = COSName.construct(ownerASAtom);
-		if (aObject.empty()) {
-			aObject = COSDictionary.construct();
-			aObject.setKey(ASAtom.O, owner);
-			aObject.setKey(attributeName, attributeValue);
-		} else if (aObject.getType() == COSObjType.COS_DICT) {
+		if (aObject.getType() == COSObjType.COS_DICT) {
 			COSObject ownerObject = aObject.getKey(ASAtom.O);
-			if (owner.equals(ownerObject)) {
+			if (ownerObject != null && ownerASAtom.equals(ownerObject.getName())) {
 				aObject.setKey(attributeName, attributeValue);
 			} else {
 				COSObject previousADictionary = aObject;
@@ -161,7 +157,8 @@ public class AttributeHelper {
 		} else if (aObject.getType() == COSObjType.COS_ARRAY) {
 			boolean isAttributeSet = false;
 			for (COSObject dictionary : (COSArray) aObject.getDirectBase()) {
-				if (owner.equals(dictionary.getKey(ASAtom.O))) {
+				COSObject ownerObject = dictionary.getKey(ASAtom.O);
+				if (ownerObject != null && ownerASAtom.equals(ownerObject.getName())) {
 					dictionary.setKey(attributeName, attributeValue);
 					isAttributeSet = true;
 					break;
@@ -170,6 +167,10 @@ public class AttributeHelper {
 			if (!isAttributeSet) {
 				addAttributeDictionaryToArray(owner, attributeName, attributeValue, aObject);
 			}
+		} else {
+			aObject = COSDictionary.construct();
+			aObject.setKey(ASAtom.O, owner);
+			aObject.setKey(attributeName, attributeValue);
 		}
 		structElement.setKey(ASAtom.A, aObject);
 	}
